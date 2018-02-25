@@ -37,11 +37,11 @@
       "color":"blue"
     },
     {
-      "filename":"HalftoneHeartPattern.png",
+      "filename":"VectorSmokeEffect.png",
       "time":"2018 Feb 22",
-      "title":"Halftone Heart Pattern",
-      "content":"半色調配合漸層背景製作的v型logo",
-      "color":"pink"
+      "title":"Vector Smoke Effect",
+      "content":"自由繪路徑配合內插",
+      "color":"red"
     }
   ]
 }
