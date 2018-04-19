@@ -10,38 +10,59 @@
     },
     {
       "filename":"fox.png",
-      "time":"Nov 10",
+      "time":"2018 Jan 25",
       "title":"Fox",
-      "content":"Whitsunday Island, Whitsunday Islands",
+      "content":"交大狐狸幾何化",
       "color":"orange"
     },
     {
       "filename":"The_Great_Wave_off_Kanagawa.png",
-      "time":"Nov 10",
+      "time":"2018 Feb 5",
       "title":"The Great Wave off Kanagawa",
-      "content":"Whitsunday Island, Whitsunday Islands",
+      "content":"神奈川衝浪圖",
       "color":"orange"
     },
     {
       "filename":"vectorpath.png",
-      "time":"Nov 10",
+      "time":"2018 Feb 6",
       "title":"Vector Path",
-      "content":"Whitsunday Island, Whitsunday Islands",
-      "color":"purple"
+      "content":"科技感的向量路徑",
+      "color":"blue"
     },
     {
       "filename":"WireframePatterns.png",
-      "time":"Nov 10",
-      "title":"WireframePatterns",
-      "content":"Whitsunday Island, Whitsunday Islands",
+      "time":"2018 Feb 10",
+      "title":"Wire frame Patterns",
+      "content":"像是宇宙力場的插畫",
       "color":"blue"
     },
     {
       "filename":"VectorSmokeEffect.png",
-      "time":"2018 Feb 22",
+      "time":"2018 Feb 25",
       "title":"Vector Smoke Effect",
       "content":"自由繪路徑配合內插",
       "color":"red"
+    },
+    {
+      "filename":"AbstractGalaxyLogo.png",
+      "time":"2018 Feb 25",
+      "title":"Abstract Galaxy Logo",
+      "content":"自由繪路徑配合內插",
+      "color":"purple"
+    },
+    {
+      "filename":"VectorFingerprintLogo.png",
+      "time":"2018 Feb 25",
+      "title":"Vector Fingerprint Logo",
+      "content":"指紋環形路徑練習",
+      "color":"amber"
+    },
+    {
+      "filename":"car.jpg",
+      "time":"2018 Apr 16",
+      "title":"Car",
+      "content":"積架跑車CG練習",
+      "color":"orange"
     }
   ]
 }
