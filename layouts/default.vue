@@ -16,6 +16,7 @@
             <NuxtLink to="/about" class="text-gray-600 hover:text-gray-900 transition-colors">关于</NuxtLink>
             <NuxtLink to="/gallery" class="text-gray-600 hover:text-gray-900 transition-colors">图片库</NuxtLink>
             <NuxtLink to="/article" class="text-gray-600 hover:text-gray-900 transition-colors">文章</NuxtLink>
+            <NuxtLink to="/admin" class="text-gray-600 hover:text-gray-900 transition-colors">後台管理</NuxtLink>
 
             <!-- Dark Mode Toggle -->
             <button
@@ -93,6 +94,17 @@
                         ]"
                       >
                         文章
+                      </NuxtLink>
+                    </HeadlessMenuItem>
+                    <HeadlessMenuItem v-slot="{ active }">
+                      <NuxtLink
+                        to="/admin"
+                        :class="[
+                          active ? 'bg-gray-100' : '',
+                          'block px-4 py-2 text-sm text-gray-700 rounded-md'
+                        ]"
+                      >
+                        後台管理
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <div class="border-t border-gray-100 my-1"></div>

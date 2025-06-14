@@ -372,10 +372,29 @@ export const useGalleryStore = defineStore('gallery', () => {
   })
 
   const availableEvents = computed(() => {
-    return Object.entries(eventStats.value).map(([name, count]) => ({
-      name,
-      count
-    }))
+    // 計算每個事件的最新時間
+    const eventTimes: Record<string, number> = {}
+
+    photographyWorks.value.forEach(work => {
+      if (work.event && work.event.name) {
+        const eventName = work.event.name
+        const workTime = new Date(work.time).getTime()
+
+        if (!eventTimes[eventName] || workTime > eventTimes[eventName]) {
+          eventTimes[eventName] = workTime
+        }
+      }
+    })
+
+    // 按最新時間排序事件
+    return Object.entries(eventStats.value)
+      .map(([name, count]) => ({
+        name,
+        count,
+        latestTime: eventTimes[name] || 0
+      }))
+      .sort((a, b) => b.latestTime - a.latestTime) // 最新的事件在前
+      .map(({ name, count }) => ({ name, count })) // 移除 latestTime，只保留需要的屬性
   })
 
   const availableYears = computed(() => {

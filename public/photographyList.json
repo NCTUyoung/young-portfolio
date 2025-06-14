@@ -1,9 +1,10 @@
 {
-  "totalNumber": "9",
+  "totalNumber": "14",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
-    "2024新北耶誕城": 4
+    "2024新北耶誕城": 4,
+    "2025 桃園三本柱": 5
   },
   "Img": [
     {
@@ -207,6 +208,113 @@
       "aperture": 3.5,
       "iso": 200,
       "shutterSpeed": 0.03333333333333333
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6516-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6516-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃園三本柱",
+        "description": "2025 桃猿三本柱",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 2500,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6487-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6487-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃園三本柱",
+        "description": "2025 桃猿三本柱",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 2500,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6178-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 桃園三本柱",
+        "description": "2025 桃猿三本柱",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 249,
+      "aperture": 6,
+      "iso": 2000,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6392-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6392-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃園三本柱",
+        "description": "2025 桃猿三本柱",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 81,
+      "aperture": 4.5,
+      "iso": 2000,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6293-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6293-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍",
+        "高速快門"
+      ],
+      "event": {
+        "name": "2025 桃園三本柱",
+        "description": "2025 桃猿三本柱",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 112,
+      "aperture": 4.8,
+      "iso": 3200,
+      "shutterSpeed": 0.0005
     }
   ]
 }
