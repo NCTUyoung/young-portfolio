@@ -1,11 +1,12 @@
 {
-  "totalNumber": "18",
+  "totalNumber": "21",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
     "2024新北耶誕城": 4,
     "2025 桃園三本柱": 5,
-    "攝影社 米倉團拍": 4
+    "攝影社 米倉團拍": 4,
+    "調色測試": 3
   },
   "Img": [
     {
@@ -220,8 +221,8 @@
         "夜拍"
       ],
       "event": {
-        "name": "2025 桃園三本柱",
-        "description": "2025 桃猿三本柱",
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
         "location": "樂天主場"
       },
       "camera": "NIKON CORPORATION",
@@ -241,8 +242,8 @@
         "夜拍"
       ],
       "event": {
-        "name": "2025 桃園三本柱",
-        "description": "2025 桃猿三本柱",
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
         "location": "樂天主場"
       },
       "camera": "NIKON CORPORATION",
@@ -263,8 +264,8 @@
         "後製"
       ],
       "event": {
-        "name": "2025 桃園三本柱",
-        "description": "2025 桃猿三本柱",
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
         "location": "樂天主場"
       },
       "camera": "NIKON CORPORATION",
@@ -284,8 +285,8 @@
         "夜拍"
       ],
       "event": {
-        "name": "2025 桃園三本柱",
-        "description": "2025 桃猿三本柱",
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
         "location": "樂天主場"
       },
       "camera": "NIKON CORPORATION",
@@ -306,8 +307,8 @@
         "高速快門"
       ],
       "event": {
-        "name": "2025 桃園三本柱",
-        "description": "2025 桃猿三本柱",
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
         "location": "樂天主場"
       },
       "camera": "NIKON CORPORATION",
@@ -403,6 +404,73 @@
       "aperture": 2.8,
       "iso": 320,
       "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/調色測試/DSC_3889-編輯-1.jpg",
+      "time": "2025 Jan 29",
+      "title": "DSC_3889-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 40,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.00025
+    },
+    {
+      "filename": "photography/調色測試/DSC_3474-編輯-1.jpg",
+      "time": "2024 Nov 03",
+      "title": "DSC_3474-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 164,
+      "aperture": 5.3,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/調色測試/DSC_3761-1.jpg",
+      "time": "2024 Nov 23",
+      "title": "DSC_3761-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 84,
+      "aperture": 5.6,
+      "iso": 2000,
+      "shutterSpeed": 0.008
     }
   ]
 }
