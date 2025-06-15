@@ -1,0 +1,476 @@
+{
+  "totalNumber": "21",
+  "category": "photography",
+  "eventStats": {
+    "春日街拍": 5,
+    "2024新北耶誕城": 4,
+    "2025 桃園三本柱": 5,
+    "攝影社 米倉團拍": 4,
+    "調色測試": 3
+  },
+  "Img": [
+    {
+      "filename": "photography/春日街拍/DSC_7030-1.jpg",
+      "time": "2025 May 17",
+      "title": "攝影作品 #7030",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "淺景深",
+        "日光",
+        "高速快門"
+      ],
+      "event": {
+        "name": "春日街拍",
+        "description": "城市日常生活紀錄",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 119,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/春日街拍/DSC_7033-1.jpg",
+      "time": "2025 May 17",
+      "title": "攝影作品 #7033",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "高速快門"
+      ],
+      "event": {
+        "name": "春日街拍",
+        "description": "城市日常生活紀錄",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 79,
+      "aperture": 2.5,
+      "iso": 100,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/春日街拍/DSC_7069-編輯-1.jpg",
+      "time": "2025 May 17",
+      "title": "攝影作品 #7069",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "春日街拍",
+        "description": "城市日常生活紀錄",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 73,
+      "aperture": 2.5,
+      "iso": 100,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/春日街拍/DSC_7556-編輯-1.jpg",
+      "time": "2025 May 17",
+      "title": "攝影作品 #7556",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "春日街拍",
+        "description": "城市日常生活紀錄",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/春日街拍/DSC_7561-編輯-編輯-1.jpg",
+      "time": "2025 May 17",
+      "title": "攝影作品 #7561",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "春日街拍",
+        "description": "城市日常生活紀錄",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg",
+      "time": "2024 Dec 13",
+      "title": "攝影作品 #4319",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "廣角",
+        "室內"
+      ],
+      "event": {
+        "name": "2024新北耶誕城",
+        "description": "新北市耶誕城燈光秀拍攝",
+        "location": "新北市板橋區"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z 50",
+      "focalLength": 18,
+      "aperture": 3.5,
+      "iso": 640,
+      "shutterSpeed": 0.0025
+    },
+    {
+      "filename": "photography/2024新北耶誕城/DSC_4379-NEF_DxO_DeepPRIMEXD-1.jpg",
+      "time": "2024 Dec 13",
+      "title": "攝影作品 #4379",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "夜拍",
+        "高速快門"
+      ],
+      "event": {
+        "name": "2024新北耶誕城",
+        "description": "新北市耶誕城燈光秀拍攝",
+        "location": "新北市板橋區"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z 50",
+      "focalLength": 40,
+      "aperture": 4.5,
+      "iso": 1000,
+      "shutterSpeed": 0.0015625
+    },
+    {
+      "filename": "photography/2024新北耶誕城/DSC_4396-NEF_DxO_DeepPRIMEXD-1.jpg",
+      "time": "2024 Dec 13",
+      "title": "攝影作品 #4396",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "廣角",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2024新北耶誕城",
+        "description": "新北市耶誕城燈光秀拍攝",
+        "location": "新北市板橋區"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z 50",
+      "focalLength": 21,
+      "aperture": 3.5,
+      "iso": 1250,
+      "shutterSpeed": 0.00625
+    },
+    {
+      "filename": "photography/2024新北耶誕城/DSC_4426-NEF_DxO_DeepPRIMEXD-1.jpg",
+      "time": "2024 Dec 13",
+      "title": "攝影作品 #4426",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "廣角",
+        "日光"
+      ],
+      "event": {
+        "name": "2024新北耶誕城",
+        "description": "新北市耶誕城燈光秀拍攝",
+        "location": "新北市板橋區"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z 50",
+      "focalLength": 18,
+      "aperture": 3.5,
+      "iso": 200,
+      "shutterSpeed": 0.03333333333333333
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6516-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6516-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 2500,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6487-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6487-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 2500,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6178-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 249,
+      "aperture": 6,
+      "iso": 2000,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6392-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6392-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍"
+      ],
+      "event": {
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 81,
+      "aperture": 4.5,
+      "iso": 2000,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/2025 桃園三本柱/DSC_6293-1.jpg",
+      "time": "2025 May 02",
+      "title": "DSC_6293-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍",
+        "高速快門"
+      ],
+      "event": {
+        "name": "2025 桃猿三本柱",
+        "description": "河智媛、禹洙漢、廉世彬",
+        "location": "樂天主場"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 112,
+      "aperture": 4.8,
+      "iso": 3200,
+      "shutterSpeed": 0.0005
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_4810-編輯-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_4810-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 98,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_5758-編輯-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_5758-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 46,
+      "aperture": 4.5,
+      "iso": 200,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_4825-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_4825-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "淺景深",
+        "日光"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 101,
+      "aperture": 2.7,
+      "iso": 100,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_5124-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_5124-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 320,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/調色測試/DSC_3889-編輯-1.jpg",
+      "time": "2025 Jan 29",
+      "title": "DSC_3889-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 40,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.00025
+    },
+    {
+      "filename": "photography/調色測試/DSC_3474-編輯-1.jpg",
+      "time": "2024 Nov 03",
+      "title": "DSC_3474-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 164,
+      "aperture": 5.3,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/調色測試/DSC_3761-1.jpg",
+      "time": "2024 Nov 23",
+      "title": "DSC_3761-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍"
+      ],
+      "event": {
+        "name": "調色測試",
+        "description": "DXO - film pack ",
+        "location": "六福村"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 84,
+      "aperture": 5.6,
+      "iso": 2000,
+      "shutterSpeed": 0.008
+    }
+  ]
+}

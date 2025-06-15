@@ -1,0 +1,1 @@
+import{_ as t}from"./DlAUqK2U.js";import{c as s,a as e,o as r}from"./ieS4v_zz.js";const a={},n={class:"prose mx-auto py-10"};function c(l,o){return r(),s("div",n,o[0]||(o[0]=[e("h1",null,"關於我",-1),e("p",null," 這裡是我的個人簡介，歡迎來到我的網站！ ",-1)]))}const f=t(a,[["render",c]]);export{f as default};

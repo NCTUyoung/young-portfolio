@@ -1,0 +1,1 @@
+import{J as n}from"./ieS4v_zz.js";const g=()=>{const e=n(),a=t=>{const s=t.startsWith("/")?t.slice(1):t;return!e.app.baseURL||e.app.baseURL==="/"?`/images/${s}`:`${e.app.baseURL}images/${s}`};return{getImagePath:a,getFullImageUrl:t=>`${window.location.origin}${a(t)}`}};export{g as u};

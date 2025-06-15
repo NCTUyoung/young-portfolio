@@ -1,0 +1,75 @@
+{
+  "totalNumber":"10",
+  "Img":[
+    {
+      "filename":"gallery/2018創作集/Capsule.png",
+      "time":"2018 Nov 10",
+      "title":"Capsule",
+      "content":"透明質感的膠囊，運用模糊與不透明的材質",
+      "color":"purple"
+    },
+    {
+      "filename":"gallery/2018創作集/fox.png",
+      "time":"2018 Jan 25",
+      "title":"Fox",
+      "content":"交大狐狸幾何化",
+      "color":"orange"
+    },
+    {
+      "filename":"gallery/2018創作集/The_Great_Wave_off_Kanagawa.png",
+      "time":"2018 Feb 5",
+      "title":"The Great Wave off Kanagawa",
+      "content":"神奈川衝浪圖",
+      "color":"orange"
+    },
+    {
+      "filename":"gallery/2018創作集/vectorpath.png",
+      "time":"2018 Feb 6",
+      "title":"Vector Path",
+      "content":"科技感的向量路徑",
+      "color":"blue"
+    },
+    {
+      "filename":"gallery/2018創作集/WireframePatterns.png",
+      "time":"2018 Feb 10",
+      "title":"Wire frame Patterns",
+      "content":"像是宇宙力場的插畫",
+      "color":"blue"
+    },
+    {
+      "filename":"gallery/2018創作集/VectorSmokeEffect.png",
+      "time":"2018 Feb 25",
+      "title":"Vector Smoke Effect",
+      "content":"自由繪路徑配合內插",
+      "color":"red"
+    },
+    {
+      "filename":"gallery/2018創作集/AbstractGalaxyLogo.png",
+      "time":"2018 Feb 25",
+      "title":"Abstract Galaxy Logo",
+      "content":"自由繪路徑配合內插",
+      "color":"purple"
+    },
+    {
+      "filename":"gallery/2018創作集/VectorFingerprintLogo.png",
+      "time":"2018 Feb 25",
+      "title":"Vector Fingerprint Logo",
+      "content":"指紋環形路徑練習",
+      "color":"amber"
+    },
+    {
+      "filename":"gallery/2018創作集/car.jpg",
+      "time":"2018 Apr 16",
+      "title":"Car",
+      "content":"積架跑車CG練習",
+      "color":"orange"
+    },
+    {
+      "filename":"gallery/2018創作集/HalftoneHeartPattern.png",
+      "time":"2018 Mar 15",
+      "title":"Halftone Heart Pattern",
+      "content":"半色調心形圖案設計",
+      "color":"red"
+    }
+  ]
+}
