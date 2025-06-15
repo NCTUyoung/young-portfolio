@@ -1,10 +1,11 @@
 {
-  "totalNumber": "14",
+  "totalNumber": "18",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
     "2024新北耶誕城": 4,
-    "2025 桃園三本柱": 5
+    "2025 桃園三本柱": 5,
+    "攝影社 米倉團拍": 4
   },
   "Img": [
     {
@@ -315,6 +316,93 @@
       "aperture": 4.8,
       "iso": 3200,
       "shutterSpeed": 0.0005
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_4810-編輯-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_4810-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 98,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_5758-編輯-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_5758-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 46,
+      "aperture": 4.5,
+      "iso": 200,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_4825-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_4825-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "淺景深",
+        "日光"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 101,
+      "aperture": 2.7,
+      "iso": 100,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/攝影社 米倉團拍/DSC_5124-1.jpg",
+      "time": "2025 Apr 27",
+      "title": "DSC_5124-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "淺景深"
+      ],
+      "event": {
+        "name": "攝影社 米倉團拍",
+        "description": "人像外拍",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 320,
+      "shutterSpeed": 0.004
     }
   ]
 }

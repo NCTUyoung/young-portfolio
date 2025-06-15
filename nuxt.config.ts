@@ -27,6 +27,7 @@ export default defineNuxtConfig({
 
   // GitHub Pages 靜態輸出配置
   nitro: {
+    preset: 'github-pages',
     prerender: {
       routes: ['/']
     }
@@ -40,8 +41,9 @@ export default defineNuxtConfig({
     storesDirs: ['./stores/**'],
   },
 
-  // 基礎路徑（如果你的 GitHub 倉庫不是以 username.github.io 命名的話）
-  // app: {
-  //   baseURL: '/your-repo-name/'
-  // }
+  // GitHub Pages 特定配置
+  app: {
+    buildAssetsDir: '_nuxt/', // 確保資源路徑正確
+    baseURL: '/young-portfolio/' // GitHub Pages 專案倉庫需要設定基礎路徑
+  }
 })

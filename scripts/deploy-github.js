@@ -14,7 +14,7 @@ console.log('🚀 開始部署到 GitHub Pages...')
 try {
   // 1. 清理並建置
   console.log('📦 正在生成靜態檔案...')
-  execSync('npm run generate', { stdio: 'inherit' })
+  execSync('npx nuxt build --preset github-pages', { stdio: 'inherit' })
 
   // 2. 進入 dist 目錄
   const distPath = path.join(process.cwd(), '.output/public')
@@ -26,15 +26,11 @@ try {
   console.log('📁 進入輸出目錄...')
   process.chdir(distPath)
 
-  // 3. 初始化 git（如果需要）
-  try {
-    execSync('git status', { stdio: 'ignore' })
-  } catch {
-    console.log('🔧 初始化 Git 倉庫...')
-    execSync('git init', { stdio: 'inherit' })
-  }
+  // 3. 初始化新的 git 倉庫（強制重新初始化以避免 .gitignore 問題）
+  console.log('🔧 初始化 Git 倉庫...')
+  execSync('git init --initial-branch=gh-pages', { stdio: 'inherit' })
 
-  // 4. 添加所有檔案
+  // 4. 添加所有檔案（在新的 git 倉庫中不會受到上層 .gitignore 影響）
   console.log('📝 添加檔案到 Git...')
   execSync('git add .', { stdio: 'inherit' })
 
@@ -45,11 +41,14 @@ try {
 
   // 6. 推送到 gh-pages 分支
   console.log('🚀 推送到 gh-pages 分支...')
-  execSync('git branch -M gh-pages', { stdio: 'inherit' })
 
-  // 注意：需要設定 origin remote
-  // execSync('git remote add origin https://github.com/用戶名/倉庫名.git', { stdio: 'inherit' })
-  // execSync('git push -u origin gh-pages --force', { stdio: 'inherit' })
+  // 設定 origin remote 並推送
+  try {
+    execSync('git remote add origin https://github.com/NCTUyoung/young-portfolio.git', { stdio: 'ignore' })
+  } catch {
+    // remote 已存在，忽略錯誤
+  }
+  execSync('git push -u origin gh-pages --force', { stdio: 'inherit' })
 
   console.log('✅ 部署完成！')
   console.log('💡 提示：請確保已設定 GitHub Pages 使用 gh-pages 分支')
