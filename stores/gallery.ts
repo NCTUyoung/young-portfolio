@@ -112,7 +112,7 @@ const getImageClass = (index: number): string => {
 }
 
 const fetchDigitalWorks = async (): Promise<GalleryItem[]> => {
-  const response = await fetch('./galleryList.json')
+  const response = await fetch('/young-portfolio/galleryList.json')
   const data = await response.json()
 
   return data.Img.map((img: any) => ({
@@ -129,7 +129,7 @@ const fetchDigitalWorks = async (): Promise<GalleryItem[]> => {
 }
 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const response = await fetch('./photographyList.json')
+  const response = await fetch('/young-portfolio/photographyList.json')
   const data = await response.json()
 
   const works = data.Img.map((img: any) => ({
