@@ -12,7 +12,7 @@
       <!-- 懶載入的圖片 -->
       <img
         v-if="isVisible"
-        :src="`/images/${image.filename}`"
+        :src="getImagePath(image.filename)"
         :alt="image.title"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         @load="onImageLoad"
@@ -177,6 +177,7 @@ const isVisible = ref(false)
 
 const { x: mouseX, y: mouseY } = useMouse({ target: cardRef })
 const { copy, copied } = useClipboard()
+const { getImagePath, getFullImageUrl } = useImagePath()
 
 // 3D tilt effect
 const rotateX = ref(0)
@@ -246,7 +247,7 @@ const copyImageUrl = async (event: Event) => {
   event.stopPropagation() // 防止觸發圖片檢視器
 
   try {
-    const imageUrl = `${window.location.origin}/images/${props.image.filename}`
+    const imageUrl = getFullImageUrl(props.image.filename)
     await copy(imageUrl)
 
     // 顯示成功通知

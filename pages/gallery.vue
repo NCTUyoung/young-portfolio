@@ -71,7 +71,7 @@
                      :key="image.filename"
                      @click="openImageViewer(image, item.images || [])"
                      class="aspect-square rounded-lg overflow-hidden border border-stone-200/50 cursor-pointer group hover:border-stone-300/70 transition-all duration-300">
-                  <img :src="`/images/${image.filename}`"
+                  <img :src="getImagePath(image.filename)"
                        :alt="image.title"
                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
                 </div>
@@ -146,6 +146,7 @@ const {
 
 const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
+const { getImagePath } = useImagePath()
 
 // ===== 計算屬性 =====
 const isGroupExpanded = (groupKey: string) => {

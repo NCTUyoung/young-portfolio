@@ -169,7 +169,7 @@
                 :title="item.title"
               >
                 <img
-                  :src="`/images/${item.filename}`"
+                  :src="getImagePath(item.filename)"
                   :alt="item.title"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   @error="handleImageError"
@@ -568,6 +568,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 
 const adminStore = useAdminStore()
+const { getImagePath } = useImagePath()
 
 // Tab 狀態
 const activeTab = ref('overview')

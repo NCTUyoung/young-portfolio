@@ -96,7 +96,7 @@
         <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
           <img v-if="currentViewerImage"
                ref="imageElement"
-               :src="`/images/${currentViewerImage.filename}`"
+               :src="getImagePath(currentViewerImage.filename)"
                :alt="currentViewerImage.title"
                :class="[
                  'select-none user-select-none',
@@ -163,6 +163,7 @@ import ImageNavigator from './ImageNavigator.vue'
 import RadialNavigation from './RadialNavigation.vue'
 
 const imageViewerStore = useImageViewerStore()
+const { getImagePath } = useImagePath()
 const {
   isOpen,
   viewerImages,
