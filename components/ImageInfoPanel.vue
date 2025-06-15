@@ -29,7 +29,7 @@
       <!-- 縮圖預覽 -->
       <div class="text-center">
         <div class="inline-block border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
-          <img :src="`/images/${currentViewerImage.filename}`"
+          <img :src="getImagePath(currentViewerImage.filename)"
                :alt="imageInfo.title"
                class="w-32 h-32 object-contain" />
         </div>
@@ -143,6 +143,7 @@ import { useImageViewerStore } from '~/stores/imageViewer'
 import ImageHistogram from './ImageHistogram.vue'
 
 const imageViewerStore = useImageViewerStore()
+const { getImagePath } = useImagePath()
 const {
   showInfoPanel,
   infoPanelWidth,

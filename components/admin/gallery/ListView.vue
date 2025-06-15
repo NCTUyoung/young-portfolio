@@ -6,7 +6,7 @@
       class="flex items-center space-x-5 p-4 bg-white/60 backdrop-blur-sm rounded-xl hover:bg-white/80 hover:shadow-sm transition-all duration-200 border border-stone-200/30"
     >
       <img
-        :src="`/images/${item.filename}`"
+        :src="getImagePath(item.filename)"
         :alt="item.title"
         class="w-16 h-16 object-cover rounded-lg flex-shrink-0 shadow-sm"
         loading="lazy"
@@ -68,6 +68,7 @@ interface Props {
 defineProps<Props>()
 
 const adminStore = useAdminStore()
+const { getImagePath } = useImagePath()
 
 // 顏色樣式對應
 const getColorClass = (color?: string) => {

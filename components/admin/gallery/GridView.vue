@@ -7,7 +7,7 @@
     >
       <div class="aspect-square">
         <img
-          :src="`/images/${item.filename}`"
+          :src="getImagePath(item.filename)"
           :alt="item.title"
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
@@ -68,6 +68,7 @@ interface Props {
 defineProps<Props>()
 
 const adminStore = useAdminStore()
+const { getImagePath } = useImagePath()
 
 // 顏色樣式對應
 const getColorClass = (color?: string) => {

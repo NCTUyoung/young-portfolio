@@ -34,6 +34,7 @@ import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
+const { getImagePath } = useImagePath()
 const { currentViewerImage, showInfoPanel, infoPanelWidth } = storeToRefs(imageViewerStore)
 
 const histogramCanvas = ref<HTMLCanvasElement>()
@@ -62,7 +63,7 @@ const generateHistogram = async () => {
     await new Promise((resolve, reject) => {
       img.onload = resolve
       img.onerror = reject
-      img.src = `/images/${currentViewerImage.value!.filename}`
+      img.src = getImagePath(currentViewerImage.value!.filename)
     })
 
     // 創建 canvas 來分析圖片

@@ -30,7 +30,7 @@
                 ]"
                 :title="`${image.title} (${index + 1}/${viewerImages.length})`">
           <!-- 縮圖圖片 -->
-          <img :src="`/images/${image.filename}`" :alt="image.title" class="w-full h-full object-cover" />
+          <img :src="getImagePath(image.filename)" :alt="image.title" class="w-full h-full object-cover" />
 
           <!-- 當前圖片的特殊效果 -->
           <div v-if="index === currentImageIndex"
@@ -55,6 +55,7 @@ import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
+const { getImagePath } = useImagePath()
 const {
   viewerImages,
   currentImageIndex,

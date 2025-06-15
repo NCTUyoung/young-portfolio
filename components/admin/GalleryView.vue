@@ -100,7 +100,7 @@
               class="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200"
             >
               <img
-                :src="`/images/${item.filename}`"
+                :src="getImagePath(item.filename)"
                 :alt="item.title"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                 @error="handleImageError"
@@ -140,7 +140,7 @@
               class="flex items-center space-x-4 p-3 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-all duration-200"
             >
               <img
-                :src="`/images/${item.filename}`"
+                :src="getImagePath(item.filename)"
                 :alt="item.title"
                 class="w-12 h-12 object-cover rounded-lg"
                 @error="handleImageError"
@@ -172,6 +172,7 @@
 
 <script setup lang="ts">
 const adminStore = useAdminStore()
+const { getImagePath } = useImagePath()
 
 // 處理圖片載入錯誤
 const handleImageError = (event: Event) => {

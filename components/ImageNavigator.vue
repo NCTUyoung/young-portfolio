@@ -20,7 +20,7 @@
         <!-- 導覽器縮圖 -->
         <img v-if="currentViewerImage"
              ref="navigatorImageElement"
-             :src="`/images/${currentViewerImage.filename}`"
+             :src="getImagePath(currentViewerImage.filename)"
              :alt="currentViewerImage.title"
              class="w-full h-full object-contain cursor-pointer"
              @click="handleNavigatorClick"
@@ -58,6 +58,7 @@ import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
+const { getImagePath } = useImagePath()
 const {
   showNavigator,
   navigatorDragging,
