@@ -8,8 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "deploy": "node scripts/deploy-github.js",
-    "build:github": "nuxt build --preset github-pages"
+    "build:github": "npm ci && nuxt build --preset github-pages"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
