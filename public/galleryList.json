@@ -1,75 +1,373 @@
 {
-  "totalNumber":"10",
-  "Img":[
+  "totalNumber": "30",
+  "Img": [
     {
-      "filename":"gallery/2018創作集/Capsule.png",
-      "time":"2018 Nov 10",
-      "title":"Capsule",
-      "content":"透明質感的膠囊，運用模糊與不透明的材質",
-      "color":"purple"
+      "filename": "gallery/2018年電繪作品/Capsule.png",
+      "time": "2018 Nov 10",
+      "title": "Capsule",
+      "content": "透明質感的膠囊，運用模糊與不透明的材質",
+      "color": "purple",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/fox.png",
-      "time":"2018 Jan 25",
-      "title":"Fox",
-      "content":"交大狐狸幾何化",
-      "color":"orange"
+      "filename": "gallery/2018年電繪作品/fox.png",
+      "time": "2018 Jan 25",
+      "title": "Fox",
+      "content": "交大狐狸幾何化",
+      "color": "orange",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/The_Great_Wave_off_Kanagawa.png",
-      "time":"2018 Feb 5",
-      "title":"The Great Wave off Kanagawa",
-      "content":"神奈川衝浪圖",
-      "color":"orange"
+      "filename": "gallery/2018年電繪作品/The_Great_Wave_off_Kanagawa.png",
+      "time": "2018 Feb 5",
+      "title": "The Great Wave off Kanagawa",
+      "content": "神奈川衝浪圖",
+      "color": "orange",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/vectorpath.png",
-      "time":"2018 Feb 6",
-      "title":"Vector Path",
-      "content":"科技感的向量路徑",
-      "color":"blue"
+      "filename": "gallery/2018年電繪作品/vectorpath.png",
+      "time": "2018 Feb 6",
+      "title": "Vector Path",
+      "content": "科技感的向量路徑",
+      "color": "blue",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/WireframePatterns.png",
-      "time":"2018 Feb 10",
-      "title":"Wire frame Patterns",
-      "content":"像是宇宙力場的插畫",
-      "color":"blue"
+      "filename": "gallery/2018年電繪作品/WireframePatterns.png",
+      "time": "2018 Feb 10",
+      "title": "Wire frame Patterns",
+      "content": "像是宇宙力場的插畫",
+      "color": "blue",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/VectorSmokeEffect.png",
-      "time":"2018 Feb 25",
-      "title":"Vector Smoke Effect",
-      "content":"自由繪路徑配合內插",
-      "color":"red"
+      "filename": "gallery/2018年電繪作品/VectorSmokeEffect.png",
+      "time": "2018 Feb 25",
+      "title": "Vector Smoke Effect",
+      "content": "自由繪路徑配合內插",
+      "color": "red",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/AbstractGalaxyLogo.png",
-      "time":"2018 Feb 25",
-      "title":"Abstract Galaxy Logo",
-      "content":"自由繪路徑配合內插",
-      "color":"purple"
+      "filename": "gallery/2018年電繪作品/AbstractGalaxyLogo.png",
+      "time": "2018 Feb 25",
+      "title": "Abstract Galaxy Logo",
+      "content": "自由繪路徑配合內插",
+      "color": "purple",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/VectorFingerprintLogo.png",
-      "time":"2018 Feb 25",
-      "title":"Vector Fingerprint Logo",
-      "content":"指紋環形路徑練習",
-      "color":"amber"
+      "filename": "gallery/2018年電繪作品/VectorFingerprintLogo.png",
+      "time": "2018 Feb 25",
+      "title": "Vector Fingerprint Logo",
+      "content": "指紋環形路徑練習",
+      "color": "amber",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/car.jpg",
-      "time":"2018 Apr 16",
-      "title":"Car",
-      "content":"積架跑車CG練習",
-      "color":"orange"
+      "filename": "gallery/2018年電繪作品/car.jpg",
+      "time": "2018 Apr 16",
+      "title": "Car",
+      "content": "積架跑車CG練習",
+      "color": "orange",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
     },
     {
-      "filename":"gallery/2018創作集/HalftoneHeartPattern.png",
-      "time":"2018 Mar 15",
-      "title":"Halftone Heart Pattern",
-      "content":"半色調心形圖案設計",
-      "color":"red"
+      "filename": "gallery/2018年電繪作品/HalftoneHeartPattern.png",
+      "time": "2018 Mar 15",
+      "title": "Halftone Heart Pattern",
+      "content": "半色調心形圖案設計",
+      "color": "red",
+      "event": {
+        "name": "2018年電繪作品",
+        "description": "2018年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2021年電繪作品/01-14.jpg",
+      "time": "2021 Dec 19",
+      "title": "電繪作品 01-14",
+      "content": "",
+      "color": "purple",
+      "event": {
+        "name": "2021年電繪作品",
+        "description": "2021年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/01-16.jpg",
+      "time": "2022 Apr 23",
+      "title": "電繪作品 01-16",
+      "content": "",
+      "color": "yellow",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2021年電繪作品/13.jpg",
+      "time": "2021 Oct 18",
+      "title": "13",
+      "content": "",
+      "color": "yellow",
+      "event": {
+        "name": "2021年電繪作品",
+        "description": "2021年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2021年電繪作品/E-39.jpg",
+      "time": "2021 Sep 05",
+      "title": "練習作品 #39",
+      "content": "",
+      "color": "orange",
+      "event": {
+        "name": "2021年電繪作品",
+        "description": "2021年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/全身自創07-12.jpg",
+      "time": "2022 Jan 17",
+      "title": "全身角色創作",
+      "content": "",
+      "color": "green",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/自創08-13.jpg",
+      "time": "2022 Feb 19",
+      "title": "原創角色設計",
+      "content": "",
+      "color": "green",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/02-26.jpg",
+      "time": "2022 Jun 25",
+      "title": "02-26",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/23.jpg",
+      "time": "2022 Aug 20",
+      "title": "23",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2022年電繪作品/15.jpg",
+      "time": "2022 Oct 08",
+      "title": "15",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2022年電繪作品",
+        "description": "2022年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2023年電繪作品/22.jpg",
+      "time": "2023 Jan 27",
+      "title": "22",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2023年電繪作品",
+        "description": "2023年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2023年電繪作品/20.jpg",
+      "time": "2023 Mar 12",
+      "title": "20",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2023年電繪作品",
+        "description": "2023年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2023年電繪作品/31.png",
+      "time": "2023 Aug 26",
+      "title": "31",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2023年電繪作品",
+        "description": "2023年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2023年電繪作品/51.jpg",
+      "time": "2023 Dec 18",
+      "title": "51",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2023年電繪作品",
+        "description": "2023年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2024年電繪作品/55.jpg",
+      "time": "2024 Apr 27",
+      "title": "55",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2024年電繪作品",
+        "description": "2024年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2024年電繪作品/23.jpg",
+      "time": "2024 Jun 18",
+      "title": "23",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2024年電繪作品",
+        "description": "2024年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2024年電繪作品/18-4.jpg",
+      "time": "2024 Jul 19",
+      "title": "18-4",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2024年電繪作品",
+        "description": "2024年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2024年電繪作品/28-編輯-2.jpg",
+      "time": "2024 Oct 09",
+      "title": "28-編輯-2",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2024年電繪作品",
+        "description": "2024年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2024年電繪作品/52-1.jpg",
+      "time": "2024 Nov 14",
+      "title": "52-1",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2024年電繪作品",
+        "description": "2024年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2025年電繪作品/17.png",
+      "time": "2025 Jan 24",
+      "title": "17",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2025年電繪作品",
+        "description": "2025年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2025年電繪作品/36-編輯-1.jpg",
+      "time": "2025 May 29",
+      "title": "36-編輯-1",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2025年電繪作品",
+        "description": "2025年創作的電繪作品集",
+        "location": ""
+      }
     }
-  ]
+  ],
+  "eventStats": {
+    "2018年電繪作品": 10,
+    "2021年電繪作品": 3,
+    "2022年電繪作品": 6,
+    "2023年電繪作品": 4,
+    "2024年電繪作品": 5,
+    "2025年電繪作品": 2
+  }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="filterState.selectedCategory === 'photography' && availableEvents.length > 0" class="mb-8">
+  <div v-if="(filterState.selectedCategory === 'photography' || filterState.selectedCategory === 'digital') && availableEvents.length > 0" class="mb-8">
     <!-- Event Filter Buttons -->
     <div class="flex flex-wrap gap-3 mb-4">
       <button
@@ -7,7 +7,7 @@
         :class="filterState.selectedEvent === null ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
         class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
       >
-        全部事件 ({{ photographyWorks.length }})
+        全部事件 ({{ currentWorks.length }})
       </button>
       <button
         v-for="event in availableEvents"
@@ -31,13 +31,15 @@ const galleryStore = useGalleryStore()
 const {
   filterState,
   availableEvents,
-  photographyWorks
+  photographyWorks,
+  digitalWorks,
+  currentWorks
 } = storeToRefs(galleryStore)
 const { setSelectedEvent } = galleryStore
 
-// 當切換到非攝影類別時，自動清除事件選擇
+// 當切換到不支援事件的類別時，自動清除事件選擇
 watch(() => filterState.value.selectedCategory, (newCategory) => {
-  if (newCategory !== 'photography' && filterState.value.selectedEvent) {
+  if (newCategory === 'all' && filterState.value.selectedEvent) {
     setSelectedEvent(null)
   }
 })

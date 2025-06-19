@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import type { PhotographyData, GalleryData } from '~/types/gallery'
+import { formatDate } from '~/utils/photoUtils'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'PATCH') {
@@ -12,6 +13,8 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
     const { filename, category, updates } = body
+
+    console.log('Update image request:', { filename, category, updates })
 
     if (!filename || !category || !updates) {
       throw createError({
@@ -45,9 +48,27 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 處理更新數據
+    const processedUpdates = { ...updates }
+
+    // 如果有日期更新，轉換為正確格式
+    if (updates.date) {
+      try {
+        console.log('Original date from client:', updates.date)
+        const date = new Date(updates.date)
+        console.log('Parsed date object:', date)
+        const formattedDate = formatDate(date)
+        console.log('Formatted date:', formattedDate)
+        processedUpdates.time = formattedDate
+        delete processedUpdates.date // 移除原始 date 字段
+      } catch (error) {
+        console.warn('Invalid date format:', updates.date, error)
+      }
+    }
+
     // 更新圖片資訊
     const originalImage = categoryData.Img[imageIndex]
-    const updatedImage = { ...originalImage, ...updates }
+    const updatedImage = { ...originalImage, ...processedUpdates }
 
     // 如果是攝影作品且有標籤更新，需要處理標籤格式
     if (category === 'photography' && updates.tags) {
@@ -59,8 +80,12 @@ export default defineEventHandler(async (event) => {
 
     categoryData.Img[imageIndex] = updatedImage
 
+    console.log('Updated image data:', updatedImage)
+
     // 寫入更新後的 JSON
     writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
+
+    console.log('Successfully wrote updated data to file')
 
     return {
       success: true,

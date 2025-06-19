@@ -155,3 +155,27 @@ export function normalizeExifData(exif: any): ExifData {
     CreateDate: exif?.CreateDate
   }
 }
+
+/**
+ * 根據時間自動推斷事件名稱
+ * @param captureTime 拍攝/創作時間
+ * @param category 分類類型 ('gallery' | 'photography')
+ * @returns 事件資訊
+ */
+export function inferEventFromTime(captureTime: Date, category: 'gallery' | 'photography') {
+  const year = captureTime.getFullYear()
+
+  if (category === 'gallery') {
+    return {
+      name: `${year}年電繪作品`,
+      description: `${year}年創作的電繪作品集`,
+      location: ''
+    }
+  } else {
+    return {
+      name: `${year}年攝影作品`,
+      description: `${year}年拍攝的攝影作品集`,
+      location: ''
+    }
+  }
+}

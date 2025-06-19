@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import type { FileWithMeta, GalleryItem, PhotographyItem, CategoryType } from '~/types/gallery'
 
 type UnifiedGalleryItem = GalleryItem | PhotographyItem
@@ -57,13 +57,27 @@ export const useAdminStore = defineStore('admin', () => {
   const pendingDeleteFilename = ref('')
   const deleteImageInfo = ref<{ title: string; filename: string } | null>(null)
 
+  // ===== 圖片編輯對話框 =====
+  const showImageEditDialog = ref(false)
+  const editingImageData = ref<UnifiedGalleryItem | null>(null)
+
   // ===== 圖片數據 (按分類分別存儲) =====
   const galleryData = ref<UnifiedGalleryItem[]>([])
   const photographyData = ref<UnifiedGalleryItem[]>([])
 
   // ===== 計算屬性 =====
   const canUpload = computed(() => {
-    return selectedFiles.value.length > 0 && eventName.value.trim() !== ''
+    if (selectedFiles.value.length === 0 || uploading.value) {
+      return false
+    }
+
+    // 如果是攝影作品，需要填寫事件名稱
+    if (uploadCategory.value === 'photography') {
+      return eventName.value.trim() !== ''
+    }
+
+    // 繪圖作品不需要額外檢查，系統會自動推斷事件
+    return true
   })
 
   // 獲取當前管理頁面的數據
@@ -91,12 +105,18 @@ export const useAdminStore = defineStore('admin', () => {
       let description = '未分類作品'
       let location = ''
 
-      // 檢查是否有事件資訊
-      if (manageCategory.value === 'photography' && (item as any).event) {
+      // 檢查是否有事件資訊 - 攝影和電繪作品都支援事件
+      if ((item as any).event) {
         const event = (item as any).event
         currentEventName = event.name || '預設事件'
         description = event.description || '未分類作品'
         location = event.location || ''
+      } else if (manageCategory.value === 'gallery') {
+        // 電繪作品按年份分組
+        const year = new Date(item.time).getFullYear()
+        currentEventName = `${year}年電繪作品`
+        description = `${year} 年創作的電繪作品`
+        location = ''
       }
 
       if (!groups[currentEventName]) {
@@ -139,8 +159,12 @@ export const useAdminStore = defineStore('admin', () => {
     const events = new Set<string>()
 
     data.forEach(item => {
-      if (manageCategory.value === 'photography' && (item as any).event) {
+      if ((item as any).event) {
         events.add((item as any).event.name || '預設事件')
+      } else if (manageCategory.value === 'gallery') {
+        // 電繪作品按年份分組
+        const year = new Date(item.time).getFullYear()
+        events.add(`${year}年電繪作品`)
       } else {
         events.add('預設事件')
       }
@@ -288,6 +312,9 @@ export const useAdminStore = defineStore('admin', () => {
           // 如果是攝影分類，添加攝影專用欄位
           if (uploadCategory.value === 'photography') {
             (newFile as any).tags = ''
+          } else {
+            // 如果是繪圖分類，添加創作日期欄位
+            newFile.creationDate = new Date().toISOString().split('T')[0] // 預設為今天
           }
 
           selectedFiles.value.push(newFile)
@@ -333,6 +360,9 @@ export const useAdminStore = defineStore('admin', () => {
         } else {
           // 繪圖作品專用欄位
           formData.append(`color_${fileData.name}`, fileData.color || 'blue')
+          if (fileData.creationDate) {
+            formData.append(`creationDate_${fileData.name}`, fileData.creationDate)
+          }
         }
       })
 
@@ -493,7 +523,128 @@ export const useAdminStore = defineStore('admin', () => {
     deleteImageInfo.value = null
     showEventEditDialog.value = false
     editingEventData.value = null
+    showImageEditDialog.value = false
+    editingImageData.value = null
     selectedEvent.value = ''
+  }
+
+  // 開始編輯圖片
+  const startEditImage = (image: UnifiedGalleryItem) => {
+    editingImageData.value = image
+    showImageEditDialog.value = true
+  }
+
+  // 確認編輯圖片
+  const confirmEditImage = async (updateData: {
+    title: string
+    content: string
+    date: string
+    color?: string
+    tags?: string[]
+  }) => {
+    if (!editingImageData.value) return
+
+    // 先關閉對話框，提升用戶體驗
+    showImageEditDialog.value = false
+    const originalImage = editingImageData.value
+    editingImageData.value = null
+
+    // 樂觀更新：先在本地更新數據
+    try {
+      console.log('開始樂觀更新...')
+      console.log('原始圖片:', originalImage)
+      console.log('更新數據:', updateData)
+
+      // 找到本地數據中對應的圖片並更新
+      const dataArray = manageCategory.value === 'gallery' ? galleryData.value : photographyData.value
+      console.log('當前數據數組長度:', dataArray.length)
+
+      const imageIndex = dataArray.findIndex(img => img.filename === originalImage.filename)
+      console.log('找到圖片索引:', imageIndex)
+
+      if (imageIndex !== -1) {
+        console.log('更新前的圖片:', dataArray[imageIndex])
+
+        // 建立更新後的圖片對象
+        const updatedImage = { ...dataArray[imageIndex] }
+        updatedImage.title = updateData.title
+        updatedImage.content = updateData.content
+
+        // 處理日期格式轉換
+        if (updateData.date) {
+          console.log('原始日期:', updateData.date)
+          const date = new Date(updateData.date)
+          const year = date.getFullYear()
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          const month = monthNames[date.getMonth()]
+          const day = String(date.getDate()).padStart(2, '0')
+          updatedImage.time = `${year} ${month} ${day}`
+          console.log('轉換後的時間:', updatedImage.time)
+        }
+
+        // 分類特定更新
+        if (manageCategory.value === 'gallery' && updateData.color) {
+          (updatedImage as any).color = updateData.color
+        } else if (manageCategory.value === 'photography' && updateData.tags) {
+          (updatedImage as any).tags = updateData.tags
+        }
+
+        console.log('更新後的圖片:', updatedImage)
+
+                // 更新本地數據 - 直接替換以觸發響應性
+        dataArray.splice(imageIndex, 1, updatedImage)
+        console.log('本地數據已更新')
+
+        // 強制觸發響應性更新 - 重新分配數組以確保 Vue 偵測到變化
+        if (manageCategory.value === 'gallery') {
+          galleryData.value = [...galleryData.value]
+        } else {
+          photographyData.value = [...photographyData.value]
+        }
+
+        // 顯示成功訊息
+        message.value = '圖片資訊更新成功'
+        messageType.value = 'success'
+      } else {
+        console.error('找不到要更新的圖片')
+      }
+    } catch (error) {
+      console.error('本地更新失敗:', error)
+    }
+
+    // 在背景調用 API 同步到伺服器
+    try {
+      loading.value = true
+
+      const response = await $fetch('/api/update-image', {
+        method: 'PATCH',
+        body: {
+          filename: originalImage.filename,
+          category: manageCategory.value,
+          updates: updateData
+        }
+      }) as { success: boolean; message: string; updatedImage: any }
+
+      if (!response.success) {
+        // 如果 API 失敗，回滾本地更新並顯示錯誤
+        message.value = '同步到伺服器失敗，請重新整理頁面'
+        messageType.value = 'error'
+        // 重新載入數據
+        await loadGalleryByCategory(manageCategory.value)
+      }
+    } catch (error) {
+      console.error('API 同步失敗:', error)
+      message.value = '同步到伺服器失敗，本地已更新，請重新整理頁面確認'
+      messageType.value = 'error'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 取消編輯圖片
+  const cancelEditImage = () => {
+    showImageEditDialog.value = false
+    editingImageData.value = null
   }
 
   return {
@@ -521,6 +672,8 @@ export const useAdminStore = defineStore('admin', () => {
     deleteImageInfo,
     showEventEditDialog,
     editingEventData,
+    showImageEditDialog,
+    editingImageData,
 
     // 表單狀態
     eventName,
@@ -560,6 +713,9 @@ export const useAdminStore = defineStore('admin', () => {
     showDeleteConfirm,
     confirmDeleteImage,
     cancelDeleteImage,
+    startEditImage,
+    confirmEditImage,
+    cancelEditImage,
     resetState
   }
 })

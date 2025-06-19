@@ -60,13 +60,11 @@ export default defineEventHandler(async (event) => {
     // 更新總數
     categoryData.totalNumber = categoryData.Img.length.toString()
 
-    // 更新事件統計（僅攝影類別）
-    if (category === 'photography' && imageRecord.event?.name) {
+    // 更新事件統計
+    if (imageRecord.event?.name) {
       const eventName = imageRecord.event.name
       if (categoryData.eventStats && categoryData.eventStats[eventName]) {
         categoryData.eventStats[eventName] -= 1
-
-        // 如果事件圖片數為 0，移除該事件統計
         if (categoryData.eventStats[eventName] <= 0) {
           delete categoryData.eventStats[eventName]
         }

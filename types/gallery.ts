@@ -9,6 +9,11 @@ export interface BaseImageItem {
 // 繪圖作品接口
 export interface GalleryItem extends BaseImageItem {
   color: string
+  event?: {
+    name: string
+    description: string
+    location: string
+  }
 }
 
 // 攝影作品接口
@@ -30,6 +35,7 @@ export interface PhotographyItem extends BaseImageItem {
 // 圖庫數據結構
 export interface GalleryData {
   totalNumber: string
+  eventStats?: Record<string, number>
   Img: GalleryItem[]
 }
 
@@ -49,6 +55,8 @@ export interface FileWithMeta {
   title: string
   content: string
   color: string
+  // 繪圖作品專用欄位
+  creationDate?: string  // 創作日期 (YYYY-MM-DD 格式)
   // 攝影作品專用欄位
   tags?: string
 }

@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-stone-50/30">
-    <!-- Header - 精簡版 -->
+  <div class="min-h-screen bg-white">
+    <!-- Header - 極簡風格 -->
     <div class="container mx-auto px-6 py-8 md:py-12">
-      <div class="max-w-4xl mx-auto">
+      <div class="max-w-7xl mx-auto">
         <h1 class="text-2xl md:text-3xl font-extralight text-stone-800 mb-3 tracking-wider">Works</h1>
         <p class="text-stone-500 font-light mb-6 text-sm tracking-wide">Digital Art & Photography</p>
 
@@ -18,146 +18,158 @@
       </div>
     </div>
 
-    <!-- Gallery with Timeline -->
+    <!-- Gallery Content -->
     <div class="container mx-auto px-6 relative">
-      <!-- Timeline Line -->
-      <div class="absolute left-12 top-0 bottom-0 w-px bg-stone-200/60 hidden md:block"></div>
-
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-20">
         <div class="inline-block animate-spin rounded-full h-10 w-10 border-b border-stone-300"></div>
         <p class="mt-6 text-stone-500 font-light tracking-wide">載入中...</p>
       </div>
 
-      <!-- Desktop: Timeline Layout -->
-      <div v-if="!isLoading" class="hidden md:block">
-        <div class="space-y-32 max-w-6xl mx-auto">
-          <GalleryTimelineItem
-            v-for="(item, index) in mixedPhotoItems"
-            :key="item.key"
-            :index="index"
-            :time-label="item.timeRange || ''"
-            :event-info="item.eventInfo"
-            :event-key="item.eventName || 'no-event'"
-            :show-event-control="!!item.eventName"
-            :show-event-info="!!item.eventName"
-          >
-            <!-- Group without card -->
-            <div class="mb-12">
-              <!-- Group Header - 更簡潔 -->
-              <div class="mb-6">
-                <h3 class="text-lg font-extralight text-stone-700 tracking-wider">
-                  {{ item.eventName || '其他作品' }}
-                </h3>
-                <p class="text-xs text-stone-400 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
-              </div>
+      <!-- 根據當前類別顯示不同佈局 -->
+      <div v-if="!isLoading">
+        <!-- 數位繪圖 - Pinterest 風格瀑布流佈局 -->
+        <div v-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
+          <GalleryMasonryLayout
+            :items="digitalArtItems"
+            :columns="4"
+            :gap="16"
+            @image-click="openImageViewer"
+          />
+        </div>
 
-              <!-- 日式雙欄佈局 - 所有照片 -->
-              <div class="space-y-3">
-                <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-                     :key="`row-${rowIdx}`"
-                     class="flex gap-3"
-                     :style="{ height: getRowHeight(rowIdx, index) }">
-                  <div v-for="(image, imgIdx) in rowImages"
-                       :key="image.filename"
-                       @click="openImageViewer(image, item.images || [])"
-                       :class="getImageWidth(imgIdx, rowIdx, index)"
-                       class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
-                    <img :src="getImagePath(image.filename)"
-                         :alt="image.title"
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                    <!-- 照片資訊懸浮層 -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                      <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
+        <!-- 攝影作品 - 保持原有的日式佈局 -->
+        <div v-else-if="currentCategory === 'photography'">
+          <!-- Timeline Layout for Photography -->
+          <div class="hidden md:block">
+            <div class="space-y-32 max-w-6xl mx-auto">
+              <GalleryTimelineItem
+                v-for="(item, index) in photographyEventItems"
+                :key="item.key"
+                :index="index"
+                :time-label="item.timeRange || ''"
+                :event-info="item.eventInfo"
+                :event-key="item.eventName || 'no-event'"
+                :show-event-control="!!item.eventName"
+                :show-event-info="!!item.eventName"
+              >
+                <!-- 日式雙欄佈局 -->
+                <div class="mb-12">
+                  <div class="mb-6">
+                    <h3 class="text-lg font-extralight text-stone-700 tracking-wider">
+                      {{ item.eventName || '其他作品' }}
+                    </h3>
+                    <p class="text-xs text-stone-400 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+                  </div>
 
-                      <!-- 攝影資訊 -->
-                      <div v-if="isPhotographyItem(image)" class="text-white/80 text-xs space-y-1 font-light">
-                        <!-- 相機型號 -->
-                        <div v-if="image.camera || image.model" class="flex items-center gap-2">
-                          <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
-                          </svg>
-                          <span>{{ image.camera }} {{ image.model }}</span>
+                  <div class="space-y-3">
+                    <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                         :key="`row-${rowIdx}`"
+                         class="flex gap-3"
+                         :style="{ height: getRowHeight(rowIdx, index) }">
+                      <div v-for="(image, imgIdx) in rowImages"
+                           :key="image.filename"
+                           @click="openImageViewer(image, item.images || [])"
+                           :class="getImageWidth(imgIdx, rowIdx, index)"
+                           class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
+                        <img :src="getImagePath(image.filename)"
+                             :alt="image.title"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                          <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
+                          <div class="text-white/80 text-xs space-y-1 font-light">
+                            <div v-if="image.camera || image.model" class="flex items-center gap-2">
+                              <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
+                              </svg>
+                              <span>{{ image.camera }} {{ image.model }}</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-white/70">
+                              <span v-if="image.aperture">f/{{ image.aperture }}</span>
+                              <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
+                              <span v-if="image.iso">ISO {{ image.iso }}</span>
+                              <span v-if="image.focalLength">{{ image.focalLength }}mm</span>
+                            </div>
+                          </div>
                         </div>
-
-                        <!-- 拍攝參數 -->
-                        <div class="flex items-center gap-3 text-white/70">
-                          <span v-if="image.aperture">f/{{ image.aperture }}</span>
-                          <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
-                          <span v-if="image.iso">ISO {{ image.iso }}</span>
-                          <span v-if="image.focalLength">{{ image.focalLength }}mm</span>
-                        </div>
-                      </div>
-
-                      <!-- 數位作品資訊 -->
-                      <div v-else class="text-white/70 text-xs">
-                        <span>{{ image.time }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </GalleryTimelineItem>
             </div>
-          </GalleryTimelineItem>
-        </div>
-      </div>
+          </div>
 
-      <!-- Mobile: Simple Card Layout -->
-      <div v-if="!isLoading" class="md:hidden block">
-        <div class="space-y-12">
-          <!-- Category Sections -->
-          <div v-for="(item, index) in mixedPhotoItems" :key="item.key">
-            <!-- Category Header -->
-            <div v-if="item.eventName" class="mb-4">
-              <h3 class="text-base font-extralight text-stone-700 tracking-wider">
-                {{ item.eventName }}
-              </h3>
-              <p class="text-xs text-stone-400 font-light">{{ item.images?.length || 0 }} 張作品</p>
-            </div>
-
-            <!-- Photo Grid - 手機版日式佈局 -->
-            <div class="space-y-2">
-              <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-                   :key="`row-${rowIdx}`"
-                   class="flex gap-2"
-                   style="height: 150px">
-                <div v-for="(image, imgIdx) in rowImages"
-                     :key="image.filename"
-                     @click="openImageViewer(image, item.images || [])"
-                     class="flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative">
-                  <img :src="getImagePath(image.filename)"
-                       :alt="image.title"
-                       class="w-full h-full object-cover">
-                  <!-- 手機版懸浮層 - 點擊時短暫顯示 -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-active:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2">
-                    <p class="text-white text-xs font-light truncate">{{ image.title || '未命名' }}</p>
-                    <!-- 攝影參數 - 極簡版 -->
-                    <div v-if="isPhotographyItem(image)" class="text-white/70 text-[10px] mt-1">
-                      <span v-if="image.aperture">f/{{ image.aperture }}</span>
-                      <span v-if="image.shutterSpeed" class="ml-2">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
-                      <span v-if="image.iso" class="ml-2">ISO {{ image.iso }}</span>
+          <!-- Mobile Layout for Photography -->
+          <div class="md:hidden block">
+            <div class="space-y-12">
+              <div v-for="(item, index) in photographyEventItems" :key="item.key">
+                <div v-if="item.eventName" class="mb-4">
+                  <h3 class="text-base font-extralight text-stone-700 tracking-wider">
+                    {{ item.eventName }}
+                  </h3>
+                  <p class="text-xs text-stone-400 font-light">{{ item.images?.length || 0 }} 張作品</p>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                       :key="`row-${rowIdx}`"
+                       class="flex gap-2"
+                       style="height: 150px">
+                    <div v-for="(image, imgIdx) in rowImages"
+                         :key="image.filename"
+                         @click="openImageViewer(image, item.images || [])"
+                         class="flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative">
+                      <img :src="getImagePath(image.filename)"
+                           :alt="image.title"
+                           class="w-full h-full object-cover">
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Ungrouped Images -->
-          <div v-if="ungroupedImages.length > 0">
-            <div class="mb-4">
-              <h3 class="text-base font-extralight text-stone-700 tracking-wider">其他作品</h3>
-              <p class="text-xs text-stone-400 font-light">{{ ungroupedImages.length }} 張作品</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div v-for="(image, idx) in ungroupedImages"
-                   :key="image.filename"
-                   @click="openImageViewer(image, ungroupedImages)"
-                   class="aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200">
-                <img :src="getImagePath(image.filename)"
-                     :alt="image.title"
-                     class="w-full h-full object-cover">
-              </div>
+        <!-- 全部作品 - 混合佈局 -->
+        <div v-else>
+          <!-- 保持原有的混合佈局 -->
+          <div class="hidden md:block">
+            <div class="space-y-32 max-w-6xl mx-auto">
+              <GalleryTimelineItem
+                v-for="(item, index) in mixedPhotoItems"
+                :key="item.key"
+                :index="index"
+                :time-label="item.timeRange || ''"
+                :event-info="item.eventInfo"
+                :event-key="item.eventName || 'no-event'"
+                :show-event-control="!!item.eventName"
+                :show-event-info="!!item.eventName"
+              >
+                <div class="mb-12">
+                  <div class="mb-6">
+                    <h3 class="text-lg font-extralight text-stone-700 tracking-wider">
+                      {{ item.eventName || '其他作品' }}
+                    </h3>
+                    <p class="text-xs text-stone-400 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                         :key="`row-${rowIdx}`"
+                         class="flex gap-3"
+                         :style="{ height: getRowHeight(rowIdx, index) }">
+                      <div v-for="(image, imgIdx) in rowImages"
+                           :key="image.filename"
+                           @click="openImageViewer(image, item.images || [])"
+                           :class="getImageWidth(imgIdx, rowIdx, index)"
+                           class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
+                        <img :src="getImagePath(image.filename)"
+                             :alt="image.title"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </GalleryTimelineItem>
             </div>
           </div>
         </div>
@@ -172,7 +184,6 @@
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
-
   </div>
 </template>
 
@@ -188,7 +199,6 @@ import { useGlobalToast } from '~/composables/useToast'
 import GalleryTabBar from '~/components/GalleryTabBar.vue'
 import EventFilter from '~/components/EventFilter.vue'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
-import PhotoCard from '~/components/PhotoCard.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
 // ===== Store 和 Composables =====
@@ -197,7 +207,11 @@ const {
   mixedPhotoItems,
   isLoading,
   digitalError,
-  photographyError
+  photographyError,
+  filterState,
+  digitalWorks,
+  currentWorks,
+  groupedWorks
 } = storeToRefs(galleryStore)
 
 const {
@@ -208,7 +222,29 @@ const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
 const { getImagePath } = useImagePath()
 
+
+
 // ===== 計算屬性 =====
+// 當前選擇的類別
+const currentCategory = computed(() => filterState.value.selectedCategory)
+
+// 數位作品列表 - 使用經過篩選的 currentWorks
+const digitalArtItems = computed(() => {
+  if (filterState.value.selectedCategory === 'digital') {
+    return currentWorks.value
+  }
+  return digitalWorks.value
+})
+
+
+
+// 攝影作品事件分組
+const photographyEventItems = computed(() => {
+  return mixedPhotoItems.value.filter(item =>
+    item.images && item.images.some(img => img.category === 'photography')
+  )
+})
+
 // 收集所有無分類的圖片
 const ungroupedImages = computed(() => {
   const images: GalleryItem[] = []
@@ -224,6 +260,8 @@ const ungroupedImages = computed(() => {
 const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
   imageViewerStore.openImageViewer(clickedImage, images)
 }
+
+
 
 // ===== 網格佈局輔助函數 =====
 // 將圖片分成每行兩張
@@ -318,10 +356,14 @@ onMounted(async () => {
         error: '載入作品失敗'
       }
     )
+
+
   } catch (error) {
     console.error('Failed to load works:', error)
   }
 })
+
+
 
 // ===== SEO =====
 useHead({

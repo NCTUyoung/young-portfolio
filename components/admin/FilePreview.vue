@@ -40,22 +40,38 @@
             />
           </div>
           <!-- 繪圖作品專用欄位 -->
-          <div v-if="adminStore.uploadCategory === 'gallery'">
-            <label class="block text-xs font-medium text-gray-700 mb-1">
-              顏色標籤
-            </label>
-            <select
-              v-model="file.color"
-              class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="blue">藍色</option>
-              <option value="red">紅色</option>
-              <option value="green">綠色</option>
-              <option value="yellow">黃色</option>
-              <option value="purple">紫色</option>
-              <option value="orange">橙色</option>
-              <option value="amber">琥珀色</option>
-            </select>
+          <div v-if="adminStore.uploadCategory === 'gallery'" class="space-y-2">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">
+                創作日期 <span class="text-red-500">*</span>
+              </label>
+              <input
+                v-model="file.creationDate"
+                type="date"
+                required
+                class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                請選擇作品的實際創作日期
+              </p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">
+                顏色標籤
+              </label>
+              <select
+                v-model="file.color"
+                class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="blue">藍色</option>
+                <option value="red">紅色</option>
+                <option value="green">綠色</option>
+                <option value="yellow">黃色</option>
+                <option value="purple">紫色</option>
+                <option value="orange">橙色</option>
+                <option value="amber">琥珀色</option>
+              </select>
+            </div>
           </div>
           <!-- 攝影作品專用欄位 -->
           <div v-if="adminStore.uploadCategory === 'photography'" class="space-y-2">

@@ -110,11 +110,20 @@
               <!-- 編輯模式覆蓋層 -->
               <div
                 v-if="adminStore.editMode"
-                class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center"
+                class="absolute top-2 right-2 z-20 opacity-80 group-hover:opacity-100 transition-opacity duration-300 flex space-x-1"
               >
                 <button
+                  @click.stop="handleEditImage(item)"
+                  class="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                  title="編輯圖片"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+                <button
                   @click.stop="adminStore.showDeleteConfirm(item.filename, item.title)"
-                  class="opacity-0 group-hover:opacity-100 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 transform scale-90 hover:scale-100"
+                  class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 shadow-lg"
                   title="刪除圖片"
                 >
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -128,6 +137,11 @@
               <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <p class="text-white text-xs font-medium truncate">{{ item.title }}</p>
                 <p class="text-white/80 text-xs mt-1">{{ formatDate(item.time) }}</p>
+              </div>
+
+              <!-- 永久顯示的日期標籤 -->
+              <div class="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                {{ formatDate(item.time) }}
               </div>
             </div>
           </div>
@@ -150,7 +164,16 @@
                 <p class="text-sm font-medium text-gray-900 truncate">{{ item.title }}</p>
                 <p class="text-xs text-gray-500">{{ formatDate(item.time) }}</p>
               </div>
-              <div v-if="adminStore.editMode" class="flex-shrink-0">
+              <div v-if="adminStore.editMode" class="flex-shrink-0 flex space-x-2">
+                <button
+                  @click="handleEditImage(item)"
+                  class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  title="編輯圖片"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
                 <button
                   @click="adminStore.showDeleteConfirm(item.filename, item.title)"
                   class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
@@ -192,5 +215,10 @@ const formatDate = (dateString: string) => {
   } catch {
     return dateString
   }
+}
+
+// 編輯圖片處理
+const handleEditImage = (item: any) => {
+  adminStore.startEditImage(item)
 }
 </script>

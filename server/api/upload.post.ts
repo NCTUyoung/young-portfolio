@@ -7,7 +7,8 @@ import {
   generateTitleAndDescription,
   extractCaptureTime,
   normalizeExifData,
-  formatDate
+  formatDate,
+  inferEventFromTime
 } from '~/utils/photoUtils'
 import type { ExifData, PhotographyData, GalleryData } from '~/types/gallery'
 
@@ -37,20 +38,16 @@ export default defineEventHandler(async (event) => {
     const [fields, files] = await form.parse(event.node.req)
 
     const uploadedFiles = []
-    const eventName = fields.event?.[0] || 'default'
-    const category = fields.category?.[0] || 'gallery' // 'gallery' 或 'photography'
+    const category = (fields.category?.[0] || 'gallery') as 'gallery' | 'photography'
+    const manualEventName = fields.event?.[0] || ''
     const eventDescription = fields.eventDescription?.[0] || ''
     const eventLocation = fields.eventLocation?.[0] || ''
 
     const categoryDir = join('./public/images', category)
-    const eventDir = join(categoryDir, eventName)
 
-    // 創建分類和事件目錄
+    // 創建分類目錄
     if (!existsSync(categoryDir)) {
       mkdirSync(categoryDir, { recursive: true })
-    }
-    if (!existsSync(eventDir)) {
-      mkdirSync(eventDir, { recursive: true })
     }
 
     // 處理上傳的檔案
@@ -59,19 +56,16 @@ export default defineEventHandler(async (event) => {
     for (const file of fileList) {
       if (file) {
         const originalName = file.originalFilename || 'unnamed'
-        const newPath = join(eventDir, originalName)
 
-                // 移動檔案到目標位置
-        const fs = await import('fs/promises')
-        await fs.rename(file.filepath, newPath)
+        // 先確定檔案的創作/拍攝時間
+        let captureTime = new Date()
 
-        // 根據分類建立不同的資料結構
-                if (category === 'photography') {
-          // 攝影作品結構 - 自動提取 EXIF 資訊
+        if (category === 'photography') {
+          // 攝影作品：優先從 EXIF 提取拍攝時間
           let rawExifData: any = {}
 
           try {
-            rawExifData = await exifr.parse(newPath)
+            rawExifData = await exifr.parse(file.filepath)
           } catch (error) {
             console.warn(`無法讀取 ${originalName} 的 EXIF 資訊:`, error)
           }
@@ -80,7 +74,28 @@ export default defineEventHandler(async (event) => {
           const exifData = normalizeExifData(rawExifData)
 
           // 提取拍攝時間
-          const captureTime = extractCaptureTime(exifData)
+          const exifTime = extractCaptureTime(exifData)
+          if (exifTime) {
+            captureTime = exifTime
+          }
+
+          // 攝影作品使用手動填寫的事件名稱
+          const eventInfo = {
+            name: manualEventName,
+            description: eventDescription,
+            location: eventLocation
+          }
+
+          // 創建事件目錄
+          const eventDir = join(categoryDir, eventInfo.name)
+          if (!existsSync(eventDir)) {
+            mkdirSync(eventDir, { recursive: true })
+          }
+
+          // 移動檔案到事件目錄
+          const newPath = join(eventDir, originalName)
+          const fs = await import('fs/promises')
+          await fs.rename(file.filepath, newPath)
 
           // 生成標題和描述
           const { title: autoTitle, description: autoDescription } = generateTitleAndDescription(originalName)
@@ -89,16 +104,12 @@ export default defineEventHandler(async (event) => {
           const tags = generateSmartTags(exifData, originalName, fields[`tags_${originalName}`]?.[0])
 
           uploadedFiles.push({
-            filename: `${category}/${eventName}/${originalName}`,
+            filename: `${category}/${eventInfo.name}/${originalName}`,
             time: formatDate(captureTime),
             title: fields[`title_${originalName}`]?.[0] || autoTitle,
             content: fields[`content_${originalName}`]?.[0] || autoDescription,
             tags: tags,
-            event: {
-              name: eventName,
-              description: eventDescription,
-              location: eventLocation
-            },
+            event: eventInfo,
             camera: exifData.Make,
             model: exifData.Model,
             focalLength: exifData.FocalLength,
@@ -107,13 +118,47 @@ export default defineEventHandler(async (event) => {
             shutterSpeed: exifData.ExposureTime
           })
         } else {
-          // 繪圖作品結構
+          // 繪圖作品：優先使用用戶指定的創作日期，否則嘗試 EXIF
+          const userCreationDate = fields[`creationDate_${originalName}`]?.[0]
+          if (userCreationDate) {
+            captureTime = new Date(userCreationDate)
+          } else {
+            // 嘗試讀取 EXIF 資料（電繪作品可能也有 EXIF）
+            try {
+              const rawExifData = await exifr.parse(file.filepath)
+              if (rawExifData) {
+                const exifData = normalizeExifData(rawExifData)
+                const exifTime = extractCaptureTime(exifData)
+                if (exifTime) {
+                  captureTime = exifTime
+                }
+              }
+            } catch (error) {
+              console.warn(`無法讀取 ${originalName} 的 EXIF 資訊，使用當前時間`)
+            }
+          }
+
+          // 繪圖作品根據時間自動推斷事件
+          const eventInfo = inferEventFromTime(captureTime, category)
+
+          // 創建事件目錄
+          const eventDir = join(categoryDir, eventInfo.name)
+          if (!existsSync(eventDir)) {
+            mkdirSync(eventDir, { recursive: true })
+          }
+
+          // 移動檔案到事件目錄
+          const newPath = join(eventDir, originalName)
+          const fs = await import('fs/promises')
+          await fs.rename(file.filepath, newPath)
+
           uploadedFiles.push({
-            filename: `${category}/${eventName}/${originalName}`,
-            time: formatDate(new Date()),
+            filename: `${category}/${eventInfo.name}/${originalName}`,
+            time: formatDate(captureTime),
             title: fields[`title_${originalName}`]?.[0] || originalName.split('.')[0],
             content: fields[`content_${originalName}`]?.[0] || '',
-            color: fields[`color_${originalName}`]?.[0] || 'blue'
+            color: fields[`color_${originalName}`]?.[0] || 'blue',
+            event: eventInfo
           })
         }
       }
@@ -148,14 +193,18 @@ export default defineEventHandler(async (event) => {
     categoryData.Img.push(...uploadedFiles)
     categoryData.totalNumber = categoryData.Img.length.toString()
 
-    // 更新事件統計（僅攝影類別）
-    if (category === 'photography') {
-      if (!categoryData.eventStats) categoryData.eventStats = {}
-      if (!categoryData.eventStats[eventName]) {
-        categoryData.eventStats[eventName] = 0
+    // 更新事件統計
+    if (!categoryData.eventStats) categoryData.eventStats = {}
+
+    // 統計每個事件的圖片數量
+    uploadedFiles.forEach(file => {
+      if (file.event && file.event.name) {
+        if (!categoryData.eventStats[file.event.name]) {
+          categoryData.eventStats[file.event.name] = 0
+        }
+        categoryData.eventStats[file.event.name] += 1
       }
-      categoryData.eventStats[eventName] += uploadedFiles.length
-    }
+    })
 
     // 寫入更新後的JSON
     writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')

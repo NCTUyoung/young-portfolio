@@ -111,10 +111,10 @@ const getImageClass = (index: number): string => {
   return classes[index % classes.length]
 }
 
-const fetchDigitalWorks = async (): Promise<GalleryItem[]> => {
+const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
   const data: any = await $fetch('/galleryList.json')
 
-  return data.Img.map((img: any) => ({
+  const works = data.Img.map((img: any) => ({
     id: `digital-${img.filename}`,
     filename: img.filename,
     title: img.title,
@@ -122,9 +122,15 @@ const fetchDigitalWorks = async (): Promise<GalleryItem[]> => {
     date: img.time,
     time: img.time,
     color: img.color,
+    event: img.event || null,
     category: 'digital' as const,
     visible: true
-  }))
+  })).sort((a: GalleryItem, b: GalleryItem) => new Date(b.time).getTime() - new Date(a.time).getTime())
+
+  return {
+    works,
+    eventStats: data.eventStats || {}
+  }
 }
 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
@@ -147,7 +153,7 @@ const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventSta
     shutterSpeed: img.shutterSpeed,
     category: 'photography' as const,
     visible: true
-  }))
+  })).sort((a: GalleryItem, b: GalleryItem) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
   return {
     works,
@@ -157,11 +163,11 @@ const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventSta
 
 export const useGalleryStore = defineStore('gallery', () => {
   const {
-    state: digitalWorks,
+    state: digitalData,
     isLoading: isLoadingDigital,
     error: digitalError,
     execute: loadDigitalWorks
-  } = useAsyncState(fetchDigitalWorks, [], {
+  } = useAsyncState(fetchDigitalWorks, { works: [], eventStats: {} }, {
     immediate: false,
     resetOnExecute: false
   })
@@ -176,6 +182,8 @@ export const useGalleryStore = defineStore('gallery', () => {
     resetOnExecute: false
   })
 
+  const digitalWorks = computed(() => digitalData.value.works)
+  const digitalEventStats = computed(() => digitalData.value.eventStats)
   const photographyWorks = computed(() => photographyData.value.works)
   const eventStats = computed(() => photographyData.value.eventStats)
 
@@ -217,6 +225,10 @@ export const useGalleryStore = defineStore('gallery', () => {
 
     if (selectedCategory === 'digital') {
       works = digitalWorks.value
+
+      if (selectedEvent) {
+        works = works.filter(work => work.event && work.event.name === selectedEvent)
+      }
     } else if (selectedCategory === 'photography') {
       works = photographyWorks.value
 
@@ -227,7 +239,8 @@ export const useGalleryStore = defineStore('gallery', () => {
       works = allWorks.value
     }
 
-    return works
+    // 按時間排序 (最新的在前)
+    return works.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
   })
 
   const filteredItems = computed(() => {
@@ -313,7 +326,7 @@ export const useGalleryStore = defineStore('gallery', () => {
       let groupName: string | null = null
       let eventInfo: any = null
 
-      if (work.category === 'photography' && work.event) {
+      if (work.event) {
         groupKey = work.event.name
         groupName = work.event.name
         eventInfo = work.event
@@ -321,7 +334,7 @@ export const useGalleryStore = defineStore('gallery', () => {
       else if (work.category === 'digital') {
         const year = new Date(work.time).getFullYear()
         groupKey = `digital-${year}`
-        groupName = `數位作品 ${year}`
+        groupName = `${year}年電繪作品`
       }
       else {
         groupName = '攝影作品'
@@ -370,29 +383,30 @@ export const useGalleryStore = defineStore('gallery', () => {
   })
 
   const availableEvents = computed(() => {
-    // 計算每個事件的最新時間
-    const eventTimes: Record<string, number> = {}
+    const eventCounts = new Map<string, number>()
+    const category = filterState.value.selectedCategory
 
-    photographyWorks.value.forEach(work => {
-      if (work.event && work.event.name) {
-        const eventName = work.event.name
-        const workTime = new Date(work.time).getTime()
-
-        if (!eventTimes[eventName] || workTime > eventTimes[eventName]) {
-          eventTimes[eventName] = workTime
+    if (category === 'all' || category === 'digital') {
+      digitalWorks.value.forEach(work => {
+        if (work.event) {
+          const count = eventCounts.get(work.event.name) || 0
+          eventCounts.set(work.event.name, count + 1)
         }
-      }
-    })
+      })
+    }
 
-    // 按最新時間排序事件
-    return Object.entries(eventStats.value)
-      .map(([name, count]) => ({
-        name,
-        count,
-        latestTime: eventTimes[name] || 0
-      }))
-      .sort((a, b) => b.latestTime - a.latestTime) // 最新的事件在前
-      .map(({ name, count }) => ({ name, count })) // 移除 latestTime，只保留需要的屬性
+    if (category === 'all' || category === 'photography') {
+      photographyWorks.value.forEach(work => {
+        if (work.event) {
+          const count = eventCounts.get(work.event.name) || 0
+          eventCounts.set(work.event.name, count + 1)
+        }
+      })
+    }
+
+    return Array.from(eventCounts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name))
   })
 
   const availableYears = computed(() => {
@@ -487,7 +501,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     await loadAllWorks()
   }
 
-  watch([digitalWorks, photographyWorks], () => {
+  watch([digitalData, photographyData], () => {
     clearCache(['allWorks', 'mixedItems'])
   }, { deep: true })
 
@@ -495,6 +509,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     digitalWorks,
     photographyWorks,
     eventStats,
+    digitalEventStats,
     expandedGroups,
     isLoading,
     filterState,

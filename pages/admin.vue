@@ -561,6 +561,15 @@
       @confirm="adminStore.confirmDeleteImage"
       @cancel="adminStore.cancelDeleteImage"
     />
+
+    <!-- 圖片編輯對話框 -->
+    <AdminImageEditDialog
+      :is-visible="adminStore.showImageEditDialog"
+      :image-data="adminStore.editingImageData"
+      :category="adminStore.manageCategory"
+      @confirm="adminStore.confirmEditImage"
+      @cancel="adminStore.cancelEditImage"
+    />
   </div>
 </template>
 

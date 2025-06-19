@@ -45,19 +45,13 @@ export default defineEventHandler(async (event) => {
     // 找到該事件的所有圖片並更新事件資訊
     let updatedCount = 0
     categoryData.Img.forEach((img: any) => {
-      // 檢查是否屬於要更新的事件
-      if (category === 'photography' && img.event) {
+      if (img.event) {
         if (img.event.name === originalEventName) {
-          // 更新攝影作品的事件資訊
           img.event.name = newEventName
           img.event.description = newDescription || ''
           img.event.location = newLocation || ''
           updatedCount++
         }
-      } else if (category === 'gallery') {
-        // 對於繪圖作品，可能需要根據其他條件判斷事件歸屬
-        // 這裡暫時跳過，因為繪圖作品目前沒有明確的事件關聯機制
-        // 如果需要可以後續擴展
       }
     })
 
