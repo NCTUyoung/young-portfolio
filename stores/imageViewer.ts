@@ -92,7 +92,7 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
   })
 
   // ===== 基本操作方法 =====
-  const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
+    const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
     const startIndex = images.findIndex(img => img.id === clickedImage.id)
     viewerImages.value = images
     currentImageIndex.value = Math.max(0, startIndex)
