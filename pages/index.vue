@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 英雄区域 -->
+    <!-- 英雄區域 -->
     <div class="bg-white/60 backdrop-blur-sm">
       <div class="max-w-7xl mx-auto py-24 px-6 sm:py-32 sm:px-8 lg:px-12">
         <div class="text-center max-w-4xl mx-auto">
@@ -14,11 +14,11 @@
       </div>
     </div>
 
-    <!-- 特色内容 -->
+    <!-- 特色內容 -->
     <div class="bg-stone-50/30 py-20">
       <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
-          <!-- 图片库卡片 -->
+          <!-- 圖片庫卡片 -->
           <div class="bg-white/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 rounded-xl hover:border-stone-300/80 transition-all duration-500 group">
             <div class="p-8">
               <h3 class="text-2xl font-extralight text-stone-800 tracking-wider leading-relaxed">圖片庫</h3>
@@ -54,7 +54,7 @@
             </div>
           </div>
 
-          <!-- 关于我们卡片 -->
+          <!-- 關於我們卡片 -->
           <div class="bg-white/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 rounded-xl hover:border-stone-300/80 transition-all duration-500 group">
             <div class="p-8">
               <h3 class="text-2xl font-extralight text-stone-800 tracking-wider leading-relaxed">關於我們</h3>
@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-// 首页组件的逻辑
+// 首頁組件的邏輯
 
 // SEO 優化
 useHead({

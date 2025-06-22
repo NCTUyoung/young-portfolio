@@ -540,7 +540,7 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="zh-TW">繁體中文</option>
-                    <option value="zh-CN">简体中文</option>
+                    <option value="zh-CN">簡體中文</option>
                     <option value="en-US">English</option>
                   </select>
                 </div>

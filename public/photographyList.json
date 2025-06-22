@@ -1,12 +1,13 @@
 {
-  "totalNumber": "21",
+  "totalNumber": "26",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
     "2024新北耶誕城": 4,
     "2025 桃園三本柱": 5,
     "攝影社 米倉團拍": 4,
-    "調色測試": 3
+    "調色測試": 3,
+    "交大外拍": 5
   },
   "Img": [
     {
@@ -471,6 +472,115 @@
       "aperture": 5.6,
       "iso": 2000,
       "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/交大外拍/DSC_3051-編輯-1.jpg",
+      "time": "2024 Oct 13",
+      "title": "DSC_3051-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "交大外拍",
+        "description": "聯發攝影",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 110,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/交大外拍/DSC_3218-1.jpg",
+      "time": "2024 Oct 13",
+      "title": "DSC_3218-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "高速快門"
+      ],
+      "event": {
+        "name": "交大外拍",
+        "description": "聯發攝影",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 73,
+      "aperture": 2.5,
+      "iso": 100,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/交大外拍/DSC_3312-1.jpg",
+      "time": "2024 Oct 13",
+      "title": "DSC_3312-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光"
+      ],
+      "event": {
+        "name": "交大外拍",
+        "description": "聯發攝影",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 128,
+      "aperture": 2.8,
+      "iso": 100,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/交大外拍/DSC_3342-編輯.jpg",
+      "time": "2024 Oct 13",
+      "title": "DSC_3342-編輯",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "後製"
+      ],
+      "event": {
+        "name": "交大外拍",
+        "description": "聯發攝影",
+        "location": "交通大學"
+      },
+      "camera": "",
+      "model": "",
+      "focalLength": 0,
+      "aperture": 0,
+      "iso": 0,
+      "shutterSpeed": 0
+    },
+    {
+      "filename": "photography/交大外拍/DSC_3368-1.jpg",
+      "time": "2024 Oct 13",
+      "title": "DSC_3368-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "日光"
+      ],
+      "event": {
+        "name": "交大外拍",
+        "description": "聯發攝影",
+        "location": "交通大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 63,
+      "aperture": 6.3,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
     }
   ]
 }

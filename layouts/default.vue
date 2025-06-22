@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-stone-50/30">
-    <!-- 导航栏 -->
+    <!-- 導航欄 -->
     <nav class="bg-white/80 backdrop-blur-md border-b border-stone-200/40">
       <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="flex justify-between h-20">
@@ -13,15 +13,15 @@
           <!-- 桌面版導航 -->
           <div class="hidden md:flex items-center space-x-8">
             <NuxtLink to="/" class="text-stone-600 hover:text-stone-800 transition-colors duration-300 font-light tracking-wide relative group">
-              首页
+              首頁
               <span class="absolute -bottom-2 left-0 w-0 h-px bg-stone-400 transition-all duration-300 group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink to="/about" class="text-stone-600 hover:text-stone-800 transition-colors duration-300 font-light tracking-wide relative group">
-              关于
+              關於
               <span class="absolute -bottom-2 left-0 w-0 h-px bg-stone-400 transition-all duration-300 group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink to="/gallery" class="text-stone-600 hover:text-stone-800 transition-colors duration-300 font-light tracking-wide relative group">
-              图片库
+              圖片庫
               <span class="absolute -bottom-2 left-0 w-0 h-px bg-stone-400 transition-all duration-300 group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink to="/article" class="text-stone-600 hover:text-stone-800 transition-colors duration-300 font-light tracking-wide relative group">
@@ -75,7 +75,7 @@
                           'block px-4 py-3 text-sm font-light tracking-wide rounded-lg transition-all duration-200'
                         ]"
                       >
-                        首页
+                        首頁
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <HeadlessMenuItem v-slot="{ active }">
@@ -86,7 +86,7 @@
                           'block px-4 py-3 text-sm font-light tracking-wide rounded-lg transition-all duration-200'
                         ]"
                       >
-                        关于
+                        關於
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <HeadlessMenuItem v-slot="{ active }">
@@ -97,7 +97,7 @@
                           'block px-4 py-3 text-sm font-light tracking-wide rounded-lg transition-all duration-200'
                         ]"
                       >
-                        图片库
+                        圖片庫
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <HeadlessMenuItem v-slot="{ active }">
@@ -149,12 +149,12 @@
       </div>
     </nav>
 
-    <!-- 主要内容 -->
+    <!-- 主要內容 -->
     <main class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
       <slot />
     </main>
 
-    <!-- 页脚 -->
+    <!-- 頁腳 -->
     <footer class="bg-white/60 backdrop-blur-sm border-t border-stone-200/40">
       <div class="max-w-7xl mx-auto py-8 px-6 sm:px-6 lg:px-8">
         <p class="text-center text-stone-500 font-light tracking-wide">© 2025 NCTU Young. All rights reserved.</p>

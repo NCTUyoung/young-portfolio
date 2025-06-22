@@ -147,6 +147,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
+import { useGalleryFilters } from '~/composables/useGalleryFilters'
 import { useDebounceFn, useStorage } from '@vueuse/core'
 
 const galleryStore = useGalleryStore()
@@ -154,19 +155,27 @@ const galleryStore = useGalleryStore()
 // 使用 storeToRefs 來保持響應性
 const {
   allWorks,
-  filteredItems,
   filterState,
-  availableYears,
-  categoryStats,
   isLoading
 } = storeToRefs(galleryStore)
+
+// 使用新的篩選 composable
+const galleryFilters = useGalleryFilters(allWorks, filterState)
+
+// 從 composable 獲取篩選相關狀態和方法
+const {
+  filteredImages: filteredItems,
+  availableYears,
+  categoryStats,
+  hasActiveFilters,
+  resetFilters: clearFilters
+} = galleryFilters
 
 // 使用 actions
 const {
   setSelectedCategory,
   setSearchQuery,
-  setYearFilter,
-  clearFilters
+  setYearFilter
 } = galleryStore
 
 // 本地搜尋狀態
@@ -191,13 +200,6 @@ const userPreferences = useStorage('gallery-filter-preferences', {
   rememberFilters: true
 })
 
-// 計算屬性
-const hasActiveFilters = computed(() => {
-  return filterState.value.selectedCategory !== 'all' ||
-         filterState.value.yearFilter !== null ||
-         filterState.value.searchQuery.trim() !== ''
-})
-
 // 分類標籤映射
 const getCategoryLabel = (category: string) => {
   const labels: Record<string, string> = {
@@ -216,9 +218,8 @@ const clearSearch = () => {
 }
 
 const refreshData = () => {
-  // 這裡可以加入重新載入資料的邏輯
-  // 例如重新載入頁面或觸發資料更新
-  window.location.reload()
+  // 重新載入資料
+  galleryStore.refreshData()
 }
 
 // 儲存使用者偏好

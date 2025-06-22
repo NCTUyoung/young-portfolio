@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import type { PhotographyData, GalleryData } from '~/types/gallery'
-import { formatDate } from '~/utils/photoUtils'
+import { formatDateFull } from '~/utils/formatters'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'PATCH') {
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
         console.log('Original date from client:', updates.date)
         const date = new Date(updates.date)
         console.log('Parsed date object:', date)
-        const formattedDate = formatDate(date)
+        const formattedDate = formatDateFull(date)
         console.log('Formatted date:', formattedDate)
         processedUpdates.time = formattedDate
         delete processedUpdates.date // 移除原始 date 字段

@@ -6,10 +6,10 @@ import {
   generateSmartTags,
   generateTitleAndDescription,
   extractCaptureTime,
-  normalizeExifData,
-  formatDate,
-  inferEventFromTime
-} from '~/utils/photoUtils'
+  normalizeExifData
+} from '~/utils/imageUtils'
+import { formatDateFull } from '~/utils/formatters'
+import { inferEventFromTime } from '~/utils/eventUtils'
 import type { ExifData, PhotographyData, GalleryData } from '~/types/gallery'
 
 export default defineEventHandler(async (event) => {
@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
     const manualEventName = fields.event?.[0] || ''
     const eventDescription = fields.eventDescription?.[0] || ''
     const eventLocation = fields.eventLocation?.[0] || ''
+    const addToExistingEvent = fields.addToExistingEvent?.[0] === 'true'
 
     const categoryDir = join('./public/images', category)
 
@@ -75,15 +76,53 @@ export default defineEventHandler(async (event) => {
 
           // 提取拍攝時間
           const exifTime = extractCaptureTime(exifData)
-          if (exifTime) {
+          if (exifTime && exifTime.getFullYear() > 1900) {
             captureTime = exifTime
+            console.log(`✅ 使用 EXIF 拍攝時間: ${originalName} -> ${captureTime.toISOString()}`)
+          } else {
+            console.warn(`⚠️ 未找到有效 EXIF 拍攝時間，使用當前時間: ${originalName}`)
           }
 
-          // 攝影作品使用手動填寫的事件名稱
-          const eventInfo = {
-            name: manualEventName,
-            description: eventDescription,
-            location: eventLocation
+          // 攝影作品事件處理
+          let eventInfo
+
+          if (addToExistingEvent && manualEventName) {
+            // 添加到現有事件 - 從現有數據中查找事件信息
+            let existingData
+            try {
+              const jsonPath = './public/photographyList.json'
+              const jsonContent = readFileSync(jsonPath, 'utf-8')
+              existingData = JSON.parse(jsonContent)
+            } catch (error) {
+              console.warn('無法讀取現有數據，將創建新事件')
+              existingData = { Img: [] }
+            }
+
+            // 查找現有事件的完整信息
+            const existingImage = existingData.Img?.find((img: any) => img.event?.name === manualEventName)
+            if (existingImage?.event) {
+              eventInfo = {
+                name: existingImage.event.name,
+                description: existingImage.event.description || '',
+                location: existingImage.event.location || ''
+              }
+              console.log(`✅ 添加到現有事件: ${eventInfo.name}`)
+            } else {
+              // 如果找不到現有事件，回退到創建新事件
+              eventInfo = {
+                name: manualEventName,
+                description: eventDescription,
+                location: eventLocation
+              }
+              console.warn(`⚠️ 找不到現有事件 "${manualEventName}"，將創建新事件`)
+            }
+          } else {
+            // 創建新事件
+            eventInfo = {
+              name: manualEventName,
+              description: eventDescription,
+              location: eventLocation
+            }
           }
 
           // 創建事件目錄
@@ -105,7 +144,7 @@ export default defineEventHandler(async (event) => {
 
           uploadedFiles.push({
             filename: `${category}/${eventInfo.name}/${originalName}`,
-            time: formatDate(captureTime),
+            time: formatDateFull(captureTime),
             title: fields[`title_${originalName}`]?.[0] || autoTitle,
             content: fields[`content_${originalName}`]?.[0] || autoDescription,
             tags: tags,
@@ -139,7 +178,7 @@ export default defineEventHandler(async (event) => {
           }
 
           // 繪圖作品根據時間自動推斷事件
-          const eventInfo = inferEventFromTime(captureTime, category)
+          const eventInfo = inferEventFromTime(captureTime, 'digital')
 
           // 創建事件目錄
           const eventDir = join(categoryDir, eventInfo.name)
@@ -154,7 +193,7 @@ export default defineEventHandler(async (event) => {
 
           uploadedFiles.push({
             filename: `${category}/${eventInfo.name}/${originalName}`,
-            time: formatDate(captureTime),
+            time: formatDateFull(captureTime),
             title: fields[`title_${originalName}`]?.[0] || originalName.split('.')[0],
             content: fields[`content_${originalName}`]?.[0] || '',
             color: fields[`color_${originalName}`]?.[0] || 'blue',

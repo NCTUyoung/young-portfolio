@@ -6,24 +6,47 @@ export interface BaseImageItem {
   content: string
 }
 
-// 繪圖作品接口
-export interface GalleryItem extends BaseImageItem {
+// 事件定義接口
+export interface PhotoEvent {
+  name: string
+  description: string
+  location: string
+}
+
+// 統一的圖片項目接口
+export interface GalleryItem {
+  id: string
+  filename: string
+  title: string
+  description: string
+  imagePath?: string
+  category: 'digital' | 'photography'
+  date: string
+  time: string
+  tags?: string[]
+  visible?: boolean
+  // 數位作品相關
+  color?: string
+  // 攝影作品相關
+  event?: PhotoEvent | null
+  camera?: string
+  model?: string
+  focalLength?: number
+  aperture?: number
+  iso?: number
+  shutterSpeed?: number
+}
+
+// 繪圖作品接口（向後兼容）
+export interface DigitalArtItem extends BaseImageItem {
   color: string
-  event?: {
-    name: string
-    description: string
-    location: string
-  }
+  event?: PhotoEvent
 }
 
 // 攝影作品接口
 export interface PhotographyItem extends BaseImageItem {
   tags: string[]
-  event: {
-    name: string
-    description: string
-    location: string
-  }
+  event: PhotoEvent
   camera: string
   model: string
   focalLength: number
@@ -32,11 +55,43 @@ export interface PhotographyItem extends BaseImageItem {
   shutterSpeed: number
 }
 
+// 事件分組接口
+export interface EventGroup {
+  eventName: string | null
+  eventInfo?: PhotoEvent
+  images: GalleryItem[]
+  timeRange: string
+}
+
+// 混合照片項目接口
+export interface MixedPhotoItem {
+  type: 'group' | 'photo'
+  key: string
+  time?: string
+  eventName?: string | null
+  eventInfo?: PhotoEvent
+  images?: GalleryItem[]
+  timeRange?: string
+  filename?: string
+  title?: string
+  event?: PhotoEvent
+  isFirstInEvent?: boolean
+  [key: string]: any
+}
+
+// 篩選狀態接口
+export interface FilterState {
+  selectedCategory: 'all' | 'digital' | 'photography'
+  selectedEvent: string | null
+  searchQuery: string
+  yearFilter: string | null
+}
+
 // 圖庫數據結構
 export interface GalleryData {
   totalNumber: string
   eventStats?: Record<string, number>
-  Img: GalleryItem[]
+  Img: DigitalArtItem[]
 }
 
 // 攝影數據結構
@@ -72,13 +127,6 @@ export interface ExifData {
   DateTimeOriginal?: string | Date
   DateTime?: string | Date
   CreateDate?: string | Date
-}
-
-// 事件定義接口
-export interface EventDefinition {
-  name: string
-  description: string
-  location: string
 }
 
 // 分類類型

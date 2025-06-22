@@ -190,8 +190,8 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useGalleryStore, type GalleryItem } from '~/stores/gallery'
-import type { PhotographyItem } from '~/types/gallery'
+import { useGalleryStore } from '~/stores/gallery'
+import type { GalleryItem, PhotographyItem } from '~/types/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGlobalToast } from '~/composables/useToast'
 

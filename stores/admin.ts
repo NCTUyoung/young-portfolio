@@ -18,6 +18,8 @@ export const useAdminStore = defineStore('admin', () => {
 
   // 上傳頁面
   const uploadCategory = ref<CategoryType>('gallery')
+  const eventMode = ref<'new' | 'existing'>('new') // 新增：事件模式
+  const selectedExistingEvent = ref('') // 新增：選中的現有事件
   const eventName = ref('')
   const eventDescription = ref('')
   const eventLocation = ref('')
@@ -71,9 +73,13 @@ export const useAdminStore = defineStore('admin', () => {
       return false
     }
 
-    // 如果是攝影作品，需要填寫事件名稱
+    // 如果是攝影作品，需要根據事件模式檢查
     if (uploadCategory.value === 'photography') {
-      return eventName.value.trim() !== ''
+      if (eventMode.value === 'new') {
+        return eventName.value.trim() !== ''
+      } else if (eventMode.value === 'existing') {
+        return selectedExistingEvent.value.trim() !== ''
+      }
     }
 
     // 繪圖作品不需要額外檢查，系統會自動推斷事件
@@ -207,6 +213,20 @@ export const useAdminStore = defineStore('admin', () => {
     )
   })
 
+  // 攝影作品可用事件列表 (上傳頁面用)
+  const availablePhotographyEvents = computed(() => {
+    const data = photographyData.value || []
+    const events = new Set<string>()
+
+    data.forEach(item => {
+      if ((item as any).event && (item as any).event.name) {
+        events.add((item as any).event.name)
+      }
+    })
+
+    return Array.from(events).sort()
+  })
+
   // ===== Actions =====
 
     // 載入指定分類的圖片列表
@@ -265,10 +285,17 @@ export const useAdminStore = defineStore('admin', () => {
     uploadCategory.value = category
     // 清空表單數據
     selectedFiles.value = []
+    eventMode.value = 'new'
+    selectedExistingEvent.value = ''
     eventName.value = ''
     eventDescription.value = ''
     eventLocation.value = ''
     message.value = ''
+
+    // 載入攝影作品數據以獲取可用事件列表
+    if (category === 'photography' && photographyData.value.length === 0) {
+      loadGalleryByCategory('photography')
+    }
   }
 
   // 設定更新
@@ -344,9 +371,19 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const formData = new FormData()
-      formData.append('event', eventName.value)
-      formData.append('eventDescription', eventDescription.value)
-      formData.append('eventLocation', eventLocation.value)
+
+      // 根據事件模式設定事件資訊
+      if (uploadCategory.value === 'photography') {
+        if (eventMode.value === 'existing') {
+          formData.append('event', selectedExistingEvent.value)
+          formData.append('addToExistingEvent', 'true')
+        } else {
+          formData.append('event', eventName.value)
+          formData.append('eventDescription', eventDescription.value)
+          formData.append('eventLocation', eventLocation.value)
+        }
+      }
+
       formData.append('category', uploadCategory.value)
 
       selectedFiles.value.forEach((fileData) => {
@@ -375,6 +412,8 @@ export const useAdminStore = defineStore('admin', () => {
         message.value = response.message
         messageType.value = 'success'
         selectedFiles.value = []
+        eventMode.value = 'new'
+        selectedExistingEvent.value = ''
         eventName.value = ''
         eventDescription.value = ''
         eventLocation.value = ''
@@ -676,6 +715,8 @@ export const useAdminStore = defineStore('admin', () => {
     editingImageData,
 
     // 表單狀態
+    eventMode,
+    selectedExistingEvent,
     eventName,
     eventDescription,
     eventLocation,
@@ -688,6 +729,7 @@ export const useAdminStore = defineStore('admin', () => {
     currentOverviewData,
     groupedManageData,
     availableEvents,
+    availablePhotographyEvents,
     overviewStats,
     recentItems,
 

@@ -1,131 +1,65 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { useStorage, useAsyncState, useDebounceFn, useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useDebounceFn } from '@vueuse/core'
+import { useApi } from '~/composables/useApi'
+import {
+  sortImagesByTime,
+  calculateTimeRange
+} from '~/utils/galleryUtils'
+import { generateImageId } from '~/utils/imageUtils'
+import { formatDateFull } from '~/utils/formatters'
+import type {
+  GalleryItem,
+  PhotoEvent,
+  EventGroup,
+  MixedPhotoItem,
+  FilterState
+} from '~/types/gallery'
 
-export interface PhotoEvent {
-  name: string
-  description?: string
-  location?: string
-}
+// 類型定義已移至 types/gallery.ts，通過上方 import 語句導入
 
-export interface GalleryItem {
-  id: string
-  filename: string
-  title: string
-  description: string
-  imagePath?: string
-  category: 'digital' | 'photography'
-  date: string
-  time: string
-  tags?: string[]
-  visible?: boolean
-  // 數位作品相關
-  color?: string
-  // 攝影作品相關
-  event?: PhotoEvent | null
-  camera?: string
-  model?: string
-  focalLength?: number
-  aperture?: number
-  iso?: number
-  shutterSpeed?: number
-}
+// 這些工具函數已移至 utils/galleryUtils.ts
+// 在 return 語句中會重新導出以保持向後兼容
 
-export interface EventGroup {
-  eventName: string | null
-  eventInfo?: PhotoEvent
-  images: GalleryItem[]
-  timeRange: string
-}
+// 數據轉換工具函數
+const transformDigitalWork = (img: any): GalleryItem => ({
+  id: generateImageId('digital', img.filename),
+  filename: img.filename,
+  title: img.title,
+  description: img.content,
+  date: img.time,
+  time: img.time,
+  color: img.color,
+  event: img.event || null,
+  category: 'digital' as const,
+  visible: true
+})
 
-export interface MixedPhotoItem {
-  type: 'group' | 'photo'
-  key: string
-  time?: string
-  eventName?: string | null
-  eventInfo?: PhotoEvent
-  images?: GalleryItem[]
-  timeRange?: string
-  filename?: string
-  title?: string
-  event?: PhotoEvent
-  isFirstInEvent?: boolean
-  [key: string]: any
-}
-
-export interface FilterState {
-  selectedCategory: 'all' | 'digital' | 'photography'
-  selectedEvent: string | null
-  searchQuery: string
-  yearFilter: string | null
-}
-
-const formatDate = (date: Date): string => {
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${month}/${day}`
-}
-
-const formatShutterSpeed = (speed: number): string => {
-  if (speed >= 1) {
-    return `${speed}s`
-  } else {
-    const fraction = Math.round(1 / speed)
-    return `1/${fraction}s`
-  }
-}
-
-const formatCameraName = (camera: string, model: string): string => {
-  if (camera === 'NIKON CORPORATION') {
-    return model || 'Nikon Camera'
-  }
-  return `${camera} ${model}`.trim()
-}
-
-const getDisplayTitle = (image: GalleryItem): string => {
-  if (image.camera) {
-    const number = image.filename.match(/DSC_(\d+)/)?.[1]
-    return number ? `攝影 #${number}` : '攝影作品'
-  }
-  return image.title
-}
-
-const getPrimaryTag = (image: GalleryItem): string | null => {
-  if (!image.tags || image.tags.length === 0) {
-    return null
-  }
-
-  const priority = ['後製', '夜拍', '人像', '望遠', '廣角', '淺景深', '標準', '日光']
-
-  for (const tag of priority) {
-    if (image.tags.includes(tag)) {
-      return tag
-    }
-  }
-
-  return image.tags[0]
-}
-
-const getImageClass = (index: number): string => {
-  const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56']
-  return classes[index % classes.length]
-}
+const transformPhotographyWork = (img: any): GalleryItem => ({
+  id: generateImageId('photography', img.filename),
+  filename: img.filename,
+  title: img.title,
+  description: img.content,
+  date: img.time,
+  time: img.time,
+  tags: img.tags || [],
+  event: img.event || null,
+  camera: img.camera,
+  model: img.model,
+  focalLength: img.focalLength,
+  aperture: img.aperture,
+  iso: img.iso,
+  shutterSpeed: img.shutterSpeed,
+  category: 'photography' as const,
+  visible: true
+})
 
 const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
   const data: any = await $fetch('/galleryList.json')
 
-  const works = data.Img.map((img: any) => ({
-    id: `digital-${img.filename}`,
-    filename: img.filename,
-    title: img.title,
-    description: img.content,
-    date: img.time,
-    time: img.time,
-    color: img.color,
-    event: img.event || null,
-    category: 'digital' as const,
-    visible: true
-  })).sort((a: GalleryItem, b: GalleryItem) => new Date(b.time).getTime() - new Date(a.time).getTime())
+  const works = sortImagesByTime(
+    data.Img.map(transformDigitalWork)
+  )
 
   return {
     works,
@@ -136,24 +70,9 @@ const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
   const data: any = await $fetch('/photographyList.json')
 
-  const works = data.Img.map((img: any) => ({
-    id: `photo-${img.filename}`,
-    filename: img.filename,
-    title: img.title,
-    description: img.content,
-    date: img.time,
-    time: img.time,
-    tags: img.tags || [],
-    event: img.event || null,
-    camera: img.camera,
-    model: img.model,
-    focalLength: img.focalLength,
-    aperture: img.aperture,
-    iso: img.iso,
-    shutterSpeed: img.shutterSpeed,
-    category: 'photography' as const,
-    visible: true
-  })).sort((a: GalleryItem, b: GalleryItem) => new Date(b.time).getTime() - new Date(a.time).getTime())
+  const works = sortImagesByTime(
+    data.Img.map(transformPhotographyWork)
+  )
 
   return {
     works,
@@ -162,32 +81,53 @@ const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventSta
 }
 
 export const useGalleryStore = defineStore('gallery', () => {
-  const {
-    state: digitalData,
-    isLoading: isLoadingDigital,
-    error: digitalError,
-    execute: loadDigitalWorks
-  } = useAsyncState(fetchDigitalWorks, { works: [], eventStats: {} }, {
-    immediate: false,
-    resetOnExecute: false
-  })
+  // 使用新的 API composable
+  const api = useApi()
 
-  const {
-    state: photographyData,
-    isLoading: isLoadingPhotography,
-    error: photographyError,
-    execute: loadPhotographyWorks
-  } = useAsyncState(fetchPhotographyWorks, { works: [], eventStats: {} }, {
-    immediate: false,
-    resetOnExecute: false
-  })
+  // 基本狀態
+  const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
+  const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
+  const isLoadingDigital = ref(false)
+  const isLoadingPhotography = ref(false)
+  const digitalError = ref<string | null>(null)
+  const photographyError = ref<string | null>(null)
 
+  // 計算屬性
   const digitalWorks = computed(() => digitalData.value.works)
   const digitalEventStats = computed(() => digitalData.value.eventStats)
   const photographyWorks = computed(() => photographyData.value.works)
   const eventStats = computed(() => photographyData.value.eventStats)
 
   const isLoading = computed(() => isLoadingDigital.value || isLoadingPhotography.value)
+
+  // 載入方法
+  const loadDigitalWorks = async () => {
+    isLoadingDigital.value = true
+    digitalError.value = null
+
+    try {
+      const result = await fetchDigitalWorks()
+      digitalData.value = result
+    } catch (error: any) {
+      digitalError.value = error.message || '載入數位作品失敗'
+    } finally {
+      isLoadingDigital.value = false
+    }
+  }
+
+  const loadPhotographyWorks = async () => {
+    isLoadingPhotography.value = true
+    photographyError.value = null
+
+    try {
+      const result = await fetchPhotographyWorks()
+      photographyData.value = result
+    } catch (error: any) {
+      photographyError.value = error.message || '載入攝影作品失敗'
+    } finally {
+      isLoadingPhotography.value = false
+    }
+  }
 
   const filterState = useLocalStorage<FilterState>('gallery-filters', {
     selectedCategory: 'all',
@@ -270,43 +210,25 @@ export const useGalleryStore = defineStore('gallery', () => {
     const hasEvents = works.some(work => work.event)
     if (!hasEvents) return []
 
-    const groups = new Map()
+            // 手動分組（保持現有邏輯，但使用工具函數優化）
+    const groups = new Map<string, GalleryItem[]>()
 
     works.forEach(work => {
-      const eventName = work.event?.name || null
-      const key = eventName || 'no-event'
-
-      if (!groups.has(key)) {
-        groups.set(key, {
-          eventName,
-          eventInfo: work.event,
-          images: [],
-          timeRange: ''
-        })
+      const eventName = work.event?.name || 'no-event'
+      if (!groups.has(eventName)) {
+        groups.set(eventName, [])
       }
-
-      groups.get(key).images.push(work)
+      groups.get(eventName)!.push(work)
     })
 
-    const groupArray = Array.from(groups.values()).map((group: any) => {
-      const times = group.images.map((img: GalleryItem) => new Date(img.time))
-      const minTime = new Date(Math.min(...times))
-      const maxTime = new Date(Math.max(...times))
-
-      group.timeRange = minTime.getTime() === maxTime.getTime()
-        ? formatDate(minTime)
-        : `${formatDate(minTime)} - ${formatDate(maxTime)}`
-
-      group.images.sort((a: GalleryItem, b: GalleryItem) =>
-        new Date(b.time).getTime() - new Date(a.time).getTime()
-      )
-
-      return group
-    })
-
-    return groupArray.sort((a: EventGroup, b: EventGroup) => {
-      const aLatest = Math.max(...a.images.map((img: GalleryItem) => new Date(img.time).getTime()))
-      const bLatest = Math.max(...b.images.map((img: GalleryItem) => new Date(img.time).getTime()))
+    return Array.from(groups.entries()).map(([eventName, images]): EventGroup => ({
+      eventName: eventName === 'no-event' ? null : eventName,
+      eventInfo: images[0]?.event || undefined,
+      images: sortImagesByTime(images),
+      timeRange: calculateTimeRange(images)
+    })).sort((a, b) => {
+      const aLatest = Math.max(...a.images.map((img) => new Date(img.time).getTime()))
+      const bLatest = Math.max(...b.images.map((img) => new Date(img.time).getTime()))
       return bLatest - aLatest
     })
   })
@@ -358,8 +280,8 @@ export const useGalleryStore = defineStore('gallery', () => {
       const maxTime = new Date(Math.max(...times))
 
       group.timeRange = minTime.getTime() === maxTime.getTime()
-        ? formatDate(minTime)
-        : `${formatDate(minTime)} - ${formatDate(maxTime)}`
+        ? formatDateFull(minTime)
+        : `${formatDateFull(minTime)} - ${formatDateFull(maxTime)}`
 
       group.images.sort((a: GalleryItem, b: GalleryItem) =>
         new Date(b.time).getTime() - new Date(a.time).getTime()
@@ -554,12 +476,39 @@ export const useGalleryStore = defineStore('gallery', () => {
     refreshData,
     clearCache,
 
-    formatDate,
-    formatShutterSpeed,
-    formatCameraName,
-    getDisplayTitle,
-    getPrimaryTag,
-    getImageClass,
+    // 重新導出工具函數以保持向後兼容（這些函數現在來自 utils/galleryUtils.ts）
+    formatDate: (date: Date) => {
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${month}/${day}`
+    },
+    formatShutterSpeed: (speed: number) => {
+      if (speed >= 1) return `${speed}s`
+      return `1/${Math.round(1 / speed)}`
+    },
+    formatCameraName: (camera: string, model: string) => {
+      if (camera === 'NIKON CORPORATION') return model || 'Nikon Camera'
+      return `${camera} ${model}`.trim()
+    },
+    getDisplayTitle: (image: GalleryItem) => {
+      if (image.camera) {
+        const number = image.filename.match(/DSC_(\d+)/)?.[1]
+        return number ? `攝影 #${number}` : '攝影作品'
+      }
+      return image.title
+    },
+    getPrimaryTag: (image: GalleryItem) => {
+      if (!image.tags || image.tags.length === 0) return null
+      const priority = ['後製', '夜拍', '人像', '望遠', '廣角', '淺景深', '標準', '日光']
+      for (const tag of priority) {
+        if (image.tags.includes(tag)) return tag
+      }
+      return image.tags[0]
+    },
+    getImageClass: (index: number) => {
+      const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56']
+      return classes[index % classes.length]
+    },
 
     digitalError,
     photographyError
