@@ -139,7 +139,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useGalleryStore, type GalleryItem } from '~/stores/gallery'
+import { useGalleryStore } from '~/stores/gallery'
+import type { GalleryItem } from '~/types/gallery'
 import { useIntersectionObserver, useMouse, useClipboard } from '@vueuse/core'
 import { useGlobalToast } from '~/composables/useToast'
 
