@@ -404,9 +404,27 @@ export const useGalleryStore = defineStore('gallery', () => {
       })
     }
 
-    return Array.from(eventCounts.entries())
+    const events = Array.from(eventCounts.entries())
       .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => a.name.localeCompare(b.name))
+
+    // 針對數位繪圖類別，按年份倒序排序
+    if (category === 'digital') {
+      return events.sort((a, b) => {
+        // 提取年份進行排序（例如："2024年電繪作品" -> 2024）
+        const yearA = parseInt(a.name.match(/(\d{4})/)?.[1] || '0')
+        const yearB = parseInt(b.name.match(/(\d{4})/)?.[1] || '0')
+
+        if (yearA !== yearB) {
+          return yearB - yearA // 年份倒序（新的在前）
+        }
+
+        // 如果年份相同或沒有年份，按名稱排序
+        return a.name.localeCompare(b.name)
+      })
+    }
+
+    // 其他類別保持原有的字母順序
+    return events.sort((a, b) => a.name.localeCompare(b.name))
   })
 
   const availableYears = computed(() => {
