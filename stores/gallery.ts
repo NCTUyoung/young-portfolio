@@ -55,7 +55,10 @@ const transformPhotographyWork = (img: any): GalleryItem => ({
 })
 
 const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const data: any = await $fetch('/galleryList.json')
+  const config = useRuntimeConfig()
+  // 確保在 GitHub Pages 的 baseURL (例如 /young-portfolio/) 下也能正確載入 JSON
+  const base = config.app?.baseURL || '/'
+  const data: any = await $fetch(`${base}galleryList.json`)
 
   const works = sortImagesByTime(
     data.Img.map(transformDigitalWork)
@@ -68,7 +71,9 @@ const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: 
 }
 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const data: any = await $fetch('/photographyList.json')
+  const config = useRuntimeConfig()
+  const base = config.app?.baseURL || '/'
+  const data: any = await $fetch(`${base}photographyList.json`)
 
   const works = sortImagesByTime(
     data.Img.map(transformPhotographyWork)
