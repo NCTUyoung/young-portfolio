@@ -98,13 +98,6 @@ export const inferEventFromPath = (filepath: string): PhotoEvent | null => {
 }
 
 /**
- * 驗證事件數據的完整性
- */
-export const validateEvent = (event: Partial<PhotoEvent>): event is PhotoEvent => {
-  return !!(event.name && event.description !== undefined && event.location !== undefined)
-}
-
-/**
  * 創建新事件
  */
 export const createEvent = (

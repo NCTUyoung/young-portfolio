@@ -72,9 +72,14 @@
                            @click="openImageViewer(image, item.images || [])"
                            :class="getImageWidth(imgIdx, rowIdx, index)"
                            class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
-                        <img :src="getImagePath(image.filename)"
-                             :alt="image.title"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <NuxtImg
+                          :src="getImagePath(image.filename)"
+                          :alt="image.title"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          loading="lazy"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          format="webp,avif,jpeg"
+                        />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                           <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
                           <div class="text-white/80 text-xs space-y-1 font-light">
@@ -119,9 +124,14 @@
                          :key="image.filename"
                          @click="openImageViewer(image, item.images || [])"
                          class="flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative">
-                      <img :src="getImagePath(image.filename)"
-                           :alt="image.title"
-                           class="w-full h-full object-cover">
+                      <NuxtImg
+                        :src="getImagePath(image.filename)"
+                        :alt="image.title"
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        sizes="(max-width: 640px) 100vw, 50vw"
+                        format="webp,avif,jpeg"
+                      />
                     </div>
                   </div>
                 </div>

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
+    "@nuxt/image": "^2.0.0",
     "@pinia/nuxt": "^0.11.1",
     "@types/formidable": "^3.4.5",
     "@vueuse/core": "^13.3.0",

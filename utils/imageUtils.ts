@@ -236,16 +236,8 @@ export const getDisplayTitle = (image: GalleryItem): string => {
   return image.title
 }
 
-// ==================== 檔案驗證 ====================
-
-/**
- * 檢查是否為有效的圖片文件
- */
-export const isValidImageFile = (filename: string): boolean => {
-  const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff']
-  return validExtensions.some(ext => filename.toLowerCase().endsWith(ext))
-}
-
+// ==================== 檔案工具 ====================
+//
 /**
  * 生成唯一的圖片 ID
  */
