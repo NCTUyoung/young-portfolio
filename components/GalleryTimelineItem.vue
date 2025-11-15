@@ -71,6 +71,7 @@
 
     <!-- Content Slot -->
     <div
+      v-if="shouldShowContent"
       class="flex-1 md:max-w-2xl"
       :class="index % 2 === 0 ? 'md:ml-16' : 'md:mr-16'"
     >
@@ -103,7 +104,16 @@ const { expandedGroups } = storeToRefs(galleryStore)
 const { toggleGroupExpansion } = galleryStore
 
 const eventName = computed(() => props.eventInfo?.name || '事件')
-const isExpanded = computed(() =>
-  props.eventKey ? expandedGroups.value[props.eventKey] || false : false
-)
+
+// 預設為展開；只有在使用者操作過該群組時才依照狀態收合/展開
+const isExpanded = computed(() => {
+  if (!props.eventKey) return true
+  const state = expandedGroups.value[props.eventKey]
+  return state === undefined ? true : state
+})
+
+// 若沒有顯示控制按鈕，內容一律顯示
+const shouldShowContent = computed(() => {
+  return !props.showEventControl || isExpanded.value
+})
 </script>

@@ -62,15 +62,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // 頁面 meta
-useHead({
+useSeoMeta({
   title: '文章專區',
-  meta: [
-    {
-      name: 'description',
-      content: '分享設計心得、技術筆記與創作故事'
-    }
-  ]
+  description: '分享設計心得、技術筆記與創作故事。',
+  ogTitle: '文章專區 - 設計心得與技術筆記',
+  ogDescription: '分享設計過程、技術筆記與創作背後的故事，文章功能即將推出。',
+  ogType: 'website',
+  ogUrl: 'https://nctuyoung.github.io/young-portfolio/article',
+  ogImage: 'https://nctuyoung.github.io/young-portfolio/images/gallery/2024年電繪作品/23.jpg',
+  twitterCard: 'summary_large_image'
 })
 </script>

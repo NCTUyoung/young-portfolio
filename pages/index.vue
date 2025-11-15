@@ -81,11 +81,15 @@
 // 首頁組件的邏輯
 
 // SEO 優化
-useHead({
+useSeoMeta({
   title: 'NCTU Young - 交大青年聚集地',
-  meta: [
-    { name: 'description', content: '交大青年的聚集地，分享生活，分享快樂。瀏覽精彩校園照片，閱讀精選文章，了解更多校園動態。' }
-  ]
+  description: '交大青年的聚集地，分享生活，分享快樂。瀏覽精彩校園照片，閱讀精選文章，了解更多校園動態。',
+  ogTitle: 'NCTU Young - 交大青年聚集地',
+  ogDescription: '交大青年的聚集地，分享生活，分享快樂。瀏覽精彩校園照片，閱讀精選文章，了解更多校園動態。',
+  ogType: 'website',
+  ogUrl: 'https://nctuyoung.github.io/young-portfolio/',
+  ogImage: 'https://nctuyoung.github.io/young-portfolio/images/gallery/2024年電繪作品/18-4.jpg',
+  twitterCard: 'summary_large_image'
 })
 </script>
 

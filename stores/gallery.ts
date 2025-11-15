@@ -406,7 +406,13 @@ export const useGalleryStore = defineStore('gallery', () => {
   }
 
   const toggleGroupExpansion = (groupKey: string) => {
-    expandedGroups.value[groupKey] = !expandedGroups.value[groupKey]
+    const current = expandedGroups.value[groupKey]
+    // 第一次點擊時，從「預設展開」切換為收合
+    if (current === undefined) {
+      expandedGroups.value[groupKey] = false
+    } else {
+      expandedGroups.value[groupKey] = !current
+    }
   }
 
   const shouldShowEventOnTimeline = (image: GalleryItem, index: number): boolean => {

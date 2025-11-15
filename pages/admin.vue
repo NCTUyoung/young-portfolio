@@ -576,6 +576,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 
+// SEO：後台頁面標記為不索引
+useSeoMeta({
+  title: '後台管理系統',
+  robots: 'noindex, nofollow'
+})
+
 const adminStore = useAdminStore()
 const { getImagePath } = useImagePath()
 

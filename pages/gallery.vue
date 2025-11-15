@@ -70,8 +70,11 @@
                       <div v-for="(image, imgIdx) in rowImages"
                            :key="image.filename"
                            @click="openImageViewer(image, item.images || [])"
-                           :class="getImageWidth(imgIdx, rowIdx, index)"
-                           class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
+                           :class="[
+                             getImageWidth(imgIdx, rowIdx, index),
+                             'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
+                             isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                           ]">
                         <NuxtImg
                           :src="getImagePath(image.filename)"
                           :alt="image.title"
@@ -79,6 +82,7 @@
                           loading="lazy"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           format="webp,avif,jpeg"
+                          @load="markImageLoaded(image.filename)"
                         />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                           <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
@@ -123,7 +127,10 @@
                     <div v-for="(image, imgIdx) in rowImages"
                          :key="image.filename"
                          @click="openImageViewer(image, item.images || [])"
-                         class="flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative">
+                         :class="[
+                           'flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative',
+                           isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                         ]">
                       <NuxtImg
                         :src="getImagePath(image.filename)"
                         :alt="image.title"
@@ -131,6 +138,7 @@
                         loading="lazy"
                         sizes="(max-width: 640px) 100vw, 50vw"
                         format="webp,avif,jpeg"
+                        @load="markImageLoaded(image.filename)"
                       />
                     </div>
                   </div>
@@ -170,11 +178,20 @@
                       <div v-for="(image, imgIdx) in rowImages"
                            :key="image.filename"
                            @click="openImageViewer(image, item.images || [])"
-                           :class="getImageWidth(imgIdx, rowIdx, index)"
-                           class="relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300">
-                        <img :src="getImagePath(image.filename)"
-                             :alt="image.title"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                           :class="[
+                             getImageWidth(imgIdx, rowIdx, index),
+                             'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
+                             isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                           ]">
+                        <NuxtImg
+                          :src="getImagePath(image.filename)"
+                          :alt="image.title"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          loading="lazy"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          format="webp,avif,jpeg"
+                          @load="markImageLoaded(image.filename)"
+                        />
                       </div>
                     </div>
                   </div>
@@ -198,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, computed } from 'vue'
+import { onMounted, watch, computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import type { GalleryItem, PhotographyItem } from '~/types/gallery'
@@ -232,8 +249,16 @@ const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
 const { getImagePath } = useImagePath()
 
+// 攝影作品載入狀態（用於優雅的 loading 效果）
+const loadedPhotographyImages = ref<Record<string, boolean>>({})
 
+const markImageLoaded = (filename: string) => {
+  loadedPhotographyImages.value[filename] = true
+}
 
+const isImageLoaded = (filename: string) => {
+  return !!loadedPhotographyImages.value[filename]
+}
 // ===== 計算屬性 =====
 // 當前選擇的類別
 const currentCategory = computed(() => filterState.value.selectedCategory)
@@ -376,11 +401,15 @@ onMounted(async () => {
 
 
 // ===== SEO =====
-useHead({
+useSeoMeta({
   title: 'Works - 作品集',
-  meta: [
-    { name: 'description', content: '數位藝術與攝影作品集' }
-  ]
+  description: '數位藝術與攝影作品集，包含數位插畫與攝影紀錄。',
+  ogTitle: 'Works - 數位藝術與攝影作品集',
+  ogDescription: '瀏覽 Young 的數位插畫與攝影作品，以事件與時間軸呈現創作與生活紀錄。',
+  ogType: 'website',
+  ogUrl: 'https://nctuyoung.github.io/young-portfolio/gallery',
+  ogImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg',
+  twitterCard: 'summary_large_image'
 })
 </script>
 
