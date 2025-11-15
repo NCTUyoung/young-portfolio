@@ -7,8 +7,7 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
     '@vueuse/nuxt',
-    'nuxt-headlessui',
-    '@nuxt/image'
+    'nuxt-headlessui'
   ],
 
   headlessui: {
@@ -24,22 +23,6 @@ export default defineNuxtConfig({
       tailwindcss: {},
       autoprefixer: {},
     },
-  },
-
-  image: {
-    // 靜態圖片主要放在 public/ 底下，實際圖片放在 public/images
-    // 這樣在程式中使用的路徑可以統一寫成 /images/xxx
-    dir: 'public',
-    // 針對常用斷點做預設設定，方便 NuxtImg 自動選擇大小
-    screens: {
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      '2xl': 1536
-    },
-    // 優先輸出現代格式，再回退到 jpeg/png
-    format: ['webp', 'avif', 'jpeg', 'png']
   },
 
   // GitHub Pages 靜態輸出配置

@@ -7,7 +7,7 @@
         :class="filterState.selectedEvent === null ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
         class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
       >
-        全部事件 ({{ currentWorks.length }})
+        全部事件 ({{ totalWorksInCategory }})
       </button>
       <button
         v-for="event in availableEvents"
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 
@@ -36,6 +36,18 @@ const {
   currentWorks
 } = storeToRefs(galleryStore)
 const { setSelectedEvent } = galleryStore
+
+// 「全部事件」顯示的是目前類別的總作品數（不受事件篩選影響）
+const totalWorksInCategory = computed(() => {
+  if (filterState.value.selectedCategory === 'digital') {
+    return digitalWorks.value.length
+  }
+  if (filterState.value.selectedCategory === 'photography') {
+    return photographyWorks.value.length
+  }
+  // 理論上這個元件只在 digital / photography 類別下渲染
+  return currentWorks.value.length
+})
 
 // 當切換到不支援事件的類別時，自動清除事件選擇
 watch(() => filterState.value.selectedCategory, (newCategory) => {

@@ -9,15 +9,13 @@
   >
     <!-- Image -->
     <div class="relative overflow-hidden rounded-lg border border-gray-100" :class="imageClass">
-      <!-- 懶載入的圖片（使用 NuxtImg 提升效能與格式） -->
-      <NuxtImg
+      <!-- 懶載入的圖片 -->
+      <img
         v-if="isVisible"
         :src="getImagePath(image.filename)"
         :alt="image.title"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         loading="lazy"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-        format="webp,avif,jpeg"
         @load="onImageLoad"
         @error="onImageError"
       />

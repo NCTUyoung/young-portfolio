@@ -75,13 +75,11 @@
                              'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
                              isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
                            ]">
-                        <NuxtImg
+                        <img
                           :src="getImagePath(image.filename)"
                           :alt="image.title"
                           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                           loading="lazy"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          format="webp,avif,jpeg"
                           @load="markImageLoaded(image.filename)"
                         />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
@@ -131,13 +129,11 @@
                            'flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative',
                            isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
                          ]">
-                      <NuxtImg
+                      <img
                         :src="getImagePath(image.filename)"
                         :alt="image.title"
                         class="w-full h-full object-cover"
                         loading="lazy"
-                        sizes="(max-width: 640px) 100vw, 50vw"
-                        format="webp,avif,jpeg"
                         @load="markImageLoaded(image.filename)"
                       />
                     </div>
@@ -183,13 +179,11 @@
                              'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
                              isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
                            ]">
-                        <NuxtImg
+                        <img
                           :src="getImagePath(image.filename)"
                           :alt="image.title"
                           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                           loading="lazy"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          format="webp,avif,jpeg"
                           @load="markImageLoaded(image.filename)"
                         />
                       </div>

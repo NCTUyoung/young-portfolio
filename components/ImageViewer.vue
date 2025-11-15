@@ -94,24 +94,22 @@
 
                 <!-- 主要圖片區域 -->
         <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
-          <NuxtImg v-if="currentViewerImage"
-                   ref="imageElement"
-                   :src="getImagePath(currentViewerImage.filename)"
-                   :alt="currentViewerImage.title"
-                   :class="[
-                     'select-none user-select-none',
-                     isDragging ? 'cursor-grabbing' : (viewerScale > 1 ? 'cursor-grab' : 'cursor-default'),
-                     isDragging ? '' : 'transition-transform duration-200 ease-out'
-                   ]"
-                   :style="imageStyle"
-                   draggable="false"
-                   loading="lazy"
-                   sizes="100vw"
-                   format="webp,avif,jpeg"
-                   @click.stop
-                   @mousedown="handleMouseDown"
-                   @touchstart="handleTouchStart"
-                   @contextmenu.prevent />
+          <img v-if="currentViewerImage"
+               ref="imageElement"
+               :src="getImagePath(currentViewerImage.filename)"
+               :alt="currentViewerImage.title"
+               :class="[
+                 'select-none user-select-none',
+                 isDragging ? 'cursor-grabbing' : (viewerScale > 1 ? 'cursor-grab' : 'cursor-default'),
+                 isDragging ? '' : 'transition-transform duration-200 ease-out'
+               ]"
+               :style="imageStyle"
+               draggable="false"
+               loading="lazy"
+               @click.stop
+               @mousedown="handleMouseDown"
+               @touchstart="handleTouchStart"
+               @contextmenu.prevent />
 
           <!-- 載入中 -->
           <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">
