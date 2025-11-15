@@ -3,8 +3,6 @@
  * 統一處理圖片路徑，支援 GitHub Pages baseURL
  */
 export const useImagePath = () => {
-  const config = useRuntimeConfig()
-
   /**
    * 獲取完整的圖片路徑
    * @param filename 圖片檔名（包含相對路徑）
@@ -13,14 +11,8 @@ export const useImagePath = () => {
   const getImagePath = (filename: string): string => {
     // 移除開頭的斜線（如果有的話）
     const cleanFilename = filename.startsWith('/') ? filename.slice(1) : filename
-
-    // 在開發環境或沒有 baseURL 時使用相對路徑
-    if (process.dev || !config.app.baseURL || config.app.baseURL === '/') {
-      return `/images/${cleanFilename}`
-    }
-
-    // 在生產環境使用完整路徑（包含 baseURL）
-    return `${config.app.baseURL}images/${cleanFilename}`
+    // 統一回傳相對於 public 的路徑，交給 Nuxt 的 baseURL / @nuxt/image 處理
+    return `/images/${cleanFilename}`
   }
 
   /**
