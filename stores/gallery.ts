@@ -54,11 +54,34 @@ const transformPhotographyWork = (img: any): GalleryItem => ({
   visible: true
 })
 
+// 在不同環境下穩健載入 JSON（本機 dev / GitHub Pages）
+const fetchJsonWithFallback = async (filename: string): Promise<any> => {
+  const candidates = [
+    // GitHub Pages 專案頁面（/young-portfolio/）
+    `/young-portfolio/${filename}`,
+    // 一般根目錄
+    `/${filename}`,
+    // 相對路徑（本機 dev 也可能適用）
+    filename
+  ]
+
+  let lastError: any = null
+
+  for (const path of candidates) {
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[gallery] trying JSON path:', path)
+      return await $fetch(path)
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError
+}
+
 const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const config = useRuntimeConfig()
-  // 確保在 GitHub Pages 的 baseURL (例如 /young-portfolio/) 下也能正確載入 JSON
-  const base = config.app?.baseURL || '/'
-  const data: any = await $fetch(`${base}galleryList.json`)
+  const data: any = await fetchJsonWithFallback('galleryList.json')
 
   const works = sortImagesByTime(
     data.Img.map(transformDigitalWork)
@@ -71,9 +94,7 @@ const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: 
 }
 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const config = useRuntimeConfig()
-  const base = config.app?.baseURL || '/'
-  const data: any = await $fetch(`${base}photographyList.json`)
+  const data: any = await fetchJsonWithFallback('photographyList.json')
 
   const works = sortImagesByTime(
     data.Img.map(transformPhotographyWork)
