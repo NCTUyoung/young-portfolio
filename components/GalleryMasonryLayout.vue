@@ -4,18 +4,24 @@
     <div class="hidden md:block space-y-4">
       <div
         v-for="(row, rowIndex) in imageRows"
-        :key="`row-${rowIndex}-${layoutKey}`"
-        class="gallery-row flex gap-4"
-        :style="{
-          transitionDelay: `${rowIndex * 100}ms`,
-          opacity: rowsLoaded[rowIndex] ? 1 : 0
-        }"
+        :key="row.key"
+        class="gallery-row flex gap-4 relative"
+        :style="{ transitionDelay: `${rowIndex * 80}ms` }"
       >
+        <!-- Skeleton overlay -->
+        <div
+          v-if="!rowsLoaded[row.key]"
+          class="absolute inset-0 rounded-lg bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse pointer-events-none z-10"
+        ></div>
+
         <div
           v-for="(item, itemIndex) in row.items"
           :key="item.filename"
           @click="$emit('imageClick', item, sortedItems)"
-          class="gallery-item relative cursor-pointer group rounded-sm hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out overflow-hidden"
+          :class="[
+            'gallery-item relative cursor-pointer group rounded-sm hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out overflow-hidden z-20',
+            rowsLoaded[row.key] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
+          ]"
           :style="{
             flex: `${item.flex} 1 0`,
             transitionDelay: `${(rowIndex * row.items.length + itemIndex) * 50}ms`
@@ -26,7 +32,8 @@
             :alt="item.title"
             class="w-full h-auto block rounded-sm transition-all duration-500 ease-out"
             :loading="rowIndex < 3 ? 'eager' : 'lazy'"
-            @load="(e) => onImageLoad(e, rowIndex, itemIndex)"
+            @load="(e) => onImageLoad(e, row.key, itemIndex)"
+            @error="() => onImageError(row.key, itemIndex)"
           >
           <!-- Hover Overlay -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex items-end justify-start p-4 rounded-sm">
@@ -71,7 +78,7 @@
 <script setup lang="ts">
 import { computed, ref, nextTick, onMounted, watch } from 'vue'
 import { useImagePath } from '~/composables/useImagePath'
-import type { GalleryItem } from '~/stores/gallery'
+import type { GalleryItem } from '~/types/gallery'
 
 const props = defineProps<{
   items: GalleryItem[]
@@ -89,8 +96,8 @@ const emit = defineEmits<{
 const { getImagePath } = useImagePath()
 
 // 狀態
-const layoutKey = ref(0)
-const rowsLoaded = ref<boolean[]>([])
+const rowsLoaded = ref<Record<string, boolean>>({})
+const loadedImages = ref<Record<string, boolean>>({})
 const gap = computed(() => props.gap || 16)
 const maxRowAspectRatio = computed(() => props.maxRowAspectRatio || 6) // 一行的最大寬高比總和
 
@@ -102,11 +109,12 @@ interface ImageWithAspectRatio extends GalleryItem {
 }
 
 interface ImageRow {
+  key: string
   items: ImageWithAspectRatio[]
 }
 
 // 存儲實際的圖片長寬比
-const imageAspectRatios = ref<Map<string, number>>(new Map())
+const imageAspectRatios = ref<Record<string, number>>({})
 
 // 計算圖片行佈局
 const imageRows = computed(() => {
@@ -119,8 +127,9 @@ const imageRows = computed(() => {
   // 預設長寬比（當圖片還沒載入時）
   const getAspectRatio = (item: GalleryItem) => {
     // 優先使用已載入的真實長寬比
-    if (imageAspectRatios.value.has(item.filename)) {
-      return imageAspectRatios.value.get(item.filename)!
+    const storedRatio = imageAspectRatios.value[item.filename]
+    if (storedRatio) {
+      return storedRatio
     }
 
     // 根據檔案名稱猜測長寬比
@@ -142,7 +151,7 @@ const imageRows = computed(() => {
       ...item,
       aspectRatio,
       flex: aspectRatio,
-      loaded: imageAspectRatios.value.has(item.filename)
+      loaded: !!imageAspectRatios.value[item.filename]
     }
 
     // 計算如果加入這張圖片，當前行的總長寬比
@@ -155,7 +164,10 @@ const imageRows = computed(() => {
 
     if (shouldStartNewRow && currentRow.length > 0) {
       // 完成當前行
-      rows.push({ items: [...currentRow] })
+      rows.push({
+        key: currentRow.map(img => img.filename).join('|') || `row-${rows.length}`,
+        items: [...currentRow]
+      })
       currentRow = [imageWithRatio]
       currentRowAspectRatio = aspectRatio
     } else {
@@ -167,36 +179,40 @@ const imageRows = computed(() => {
 
   // 處理最後一行
   if (currentRow.length > 0) {
-    rows.push({ items: currentRow })
+    rows.push({
+      key: currentRow.map(img => img.filename).join('|') || `row-${rows.length}`,
+      items: currentRow
+    })
   }
 
   return rows
 })
 
 // 圖片載入完成
-const onImageLoad = async (event: Event, rowIndex: number, itemIndex: number) => {
+// 注意：這裡不再根據實際長寬比重新計算佈局，避免載入過程中整個瀑布流重新排版造成閃爍
+const onImageLoad = (event: Event, rowKey: string, itemIndex: number) => {
   const img = event.target as HTMLImageElement
+  const row = imageRows.value.find(row => row.key === rowKey)
+
+  if (!row) return
 
   // 獲取真實的長寬比
   if (img.naturalWidth && img.naturalHeight) {
     const realAspectRatio = img.naturalWidth / img.naturalHeight
-    const item = imageRows.value[rowIndex]?.items[itemIndex]
+    const item = row.items[itemIndex]
 
     if (item) {
-      // 存儲真實長寬比
-      imageAspectRatios.value.set(item.filename, realAspectRatio)
-
-      // 如果與預估差異較大，觸發重新計算
-      if (Math.abs(item.aspectRatio - realAspectRatio) > 0.1) {
-        // 強制重新計算佈局
-        layoutKey.value++
+      const previousRatio = imageAspectRatios.value[item.filename]
+      if (!previousRatio || Math.abs(previousRatio - realAspectRatio) > 0.05) {
+        imageAspectRatios.value = {
+          ...imageAspectRatios.value,
+          [item.filename]: realAspectRatio
+        }
       }
-    }
-  }
 
-  // 標記行已載入
-  if (!rowsLoaded.value[rowIndex]) {
-    rowsLoaded.value[rowIndex] = true
+      markImageLoaded(item.filename)
+      maybeMarkRowReady(row.key)
+    }
   }
 
   // 添加載入動畫
@@ -210,6 +226,37 @@ const onImageLoad = async (event: Event, rowIndex: number, itemIndex: number) =>
   }, 50)
 }
 
+const onImageError = (rowKey: string, itemIndex: number) => {
+  const row = imageRows.value.find(row => row.key === rowKey)
+  if (!row) return
+  const item = row.items[itemIndex]
+  if (item) {
+    markImageLoaded(item.filename)
+    maybeMarkRowReady(row.key)
+  }
+}
+
+const markImageLoaded = (filename: string) => {
+  if (loadedImages.value[filename]) return
+  loadedImages.value = {
+    ...loadedImages.value,
+    [filename]: true
+  }
+}
+
+const maybeMarkRowReady = (rowKey: string) => {
+  if (rowsLoaded.value[rowKey]) return
+  const row = imageRows.value.find(row => row.key === rowKey)
+  if (!row) return
+  const ready = row.items.every(item => loadedImages.value[item.filename])
+  if (ready) {
+    rowsLoaded.value = {
+      ...rowsLoaded.value,
+      [row.key]: true
+    }
+  }
+}
+
 // 強制重新計算佈局（用於篩選器變化時）
 const forceRelayout = async () => {
   resetLayout()
@@ -219,8 +266,8 @@ const forceRelayout = async () => {
 
 // 重置佈局狀態
 const resetLayout = () => {
-  rowsLoaded.value = new Array(imageRows.value.length).fill(false)
-  layoutKey.value++ // 強制重新渲染
+  rowsLoaded.value = {}
+  loadedImages.value = {}
 }
 
 // 監聽數據變化
@@ -228,28 +275,18 @@ watch(() => sortedItems.value, (newItems, oldItems) => {
   if (newItems.length !== oldItems?.length ||
       newItems.some((item, index) => item.filename !== oldItems[index]?.filename)) {
     // 清除舊的長寬比數據
-    imageAspectRatios.value.clear()
+    imageAspectRatios.value = {}
     forceRelayout()
   }
 }, { immediate: false })
 
 watch(() => props.items, () => {
+  imageAspectRatios.value = {}
   forceRelayout()
 }, { deep: true })
 
 onMounted(() => {
   resetLayout()
-
-  // 初始化行載入狀態
-  setTimeout(() => {
-    rowsLoaded.value = new Array(imageRows.value.length).fill(false)
-    // 逐行顯示動畫
-    imageRows.value.forEach((_, index) => {
-      setTimeout(() => {
-        rowsLoaded.value[index] = true
-      }, index * 150)
-    })
-  }, 100)
 })
 </script>
 
