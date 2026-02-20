@@ -171,7 +171,7 @@
                 <img
                   :src="getImagePath(item.filename)"
                   :alt="item.title"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  class="w-full h-full object-contain bg-stone-100 dark:bg-stone-800 group-hover:scale-105 transition-transform duration-200"
                   @error="handleImageError"
                   loading="lazy"
                 />

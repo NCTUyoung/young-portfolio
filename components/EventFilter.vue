@@ -5,9 +5,9 @@
       <button
         @click="setSelectedEvent(null)"
         :class="filterState.selectedEvent === null
-          ? 'bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900'
-          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'"
-        class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
+          ? 'bg-accent-600 dark:bg-accent-500 text-white'
+          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-accent-300/60 dark:hover:border-accent-600/60 hover:text-accent-600 dark:hover:text-accent-400'"
+        class="px-4 py-2 rounded-lg text-sm font-light transition-all duration-200"
       >
         全部事件 ({{ totalWorksInCategory }})
       </button>
@@ -16,9 +16,9 @@
         :key="event.name"
         @click="setSelectedEvent(event.name)"
         :class="filterState.selectedEvent === event.name
-          ? 'bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900'
-          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'"
-        class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
+          ? 'bg-accent-600 dark:bg-accent-500 text-white'
+          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-accent-300/60 dark:hover:border-accent-600/60 hover:text-accent-600 dark:hover:text-accent-400'"
+        class="px-4 py-2 rounded-lg text-sm font-light transition-all duration-200"
       >
         {{ event.name }} ({{ event.count }})
       </button>

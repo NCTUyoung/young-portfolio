@@ -7,7 +7,7 @@
     >
       <!-- Timeline Dot -->
       <div
-        class="absolute w-4 h-4 bg-white dark:bg-stone-800 border-2 border-stone-400 dark:border-stone-500 rounded-full hidden md:block z-10"
+        class="absolute w-4 h-4 bg-white dark:bg-stone-800 border-2 border-accent-400 dark:border-accent-500 rounded-full hidden md:block z-10"
         :class="index % 2 === 0 ? 'left-[-4.5rem]' : 'right-[-4.5rem]'"
       ></div>
 
@@ -21,7 +21,7 @@
           @click="eventKey && toggleGroupExpansion(eventKey)"
           :class="[
             'w-5 h-5 rounded-full transition-all duration-200 flex items-center justify-center group shadow-sm',
-            isExpanded ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
+            isExpanded ? 'bg-stone-400 hover:bg-stone-500 dark:bg-stone-500 dark:hover:bg-stone-400' : 'bg-accent-500 hover:bg-accent-600'
           ]"
           :title="`${isExpanded ? '折疊' : '展開'} ${eventName} 的作品`"
         >

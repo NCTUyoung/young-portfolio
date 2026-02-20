@@ -46,6 +46,7 @@ export default defineNuxtConfig({
   app: {
     buildAssetsDir: '_nuxt/', // 確保資源路徑正確
     baseURL: '/young-portfolio/', // GitHub Pages 專案倉庫需要設定基礎路徑
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       htmlAttrs: {
         lang: 'zh-Hant'

@@ -1,10 +1,19 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-stone-900 transition-colors duration-300">
-    <!-- Header - 極簡風格 -->
-    <div class="container mx-auto px-6 py-8 md:py-12">
+  <div ref="pageRef" class="min-h-screen transition-colors duration-300">
+    <!-- Header — 個性化設計 -->
+    <div class="container mx-auto px-6 py-12 md:py-20 relative">
+      <!-- 裝飾線 -->
+      <div class="deco-line-v h-16 top-4 right-[8%] hidden lg:block"></div>
+      <div class="deco-dot top-4 right-[8%] hidden lg:block" style="transform: translate(-2px, -8px)"></div>
+
       <div class="max-w-7xl mx-auto">
-        <h1 class="text-2xl md:text-3xl font-extralight text-stone-800 dark:text-stone-200 mb-3 tracking-wider">Works</h1>
-        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide">Digital Art & Photography</p>
+        <div class="flex items-end gap-6 mb-3">
+          <h1 class="text-3xl md:text-4xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">Works</h1>
+          <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"></div>
+        </div>
+        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide">
+          <span class="text-accent-500 dark:text-accent-400">{{ categoryLabel }}</span> · {{ categoryCount }} works
+        </p>
 
         <!-- Category Tabs -->
         <div class="mb-4">
@@ -26,8 +35,9 @@
         <p class="mt-6 text-stone-500 dark:text-stone-400 font-light tracking-wide">載入中...</p>
       </div>
 
-      <!-- 根據當前類別顯示不同佈局 -->
-      <div v-if="!isLoading">
+      <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
+      <transition name="gallery-fade" mode="out-in">
+      <div v-if="!isLoading" :key="currentCategory">
         <!-- 數位繪圖 - Pinterest 風格瀑布流佈局 -->
         <div v-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
           <GalleryMasonryLayout
@@ -166,41 +176,25 @@
                     </h3>
                     <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
                   </div>
-                  <div class="space-y-3">
-                    <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-                         :key="`row-${rowIdx}`"
-                         class="flex gap-3"
-                         :style="{ height: getRowHeight(rowIdx, index) }">
-                      <div v-for="(image, imgIdx) in rowImages"
-                           :key="image.filename"
-                           @click="openImageViewer(image, item.images || [])"
-                           :class="[
-                             getImageWidth(imgIdx, rowIdx, index),
-                             'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
-                             isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                           ]">
-                        <img
-                          :src="getImagePath(image.filename)"
-                          :alt="image.title"
-                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                          loading="lazy"
-                          @load="markImageLoaded(image.filename)"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <!-- 重用 GalleryMasonryLayout：flex 行式排版，圖片按比例分配寬度、同行等高、不裁切 -->
+                  <GalleryMasonryLayout
+                    :items="item.images || []"
+                    @image-click="(img, imgs) => openImageViewer(img, imgs)"
+                  />
                 </div>
               </GalleryTimelineItem>
             </div>
           </div>
         </div>
       </div>
+      </transition>
     </div>
 
-    <!-- Footer -->
-    <div class="container mx-auto px-6 py-16 text-center">
-      <div class="text-2xl md:text-3xl font-extralight text-stone-300 dark:text-stone-600 italic tracking-wider">friday vibes</div>
-      <div class="text-xs text-stone-400 dark:text-stone-500 mt-2 font-light tracking-wide">thank god it's friday!</div>
+    <!-- Footer — 根據分類變化 -->
+    <div class="container mx-auto px-6 py-20 lg:py-28 text-center relative">
+      <div class="deco-line-h w-40 top-0 left-1/2 -translate-x-1/2"></div>
+      <div class="text-2xl md:text-3xl font-extralight text-stone-300 dark:text-stone-600 italic tracking-wider">{{ footerQuote }}</div>
+      <div class="text-xs text-accent-400/60 dark:text-accent-500/40 mt-2 font-light tracking-wide">{{ footerSub }}</div>
     </div>
 
     <!-- 圖片檢視器 -->
@@ -242,6 +236,7 @@ const {
 const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
 const { getImagePath } = useImagePath()
+const pageRef = ref<HTMLElement | null>(null)
 
 // 攝影作品載入狀態（用於優雅的 loading 效果）
 const loadedPhotographyImages = ref<Record<string, boolean>>({})
@@ -256,6 +251,28 @@ const isImageLoaded = (filename: string) => {
 // ===== 計算屬性 =====
 // 當前選擇的類別
 const currentCategory = computed(() => filterState.value.selectedCategory)
+
+// Gallery header dynamic info
+const categoryLabel = computed(() => {
+  const labels: Record<string, string> = { digital: 'Digital Art', photography: 'Photography', all: 'All Works' }
+  return labels[currentCategory.value] || 'All Works'
+})
+const categoryCount = computed(() => {
+  if (currentCategory.value === 'digital') return digitalArtItems.value.length
+  if (currentCategory.value === 'photography') {
+    return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
+  }
+  return mixedPhotoItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
+})
+
+// Footer quotes by category
+const footerQuotes: Record<string, { quote: string; sub: string }> = {
+  digital:     { quote: '每一筆都是故事', sub: 'every stroke tells a story' },
+  photography: { quote: '光影之間，皆是詩', sub: 'poetry between light and shadow' },
+  all:         { quote: '創作不止，記錄不息', sub: 'create, capture, repeat' },
+}
+const footerQuote = computed(() => footerQuotes[currentCategory.value]?.quote || footerQuotes.all.quote)
+const footerSub = computed(() => footerQuotes[currentCategory.value]?.sub || footerQuotes.all.sub)
 
 // 數位作品列表 - 使用經過篩選的 currentWorks
 const digitalArtItems = computed(() => {
@@ -408,6 +425,12 @@ useSeoMeta({
 </script>
 
 <style scoped>
+/* ===== Category 切換過場 ===== */
+.gallery-fade-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.gallery-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.gallery-fade-enter-from { opacity: 0; transform: translateY(12px); }
+.gallery-fade-leave-to   { opacity: 0; transform: translateY(-8px); }
+
 /* ===== 日式排版優化樣式 ===== */
 
 /* 滾動條樣式 - 更細緻的設計 */

@@ -6,6 +6,7 @@
         v-for="(row, rowIndex) in imageRows"
         :key="row.key"
         class="gallery-row flex gap-4 relative"
+        :class="{ 'justify-center': row.items.length === 1 }"
         :style="{ transitionDelay: `${rowIndex * 80}ms` }"
       >
         <!-- Skeleton overlay -->
@@ -23,7 +24,8 @@
             rowsLoaded[row.key] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
           ]"
           :style="{
-            flex: `${item.flex} 1 0`,
+            flex: row.items.length === 1 ? '0 0 auto' : `${item.flex} 1 0`,
+            maxWidth: row.items.length === 1 ? getSingleItemMaxWidth(item.aspectRatio) : undefined,
             transitionDelay: `${(rowIndex * row.items.length + itemIndex) * 50}ms`
           }"
         >
@@ -116,76 +118,117 @@ interface ImageRow {
 // 存儲實際的圖片長寬比
 const imageAspectRatios = ref<Record<string, number>>({})
 
-// 計算圖片行佈局
-const imageRows = computed(() => {
-  if (!sortedItems.value.length) return []
+// 單張圖片獨佔一行時，根據比例限制最大寬度，避免直式照片撐滿整行
+const getSingleItemMaxWidth = (aspectRatio: number): string => {
+  if (aspectRatio < 0.8) return '40%'   // 直式 → 最多佔 40%
+  if (aspectRatio < 1.2) return '55%'   // 方形 → 最多佔 55%
+  if (aspectRatio < 1.8) return '70%'   // 一般橫式 → 最多佔 70%
+  return '85%'                           // 超寬 → 最多佔 85%
+}
 
+// 預設長寬比（當圖片還沒載入時）
+const getAspectRatio = (item: GalleryItem) => {
+  // 優先使用已載入的真實長寬比
+  const storedRatio = imageAspectRatios.value[item.filename]
+  if (storedRatio) {
+    return storedRatio
+  }
+
+  // 根據檔案名稱猜測長寬比
+  const filename = item.filename.toLowerCase()
+  if (filename.includes('portrait') || filename.includes('vertical')) {
+    return 0.75 // 豎圖
+  } else if (filename.includes('panorama') || filename.includes('wide')) {
+    return 2.5 // 超寬圖
+  } else {
+    return 1.5 // 一般橫圖
+  }
+}
+
+// 將一組圖片按順序填入行
+const buildRowsFromBucket = (images: ImageWithAspectRatio[], maxAR: number): ImageRow[] => {
   const rows: ImageRow[] = []
   let currentRow: ImageWithAspectRatio[] = []
-  let currentRowAspectRatio = 0
+  let currentRowAR = 0
 
-  // 預設長寬比（當圖片還沒載入時）
-  const getAspectRatio = (item: GalleryItem) => {
-    // 優先使用已載入的真實長寬比
-    const storedRatio = imageAspectRatios.value[item.filename]
-    if (storedRatio) {
-      return storedRatio
-    }
-
-    // 根據檔案名稱猜測長寬比
-    const filename = item.filename.toLowerCase()
-    if (filename.includes('portrait') || filename.includes('vertical')) {
-      return 0.75 // 豎圖
-    } else if (filename.includes('panorama') || filename.includes('wide')) {
-      return 2.5 // 超寬圖
-    } else {
-      return 1.5 // 一般橫圖
-    }
-  }
-
-  for (let i = 0; i < sortedItems.value.length; i++) {
-    const item = sortedItems.value[i]
-    const aspectRatio = getAspectRatio(item)
-
-    const imageWithRatio: ImageWithAspectRatio = {
-      ...item,
-      aspectRatio,
-      flex: aspectRatio,
-      loaded: !!imageAspectRatios.value[item.filename]
-    }
-
-    // 計算如果加入這張圖片，當前行的總長寬比
-    const newRowAspectRatio = currentRowAspectRatio + aspectRatio
-
-    // 決定是否開始新行
+  for (const img of images) {
+    const newAR = currentRowAR + img.aspectRatio
     const shouldStartNewRow =
-      currentRow.length >= 3 || // 最多3張圖片
-      (currentRow.length >= 1 && newRowAspectRatio > maxRowAspectRatio.value)
+      currentRow.length >= 3 ||
+      (currentRow.length >= 1 && newAR > maxAR)
 
     if (shouldStartNewRow && currentRow.length > 0) {
-      // 完成當前行
       rows.push({
-        key: currentRow.map(img => img.filename).join('|') || `row-${rows.length}`,
+        key: currentRow.map(i => i.filename).join('|') || `row-${rows.length}`,
         items: [...currentRow]
       })
-      currentRow = [imageWithRatio]
-      currentRowAspectRatio = aspectRatio
+      currentRow = [img]
+      currentRowAR = img.aspectRatio
     } else {
-      // 添加到當前行
-      currentRow.push(imageWithRatio)
-      currentRowAspectRatio = newRowAspectRatio
+      currentRow.push(img)
+      currentRowAR = newAR
     }
   }
 
-  // 處理最後一行
-  if (currentRow.length > 0) {
+  // 最後一行：如果只剩 1 張，嘗試併入前一行
+  if (currentRow.length === 1 && rows.length > 0) {
+    const lastRow = rows[rows.length - 1]
+    if (lastRow.items.length < 4) {
+      lastRow.items.push(currentRow[0])
+      lastRow.key = lastRow.items.map(i => i.filename).join('|')
+    } else {
+      rows.push({
+        key: currentRow.map(i => i.filename).join('|') || `row-${rows.length}`,
+        items: currentRow
+      })
+    }
+  } else if (currentRow.length > 0) {
     rows.push({
-      key: currentRow.map(img => img.filename).join('|') || `row-${rows.length}`,
+      key: currentRow.map(i => i.filename).join('|') || `row-${rows.length}`,
       items: currentRow
     })
   }
 
   return rows
+}
+
+// 計算圖片行佈局 — 按比例分組，避免直式和橫式混排造成尺寸差異過大
+const imageRows = computed(() => {
+  if (!sortedItems.value.length) return []
+
+  // 1. 計算所有圖片的比例
+  const allImages: ImageWithAspectRatio[] = sortedItems.value.map(item => {
+    const aspectRatio = getAspectRatio(item)
+    return {
+      ...item,
+      aspectRatio,
+      flex: aspectRatio,
+      loaded: !!imageAspectRatios.value[item.filename]
+    }
+  })
+
+  // 2. 分成直式（AR < 1.0）和橫式（AR >= 1.0）兩組
+  const portraits = allImages.filter(img => img.aspectRatio < 1.0)
+  const landscapes = allImages.filter(img => img.aspectRatio >= 1.0)
+
+  // 3. 分別建行 — 直式用較低的 maxAR（因為直式圖比較窄，一行可以放更多）
+  const landscapeRows = buildRowsFromBucket(landscapes, maxRowAspectRatio.value)
+  const portraitRows = buildRowsFromBucket(portraits, maxRowAspectRatio.value)
+
+  // 4. 交錯合併：橫式行和直式行交替出現
+  const merged: ImageRow[] = []
+  let li = 0, pi = 0
+  while (li < landscapeRows.length || pi < portraitRows.length) {
+    // 每次先放 2 行橫式，再放 1 行直式，保持視覺節奏
+    for (let n = 0; n < 2 && li < landscapeRows.length; n++) {
+      merged.push(landscapeRows[li++])
+    }
+    if (pi < portraitRows.length) {
+      merged.push(portraitRows[pi++])
+    }
+  }
+
+  return merged
 })
 
 // 圖片載入完成

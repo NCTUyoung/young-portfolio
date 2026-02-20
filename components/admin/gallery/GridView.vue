@@ -9,7 +9,7 @@
         <img
           :src="getImagePath(item.filename)"
           :alt="item.title"
-          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          class="w-full h-full object-contain bg-stone-100 dark:bg-stone-800 transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
       </div>
