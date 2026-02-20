@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
     '@vueuse/nuxt',
-    'nuxt-headlessui'
+    'nuxt-headlessui',
+    '@nuxt/image'
   ],
 
   headlessui: {

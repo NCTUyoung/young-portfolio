@@ -11,7 +11,7 @@
         <!-- Skeleton overlay -->
         <div
           v-if="!rowsLoaded[row.key]"
-          class="absolute inset-0 rounded-lg bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse pointer-events-none z-10"
+          class="absolute inset-0 rounded-lg bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 dark:from-stone-700 dark:via-stone-800 dark:to-stone-700 animate-pulse pointer-events-none z-10"
         ></div>
 
         <div
@@ -66,8 +66,8 @@
             loading="lazy"
           >
           <div class="mt-2">
-            <h4 class="text-sm font-light text-stone-700 line-clamp-1">{{ item.title }}</h4>
-            <p class="text-xs text-stone-400">{{ item.time }}</p>
+            <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1">{{ item.title }}</h4>
+            <p class="text-xs text-stone-400 dark:text-stone-500">{{ item.time }}</p>
           </div>
         </div>
       </div>

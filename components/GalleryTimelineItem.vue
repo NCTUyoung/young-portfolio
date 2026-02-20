@@ -7,7 +7,7 @@
     >
       <!-- Timeline Dot -->
       <div
-        class="absolute w-4 h-4 bg-white border-2 border-gray-400 rounded-full hidden md:block z-10"
+        class="absolute w-4 h-4 bg-white dark:bg-stone-800 border-2 border-stone-400 dark:border-stone-500 rounded-full hidden md:block z-10"
         :class="index % 2 === 0 ? 'left-[-4.5rem]' : 'right-[-4.5rem]'"
       ></div>
 
@@ -43,7 +43,7 @@
       </div>
 
       <!-- Time Label -->
-      <div class="text-sm text-gray-500 font-light tracking-wide mb-10">
+      <div class="text-sm text-stone-500 dark:text-stone-400 font-light tracking-wide mb-10">
         <span class="transform md:-rotate-90 origin-center whitespace-nowrap inline-block">
           {{ timeLabel }}
         </span>
@@ -56,13 +56,13 @@
         :class="index % 2 === 0 ? '' : 'text-right'"
       >
         <div
-          class="p-2 bg-white/90 backdrop-blur-sm rounded text-xs shadow-sm max-w-32"
+          class="p-2 bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm rounded text-xs shadow-sm max-w-32"
           :class="index % 2 === 0 ? 'text-left' : 'text-right'"
         >
-          <div v-if="eventInfo.description" class="text-gray-700 mb-1 truncate">
+          <div v-if="eventInfo.description" class="text-stone-700 dark:text-stone-300 mb-1 truncate">
             {{ eventInfo.description }}
           </div>
-          <div v-if="eventInfo.location" class="text-gray-500 truncate">
+          <div v-if="eventInfo.location" class="text-stone-500 dark:text-stone-400 truncate">
             📍 {{ eventInfo.location }}
           </div>
         </div>

@@ -4,7 +4,9 @@
     <div class="flex flex-wrap gap-3 mb-4">
       <button
         @click="setSelectedEvent(null)"
-        :class="filterState.selectedEvent === null ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+        :class="filterState.selectedEvent === null
+          ? 'bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900'
+          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'"
         class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
       >
         全部事件 ({{ totalWorksInCategory }})
@@ -13,7 +15,9 @@
         v-for="event in availableEvents"
         :key="event.name"
         @click="setSelectedEvent(event.name)"
-        :class="filterState.selectedEvent === event.name ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+        :class="filterState.selectedEvent === event.name
+          ? 'bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900'
+          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'"
         class="px-4 py-2 rounded-lg text-sm font-light transition-colors duration-200"
       >
         {{ event.name }} ({{ event.count }})

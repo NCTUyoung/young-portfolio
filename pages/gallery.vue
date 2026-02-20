@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white dark:bg-stone-900 transition-colors duration-300">
     <!-- Header - 極簡風格 -->
     <div class="container mx-auto px-6 py-8 md:py-12">
       <div class="max-w-7xl mx-auto">
-        <h1 class="text-2xl md:text-3xl font-extralight text-stone-800 mb-3 tracking-wider">Works</h1>
-        <p class="text-stone-500 font-light mb-6 text-sm tracking-wide">Digital Art & Photography</p>
+        <h1 class="text-2xl md:text-3xl font-extralight text-stone-800 dark:text-stone-200 mb-3 tracking-wider">Works</h1>
+        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide">Digital Art & Photography</p>
 
         <!-- Category Tabs -->
         <div class="mb-4">
@@ -22,8 +22,8 @@
     <div class="container mx-auto px-6 relative">
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-20">
-        <div class="inline-block animate-spin rounded-full h-10 w-10 border-b border-stone-300"></div>
-        <p class="mt-6 text-stone-500 font-light tracking-wide">載入中...</p>
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-b border-stone-300 dark:border-stone-600"></div>
+        <p class="mt-6 text-stone-500 dark:text-stone-400 font-light tracking-wide">載入中...</p>
       </div>
 
       <!-- 根據當前類別顯示不同佈局 -->
@@ -56,10 +56,10 @@
                 <!-- 日式雙欄佈局 -->
                 <div class="mb-12">
                   <div class="mb-6">
-                    <h3 class="text-lg font-extralight text-stone-700 tracking-wider">
+                    <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                       {{ item.eventName || '其他作品' }}
                     </h3>
-                    <p class="text-xs text-stone-400 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+                    <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
                   </div>
 
                   <div class="space-y-3">
@@ -73,7 +73,7 @@
                            :class="[
                              getImageWidth(imgIdx, rowIdx, index),
                              'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
-                             isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                             isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                            ]">
                         <img
                           :src="getImagePath(image.filename)"
@@ -112,10 +112,10 @@
             <div class="space-y-12">
               <div v-for="(item, index) in photographyEventItems" :key="item.key">
                 <div v-if="item.eventName" class="mb-4">
-                  <h3 class="text-base font-extralight text-stone-700 tracking-wider">
+                  <h3 class="text-base font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                     {{ item.eventName }}
                   </h3>
-                  <p class="text-xs text-stone-400 font-light">{{ item.images?.length || 0 }} 張作品</p>
+                  <p class="text-xs text-stone-400 dark:text-stone-500 font-light">{{ item.images?.length || 0 }} 張作品</p>
                 </div>
                 <div class="space-y-2">
                   <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
@@ -127,7 +127,7 @@
                          @click="openImageViewer(image, item.images || [])"
                          :class="[
                            'flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative',
-                           isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                           isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                          ]">
                       <img
                         :src="getImagePath(image.filename)"
@@ -161,10 +161,10 @@
               >
                 <div class="mb-12">
                   <div class="mb-6">
-                    <h3 class="text-lg font-extralight text-stone-700 tracking-wider">
+                    <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                       {{ item.eventName || '其他作品' }}
                     </h3>
-                    <p class="text-xs text-stone-400 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+                    <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
                   </div>
                   <div class="space-y-3">
                     <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
@@ -177,7 +177,7 @@
                            :class="[
                              getImageWidth(imgIdx, rowIdx, index),
                              'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
-                             isImageLoaded(image.filename) ? 'bg-white' : 'bg-stone-100 animate-pulse'
+                             isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                            ]">
                         <img
                           :src="getImagePath(image.filename)"
@@ -199,8 +199,8 @@
 
     <!-- Footer -->
     <div class="container mx-auto px-6 py-16 text-center">
-      <div class="text-2xl md:text-3xl font-extralight text-stone-300 italic tracking-wider">friday vibes</div>
-      <div class="text-xs text-stone-400 mt-2 font-light tracking-wide">thank god it's friday!</div>
+      <div class="text-2xl md:text-3xl font-extralight text-stone-300 dark:text-stone-600 italic tracking-wider">friday vibes</div>
+      <div class="text-xs text-stone-400 dark:text-stone-500 mt-2 font-light tracking-wide">thank god it's friday!</div>
     </div>
 
     <!-- 圖片檢視器 -->

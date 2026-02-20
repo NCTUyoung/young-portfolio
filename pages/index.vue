@@ -1,13 +1,13 @@
 <template>
   <div>
     <!-- 英雄區域 -->
-    <div class="bg-white/60 backdrop-blur-sm">
+    <div class="bg-white/60 dark:bg-stone-800/60 backdrop-blur-sm">
       <div class="max-w-7xl mx-auto py-24 px-6 sm:py-32 sm:px-8 lg:px-12">
         <div class="text-center max-w-4xl mx-auto">
-          <h1 class="text-5xl font-extralight text-stone-800 sm:text-6xl sm:tracking-wider lg:text-7xl leading-tight">
+          <h1 class="text-5xl font-extralight text-stone-800 dark:text-stone-200 sm:text-6xl sm:tracking-wider lg:text-7xl leading-tight">
             歡迎來到 NCTU Young
           </h1>
-          <p class="mt-8 max-w-2xl mx-auto text-xl text-stone-600 font-light leading-relaxed tracking-wide">
+          <p class="mt-8 max-w-2xl mx-auto text-xl text-stone-600 dark:text-stone-400 font-light leading-relaxed tracking-wide">
             這裡是交大青年的聚集地，分享生活，分享快樂。
           </p>
         </div>
@@ -15,18 +15,18 @@
     </div>
 
     <!-- 特色內容 -->
-    <div class="bg-stone-50/30 py-20">
+    <div class="bg-stone-50/30 dark:bg-stone-900/30 py-20">
       <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
           <!-- 圖片庫卡片 -->
-          <div class="bg-white/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 rounded-xl hover:border-stone-300/80 transition-all duration-500 group">
+          <div class="bg-white/70 dark:bg-stone-800/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 dark:border-stone-700/60 rounded-xl hover:border-stone-300/80 dark:hover:border-stone-600/80 transition-all duration-500 group">
             <div class="p-8">
-              <h3 class="text-2xl font-extralight text-stone-800 tracking-wider leading-relaxed">圖片庫</h3>
-              <p class="mt-4 text-stone-600 font-light leading-relaxed tracking-wide">
+              <h3 class="text-2xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider leading-relaxed">圖片庫</h3>
+              <p class="mt-4 text-stone-600 dark:text-stone-400 font-light leading-relaxed tracking-wide">
                 瀏覽精彩的校園生活照片，記錄美好瞬間。
               </p>
               <div class="mt-6">
-                <NuxtLink to="/gallery" class="text-stone-600 hover:text-stone-800 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
+                <NuxtLink to="/gallery" class="text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
                   查看圖片庫
                   <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -37,14 +37,14 @@
           </div>
 
           <!-- 文章卡片 -->
-          <div class="bg-white/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 rounded-xl hover:border-stone-300/80 transition-all duration-500 group">
+          <div class="bg-white/70 dark:bg-stone-800/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 dark:border-stone-700/60 rounded-xl hover:border-stone-300/80 dark:hover:border-stone-600/80 transition-all duration-500 group">
             <div class="p-8">
-              <h3 class="text-2xl font-extralight text-stone-800 tracking-wider leading-relaxed">文章</h3>
-              <p class="mt-4 text-stone-600 font-light leading-relaxed tracking-wide">
+              <h3 class="text-2xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider leading-relaxed">文章</h3>
+              <p class="mt-4 text-stone-600 dark:text-stone-400 font-light leading-relaxed tracking-wide">
                 閱讀精選文章，了解校園動態。
               </p>
               <div class="mt-6">
-                <NuxtLink to="/article" class="text-stone-600 hover:text-stone-800 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
+                <NuxtLink to="/article" class="text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
                   閱讀文章
                   <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -55,14 +55,14 @@
           </div>
 
           <!-- 關於我們卡片 -->
-          <div class="bg-white/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 rounded-xl hover:border-stone-300/80 transition-all duration-500 group">
+          <div class="bg-white/70 dark:bg-stone-800/70 backdrop-blur-sm overflow-hidden border border-stone-200/60 dark:border-stone-700/60 rounded-xl hover:border-stone-300/80 dark:hover:border-stone-600/80 transition-all duration-500 group">
             <div class="p-8">
-              <h3 class="text-2xl font-extralight text-stone-800 tracking-wider leading-relaxed">關於我們</h3>
-              <p class="mt-4 text-stone-600 font-light leading-relaxed tracking-wide">
+              <h3 class="text-2xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider leading-relaxed">關於我們</h3>
+              <p class="mt-4 text-stone-600 dark:text-stone-400 font-light leading-relaxed tracking-wide">
                 了解更多關於 NCTU Young 的故事。
               </p>
               <div class="mt-6">
-                <NuxtLink to="/about" class="text-stone-600 hover:text-stone-800 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
+                <NuxtLink to="/about" class="text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 font-light tracking-wide transition-colors duration-300 relative group-hover:translate-x-1 inline-flex items-center">
                   了解更多
                   <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
