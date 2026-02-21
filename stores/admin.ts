@@ -340,8 +340,13 @@ export const useAdminStore = defineStore('admin', () => {
           if (uploadCategory.value === 'photography') {
             (newFile as any).tags = ''
           } else {
-            // 如果是繪圖分類，添加創作日期欄位
-            newFile.creationDate = new Date().toISOString().split('T')[0] // 預設為今天
+            // 如果是繪圖分類，從 file.lastModified 推斷創作日期
+            // lastModified 為檔案最後修改時間（毫秒），通常接近創作時間
+            const inferredDate = new Date(file.lastModified)
+            const isValidDate = !isNaN(inferredDate.getTime()) && inferredDate.getFullYear() > 1970
+            newFile.creationDate = isValidDate
+              ? inferredDate.toISOString().split('T')[0]
+              : new Date().toISOString().split('T')[0] // fallback 為今天
           }
 
           selectedFiles.value.push(newFile)

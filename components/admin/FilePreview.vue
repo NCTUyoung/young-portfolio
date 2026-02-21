@@ -61,6 +61,7 @@
                 type="date"
                 class="w-full px-2.5 py-1.5 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
               />
+              <p class="text-xs text-stone-400 font-light mt-1">已從檔案修改時間自動推斷，可依需求調整</p>
             </div>
             <div>
               <label class="block text-xs font-light text-stone-400 mb-1 tracking-wide">顏色標籤</label>
