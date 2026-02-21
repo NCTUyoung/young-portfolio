@@ -162,18 +162,38 @@ export default defineEventHandler(async (event) => {
           if (userCreationDate) {
             captureTime = new Date(userCreationDate)
           } else {
-            // 嘗試讀取 EXIF 資料（電繪作品可能也有 EXIF）
+            // 嘗試讀取 EXIF/XMP 資料（PNG/PSD 可能有 XMP 創作日期）
             try {
-              const rawExifData = await exifr.parse(file.filepath)
+              const rawExifData = await exifr.parse(file.filepath, { xmp: true })
               if (rawExifData) {
                 const exifData = normalizeExifData(rawExifData)
                 const exifTime = extractCaptureTime(exifData)
-                if (exifTime) {
+                if (exifTime && exifTime.getFullYear() > 1970) {
                   captureTime = exifTime
+                  console.log(`✅ 從 EXIF/XMP 推斷創作時間: ${originalName} -> ${captureTime.toISOString()}`)
                 }
               }
             } catch (error) {
-              console.warn(`無法讀取 ${originalName} 的 EXIF 資訊，使用當前時間`)
+              console.warn(`無法讀取 ${originalName} 的 EXIF/XMP 資訊`)
+            }
+
+            // EXIF 無法取得時，嘗試 fs.stat() 的 birthtime（建立時間）或 mtime（修改時間）
+            if (captureTime.getTime() > Date.now() - 5000) {
+              // captureTime 仍是剛設定的「現在」，代表 EXIF 沒找到有效日期
+              try {
+                const { statSync } = await import('fs')
+                const fileStat = statSync(file.filepath)
+                // birthtime 優先（某些 OS 有真實建立時間）；否則用 mtime
+                const statDate = fileStat.birthtime.getFullYear() > 1970
+                  ? fileStat.birthtime
+                  : fileStat.mtime
+                if (statDate.getFullYear() > 1970) {
+                  captureTime = statDate
+                  console.log(`✅ 從 fs.stat() 推斷創作時間: ${originalName} -> ${captureTime.toISOString()}`)
+                }
+              } catch (statError) {
+                console.warn(`無法讀取 ${originalName} 的檔案系統時間，使用當前時間`)
+              }
             }
           }
 
