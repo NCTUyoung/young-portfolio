@@ -31,7 +31,7 @@
           <input
             v-model="localEventName"
             type="text"
-            class="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg bg-stone-50 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all font-light text-stone-700"
             placeholder="輸入事件名稱"
             :disabled="loading"
           />
@@ -45,7 +45,7 @@
           <textarea
             v-model="localDescription"
             rows="3"
-            class="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+            class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg bg-stone-50 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all resize-none font-light text-stone-700"
             placeholder="輸入事件描述"
             :disabled="loading"
           />
@@ -59,7 +59,7 @@
           <input
             v-model="localLocation"
             type="text"
-            class="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg bg-stone-50 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all font-light text-stone-700"
             placeholder="輸入事件地點"
             :disabled="loading"
           />
@@ -78,7 +78,7 @@
         <button
           @click="handleConfirm"
           :disabled="loading || !localEventName.trim()"
-          class="px-4 py-2.5 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+          class="px-4 py-2.5 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center"
         >
           <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>

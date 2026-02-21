@@ -686,6 +686,80 @@ export const useAdminStore = defineStore('admin', () => {
     editingImageData.value = null
   }
 
+  // 刪除整個事件（含所有圖片）
+  const deleteEvent = async (eventName: string) => {
+    loading.value = true
+    try {
+      const response = await $fetch('/api/delete-event', {
+        method: 'DELETE',
+        body: { eventName, category: manageCategory.value }
+      }) as { success: boolean; message: string; deletedCount: number }
+
+      if (response.success) {
+        message.value = response.message
+        messageType.value = 'success'
+        await loadGalleryByCategory(manageCategory.value)
+      }
+    } catch (error) {
+      console.error('Delete event failed:', error)
+      message.value = '刪除事件失敗，請稍後再試'
+      messageType.value = 'error'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 批次刪除圖片
+  const batchDeleteImages = async (filenames: string[]) => {
+    if (filenames.length === 0) return
+    loading.value = true
+    let successCount = 0
+    try {
+      for (const filename of filenames) {
+        try {
+          await $fetch('/api/delete-image', {
+            method: 'DELETE',
+            body: { filename, category: manageCategory.value }
+          })
+          successCount++
+        } catch (e) {
+          console.error(`Failed to delete ${filename}:`, e)
+        }
+      }
+      message.value = `成功刪除 ${successCount} 張圖片`
+      messageType.value = 'success'
+      await loadGalleryByCategory(manageCategory.value)
+    } catch (error) {
+      console.error('Batch delete failed:', error)
+      message.value = '批次刪除失敗'
+      messageType.value = 'error'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 重新排序事件內的圖片（本地更新）
+  const reorderEventImages = (eventName: string, newOrder: string[]) => {
+    const dataArray = manageCategory.value === 'gallery' ? galleryData.value : photographyData.value
+    // 依照 newOrder 重新排列同一 event 的圖片
+    const eventItems = dataArray.filter(img => {
+      if ((img as any).event?.name) return (img as any).event.name === eventName
+      const year = new Date(img.time).getFullYear()
+      return `${year}年電繪作品` === eventName
+    })
+    const otherItems = dataArray.filter(img => !eventItems.includes(img))
+    const reordered = newOrder
+      .map(fn => eventItems.find(img => img.filename === fn))
+      .filter(Boolean) as typeof dataArray
+
+    const merged = [...reordered, ...otherItems]
+    if (manageCategory.value === 'gallery') {
+      galleryData.value = merged
+    } else {
+      photographyData.value = merged
+    }
+  }
+
   return {
     // 基本狀態
     loading,
@@ -758,6 +832,9 @@ export const useAdminStore = defineStore('admin', () => {
     startEditImage,
     confirmEditImage,
     cancelEditImage,
+    deleteEvent,
+    batchDeleteImages,
+    reorderEventImages,
     resetState
   }
 })

@@ -1,39 +1,76 @@
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+  <div>
+    <!-- 工具列：搜尋 + 批次模式 -->
+    <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+      <!-- 搜尋框 -->
+      <div class="relative flex-1 max-w-xs">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="搜尋圖片名稱…"
+          class="w-full pl-9 pr-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+        />
+        <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- 批次操作按鈕 -->
+      <button
+        @click="toggleBatchMode"
+        :class="[
+          'px-3 py-1.5 text-xs font-light rounded-lg border transition-all duration-200 flex items-center space-x-1.5',
+          batchMode
+            ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+            : 'bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100'
+        ]"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <span>{{ batchMode ? '退出批次' : '批次操作' }}</span>
+      </button>
+    </div>
+
     <!-- 載入中 -->
-    <div v-if="adminStore.loading" class="text-center py-12">
-      <div class="inline-flex items-center">
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <div v-if="adminStore.loading" class="text-center py-16">
+      <div class="inline-flex items-center space-x-2 text-stone-400">
+        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-gray-500">載入中...</span>
+        <span class="text-sm font-light">載入中…</span>
       </div>
     </div>
 
     <!-- 無數據 -->
-    <div v-else-if="adminStore.groupedManageData.length === 0" class="text-center py-12">
-      <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+    <div v-else-if="adminStore.groupedManageData.length === 0" class="text-center py-20">
+      <svg class="w-12 h-12 mx-auto mb-4 text-stone-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
-      <p class="text-gray-500 mb-2">尚無作品</p>
-      <p class="text-gray-400 text-sm">請先上傳一些圖片</p>
+      <p class="text-stone-400 text-sm font-light">尚無作品，請先上傳圖片</p>
+    </div>
+
+    <!-- 搜尋無結果 -->
+    <div v-else-if="searchQuery && filteredGroups.length === 0" class="text-center py-16">
+      <p class="text-stone-400 text-sm font-light">找不到包含「{{ searchQuery }}」的圖片</p>
     </div>
 
     <!-- 事件列表 -->
     <template v-else>
       <div
-        v-for="group in adminStore.groupedManageData"
+        v-for="(group, gIdx) in filteredGroups"
         :key="group.eventName"
-        :class="[
-          'bg-gray-50 border border-gray-200 rounded-lg overflow-hidden',
-          'mx-6 mb-4',
-          { 'mt-6': adminStore.groupedManageData.indexOf(group) === 0 }
-        ]"
+        class="mb-4 border border-stone-200 rounded-xl overflow-hidden"
       >
-        <!-- 事件標題 -->
+        <!-- 事件標題欄 -->
         <div
-          class="px-4 py-3 bg-white border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+          class="px-4 py-3 bg-white border-b border-stone-100 cursor-pointer hover:bg-stone-50 transition-colors duration-200"
           @click="adminStore.toggleEventExpand(group.eventName)"
         >
           <div class="flex items-center justify-between">
@@ -41,147 +78,204 @@
               <!-- 展開圖標 -->
               <svg
                 :class="[
-                  'w-4 h-4 text-gray-400 transition-transform duration-200',
+                  'w-4 h-4 text-stone-400 transition-transform duration-200 flex-shrink-0',
                   adminStore.expandedEvents.includes(group.eventName) ? 'rotate-90' : ''
                 ]"
-                fill="currentColor"
-                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
               </svg>
 
-              <div>
+              <div class="min-w-0">
                 <div class="flex items-center space-x-2">
-                  <h4 class="text-base font-medium text-gray-900">{{ group.eventName }}</h4>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <h4 class="text-sm font-light text-stone-800">{{ group.eventName }}</h4>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-light bg-amber-100 text-amber-700">
                     {{ group.items.length }} 張
                   </span>
                 </div>
-                <div v-if="group.description || group.location" class="mt-1 text-sm text-gray-500">
-                  {{ group.description }}
+                <div v-if="group.description || group.location" class="mt-0.5 text-xs text-stone-400 font-light">
+                  <span v-if="group.description">{{ group.description }}</span>
                   <span v-if="group.location" class="ml-2">📍 {{ group.location }}</span>
                 </div>
               </div>
             </div>
 
             <!-- 操作按鈕 -->
-            <div class="flex items-center space-x-1" @click.stop>
+            <div class="flex items-center space-x-1 flex-shrink-0" @click.stop>
+              <!-- 批次：全選/取消 -->
+              <button
+                v-if="batchMode"
+                @click="toggleSelectGroup(group)"
+                class="px-2 py-1 text-xs font-light text-stone-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                :title="isGroupAllSelected(group) ? '取消全選' : '全選此事件'"
+              >
+                {{ isGroupAllSelected(group) ? '取消' : '全選' }}
+              </button>
+
+              <!-- 編輯事件 -->
               <button
                 @click="adminStore.startEditEvent(group.eventName, group.description, group.location)"
-                class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
                 title="編輯事件"
               >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </button>
+
+              <!-- 新增圖片到此事件 -->
               <button
-                class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
-                title="新增圖片"
+                @click="$emit('switchToUpload', group.eventName)"
+                class="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                title="新增圖片到此事件"
               >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+
+              <!-- 刪除整個事件 -->
+              <button
+                @click="promptDeleteEvent(group.eventName, group.items.length)"
+                class="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                title="刪除整個事件"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 圖片網格 -->
+        <!-- 圖片區域 -->
         <div
           v-if="adminStore.expandedEvents.includes(group.eventName)"
-          class="p-4"
+          class="p-4 bg-stone-50/30"
         >
           <!-- 網格檢視 -->
-          <div v-if="adminStore.manageViewMode === 'grid'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          <div v-if="adminStore.manageViewMode === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             <div
-              v-for="item in group.items"
+              v-for="(item, itemIdx) in group.items"
               :key="item.filename"
-              class="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200"
+              :draggable="adminStore.editMode"
+              @dragstart="handleDragStart(item.filename, group.eventName)"
+              @dragover.prevent
+              @drop="handleDrop(item.filename, group.eventName)"
+              :class="[
+                'group relative aspect-square bg-stone-100 rounded-xl overflow-hidden transition-all duration-200',
+                adminStore.editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
+                selectedFiles.has(item.filename) ? 'ring-2 ring-amber-400' : 'hover:shadow-md',
+                dragOverFilename === item.filename && dragEventName === group.eventName ? 'ring-2 ring-amber-300 opacity-70' : ''
+              ]"
+              @click="handleImageClick(item, group.items, itemIdx)"
             >
               <img
                 :src="getImagePath(item.filename)"
                 :alt="item.title"
-                class="w-full h-full object-contain bg-stone-100 dark:bg-stone-800 group-hover:scale-105 transition-transform duration-200"
+                class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
                 @error="handleImageError"
                 loading="lazy"
               />
 
-              <!-- 編輯模式覆蓋層 -->
+              <!-- 批次 checkbox -->
+              <div v-if="batchMode" class="absolute top-1.5 left-1.5 z-20" @click.stop>
+                <div
+                  @click="toggleSelectFile(item.filename)"
+                  :class="[
+                    'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
+                    selectedFiles.has(item.filename)
+                      ? 'bg-amber-500 border-amber-500'
+                      : 'bg-white/80 border-stone-300 hover:border-amber-400'
+                  ]"
+                >
+                  <svg v-if="selectedFiles.has(item.filename)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 編輯模式操作 -->
               <div
-                v-if="adminStore.editMode"
-                class="absolute top-2 right-2 z-20 opacity-80 group-hover:opacity-100 transition-opacity duration-300 flex space-x-1"
+                v-if="adminStore.editMode && !batchMode"
+                class="absolute top-1.5 right-1.5 z-20 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                @click.stop
               >
                 <button
-                  @click.stop="handleEditImage(item)"
-                  class="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-                  title="編輯圖片"
+                  @click="adminStore.startEditImage(item)"
+                  class="p-1.5 bg-white/90 text-stone-600 rounded-lg hover:bg-stone-100 transition-colors shadow-sm"
+                  title="編輯"
                 >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
                 <button
-                  @click.stop="adminStore.showDeleteConfirm(item.filename, item.title)"
-                  class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                  title="刪除圖片"
+                  @click="adminStore.showDeleteConfirm(item.filename, item.title)"
+                  class="p-1.5 bg-white/90 text-red-500 rounded-lg hover:bg-red-50 transition-colors shadow-sm"
+                  title="刪除"
                 >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
               </div>
 
-              <!-- 圖片資訊 -->
-              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <p class="text-white text-xs font-medium truncate">{{ item.title }}</p>
-                <p class="text-white/80 text-xs mt-1">{{ formatDate(item.time) }}</p>
-              </div>
-
-              <!-- 永久顯示的日期標籤 -->
-              <div class="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                {{ formatDate(item.time) }}
+              <!-- hover 資訊 -->
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <p class="text-white text-xs font-light truncate">{{ item.title }}</p>
+                <p class="text-white/60 text-xs font-light">{{ formatDate(item.time) }}</p>
               </div>
             </div>
           </div>
 
           <!-- 列表檢視 -->
-          <div v-else class="space-y-2">
+          <div v-else class="space-y-1.5">
             <div
               v-for="item in group.items"
               :key="item.filename"
-              class="flex items-center space-x-4 p-3 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-all duration-200"
+              class="flex items-center space-x-3 px-3 py-2.5 bg-white rounded-xl border border-stone-100 hover:border-stone-200 transition-all"
             >
+              <!-- Checkbox -->
+              <div v-if="batchMode" @click.stop>
+                <div
+                  @click="toggleSelectFile(item.filename)"
+                  :class="[
+                    'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all flex-shrink-0',
+                    selectedFiles.has(item.filename)
+                      ? 'bg-amber-500 border-amber-500'
+                      : 'border-stone-300 hover:border-amber-400'
+                  ]"
+                >
+                  <svg v-if="selectedFiles.has(item.filename)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+
               <img
                 :src="getImagePath(item.filename)"
                 :alt="item.title"
-                class="w-12 h-12 object-cover rounded-lg"
+                class="w-10 h-10 object-cover rounded-lg flex-shrink-0 cursor-pointer"
                 @error="handleImageError"
                 loading="lazy"
+                @click="openLightbox(item, group.items, group.items.indexOf(item))"
               />
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ item.title }}</p>
-                <p class="text-xs text-gray-500">{{ formatDate(item.time) }}</p>
+                <p class="text-sm font-light text-stone-800 truncate">{{ item.title }}</p>
+                <p class="text-xs text-stone-400 font-light">{{ formatDate(item.time) }}</p>
               </div>
-              <div v-if="adminStore.editMode" class="flex-shrink-0 flex space-x-2">
-                <button
-                  @click="handleEditImage(item)"
-                  class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                  title="編輯圖片"
-                >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              <div v-if="adminStore.editMode" class="flex-shrink-0 flex space-x-1">
+                <button @click="adminStore.startEditImage(item)" class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors" title="編輯">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
-                <button
-                  @click="adminStore.showDeleteConfirm(item.filename, item.title)"
-                  class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                  title="刪除圖片"
-                >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                <button @click="adminStore.showDeleteConfirm(item.filename, item.title)" class="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="刪除">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
               </div>
@@ -190,35 +284,231 @@
         </div>
       </div>
     </template>
+
+    <!-- 批次操作浮動欄 -->
+    <Transition name="slide-up">
+      <div
+        v-if="batchMode && selectedFiles.size > 0"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center space-x-4 bg-stone-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl"
+      >
+        <span class="text-sm font-light">已選 <span class="text-amber-400 font-medium">{{ selectedFiles.size }}</span> 張</span>
+        <div class="w-px h-4 bg-stone-700"></div>
+        <button
+          @click="clearSelection"
+          class="text-xs text-stone-400 hover:text-white transition-colors font-light"
+        >
+          取消選取
+        </button>
+        <button
+          @click="confirmBatchDelete"
+          class="px-4 py-1.5 bg-red-600 text-white text-xs font-light rounded-lg hover:bg-red-500 transition-colors"
+        >
+          批次刪除
+        </button>
+      </div>
+    </Transition>
+
+    <!-- 刪除事件確認對話框 -->
+    <AdminConfirmDialog
+      :is-visible="showDeleteEventDialog"
+      title="刪除整個事件"
+      :message="`確定要刪除事件「${deleteEventTarget}」及其所有 ${deleteEventCount} 張圖片嗎？`"
+      details="此操作無法復原，所有圖片檔案將被永久刪除。"
+      @confirm="handleDeleteEvent"
+      @cancel="showDeleteEventDialog = false"
+    />
+
+    <!-- 批次刪除確認對話框 -->
+    <AdminConfirmDialog
+      :is-visible="showBatchDeleteDialog"
+      title="批次刪除圖片"
+      :message="`確定要刪除已選取的 ${selectedFiles.size} 張圖片嗎？`"
+      details="此操作無法復原，選取的圖片將被永久刪除。"
+      @confirm="executeBatchDelete"
+      @cancel="showBatchDeleteDialog = false"
+    />
+
+    <!-- Lightbox -->
+    <AdminLightbox
+      :is-visible="lightboxVisible"
+      :images="lightboxImages"
+      :initial-index="lightboxIndex"
+      @close="lightboxVisible = false"
+    />
+
+    <!-- 事件編輯對話框 -->
+    <AdminEventEditDialog
+      v-if="adminStore.showEventEditDialog && adminStore.editingEventData"
+      :show="adminStore.showEventEditDialog"
+      :event-name="adminStore.editingEventData.name"
+      :description="adminStore.editingEventData.description"
+      :location="adminStore.editingEventData.location"
+      :loading="adminStore.loading"
+      @confirm="adminStore.confirmEditEvent"
+      @cancel="adminStore.cancelEditEvent"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits<{ switchToUpload: [eventName: string] }>()
+
 const adminStore = useAdminStore()
 const { getImagePath } = useImagePath()
 
-// 處理圖片載入錯誤
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  img.style.display = 'none'
+// ===== 搜尋 =====
+const searchQuery = ref('')
+
+const filteredGroups = computed(() => {
+  const groups = adminStore.groupedManageData
+  if (!searchQuery.value.trim()) return groups
+  const q = searchQuery.value.toLowerCase()
+  return groups
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item =>
+        item.title?.toLowerCase().includes(q) ||
+        item.filename?.toLowerCase().includes(q)
+      )
+    }))
+    .filter(group => group.items.length > 0)
+})
+
+// ===== 批次操作 =====
+const batchMode = ref(false)
+const selectedFiles = ref(new Set<string>())
+
+const toggleBatchMode = () => {
+  batchMode.value = !batchMode.value
+  if (!batchMode.value) selectedFiles.value.clear()
 }
 
-// 格式化日期
+const toggleSelectFile = (filename: string) => {
+  if (selectedFiles.value.has(filename)) {
+    selectedFiles.value.delete(filename)
+  } else {
+    selectedFiles.value.add(filename)
+  }
+  selectedFiles.value = new Set(selectedFiles.value) // 觸發響應性
+}
+
+const toggleSelectGroup = (group: { items: any[] }) => {
+  const filenames = group.items.map(i => i.filename)
+  const allSelected = filenames.every(fn => selectedFiles.value.has(fn))
+  if (allSelected) {
+    filenames.forEach(fn => selectedFiles.value.delete(fn))
+  } else {
+    filenames.forEach(fn => selectedFiles.value.add(fn))
+  }
+  selectedFiles.value = new Set(selectedFiles.value)
+}
+
+const isGroupAllSelected = (group: { items: any[] }) =>
+  group.items.length > 0 && group.items.every(i => selectedFiles.value.has(i.filename))
+
+const clearSelection = () => {
+  selectedFiles.value = new Set()
+}
+
+const showBatchDeleteDialog = ref(false)
+const confirmBatchDelete = () => { showBatchDeleteDialog.value = true }
+const executeBatchDelete = async () => {
+  showBatchDeleteDialog.value = false
+  await adminStore.batchDeleteImages(Array.from(selectedFiles.value))
+  selectedFiles.value = new Set()
+  batchMode.value = false
+}
+
+// ===== 刪除事件 =====
+const showDeleteEventDialog = ref(false)
+const deleteEventTarget = ref('')
+const deleteEventCount = ref(0)
+
+const promptDeleteEvent = (eventName: string, count: number) => {
+  deleteEventTarget.value = eventName
+  deleteEventCount.value = count
+  showDeleteEventDialog.value = true
+}
+
+const handleDeleteEvent = async () => {
+  showDeleteEventDialog.value = false
+  await adminStore.deleteEvent(deleteEventTarget.value)
+}
+
+// ===== 拖曳排序 =====
+const dragFilename = ref('')
+const dragEventName = ref('')
+const dragOverFilename = ref('')
+
+const handleDragStart = (filename: string, eventName: string) => {
+  dragFilename.value = filename
+  dragEventName.value = eventName
+}
+
+const handleDrop = (targetFilename: string, targetEventName: string) => {
+  dragOverFilename.value = ''
+  if (!dragFilename.value || dragFilename.value === targetFilename) return
+  if (dragEventName.value !== targetEventName) return
+
+  const group = adminStore.groupedManageData.find(g => g.eventName === targetEventName)
+  if (!group) return
+
+  const items = [...group.items]
+  const fromIdx = items.findIndex(i => i.filename === dragFilename.value)
+  const toIdx = items.findIndex(i => i.filename === targetFilename)
+  if (fromIdx === -1 || toIdx === -1) return
+
+  const newOrder = items.map(i => i.filename)
+  const [moved] = newOrder.splice(fromIdx, 1)
+  newOrder.splice(toIdx, 0, moved)
+
+  adminStore.reorderEventImages(targetEventName, newOrder)
+  dragFilename.value = ''
+  dragEventName.value = ''
+}
+
+// ===== Lightbox =====
+const lightboxVisible = ref(false)
+const lightboxImages = ref<{ filename: string; title: string; time?: string }[]>([])
+const lightboxIndex = ref(0)
+
+const openLightbox = (item: any, items: any[], idx: number) => {
+  lightboxImages.value = items.map(i => ({ filename: i.filename, title: i.title, time: i.time }))
+  lightboxIndex.value = idx
+  lightboxVisible.value = true
+}
+
+const handleImageClick = (item: any, items: any[], idx: number) => {
+  if (batchMode.value) {
+    toggleSelectFile(item.filename)
+  } else if (!adminStore.editMode) {
+    openLightbox(item, items, idx)
+  }
+}
+
+// ===== 共用 =====
+const handleImageError = (event: Event) => {
+  (event.target as HTMLImageElement).style.display = 'none'
+}
+
 const formatDate = (dateString: string) => {
   try {
     const date = new Date(dateString)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+    return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'short', day: 'numeric' })
   } catch {
     return dateString
   }
 }
-
-// 編輯圖片處理
-const handleEditImage = (item: any) => {
-  adminStore.startEditImage(item)
-}
 </script>
+
+<style scoped>
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+}
+</style>

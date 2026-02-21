@@ -1,79 +1,74 @@
 <template>
-  <div v-if="isVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
-      <!-- 標題 -->
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-medium text-gray-900">編輯圖片資訊</h3>
-      </div>
+  <Teleport to="body">
+    <div v-if="isVisible" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="cancel">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        <!-- 標題 -->
+        <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
+          <h3 class="text-sm font-medium text-stone-800 tracking-wide">編輯圖片資訊</h3>
+          <button @click="cancel" class="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-      <!-- 內容 -->
-      <div class="p-6 max-h-[70vh] overflow-y-auto">
-        <div v-if="imageData" class="space-y-6">
-          <!-- 圖片預覽 -->
-          <div class="flex items-start space-x-4">
-            <img
-              :src="getImagePath(imageData.filename)"
-              :alt="imageData.title"
-              class="w-24 h-24 object-cover rounded-lg border border-gray-200"
-            />
-            <div class="flex-1">
-              <h4 class="font-medium text-gray-900 mb-1">{{ imageData.filename }}</h4>
-              <p class="text-sm text-gray-500">檔案名稱</p>
-            </div>
-          </div>
-
-          <!-- 基本資訊 -->
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                標題 <span class="text-red-500">*</span>
-              </label>
-              <input
-                v-model="formData.title"
-                type="text"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="請輸入圖片標題"
+        <!-- 內容 -->
+        <div class="p-6 max-h-[70vh] overflow-y-auto">
+          <div v-if="imageData" class="space-y-6">
+            <!-- 圖片預覽 -->
+            <div class="flex items-start space-x-4">
+              <img
+                :src="getImagePath(imageData.filename)"
+                :alt="imageData.title"
+                class="w-20 h-20 object-cover rounded-xl border border-stone-100"
               />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-light text-stone-800 truncate">{{ imageData.filename }}</p>
+                <p class="text-xs text-stone-400 font-light mt-1">檔案名稱</p>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                描述
-              </label>
-              <textarea
-                v-model="formData.content"
-                rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="請輸入圖片描述"
-              />
-            </div>
-
-            <!-- 創作/拍攝日期 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ category === 'gallery' ? '創作日期' : '拍攝日期' }} <span class="text-red-500">*</span>
-              </label>
-              <input
-                v-model="formData.date"
-                type="date"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p class="text-xs text-gray-500 mt-1">
-                {{ category === 'gallery' ? '選擇作品的實際創作日期' : '選擇照片的實際拍攝日期' }}
-              </p>
-            </div>
-
-            <!-- 繪圖作品專用欄位 -->
-            <div v-if="category === 'gallery'" class="space-y-4">
+            <!-- 表單欄位 -->
+            <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  顏色標籤
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">
+                  標題 <span class="text-red-400">*</span>
                 </label>
+                <input
+                  v-model="formData.title"
+                  type="text"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  placeholder="請輸入圖片標題"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">描述</label>
+                <textarea
+                  v-model="formData.content"
+                  rows="3"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
+                  placeholder="請輸入圖片描述"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">
+                  {{ category === 'gallery' ? '創作日期' : '拍攝日期' }} <span class="text-red-400">*</span>
+                </label>
+                <input
+                  v-model="formData.date"
+                  type="date"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                />
+              </div>
+
+              <!-- 繪圖作品專用 -->
+              <div v-if="category === 'gallery'">
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">顏色標籤</label>
                 <select
                   v-model="formData.color"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                 >
                   <option value="blue">藍色</option>
                   <option value="red">紅色</option>
@@ -84,75 +79,65 @@
                   <option value="amber">琥珀色</option>
                 </select>
               </div>
-            </div>
 
-            <!-- 攝影作品專用欄位 -->
-            <div v-if="category === 'photography'" class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  標籤 (用逗號分隔)
-                </label>
+              <!-- 攝影作品專用 -->
+              <div v-if="category === 'photography'">
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">標籤（逗號分隔）</label>
                 <input
                   v-model="formData.tagsString"
                   type="text"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="例如：人像,街拍,藝術"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  placeholder="例如：人像,街拍"
                 />
-                <p class="text-xs text-gray-500 mt-1">
-                  相機設定（ISO、光圈、快門等）無法修改，會自動從照片讀取
-                </p>
+                <p class="text-xs text-stone-400 font-light mt-1">相機設定無法修改，會自動從照片讀取</p>
               </div>
-            </div>
 
-            <!-- 事件資訊 (如果有的話) -->
-            <div v-if="imageData.event" class="border-t pt-4">
-              <h5 class="text-sm font-medium text-gray-700 mb-3">事件資訊</h5>
-              <div class="space-y-3 bg-gray-50 p-3 rounded-md">
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">事件名稱</label>
-                  <p class="text-sm text-gray-900">{{ imageData.event.name }}</p>
+              <!-- 事件資訊 -->
+              <div v-if="imageData.event" class="border-t border-stone-100 pt-4">
+                <h5 class="text-xs font-light text-stone-500 mb-3 tracking-wider uppercase">事件資訊</h5>
+                <div class="bg-stone-50 rounded-xl p-4 space-y-2">
+                  <div>
+                    <p class="text-xs text-stone-400 font-light">事件名稱</p>
+                    <p class="text-sm font-light text-stone-700">{{ imageData.event.name }}</p>
+                  </div>
+                  <div v-if="imageData.event.description">
+                    <p class="text-xs text-stone-400 font-light">事件描述</p>
+                    <p class="text-sm font-light text-stone-700">{{ imageData.event.description }}</p>
+                  </div>
+                  <div v-if="imageData.event.location">
+                    <p class="text-xs text-stone-400 font-light">地點</p>
+                    <p class="text-sm font-light text-stone-700">{{ imageData.event.location }}</p>
+                  </div>
                 </div>
-                <div v-if="imageData.event.description">
-                  <label class="block text-xs font-medium text-gray-600 mb-1">事件描述</label>
-                  <p class="text-sm text-gray-900">{{ imageData.event.description }}</p>
-                </div>
-                <div v-if="imageData.event.location">
-                  <label class="block text-xs font-medium text-gray-600 mb-1">事件地點</label>
-                  <p class="text-sm text-gray-900">{{ imageData.event.location }}</p>
-                </div>
+                <p class="text-xs text-stone-400 font-light mt-2">事件資訊請透過事件編輯功能修改</p>
               </div>
-              <p class="text-xs text-gray-500 mt-2">
-                事件資訊請到事件編輯功能中修改
-              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 按鈕 -->
-      <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-        <button
-          @click="cancel"
-          type="button"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          取消
-        </button>
-        <button
-          @click="confirm"
-          :disabled="!isFormValid"
-          type="button"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          保存
-        </button>
+        <!-- 按鈕 -->
+        <div class="px-6 py-4 border-t border-stone-100 flex justify-end space-x-3">
+          <button
+            @click="cancel"
+            class="px-4 py-2 text-sm font-light text-stone-600 bg-stone-100 border border-stone-200 rounded-lg hover:bg-stone-200 transition-colors"
+          >
+            取消
+          </button>
+          <button
+            @click="confirm"
+            :disabled="!isFormValid"
+            class="px-4 py-2 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            儲存
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { GalleryItem, PhotographyItem } from '~/types/gallery'
 
 interface Props {
@@ -162,54 +147,30 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{
-  confirm: [data: {
-    title: string
-    content: string
-    date: string
-    color?: string
-    tags?: string[]
-  }]
+  confirm: [data: { title: string; content: string; date: string; color?: string; tags?: string[] }]
   cancel: []
 }>()
 
 const { getImagePath } = useImagePath()
 
-// 表單數據
-const formData = ref({
-  title: '',
-  content: '',
-  date: '',
-  color: 'blue',
-  tagsString: ''
-})
+const formData = ref({ title: '', content: '', date: '', color: 'blue', tagsString: '' })
 
-// 表單驗證
-const isFormValid = computed(() => {
-  return formData.value.title.trim() !== '' && formData.value.date !== ''
-})
+const isFormValid = computed(() => formData.value.title.trim() !== '' && formData.value.date !== '')
 
-// 監聽 imageData 變化，重置表單
 watch(() => props.imageData, (newData) => {
   if (newData) {
-    // 解析日期字符串，提取日期部分
-    const dateStr = newData.time
     let dateOnly = ''
-
     try {
-      // 嘗試解析 "2024 Jan 15" 格式
-      const date = new Date(dateStr)
+      const date = new Date(newData.time)
       if (!isNaN(date.getTime())) {
         dateOnly = date.toISOString().split('T')[0]
       } else {
-        // 如果解析失敗，使用當前日期
         dateOnly = new Date().toISOString().split('T')[0]
       }
     } catch {
       dateOnly = new Date().toISOString().split('T')[0]
     }
-
     formData.value = {
       title: newData.title || '',
       content: newData.content || '',
@@ -224,31 +185,26 @@ watch(() => props.imageData, (newData) => {
   }
 }, { immediate: true })
 
-// 確認按鈕
 const confirm = () => {
   if (!isFormValid.value) return
-
   const updateData: any = {
     title: formData.value.title.trim(),
     content: formData.value.content.trim(),
     date: formData.value.date
   }
-
   if (props.category === 'gallery') {
     updateData.color = formData.value.color
   } else if (props.category === 'photography') {
-    updateData.tags = formData.value.tagsString
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag)
+    updateData.tags = formData.value.tagsString.split(',').map(t => t.trim()).filter(t => t)
   }
-
-  console.log('Sending update data:', updateData)
   emit('confirm', updateData)
 }
 
-// 取消按鈕
-const cancel = () => {
-  emit('cancel')
-}
+const cancel = () => emit('cancel')
+
+onMounted(() => {
+  const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') cancel() }
+  document.addEventListener('keydown', handleEsc)
+  onUnmounted(() => document.removeEventListener('keydown', handleEsc))
+})
 </script>
