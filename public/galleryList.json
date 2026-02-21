@@ -1,5 +1,5 @@
 {
-  "totalNumber": "30",
+  "totalNumber": "34",
   "Img": [
     {
       "filename": "gallery/2018年電繪作品/Capsule.png",
@@ -360,6 +360,54 @@
         "description": "2025年創作的電繪作品集",
         "location": ""
       }
+    },
+    {
+      "filename": "gallery/2025年電繪作品/21-編輯.jpg",
+      "time": "2025 Jul 20",
+      "title": "鏡",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2025年電繪作品",
+        "description": "2025年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2025年電繪作品/17-編輯.jpg",
+      "time": "2025 Sep 08",
+      "title": "鑽石",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2025年電繪作品",
+        "description": "2025年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2025年電繪作品/test3-1.jpg",
+      "time": "2025 Nov 30",
+      "title": "Cosplayer",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2025年電繪作品",
+        "description": "2025年創作的電繪作品集",
+        "location": ""
+      }
+    },
+    {
+      "filename": "gallery/2026年電繪作品/7-編輯-2-1.jpg",
+      "time": "2026 Jan 04",
+      "title": "保時捷356",
+      "content": "",
+      "color": "blue",
+      "event": {
+        "name": "2026年電繪作品",
+        "description": "2026年創作的電繪作品集",
+        "location": ""
+      }
     }
   ],
   "eventStats": {
@@ -368,6 +416,7 @@
     "2022年電繪作品": 6,
     "2023年電繪作品": 4,
     "2024年電繪作品": 5,
-    "2025年電繪作品": 2
+    "2025年電繪作品": 5,
+    "2026年電繪作品": 1
   }
 }
