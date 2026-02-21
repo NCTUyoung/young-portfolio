@@ -136,3 +136,82 @@
   writing-mode: vertical-rl;
   text-orientation: mixed;
 }
+
+/* ===== 日式節標題小標 ===== */
+.jp-section-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-weight: 300;
+  color: theme('colors.accent.500');
+}
+.dark .jp-section-label {
+  color: theme('colors.accent.400');
+}
+
+/* ===== 大型漢字背景裝飾 ===== */
+.jp-kana-bg {
+  font-size: clamp(6rem, 18vw, 18rem);
+  font-weight: 100;
+  line-height: 1;
+  color: theme('colors.stone.100');
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: 0.05em;
+}
+.dark .jp-kana-bg {
+  color: theme('colors.stone.800');
+  opacity: 0.5;
+}
+
+/* ===== 墨水描線動畫（供 SVG stroke 使用） ===== */
+@keyframes ink-draw {
+  0% {
+    stroke-dashoffset: 200;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+.ink-draw-line {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: ink-draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ===== 日式側線（引言、事件資訊框） ===== */
+.jp-side-line {
+  border-left: 1.5px solid theme('colors.accent.300');
+  padding-left: 1rem;
+  opacity: 0.7;
+}
+.dark .jp-side-line {
+  border-left-color: theme('colors.accent.600');
+}
+
+/* ===== 紙紋底色（極淡） ===== */
+.washi-bg {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      theme('colors.stone.200 / 20%') 39px,
+      theme('colors.stone.200 / 20%') 40px
+    );
+}
+.dark .washi-bg {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      theme('colors.stone.700 / 15%') 39px,
+      theme('colors.stone.700 / 15%') 40px
+    );
+}

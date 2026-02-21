@@ -8,11 +8,25 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     'nuxt-headlessui',
-    '@nuxt/image'
+    '@nuxt/image',
+    '@nuxt/eslint',
+    '@nuxt/fonts'
   ],
 
   headlessui: {
     prefix: 'Headless'
+  },
+
+  // 字型設定：改由 @nuxt/fonts 管理，取代 CSS @import
+  // 支援自動子集化、本地緩存，效能更佳
+  fonts: {
+    families: [
+      {
+        name: 'Noto Serif JP',
+        weights: [100, 200, 300],
+        provider: 'google'
+      }
+    ]
   },
 
   css: ['~/assets/css/main.css'],

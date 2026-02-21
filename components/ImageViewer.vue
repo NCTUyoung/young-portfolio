@@ -2,19 +2,21 @@
     <!-- 圖片檢視器 -->
   <div v-if="isOpen" class="fixed inset-0 z-[9999] bg-black bg-opacity-90 backdrop-blur-sm">
     <!-- 背景點擊關閉 -->
-    <div @click="closeImageViewer" class="absolute inset-0"></div>
+    <div class="absolute inset-0" @click="closeImageViewer"/>
 
     <!-- 主要內容 -->
     <div class="relative w-full h-full flex">
       <!-- 圖片檢視區域 -->
-      <div class="image-viewer-area flex-1 flex items-center justify-center p-4 transition-all duration-300"
+      <div
+class="image-viewer-area flex-1 flex items-center justify-center p-4 transition-all duration-300"
            :style="{
              marginRight: showInfoPanel ? infoPanelWidth + 'px' : '0px'
            }"
            @wheel.prevent="handleWheel">
 
         <!-- 頂部工具列 -->
-        <div class="absolute top-4 left-4 z-10 flex items-center justify-between"
+        <div
+class="absolute top-4 left-4 z-10 flex items-center justify-between"
              :style="{
                right: showInfoPanel ? (infoPanelWidth + 16) + 'px' : '16px'
              }">
@@ -30,63 +32,69 @@
           <!-- 操作按鈕 -->
           <div class="flex items-center space-x-2 bg-black bg-opacity-50 backdrop-blur-sm rounded-lg px-2 py-2">
             <!-- 縮放控制 -->
-            <button @click="zoomOut" :disabled="!canZoomOut"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    title="縮小 (Ctrl + -)">
+            <button
+:disabled="!canZoomOut" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    title="縮小 (Ctrl + -)"
+                    @click="zoomOut">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
               </svg>
             </button>
 
             <span class="text-white text-sm min-w-[60px] text-center">{{ Math.round(viewerScale * 100) }}%</span>
 
-            <button @click="zoomIn" :disabled="!canZoomIn"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    title="放大 (Ctrl + +)">
+            <button
+:disabled="!canZoomIn" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    title="放大 (Ctrl + +)"
+                    @click="zoomIn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
               </svg>
             </button>
 
             <!-- 適應螢幕/原始大小切換 -->
-            <button @click="toggleFitToScreen"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-                    :title="fitToScreen ? '顯示原始大小' : '適應螢幕'">
+            <button
+class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+                    :title="fitToScreen ? '顯示原始大小' : '適應螢幕'"
+                    @click="toggleFitToScreen">
               <svg v-if="fitToScreen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
               </svg>
               <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
               </svg>
             </button>
 
             <!-- 重置縮放 -->
-            <button @click="resetTransform"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-                    title="重置縮放 (0)">
+            <button
+class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+                    title="重置縮放 (0)"
+                    @click="resetTransform">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
               </svg>
             </button>
 
 
 
             <!-- 資訊面板切換 -->
-            <button @click="toggleInfoPanel"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+            <button
+class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
                     :class="{ 'bg-white bg-opacity-20': showInfoPanel }"
-                    title="圖片資訊 (I)">
+                    title="圖片資訊 (I)"
+                    @click="toggleInfoPanel">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </button>
 
             <!-- 關閉按鈕 -->
-            <button @click="closeImageViewer"
-                    class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-                    title="關閉 (Esc)">
+            <button
+class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+                    title="關閉 (Esc)"
+                    @click="closeImageViewer">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
           </div>
@@ -94,7 +102,8 @@
 
                 <!-- 主要圖片區域 -->
         <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
-          <img v-if="currentViewerImage"
+          <img
+v-if="currentViewerImage"
                ref="imageElement"
                :src="getImagePath(currentViewerImage.filename)"
                :alt="currentViewerImage.title"
@@ -109,36 +118,38 @@
                @click.stop
                @mousedown="handleMouseDown"
                @touchstart="handleTouchStart"
-               @contextmenu.prevent />
+               @contextmenu.prevent >
 
           <!-- 載入中 -->
           <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">
             <div class="text-white text-center">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"/>
               <p>載入中...</p>
             </div>
           </div>
         </div>
 
         <!-- 導航按鈕 -->
-        <button v-if="viewerImages.length > 1 && hasPrevious"
-                @click="goToPreviousImage"
+        <button
+v-if="viewerImages.length > 1 && hasPrevious"
                 class="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
-                title="上一張 (←)">
+                title="上一張 (←)"
+                @click="goToPreviousImage">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
         </button>
 
-        <button v-if="viewerImages.length > 1 && hasNext"
-                @click="goToNextImage"
+        <button
+v-if="viewerImages.length > 1 && hasNext"
                 class="absolute top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
                 :style="{
                   right: showInfoPanel ? (infoPanelWidth + 16) + 'px' : '16px'
                 }"
-                title="下一張 (→)">
+                title="下一張 (→)"
+                @click="goToNextImage">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
         </button>
 

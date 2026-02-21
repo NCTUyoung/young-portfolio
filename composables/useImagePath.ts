@@ -24,7 +24,7 @@ export const useImagePath = () => {
   const getFullImageUrl = (filename: string): string => {
     const path = getImagePath(filename)
 
-    if (process.server) {
+    if (import.meta.server) {
       // 服務端渲染時只需要回傳相對路徑（交給瀏覽器補上 domain）
       return path
     }

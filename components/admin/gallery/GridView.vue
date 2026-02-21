@@ -9,25 +9,25 @@
         <img
           :src="getImagePath(item.filename)"
           :alt="item.title"
-          class="w-full h-full object-contain bg-stone-100 dark:bg-stone-800 transition-transform duration-300 group-hover:scale-105"
+          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-        />
+        >
       </div>
       <!-- 編輯模式刪除按鈕 -->
       <div v-if="adminStore.editMode" class="absolute top-2 right-2 z-20 opacity-80 group-hover:opacity-100 transition-opacity duration-300 flex space-x-1">
         <button
-          @click.stop="handleEditImage(item)"
           class="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 shadow-lg"
           title="編輯圖片"
+          @click.stop="handleEditImage(item)"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
           </svg>
         </button>
         <button
-          @click.stop="handleDeleteImage(item.filename, item.title)"
           class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 shadow-lg"
           title="刪除圖片"
+          @click.stop="handleDeleteImage(item.filename, item.title)"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
@@ -52,7 +52,7 @@
                   'inline-block w-3 h-3 rounded-full border border-white/30',
                   getColorClass((item as GalleryItem).color || 'blue')
                 ]"
-              ></span>
+              />
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ interface Props {
     eventName: string
     description: string
     location: string
-    items: (GalleryItem | any)[]
+    items: GalleryItem[]
   }
 }
 
@@ -91,7 +91,7 @@ const handleDeleteImage = (filename: string, title: string) => {
 }
 
 // 編輯圖片處理
-const handleEditImage = (item: any) => {
+const handleEditImage = (item: GalleryItem) => {
   adminStore.startEditImage(item)
 }
 </script>

@@ -13,12 +13,11 @@
         <div
           v-if="!rowsLoaded[row.key]"
           class="absolute inset-0 rounded-lg bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 dark:from-stone-700 dark:via-stone-800 dark:to-stone-700 animate-pulse pointer-events-none z-10"
-        ></div>
+        />
 
         <div
           v-for="(item, itemIndex) in row.items"
           :key="item.filename"
-          @click="$emit('imageClick', item, sortedItems)"
           :class="[
             'gallery-item relative cursor-pointer group rounded-sm hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out overflow-hidden z-20',
             rowsLoaded[row.key] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
@@ -28,6 +27,7 @@
             maxWidth: row.items.length === 1 ? getSingleItemMaxWidth(item.aspectRatio) : undefined,
             transitionDelay: `${(rowIndex * row.items.length + itemIndex) * 50}ms`
           }"
+          @click="$emit('imageClick', item, sortedItems)"
         >
           <img
             :src="getImagePath(item.filename)"
@@ -43,7 +43,7 @@
               <h3 class="text-lg font-light mb-1 drop-shadow-lg">{{ item.title }}</h3>
               <p class="text-sm opacity-90 drop-shadow-md">{{ item.time }}</p>
               <div v-if="item.color" class="flex items-center gap-2 mt-2 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 delay-200">
-                <div :class="`w-3 h-3 rounded-full bg-${item.color}-500 shadow-lg`"></div>
+                <div :class="`w-3 h-3 rounded-full bg-${item.color}-500 shadow-lg`"/>
                 <span class="text-xs opacity-80 capitalize drop-shadow-sm">{{ item.color }}</span>
               </div>
             </div>
@@ -58,8 +58,8 @@
         <div
           v-for="item in sortedItems"
           :key="item.filename"
-          @click="$emit('imageClick', item, sortedItems)"
           class="cursor-pointer active:scale-95 transition-transform duration-200"
+          @click="$emit('imageClick', item, sortedItems)"
         >
           <img
             :src="getImagePath(item.filename)"
@@ -91,7 +91,7 @@ const props = defineProps<{
 // 使用傳入的 items（應該已經按時間排序）
 const sortedItems = computed(() => props.items)
 
-const emit = defineEmits<{
+defineEmits<{
   imageClick: [item: GalleryItem, items: GalleryItem[]]
 }>()
 
@@ -100,7 +100,6 @@ const { getImagePath } = useImagePath()
 // 狀態
 const rowsLoaded = ref<Record<string, boolean>>({})
 const loadedImages = ref<Record<string, boolean>>({})
-const gap = computed(() => props.gap || 16)
 const maxRowAspectRatio = computed(() => props.maxRowAspectRatio || 6) // 一行的最大寬高比總和
 
 // 圖片數據接口

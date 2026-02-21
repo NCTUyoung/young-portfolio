@@ -8,17 +8,23 @@
           :src="getImagePath('photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg')"
           alt="Featured photography"
           class="w-full h-full object-cover"
-        />
+        >
         <!-- 多層漸層遮罩 -->
-        <div class="absolute inset-0 bg-gradient-to-r from-white/85 via-white/50 to-transparent dark:from-stone-900/90 dark:via-stone-900/60 dark:to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/30 dark:from-stone-900 dark:via-transparent dark:to-stone-900/30"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-white/85 via-white/50 to-transparent dark:from-stone-900/90 dark:via-stone-900/60 dark:to-transparent"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/30 dark:from-stone-900 dark:via-transparent dark:to-stone-900/30"/>
       </div>
 
       <!-- 裝飾性元素 -->
-      <div class="deco-line-v h-24 top-12 left-[8%] hidden lg:block"></div>
-      <div class="deco-dot top-10 left-[8%] hidden lg:block" style="transform: translateX(-2px) translateY(-8px);"></div>
-      <div class="deco-line-h w-32 bottom-32 right-[10%] hidden lg:block"></div>
-      <div class="deco-dot bottom-32 right-[10%] hidden lg:block" style="transform: translateX(36px) translateY(-2px);"></div>
+      <div class="deco-line-v h-36 top-12 left-[8%] hidden lg:block"/>
+      <div class="deco-dot top-10 left-[8%] hidden lg:block" style="transform: translateX(-2px) translateY(-8px);"/>
+      <!-- 右上角豎排漢字裝飾 -->
+      <div class="absolute top-12 right-[8%] hidden lg:flex flex-col items-center gap-3 select-none pointer-events-none">
+        <div class="w-px h-8 bg-gradient-to-b from-transparent to-stone-300/40 dark:to-stone-600/30"/>
+        <span class="writing-vertical font-jp text-xs tracking-[0.5em] text-stone-300/60 dark:text-stone-600/40">作品集</span>
+        <div class="w-px h-8 bg-gradient-to-b from-stone-300/40 dark:from-stone-600/30 to-transparent"/>
+      </div>
+      <div class="deco-line-h w-32 bottom-32 right-[10%] hidden lg:block"/>
+      <div class="deco-dot bottom-32 right-[10%] hidden lg:block" style="transform: translateX(36px) translateY(-2px);"/>
 
       <!-- Hero 內容 — 品牌標語 -->
       <div class="relative z-10 h-full flex items-center">
@@ -54,16 +60,16 @@
       <!-- 底部滾動提示 -->
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 dark:text-stone-500">
         <span class="text-xs tracking-[0.2em] font-light">SCROLL</span>
-        <div class="w-px h-8 bg-gradient-to-b from-stone-400 to-transparent dark:from-stone-500 animate-pulse"></div>
+        <div class="w-px h-8 bg-gradient-to-b from-stone-400 to-transparent dark:from-stone-500 animate-pulse"/>
       </div>
     </section>
 
     <!-- ===== 關於我 — 偏左排版 + 錯位設計 ===== -->
     <section class="relative py-20 sm:py-28 overflow-hidden">
       <!-- 背景裝飾 -->
-      <div class="absolute top-0 right-0 w-1/2 h-full bg-stone-100/40 dark:bg-stone-800/30 rounded-l-[4rem] hidden lg:block"></div>
-      <div class="deco-line-v h-32 top-8 right-[42%] hidden lg:block"></div>
-      <div class="deco-dot top-8 right-[42%] hidden lg:block" style="transform: translate(-2px, -10px)"></div>
+      <div class="absolute top-0 right-0 w-1/2 h-full bg-stone-100/40 dark:bg-stone-800/30 rounded-l-[4rem] hidden lg:block"/>
+      <div class="deco-line-v h-32 top-8 right-[42%] hidden lg:block"/>
+      <div class="deco-dot top-8 right-[42%] hidden lg:block" style="transform: translate(-2px, -10px)"/>
 
       <div class="relative max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="flex flex-col lg:flex-row items-start gap-12 lg:gap-20">
@@ -111,16 +117,16 @@
           <!-- 右側：頭像（錯位突出） -->
           <div class="reveal-right reveal-delay-2 relative flex-shrink-0 lg:mt-8">
             <!-- 頭像背景裝飾框 -->
-            <div class="absolute -top-4 -left-4 w-52 h-52 sm:w-64 sm:h-64 rounded-2xl border border-accent-300/30 dark:border-accent-600/30"></div>
+            <div class="absolute -top-4 -left-4 w-52 h-52 sm:w-64 sm:h-64 rounded-2xl border border-accent-300/30 dark:border-accent-600/30"/>
             <div class="relative w-48 h-48 sm:w-56 sm:h-56 rounded-2xl overflow-hidden shadow-xl">
               <img
                 :src="avatarPath"
                 alt="Young"
                 class="w-full h-full object-cover"
-              />
+              >
             </div>
             <!-- 浮動裝飾點 -->
-            <div class="absolute -bottom-3 -right-3 w-6 h-6 rounded-full bg-accent-400/60 dark:bg-accent-500/50 animate-breathe"></div>
+            <div class="absolute -bottom-3 -right-3 w-6 h-6 rounded-full bg-accent-400/60 dark:bg-accent-500/50 animate-breathe"/>
           </div>
         </div>
       </div>
@@ -128,7 +134,7 @@
 
     <!-- ===== 創作領域 — 左右交錯 ===== -->
     <section class="py-20 lg:py-28 bg-stone-50/40 dark:bg-stone-800/20 relative">
-      <div class="deco-line-h w-full top-0 left-0"></div>
+      <div class="deco-line-h w-full top-0 left-0"/>
 
       <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-16">
@@ -140,7 +146,7 @@
 
         <!-- 第一排：電繪（大）左 + 留白右 -->
         <div class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-          <div class="lg:col-span-7 bg-white/80 dark:bg-stone-800/60 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 lg:p-10 hover:border-accent-200/60 dark:hover:border-accent-700/40 transition-all duration-500 group">
+          <div class="lg:col-span-7 bg-white/80 dark:bg-stone-800/60 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 lg:p-10 hover:border-accent-200/60 dark:hover:border-accent-700/40 hover:-translate-y-0.5 transition-all duration-500 group">
             <div class="flex items-center gap-4 mb-6">
               <div class="w-12 h-12 rounded-xl bg-accent-100/80 dark:bg-accent-900/30 flex items-center justify-center group-hover:bg-accent-200/80 dark:group-hover:bg-accent-800/40 transition-colors duration-500">
                 <svg class="w-6 h-6 text-accent-600 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,16 +160,21 @@
               從幾何化的動物插畫到精緻的人物繪圖，持續在創作中成長與突破。
             </p>
             <div class="flex flex-wrap gap-2">
-              <span v-for="tag in digitalTags" :key="tag"
+              <span
+v-for="tag in digitalTags" :key="tag"
                     class="px-3 py-1 text-xs font-light text-accent-700 dark:text-accent-300 bg-accent-100/50 dark:bg-accent-900/30 rounded-full tracking-wide">
                 {{ tag }}
               </span>
             </div>
           </div>
           <!-- 右側留白，裝飾 -->
-          <div class="hidden lg:flex lg:col-span-5 items-center justify-center">
-            <div class="writing-vertical text-8xl font-extralight text-stone-100 dark:text-stone-800/60 tracking-widest select-none">
-              繪
+          <div class="hidden lg:flex lg:col-span-5 items-center justify-center relative">
+            <!-- 左側細線 -->
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-px h-24 bg-gradient-to-b from-transparent via-stone-200/60 dark:via-stone-700/40 to-transparent"/>
+            <div class="flex flex-col items-center gap-3 select-none pointer-events-none">
+              <div class="w-px h-6 bg-gradient-to-b from-transparent to-stone-200/40 dark:to-stone-700/30"/>
+              <div class="writing-vertical font-jp text-[6rem] font-thin text-stone-100 dark:text-stone-800/50 tracking-widest leading-none">繪</div>
+              <div class="w-px h-6 bg-gradient-to-b from-stone-200/40 dark:from-stone-700/30 to-transparent"/>
             </div>
           </div>
         </div>
@@ -171,12 +182,16 @@
         <!-- 第二排：留白左 + 攝影（大）右 -->
         <div class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8">
           <!-- 左側留白，裝飾 -->
-          <div class="hidden lg:flex lg:col-span-5 items-center justify-center">
-            <div class="writing-vertical text-8xl font-extralight text-stone-100 dark:text-stone-800/60 tracking-widest select-none">
-              影
+          <div class="hidden lg:flex lg:col-span-5 items-center justify-center relative">
+            <!-- 右側細線 -->
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-px h-24 bg-gradient-to-b from-transparent via-stone-200/60 dark:via-stone-700/40 to-transparent"/>
+            <div class="flex flex-col items-center gap-3 select-none pointer-events-none">
+              <div class="w-px h-6 bg-gradient-to-b from-transparent to-stone-200/40 dark:to-stone-700/30"/>
+              <div class="writing-vertical font-jp text-[6rem] font-thin text-stone-100 dark:text-stone-800/50 tracking-widest leading-none">影</div>
+              <div class="w-px h-6 bg-gradient-to-b from-stone-200/40 dark:from-stone-700/30 to-transparent"/>
             </div>
           </div>
-          <div class="lg:col-span-7 bg-white/80 dark:bg-stone-800/60 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 lg:p-10 hover:border-accent-200/60 dark:hover:border-accent-700/40 transition-all duration-500 group">
+          <div class="lg:col-span-7 bg-white/80 dark:bg-stone-800/60 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 lg:p-10 hover:border-accent-200/60 dark:hover:border-accent-700/40 hover:-translate-y-0.5 transition-all duration-500 group">
             <div class="flex items-center gap-4 mb-6">
               <div class="w-12 h-12 rounded-xl bg-accent-100/80 dark:bg-accent-900/30 flex items-center justify-center group-hover:bg-accent-200/80 dark:group-hover:bg-accent-800/40 transition-colors duration-500">
                 <svg class="w-6 h-6 text-accent-600 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +206,8 @@
               喜歡運用淺景深與自然光線，捕捉充滿故事感的畫面。
             </p>
             <div class="flex flex-wrap gap-2">
-              <span v-for="tag in photoTags" :key="tag"
+              <span
+v-for="tag in photoTags" :key="tag"
                     class="px-3 py-1 text-xs font-light text-accent-700 dark:text-accent-300 bg-accent-100/50 dark:bg-accent-900/30 rounded-full tracking-wide">
                 {{ tag }}
               </span>
@@ -212,7 +228,8 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div v-for="(tool, index) in tools" :key="tool.category"
+          <div
+v-for="(tool, index) in tools" :key="tool.category"
                class="reveal text-center bg-white/70 dark:bg-stone-800/70 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 hover:border-accent-200/60 dark:hover:border-accent-700/40 transition-all duration-500 group"
                :class="[`reveal-delay-${index + 1}`]">
             <div class="w-12 h-12 mx-auto mb-5 rounded-xl bg-accent-100/60 dark:bg-accent-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
@@ -220,7 +237,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="tool.icon" />
               </svg>
             </div>
-            <h3 class="text-sm font-medium text-stone-700 dark:text-stone-300 tracking-wider mb-4">{{ tool.category }}</h3>
+            <h3 class="text-xs font-light text-stone-500 dark:text-stone-400 tracking-[0.35em] uppercase mb-4">{{ tool.category }}</h3>
             <ul class="space-y-2">
               <li v-for="item in tool.items" :key="item" class="text-sm text-stone-500 dark:text-stone-400 font-light tracking-wide">
                 {{ item }}
@@ -233,21 +250,47 @@
 
     <!-- ===== 大引言區塊 — 視覺間斷 ===== -->
     <section class="reveal relative py-24 lg:py-32 overflow-hidden">
-      <div class="deco-line-h w-full top-0 left-0"></div>
+      <div class="deco-line-h w-full top-0 left-0"/>
 
       <!-- 背景大字裝飾 -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span class="text-[12rem] sm:text-[16rem] font-extralight text-stone-100 dark:text-stone-800/40 leading-none">侘</span>
+        <span class="jp-kana-bg font-jp">侘</span>
+      </div>
+
+      <!-- 左右豎排旁注 -->
+      <div class="absolute left-[6%] top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-2 pointer-events-none select-none">
+        <div class="w-px h-12 bg-gradient-to-b from-transparent via-accent-300/30 dark:via-accent-600/20 to-transparent"/>
+        <span class="writing-vertical font-jp text-[0.6rem] tracking-[0.6em] text-accent-400/40 dark:text-accent-500/30">わびさび</span>
+        <div class="w-px h-12 bg-gradient-to-b from-transparent via-accent-300/30 dark:via-accent-600/20 to-transparent"/>
+      </div>
+      <div class="absolute right-[6%] top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-2 pointer-events-none select-none">
+        <div class="w-px h-12 bg-gradient-to-b from-transparent via-stone-300/40 dark:via-stone-600/30 to-transparent"/>
+        <span class="writing-vertical font-jp text-[0.6rem] tracking-[0.6em] text-stone-400/40 dark:text-stone-600/30">不完全美</span>
+        <div class="w-px h-12 bg-gradient-to-b from-transparent via-stone-300/40 dark:via-stone-600/30 to-transparent"/>
       </div>
 
       <div class="relative max-w-3xl mx-auto px-6 text-center">
-        <blockquote class="text-2xl sm:text-3xl lg:text-4xl font-extralight text-stone-700 dark:text-stone-300 tracking-wider leading-relaxed">
-          「不完美之中，<br />藏著最真實的美。」
+        <!-- 裝飾橫線 -->
+        <div class="flex items-center justify-center gap-4 mb-8">
+          <div class="h-px w-16 bg-gradient-to-r from-transparent to-accent-300/50 dark:to-accent-600/40"/>
+          <div class="w-1 h-1 rounded-full bg-accent-400/60 dark:bg-accent-500/50"/>
+          <div class="h-px w-16 bg-gradient-to-l from-transparent to-accent-300/50 dark:to-accent-600/40"/>
+        </div>
+
+        <blockquote class="font-jp text-2xl sm:text-3xl lg:text-4xl font-thin text-stone-700 dark:text-stone-300 tracking-wider leading-relaxed">
+          「不完美之中，<br >藏著最真實的美。」
         </blockquote>
-        <p class="mt-6 text-sm text-stone-400 dark:text-stone-500 font-light tracking-wider">— 侘寂之道</p>
+        <p class="mt-6 text-xs text-stone-400 dark:text-stone-500 font-light tracking-[0.4em]">— 侘寂之道</p>
+
+        <!-- 底部裝飾 -->
+        <div class="flex items-center justify-center gap-4 mt-8">
+          <div class="h-px w-8 bg-gradient-to-r from-transparent to-stone-300/40 dark:to-stone-600/30"/>
+          <div class="w-1 h-1 rounded-full bg-stone-300/60 dark:bg-stone-600/40"/>
+          <div class="h-px w-8 bg-gradient-to-l from-transparent to-stone-300/40 dark:to-stone-600/30"/>
+        </div>
       </div>
 
-      <div class="deco-line-h w-full bottom-0 left-0"></div>
+      <div class="deco-line-h w-full bottom-0 left-0"/>
     </section>
 
     <!-- ===== 創作歷程 Timeline ===== -->
@@ -262,15 +305,20 @@
 
         <div class="relative">
           <!-- Timeline 主線 — accent 漸層 -->
-          <div class="absolute left-[1.55rem] top-0 bottom-0 w-px bg-gradient-to-b from-accent-300 via-accent-400/60 to-stone-200 dark:from-accent-600 dark:via-accent-700/50 dark:to-stone-700 hidden sm:block"></div>
+          <div class="absolute left-[0.875rem] top-0 bottom-0 w-px bg-gradient-to-b from-accent-300 via-accent-400/60 to-stone-200 dark:from-accent-600 dark:via-accent-700/50 dark:to-stone-700 hidden sm:block"/>
 
           <div class="space-y-10">
-            <div v-for="(milestone, index) in milestones" :key="index"
+            <div
+v-for="(milestone, index) in milestones" :key="index"
                  class="reveal flex gap-6 items-start"
                  :class="[`reveal-delay-${Math.min(index + 1, 5)}`]">
-              <!-- 年份 + accent 圓點 -->
-              <div class="flex-shrink-0 relative">
-                <div class="w-3 h-3 rounded-full bg-accent-400 dark:bg-accent-500 ring-4 ring-white dark:ring-stone-900 mt-1.5 relative z-10"></div>
+              <!-- 年份 + accent 菱形節點 -->
+              <div class="flex-shrink-0 relative flex items-start justify-center w-7">
+                <!-- 外框菱形 -->
+                <div class="w-3 h-3 bg-white dark:bg-stone-900 border border-accent-400/70 dark:border-accent-500/70 rotate-45 relative z-10 mt-2">
+                  <!-- 內核 -->
+                  <div class="absolute inset-[2px] bg-accent-400 dark:bg-accent-500"/>
+                </div>
               </div>
               <div class="pb-2">
                 <div class="flex items-baseline gap-3 mb-1">
@@ -295,7 +343,7 @@
               精選作品
             </h2>
           </div>
-          <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"></div>
+          <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"/>
         </div>
 
         <!-- 作品 Grid：2 列交錯高度 -->
@@ -316,8 +364,8 @@
                 :alt="work.title"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"/>
               <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                 <p class="text-white text-sm font-light tracking-wide">{{ work.title }}</p>
                 <p class="text-white/60 text-xs font-light mt-0.5">{{ work.category }}</p>
@@ -343,8 +391,8 @@
 
     <!-- ===== 導航卡片 ===== -->
     <section class="relative py-24 lg:py-32 bg-stone-50/40 dark:bg-stone-800/20">
-      <div class="deco-line-h w-full top-0 left-0"></div>
-      <div class="deco-line-v h-40 -top-20 right-[15%] hidden lg:block"></div>
+      <div class="deco-line-h w-full top-0 left-0"/>
+      <div class="deco-line-v h-40 -top-20 right-[15%] hidden lg:block"/>
 
       <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-16 max-w-lg">
@@ -363,9 +411,9 @@
                 :src="getImagePath('gallery/2024年電繪作品/23.jpg')"
                 alt="Gallery preview"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-              <div class="absolute top-6 right-6 w-3 h-3 rounded-full bg-accent-400 opacity-70 group-hover:opacity-100 transition-opacity"></div>
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"/>
+              <div class="absolute top-6 right-6 w-3 h-3 rounded-full bg-accent-400 opacity-70 group-hover:opacity-100 transition-opacity"/>
               <div class="absolute bottom-0 left-0 p-8 lg:p-10">
                 <p class="text-accent-300 text-xs tracking-[0.2em] uppercase mb-2 font-light">Collection</p>
                 <h3 class="text-3xl lg:text-4xl font-extralight text-white tracking-wider mb-3">作品集</h3>
@@ -385,7 +433,7 @@
               to="/article"
               class="block h-full bg-white/70 dark:bg-stone-800/70 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 lg:p-10 hover:border-accent-300/60 dark:hover:border-accent-600/60 transition-all duration-500 relative overflow-hidden"
             >
-              <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent-100/30 dark:bg-accent-900/20 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent-100/30 dark:bg-accent-900/20 blur-2xl group-hover:scale-150 transition-transform duration-700"/>
               <div class="relative">
                 <div class="w-10 h-10 rounded-lg bg-stone-100/80 dark:bg-stone-700/80 flex items-center justify-center mb-5">
                   <svg class="w-5 h-5 text-accent-500 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

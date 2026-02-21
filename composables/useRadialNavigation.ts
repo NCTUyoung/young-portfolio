@@ -107,7 +107,7 @@ export const useRadialNavigation = (
 
     // 清空現有的位置映射
     Object.keys(posMap).forEach(key => {
-      delete posMap[Number(key)]
+      Reflect.deleteProperty(posMap, Number(key))
     })
 
     // 為可見的圖片計算位置
@@ -178,7 +178,7 @@ export const useRadialNavigation = (
 
       // 清空位置映射
       Object.keys(posMap).forEach(key => {
-        delete posMap[Number(key)]
+        Reflect.deleteProperty(posMap, Number(key))
       })
 
       // 插值動畫

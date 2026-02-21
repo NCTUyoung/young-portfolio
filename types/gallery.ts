@@ -76,7 +76,7 @@ export interface MixedPhotoItem {
   title?: string
   event?: PhotoEvent
   isFirstInEvent?: boolean
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // 篩選狀態接口

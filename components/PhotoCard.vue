@@ -2,10 +2,10 @@
     <div
     ref="cardRef"
     class="group hover:transform hover:scale-105 transition-all duration-300 cursor-pointer"
+    :style="{ transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)` }"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
     @click="openImageViewer"
-    :style="{ transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)` }"
   >
     <!-- Image -->
     <div class="relative overflow-hidden rounded-lg border border-gray-100" :class="imageClass">
@@ -18,7 +18,7 @@
         loading="lazy"
         @load="onImageLoad"
         @error="onImageError"
-      />
+      >
 
       <!-- 載入佔位符 -->
       <div
@@ -26,7 +26,7 @@
         class="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center"
       >
         <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+          <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
         </svg>
       </div>
 
@@ -37,19 +37,21 @@
       >
         <div class="text-center">
           <svg class="w-8 h-8 text-red-400 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
           </svg>
           <p class="text-xs text-red-600">載入失敗</p>
         </div>
       </div>
 
       <!-- Category Badge -->
-      <div class="absolute top-4 right-4" v-if="isVisible">
-        <span v-if="primaryTag"
+      <div v-if="isVisible" class="absolute top-4 right-4">
+        <span
+v-if="primaryTag"
               class="px-2 py-1 text-xs font-light border border-gray-200 text-gray-600 rounded bg-white/90 backdrop-blur-sm">
           {{ primaryTag }}
         </span>
-        <span v-else
+        <span
+v-else
               class="px-3 py-1 rounded-full text-xs font-light bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm border border-gray-100">
           {{ image.category === 'digital' ? '繪圖' : '攝影' }}
         </span>
@@ -72,7 +74,7 @@
           transform: 'translate(-50%, -50%)'
         }"
       >
-        <div class="w-2 h-2 bg-blue-500 rounded-full opacity-60"></div>
+        <div class="w-2 h-2 bg-blue-500 rounded-full opacity-60"/>
       </div>
     </div>
 
@@ -86,15 +88,15 @@
 
         <!-- 複製連結按鈕 -->
         <button
-          @click="copyImageUrl"
           class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 rounded"
           :title="copied ? '已複製！' : '複製圖片連結'"
+          @click="copyImageUrl"
         >
           <svg v-if="!copied" class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
           </svg>
           <svg v-else class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
           </svg>
         </button>
       </div>
@@ -104,7 +106,7 @@
         <!-- Camera Info -->
         <div class="flex items-center text-sm text-gray-500 mb-4 font-light">
           <svg class="w-4 h-4 mr-2 opacity-60" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+            <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
           </svg>
           <span>{{ cameraName }}</span>
         </div>
@@ -140,10 +142,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useGalleryStore } from '~/stores/gallery'
 import type { GalleryItem } from '~/types/gallery'
 import { useIntersectionObserver, useMouse, useClipboard } from '@vueuse/core'
 import { useGlobalToast } from '~/composables/useToast'
+import { getDisplayTitle, getPrimaryTag, getImageClass } from '~/utils/imageUtils'
+import { formatCameraName, formatShutterSpeed } from '~/utils/formatters'
 
 interface Props {
   image: GalleryItem
@@ -156,7 +159,6 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const galleryStore = useGalleryStore()
 
 // Refs
 const cardRef = ref<HTMLElement>()
@@ -165,7 +167,7 @@ const imageError = ref(false)
 const isHovered = ref(false)
 
 // VueUse composables
-const { stop } = useIntersectionObserver(
+const { stop: _stop } = useIntersectionObserver(
   cardRef,
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
@@ -187,28 +189,28 @@ const rotateY = ref(0)
 
 // Computed properties
 const displayTitle = computed(() =>
-  galleryStore.getDisplayTitle(props.image)
+  getDisplayTitle(props.image)
 )
 
 const primaryTag = computed(() =>
-  galleryStore.getPrimaryTag(props.image)
+  getPrimaryTag(props.image)
 )
 
 const cameraName = computed(() =>
   props.image.camera && props.image.model
-    ? galleryStore.formatCameraName(props.image.camera, props.image.model)
+    ? formatCameraName(props.image.camera, props.image.model)
     : ''
 )
 
 const shutterSpeedText = computed(() =>
   props.image.shutterSpeed
-    ? galleryStore.formatShutterSpeed(props.image.shutterSpeed)
+    ? formatShutterSpeed(props.image.shutterSpeed)
     : ''
 )
 
 const imageClass = computed(() =>
   props.index !== undefined
-    ? galleryStore.getImageClass(props.index)
+    ? getImageClass(props.index)
     : 'h-64'
 )
 
@@ -254,7 +256,7 @@ const copyImageUrl = async (event: Event) => {
 
     // 顯示成功通知
     toast.success('連結已複製！', '圖片連結已複製到剪貼簿')
-  } catch (error) {
+  } catch {
     // 顯示錯誤通知
     toast.error('複製失敗', '無法複製連結到剪貼簿')
   }

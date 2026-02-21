@@ -8,20 +8,20 @@
         :width="canvasWidth"
         height="120"
         class="w-full h-full rounded"
-      ></canvas>
+      />
     </div>
 
     <div class="flex justify-center space-x-4 text-xs">
       <div class="flex items-center">
-        <div class="w-3 h-3 bg-red-500 rounded mr-1 opacity-80"></div>
+        <div class="w-3 h-3 bg-red-500 rounded mr-1 opacity-80"/>
         <span class="text-gray-300">紅</span>
       </div>
       <div class="flex items-center">
-        <div class="w-3 h-3 bg-green-500 rounded mr-1 opacity-80"></div>
+        <div class="w-3 h-3 bg-green-500 rounded mr-1 opacity-80"/>
         <span class="text-gray-300">綠</span>
       </div>
       <div class="flex items-center">
-        <div class="w-3 h-3 bg-blue-500 rounded mr-1 opacity-80"></div>
+        <div class="w-3 h-3 bg-blue-500 rounded mr-1 opacity-80"/>
         <span class="text-gray-300">藍</span>
       </div>
     </div>

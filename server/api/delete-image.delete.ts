@@ -1,6 +1,16 @@
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
-import { join } from 'path'
-import type { PhotographyData, GalleryData } from '~/types/gallery'
+
+type ImgRecord = {
+  filename: string
+  event?: { name?: string }
+  [key: string]: unknown
+}
+
+type CategoryData = {
+  Img: ImgRecord[]
+  totalNumber: string
+  eventStats?: Record<string, number>
+}
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'DELETE') {
@@ -27,11 +37,11 @@ export default defineEventHandler(async (event) => {
     const imagePath = `./public/images/${filename}`
 
     // 讀取 JSON 數據
-    let categoryData
+    let categoryData: CategoryData
     try {
       const jsonContent = readFileSync(jsonPath, 'utf-8')
       categoryData = JSON.parse(jsonContent)
-    } catch (error) {
+    } catch {
       throw createError({
         statusCode: 404,
         statusMessage: '找不到圖庫資料檔案'
@@ -39,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 檢查圖片是否存在於資料中
-    const imageIndex = categoryData.Img.findIndex((img: any) => img.filename === filename)
+    const imageIndex = categoryData.Img.findIndex((img) => img.filename === filename)
     if (imageIndex === -1) {
       throw createError({
         statusCode: 404,
@@ -66,7 +76,7 @@ export default defineEventHandler(async (event) => {
       if (categoryData.eventStats && categoryData.eventStats[eventName]) {
         categoryData.eventStats[eventName] -= 1
         if (categoryData.eventStats[eventName] <= 0) {
-          delete categoryData.eventStats[eventName]
+          Reflect.deleteProperty(categoryData.eventStats, eventName)
         }
       }
     }
@@ -79,11 +89,10 @@ export default defineEventHandler(async (event) => {
       message: '圖片刪除成功',
       deletedFilename: filename
     }
-
-    } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete image error:', error)
-
-    if (error.statusCode) {
+    const err = error as { statusCode?: number }
+    if (err.statusCode) {
       throw error
     }
 

@@ -2,16 +2,16 @@
   <div>
     <label class="block text-xs font-light text-stone-500 mb-3 tracking-wider uppercase">選擇圖片</label>
     <div
-      @drop="handleDrop"
-      @dragover.prevent
-      @dragenter.prevent="isDragging = true"
-      @dragleave="isDragging = false"
       :class="[
         'border-2 border-dashed rounded-xl p-10 text-center transition-colors duration-200 cursor-pointer',
         isDragging
           ? 'border-amber-400 bg-amber-50/50'
           : 'border-stone-200 hover:border-stone-300 bg-stone-50/50'
       ]"
+      @drop="handleDrop"
+      @dragover.prevent
+      @dragenter.prevent="isDragging = true"
+      @dragleave="isDragging = false"
       @click="fileInput?.click()"
     >
       <input
@@ -19,9 +19,9 @@
         type="file"
         multiple
         accept="image/*"
-        @change="handleFileSelect"
         class="hidden"
-      />
+        @change="handleFileSelect"
+      >
       <div class="space-y-3">
         <svg class="mx-auto h-10 w-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />

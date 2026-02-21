@@ -5,10 +5,6 @@ import {
   ISO_CATEGORIES,
   TAG_PRIORITY
 } from '~/config/constants'
-import {
-  formatShutterSpeed,
-  formatCameraName
-} from './formatters'
 
 /**
  * 圖片處理核心工具函數
@@ -54,7 +50,7 @@ export const extractCaptureTime = (exif: ExifData): Date => {
 /**
  * 驗證和清理 EXIF 數據
  */
-export const normalizeExifData = (exif: any): ExifData => {
+export const normalizeExifData = (exif: Record<string, unknown>): ExifData => {
   return {
     Make: exif?.Make || '',
     Model: exif?.Model || '',
@@ -74,7 +70,7 @@ export const normalizeExifData = (exif: any): ExifData => {
  * 根據焦距分類鏡頭類型
  */
 export const categorizeFocalLength = (focalLength: number): string => {
-  for (const [key, category] of Object.entries(FOCAL_LENGTH_CATEGORIES)) {
+  for (const [_key, category] of Object.entries(FOCAL_LENGTH_CATEGORIES)) {
     if ('max' in category && focalLength <= category.max) {
       return category.label
     }
@@ -243,4 +239,14 @@ export const getDisplayTitle = (image: GalleryItem): string => {
  */
 export const generateImageId = (category: 'digital' | 'photography', filename: string): string => {
   return `${category}-${filename.replace(/\.[^/.]+$/, '')}`
+}
+
+// ==================== 版面工具 ====================
+
+/**
+ * 根據 index 決定圖片卡片高度 class（瀑布流錯落效果）
+ */
+export const getImageClass = (index: number): string => {
+  const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56']
+  return classes[index % classes.length]
 }

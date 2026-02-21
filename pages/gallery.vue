@@ -3,16 +3,29 @@
     <!-- Header — 個性化設計 -->
     <div class="container mx-auto px-6 py-12 md:py-20 relative">
       <!-- 裝飾線 -->
-      <div class="deco-line-v h-16 top-4 right-[8%] hidden lg:block"></div>
-      <div class="deco-dot top-4 right-[8%] hidden lg:block" style="transform: translate(-2px, -8px)"></div>
+      <div class="deco-line-v h-20 top-4 right-[8%] hidden lg:block"/>
+      <div class="deco-dot top-4 right-[8%] hidden lg:block" style="transform: translate(-2px, -8px)"/>
+      <!-- 右側豎排裝飾字 -->
+      <div class="absolute top-8 right-[8%] hidden lg:flex flex-col items-center gap-2 select-none pointer-events-none" style="transform: translateX(20px)">
+        <span class="writing-vertical font-jp text-[0.6rem] tracking-[0.5em] text-stone-300/50 dark:text-stone-700/40">記録と創作</span>
+      </div>
 
       <div class="max-w-7xl mx-auto">
-        <div class="flex items-end gap-6 mb-3">
-          <h1 class="text-3xl md:text-4xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">Works</h1>
-          <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"></div>
+        <!-- 小標 + 主標 -->
+        <div class="mb-2">
+          <p class="jp-section-label mb-2">Gallery</p>
+          <div class="flex items-end gap-6">
+            <h1 class="text-3xl md:text-4xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">Works</h1>
+            <!-- 裝飾細線 -->
+            <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/50 to-transparent mb-2"/>
+          </div>
         </div>
-        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide">
-          <span class="text-accent-500 dark:text-accent-400">{{ categoryLabel }}</span> · {{ categoryCount }} works
+
+        <!-- 作品數量 -->
+        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide flex items-center gap-2">
+          <span class="text-accent-500 dark:text-accent-400">{{ categoryLabel }}</span>
+          <span class="text-stone-300 dark:text-stone-700">·</span>
+          <span>{{ categoryCount }} works</span>
         </p>
 
         <!-- Category Tabs -->
@@ -30,9 +43,16 @@
     <!-- Gallery Content -->
     <div class="container mx-auto px-6 relative">
       <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-20">
-        <div class="inline-block animate-spin rounded-full h-10 w-10 border-b border-stone-300 dark:border-stone-600"></div>
-        <p class="mt-6 text-stone-500 dark:text-stone-400 font-light tracking-wide">載入中...</p>
+      <div v-if="isLoading" class="text-center py-28">
+        <!-- 日式菱形旋轉動畫 -->
+        <div class="inline-flex flex-col items-center gap-6">
+          <div class="relative w-10 h-10">
+            <div class="absolute inset-0 border border-accent-300/60 dark:border-accent-600/40 rotate-45 animate-spin" style="animation-duration: 2s;"/>
+            <div class="absolute inset-[6px] border border-accent-400/40 dark:border-accent-500/30 rotate-45 animate-spin" style="animation-duration: 3s; animation-direction: reverse;"/>
+            <div class="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-accent-400 dark:bg-accent-500 rotate-45"/>
+          </div>
+          <p class="jp-section-label">Loading</p>
+        </div>
       </div>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
@@ -73,31 +93,33 @@
                   </div>
 
                   <div class="space-y-3">
-                    <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                    <div
+v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
                          :key="`row-${rowIdx}`"
                          class="flex gap-3"
                          :style="{ height: getRowHeight(rowIdx, index) }">
-                      <div v-for="(image, imgIdx) in rowImages"
+                      <div
+v-for="(image, imgIdx) in rowImages"
                            :key="image.filename"
-                           @click="openImageViewer(image, item.images || [])"
                            :class="[
                              getImageWidth(imgIdx, rowIdx, index),
                              'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
                              isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                           ]">
+                           ]"
+                           @click="openImageViewer(image, item.images || [])">
                         <img
                           :src="getImagePath(image.filename)"
                           :alt="image.title"
                           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                           loading="lazy"
                           @load="markImageLoaded(image.filename)"
-                        />
+                        >
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                           <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
                           <div class="text-white/80 text-xs space-y-1 font-light">
                             <div v-if="image.camera || image.model" class="flex items-center gap-2">
                               <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
                               </svg>
                               <span>{{ image.camera }} {{ image.model }}</span>
                             </div>
@@ -120,7 +142,7 @@
           <!-- Mobile Layout for Photography -->
           <div class="md:hidden block">
             <div class="space-y-12">
-              <div v-for="(item, index) in photographyEventItems" :key="item.key">
+              <div v-for="item in photographyEventItems" :key="item.key">
                 <div v-if="item.eventName" class="mb-4">
                   <h3 class="text-base font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                     {{ item.eventName }}
@@ -128,24 +150,26 @@
                   <p class="text-xs text-stone-400 dark:text-stone-500 font-light">{{ item.images?.length || 0 }} 張作品</p>
                 </div>
                 <div class="space-y-2">
-                  <div v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                  <div
+v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
                        :key="`row-${rowIdx}`"
                        class="flex gap-2"
                        style="height: 150px">
-                    <div v-for="(image, imgIdx) in rowImages"
+                    <div
+v-for="image in rowImages"
                          :key="image.filename"
-                         @click="openImageViewer(image, item.images || [])"
                          :class="[
                            'flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative',
                            isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                         ]">
+                         ]"
+                         @click="openImageViewer(image, item.images || [])">
                       <img
                         :src="getImagePath(image.filename)"
                         :alt="image.title"
                         class="w-full h-full object-cover"
                         loading="lazy"
                         @load="markImageLoaded(image.filename)"
-                      />
+                      >
                     </div>
                   </div>
                 </div>
@@ -191,10 +215,27 @@
     </div>
 
     <!-- Footer — 根據分類變化 -->
-    <div class="container mx-auto px-6 py-20 lg:py-28 text-center relative">
-      <div class="deco-line-h w-40 top-0 left-1/2 -translate-x-1/2"></div>
-      <div class="text-2xl md:text-3xl font-extralight text-stone-300 dark:text-stone-600 italic tracking-wider">{{ footerQuote }}</div>
-      <div class="text-xs text-accent-400/60 dark:text-accent-500/40 mt-2 font-light tracking-wide">{{ footerSub }}</div>
+    <div class="container mx-auto px-6 py-20 lg:py-28 text-center relative overflow-hidden">
+      <div class="deco-line-h w-40 top-0 left-1/2 -translate-x-1/2"/>
+
+      <!-- 背景漢字裝飾 -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+        <span class="font-jp text-[10rem] sm:text-[14rem] font-thin leading-none text-stone-100/80 dark:text-stone-800/40">
+          {{ currentCategory === 'digital' ? '繪' : currentCategory === 'photography' ? '影' : '創' }}
+        </span>
+      </div>
+
+      <div class="relative">
+        <!-- 上方裝飾 -->
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <div class="h-px w-12 bg-gradient-to-r from-transparent to-accent-300/40 dark:to-accent-600/30"/>
+          <div class="w-1 h-1 rounded-full bg-accent-400/50"/>
+          <div class="h-px w-12 bg-gradient-to-l from-transparent to-accent-300/40 dark:to-accent-600/30"/>
+        </div>
+
+        <div class="font-jp text-2xl md:text-3xl font-thin text-stone-300 dark:text-stone-600 tracking-wider">{{ footerQuote }}</div>
+        <div class="text-xs text-accent-400/50 dark:text-accent-500/35 mt-3 font-light tracking-[0.4em]">{{ footerSub }}</div>
+      </div>
     </div>
 
     <!-- 圖片檢視器 -->
@@ -206,7 +247,7 @@
 import { onMounted, watch, computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
-import type { GalleryItem, PhotographyItem } from '~/types/gallery'
+import type { GalleryItem } from '~/types/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGlobalToast } from '~/composables/useToast'
 
@@ -226,7 +267,6 @@ const {
   filterState,
   digitalWorks,
   currentWorks,
-  groupedWorks
 } = storeToRefs(galleryStore)
 
 const {
@@ -291,8 +331,8 @@ const photographyEventItems = computed(() => {
   )
 })
 
-// 收集所有無分類的圖片
-const ungroupedImages = computed(() => {
+// 收集所有無分類的圖片（保留供未來擴展用）
+const _ungroupedImages = computed(() => {
   const images: GalleryItem[] = []
   mixedPhotoItems.value.forEach(item => {
     if (!item.eventName && item.images) {
@@ -368,10 +408,6 @@ const getImageWidth = (imageIndex: number, rowIndex: number, groupIndex: number)
 }
 
 // ===== 輔助方法 =====
-// 判斷是否為攝影作品
-const isPhotographyItem = (item: any): item is PhotographyItem => {
-  return 'camera' in item && 'iso' in item && 'shutterSpeed' in item
-}
 
 // 格式化快門速度
 const formatShutterSpeed = (speed: number) => {
@@ -394,14 +430,7 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 // ===== 生命週期 =====
 onMounted(async () => {
   try {
-    await toast.promise(
-      loadAllWorks(),
-      {
-        loading: '載入作品中...',
-        success: '作品載入完成！',
-        error: '載入作品失敗'
-      }
-    )
+    await loadAllWorks()
 
 
   } catch (error) {

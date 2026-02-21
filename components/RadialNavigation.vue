@@ -1,6 +1,7 @@
 <template>
   <!-- 放射型輪盤縮圖導航 -->
-  <div v-if="viewerImages.length > 1"
+  <div
+v-if="viewerImages.length > 1"
        class="fixed bottom-8 transform -translate-x-1/2 z-30"
        :style="{
          left: showInfoPanel ? `calc(50% - ${infoPanelWidth / 2}px)` : '50%'
@@ -8,9 +9,9 @@
     <div class="relative">
       <!-- 放射型縮圖 -->
       <div class="relative">
-        <button v-for="visibleImage in getVisibleRadialImages"
+        <button
+v-for="visibleImage in getVisibleRadialImages"
                 :key="visibleImage.id"
-                @click="selectRadialImage(visibleImage.originalIndex)"
                 :style="{
                   position: 'absolute',
                   left: '50%',
@@ -28,18 +29,20 @@
                     ? 'border-white shadow-2xl shadow-blue-500/60 radial-nav-active'
                     : 'border-gray-500 hover:border-white hover:shadow-lg hover:shadow-white/30'
                 ]"
-                :title="`${visibleImage.title} (${visibleImage.originalIndex + 1}/${viewerImages.length})`">
+                :title="`${visibleImage.title} (${visibleImage.originalIndex + 1}/${viewerImages.length})`"
+                @click="selectRadialImage(visibleImage.originalIndex)">
           <!-- 縮圖圖片 -->
-          <img :src="getImagePath(visibleImage.filename)" :alt="visibleImage.title" class="w-full h-full object-cover" />
+          <img :src="getImagePath(visibleImage.filename)" :alt="visibleImage.title" class="w-full h-full object-cover" >
 
           <!-- 當前圖片的特殊效果 -->
-          <div v-if="visibleImage.originalIndex === currentImageIndex"
-               class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-pulse"></div>
+          <div
+v-if="visibleImage.originalIndex === currentImageIndex"
+               class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-pulse"/>
         </button>
       </div>
 
       <!-- 中心控制按鈕 -->
-      <button @click="handleCenterButtonClick" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-black bg-opacity-80 backdrop-blur-md rounded-full border-2 border-white border-opacity-40 hover:border-opacity-70 hover:bg-opacity-90 transition-all duration-200 flex items-center justify-center z-40">
+      <button class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-black bg-opacity-80 backdrop-blur-md rounded-full border-2 border-white border-opacity-40 hover:border-opacity-70 hover:bg-opacity-90 transition-all duration-200 flex items-center justify-center z-40" @click="handleCenterButtonClick">
         <div class="text-white text-xs font-medium leading-tight">
           <div>{{ currentImageIndex + 1 }}</div>
           <div class="text-gray-300">/{{ viewerImages.length }}</div>
@@ -52,7 +55,7 @@
       </div>
 
       <!-- 背景光暈 -->
-      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 opacity-10 scale-150 animate-pulse pointer-events-none w-20 h-20"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 opacity-10 scale-150 animate-pulse pointer-events-none w-20 h-20"/>
     </div>
   </div>
 </template>

@@ -10,7 +10,7 @@ import {
 } from '~/utils/imageUtils'
 import { formatDateFull } from '~/utils/formatters'
 import { inferEventFromTime } from '~/utils/eventUtils'
-import type { ExifData, PhotographyData, GalleryData } from '~/types/gallery'
+import type { PhotographyData, GalleryData } from '~/types/gallery'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'POST') {
@@ -63,12 +63,12 @@ export default defineEventHandler(async (event) => {
 
         if (category === 'photography') {
           // 攝影作品：優先從 EXIF 提取拍攝時間
-          let rawExifData: any = {}
+          let rawExifData: Record<string, unknown> = {}
 
           try {
             rawExifData = await exifr.parse(file.filepath)
-          } catch (error) {
-            console.warn(`無法讀取 ${originalName} 的 EXIF 資訊:`, error)
+          } catch (err) {
+            console.warn(`無法讀取 ${originalName} 的 EXIF 資訊:`, err)
           }
 
           // 標準化 EXIF 數據
@@ -93,13 +93,13 @@ export default defineEventHandler(async (event) => {
               const jsonPath = './public/photographyList.json'
               const jsonContent = readFileSync(jsonPath, 'utf-8')
               existingData = JSON.parse(jsonContent)
-            } catch (error) {
+            } catch {
               console.warn('無法讀取現有數據，將創建新事件')
               existingData = { Img: [] }
             }
 
             // 查找現有事件的完整信息
-            const existingImage = existingData.Img?.find((img: any) => img.event?.name === manualEventName)
+            const existingImage = existingData.Img?.find((img: { event?: { name?: string } }) => img.event?.name === manualEventName)
             if (existingImage?.event) {
               eventInfo = {
                 name: existingImage.event.name,
@@ -173,7 +173,7 @@ export default defineEventHandler(async (event) => {
                   console.log(`✅ 從 EXIF/XMP 推斷創作時間: ${originalName} -> ${captureTime.toISOString()}`)
                 }
               }
-            } catch (error) {
+            } catch {
               console.warn(`無法讀取 ${originalName} 的 EXIF/XMP 資訊`)
             }
 
@@ -191,7 +191,7 @@ export default defineEventHandler(async (event) => {
                   captureTime = statDate
                   console.log(`✅ 從 fs.stat() 推斷創作時間: ${originalName} -> ${captureTime.toISOString()}`)
                 }
-              } catch (statError) {
+              } catch {
                 console.warn(`無法讀取 ${originalName} 的檔案系統時間，使用當前時間`)
               }
             }
@@ -231,7 +231,7 @@ export default defineEventHandler(async (event) => {
     try {
       const jsonContent = readFileSync(jsonPath, 'utf-8')
       categoryData = JSON.parse(jsonContent)
-    } catch (error) {
+    } catch {
       // 根據分類建立初始結構
       if (category === 'photography') {
         categoryData = {

@@ -1,24 +1,26 @@
 <template>
-  <div v-if="showInfoPanel && currentViewerImage && imageInfo"
+  <div
+v-if="showInfoPanel && currentViewerImage && imageInfo"
        class="info-panel fixed top-0 right-0 h-full bg-black bg-opacity-90 backdrop-blur-md border-l border-gray-600 overflow-y-auto z-50 transition-all duration-300"
        :style="{ width: infoPanelWidth + 'px' }"
        @wheel.stop>
 
     <!-- 可拖拽的調整邊界 -->
-    <div class="absolute left-0 top-0 w-2 h-full cursor-col-resize hover:bg-blue-500 hover:bg-opacity-30 transition-colors z-10"
+    <div
+class="absolute left-0 top-0 w-2 h-full cursor-col-resize hover:bg-blue-500 hover:bg-opacity-30 transition-colors z-10"
          @mousedown="startResize"
          @touchstart="startResize">
       <!-- 調整握把 -->
-      <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-20 bg-gray-400 rounded-r opacity-70 hover:opacity-100 transition-opacity"></div>
+      <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-20 bg-gray-400 rounded-r opacity-70 hover:opacity-100 transition-opacity"/>
     </div>
 
     <!-- 面板標題 -->
     <div class="sticky top-0 bg-black bg-opacity-75 backdrop-blur-sm border-b border-gray-600 p-4">
       <div class="flex items-center justify-between">
         <h3 class="text-white font-medium">圖片資訊</h3>
-        <button @click="imageViewerStore.toggleInfoPanel" class="p-1 text-gray-400 hover:text-white transition-colors">
+        <button class="p-1 text-gray-400 hover:text-white transition-colors" @click="imageViewerStore.toggleInfoPanel">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
@@ -29,9 +31,10 @@
       <!-- 縮圖預覽 -->
       <div class="text-center">
         <div class="inline-block border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
-          <img :src="getImagePath(currentViewerImage.filename)"
+          <img
+:src="getImagePath(currentViewerImage.filename)"
                :alt="imageInfo.title"
-               class="w-32 h-32 object-contain" />
+               class="w-32 h-32 object-contain" >
         </div>
         <div class="mt-2 text-sm text-gray-300 text-center font-medium">{{ imageInfo.title }}</div>
       </div>
@@ -116,7 +119,8 @@
         <h4 class="text-white font-medium border-b border-gray-600 pb-2">標籤</h4>
 
         <div class="flex flex-wrap gap-2">
-          <span v-for="tag in imageInfo.tags"
+          <span
+v-for="tag in imageInfo.tags"
                 :key="tag"
                 class="px-2 py-1 bg-gray-700 text-gray-300 rounded-full text-xs border border-gray-600">
             {{ tag }}
@@ -137,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import ImageHistogram from './ImageHistogram.vue'
@@ -253,7 +257,7 @@ const imageInfo = computed(() => {
   }
 
   // 調試信息（開發時使用）
-  if (process.dev) {
+  if (import.meta.dev) {
     console.log('圖片時間資訊:', {
       date: image.date,
       time: image.time,

@@ -7,8 +7,8 @@
     >
       <!-- 關閉按鈕 -->
       <button
-        @click="close"
         class="absolute top-4 right-4 p-2 text-white/60 hover:text-white transition-colors z-10"
+        @click="close"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
@@ -23,8 +23,8 @@
       <!-- 上一張 -->
       <button
         v-if="images.length > 1"
-        @click.stop="prev"
         class="absolute left-4 p-3 text-white/50 hover:text-white transition-colors group"
+        @click.stop="prev"
       >
         <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
@@ -39,7 +39,7 @@
           :alt="currentImage.title"
           class="max-w-full max-h-[75vh] object-contain rounded-lg select-none"
           @error="handleError"
-        />
+        >
         <!-- 標題 -->
         <div v-if="currentImage" class="mt-4 text-center">
           <p class="text-white/80 text-sm font-light">{{ currentImage.title }}</p>
@@ -50,8 +50,8 @@
       <!-- 下一張 -->
       <button
         v-if="images.length > 1"
-        @click.stop="next"
         class="absolute right-4 p-3 text-white/50 hover:text-white transition-colors group"
+        @click.stop="next"
       >
         <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />

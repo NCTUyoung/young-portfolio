@@ -1,28 +1,86 @@
 <template>
-  <div v-if="(filterState.selectedCategory === 'photography' || filterState.selectedCategory === 'digital') && availableEvents.length > 0" class="mb-8">
-    <!-- Event Filter Buttons -->
-    <div class="flex flex-wrap gap-3 mb-4">
+  <div
+    v-if="(filterState.selectedCategory === 'photography' || filterState.selectedCategory === 'digital') && availableEvents.length > 0"
+    class="mb-8"
+  >
+    <!-- 頂部裝飾細線 -->
+    <div class="deco-line-h w-full mb-4"/>
+
+    <!-- 小標 -->
+    <p class="jp-section-label mb-3">Event</p>
+
+    <!-- 底線 Tab 篩選列 -->
+    <div class="flex flex-wrap gap-x-1 gap-y-1">
+      <!-- 全部事件 -->
       <button
-        @click="setSelectedEvent(null)"
+        class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
         :class="filterState.selectedEvent === null
-          ? 'bg-accent-600 dark:bg-accent-500 text-white'
-          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-accent-300/60 dark:hover:border-accent-600/60 hover:text-accent-600 dark:hover:text-accent-400'"
-        class="px-4 py-2 rounded-lg text-sm font-light transition-all duration-200"
+          ? 'text-stone-800 dark:text-stone-100'
+          : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"
+        @click="setSelectedEvent(null)"
       >
-        全部事件 ({{ totalWorksInCategory }})
+        <!-- 選中底線（漸層暈染） -->
+        <span
+          :class="[
+            'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out',
+            filterState.selectedEvent === null
+              ? 'w-full bg-gradient-to-r from-transparent via-accent-500 dark:via-accent-400 to-transparent'
+              : 'w-0 bg-transparent'
+          ]"
+        />
+        <!-- 計數格式 name · n -->
+        <span class="text-xs">全部事件</span>
+        <span class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
+        <span
+          class="text-xs tabular-nums transition-colors duration-300"
+          :class="filterState.selectedEvent === null
+            ? 'text-accent-500 dark:text-accent-400'
+            : 'text-stone-400 dark:text-stone-600'"
+        >{{ totalWorksInCategory }}</span>
       </button>
-      <button
-        v-for="event in availableEvents"
-        :key="event.name"
-        @click="setSelectedEvent(event.name)"
-        :class="filterState.selectedEvent === event.name
-          ? 'bg-accent-600 dark:bg-accent-500 text-white'
-          : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-accent-300/60 dark:hover:border-accent-600/60 hover:text-accent-600 dark:hover:text-accent-400'"
-        class="px-4 py-2 rounded-lg text-sm font-light transition-all duration-200"
-      >
-        {{ event.name }} ({{ event.count }})
-      </button>
+
+      <!-- 垂直分隔線 -->
+      <span class="self-center w-px h-4 bg-stone-200/60 dark:bg-stone-700/50 mx-1"/>
+
+      <!-- 各事件 -->
+      <template v-for="(event, index) in availableEvents" :key="event.name">
+        <button
+          class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
+          :class="filterState.selectedEvent === event.name
+            ? 'text-stone-800 dark:text-stone-100'
+            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"
+          @click="setSelectedEvent(event.name)"
+        >
+          <!-- 選中底線（漸層暈染） -->
+          <span
+            :class="[
+              'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out',
+              filterState.selectedEvent === event.name
+                ? 'w-full bg-gradient-to-r from-transparent via-accent-500 dark:via-accent-400 to-transparent'
+                : 'w-0 bg-transparent'
+            ]"
+          />
+          <!-- 計數格式 name · n -->
+          <span class="text-xs">{{ event.name }}</span>
+          <span class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
+          <span
+            class="text-xs tabular-nums transition-colors duration-300"
+            :class="filterState.selectedEvent === event.name
+              ? 'text-accent-500 dark:text-accent-400'
+              : 'text-stone-400 dark:text-stone-600'"
+          >{{ event.count }}</span>
+        </button>
+
+        <!-- 事件間的細分隔線（最後一個不加） -->
+        <span
+          v-if="index < availableEvents.length - 1"
+          class="self-center w-px h-3 bg-stone-200/50 dark:bg-stone-700/40 mx-0.5"
+        />
+      </template>
     </div>
+
+    <!-- 底部裝飾細線 -->
+    <div class="deco-line-h w-full mt-4"/>
   </div>
 </template>
 
@@ -49,7 +107,6 @@ const totalWorksInCategory = computed(() => {
   if (filterState.value.selectedCategory === 'photography') {
     return photographyWorks.value.length
   }
-  // 理論上這個元件只在 digital / photography 類別下渲染
   return currentWorks.value.length
 })
 

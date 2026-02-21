@@ -1,5 +1,5 @@
 import { ref, computed, readonly } from 'vue'
-import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
+import { useIntervalFn } from '@vueuse/core'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -186,7 +186,7 @@ export const useToast = () => {
     options: {
       loading: string
       success: string | ((data: T) => string)
-      error: string | ((error: any) => string)
+      error: string | ((error: unknown) => string)
     }
   ): Promise<T> => {
     const loadingId = loading(options.loading)

@@ -1,5 +1,9 @@
 import { readFileSync, writeFileSync } from 'fs'
-import type { PhotographyData, GalleryData } from '~/types/gallery'
+
+type ImgRecord = {
+  event?: { name?: string; description?: string; location?: string }
+  [key: string]: unknown
+}
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'PATCH') {
@@ -31,11 +35,11 @@ export default defineEventHandler(async (event) => {
     const jsonPath = `./public/${jsonFileName}`
 
     // 讀取 JSON 數據
-    let categoryData
+    let categoryData: { Img: ImgRecord[] }
     try {
       const jsonContent = readFileSync(jsonPath, 'utf-8')
       categoryData = JSON.parse(jsonContent)
-    } catch (error) {
+    } catch {
       throw createError({
         statusCode: 404,
         statusMessage: '找不到圖庫資料檔案'
@@ -44,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
     // 找到該事件的所有圖片並更新事件資訊
     let updatedCount = 0
-    categoryData.Img.forEach((img: any) => {
+    categoryData.Img.forEach((img) => {
       if (img.event) {
         if (img.event.name === originalEventName) {
           img.event.name = newEventName
@@ -70,11 +74,10 @@ export default defineEventHandler(async (event) => {
       message: `成功更新事件資訊，共更新 ${updatedCount} 張圖片`,
       updatedCount
     }
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update event error:', error)
-
-    if (error.statusCode) {
+    const err = error as { statusCode?: number }
+    if (err.statusCode) {
       throw error
     }
 

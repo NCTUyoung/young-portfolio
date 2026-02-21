@@ -5,7 +5,7 @@
         <!-- 標題 -->
         <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
           <h3 class="text-sm font-medium text-stone-800 tracking-wide">編輯圖片資訊</h3>
-          <button @click="cancel" class="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors">
+          <button class="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" @click="cancel">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -21,7 +21,7 @@
                 :src="getImagePath(imageData.filename)"
                 :alt="imageData.title"
                 class="w-20 h-20 object-cover rounded-xl border border-stone-100"
-              />
+              >
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-light text-stone-800 truncate">{{ imageData.filename }}</p>
                 <p class="text-xs text-stone-400 font-light mt-1">檔案名稱</p>
@@ -39,7 +39,7 @@
                   type="text"
                   class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                   placeholder="請輸入圖片標題"
-                />
+                >
               </div>
 
               <div>
@@ -60,7 +60,7 @@
                   v-model="formData.date"
                   type="date"
                   class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                />
+                >
               </div>
 
               <!-- 繪圖作品專用 -->
@@ -88,7 +88,7 @@
                   type="text"
                   class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                   placeholder="例如：人像,街拍"
-                />
+                >
                 <p class="text-xs text-stone-400 font-light mt-1">相機設定無法修改，會自動從照片讀取</p>
               </div>
 
@@ -118,15 +118,15 @@
         <!-- 按鈕 -->
         <div class="px-6 py-4 border-t border-stone-100 flex justify-end space-x-3">
           <button
-            @click="cancel"
             class="px-4 py-2 text-sm font-light text-stone-600 bg-stone-100 border border-stone-200 rounded-lg hover:bg-stone-200 transition-colors"
+            @click="cancel"
           >
             取消
           </button>
           <button
-            @click="confirm"
             :disabled="!isFormValid"
             class="px-4 py-2 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            @click="confirm"
           >
             儲存
           </button>
@@ -187,7 +187,7 @@ watch(() => props.imageData, (newData) => {
 
 const confirm = () => {
   if (!isFormValid.value) return
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     title: formData.value.title.trim(),
     content: formData.value.content.trim(),
     date: formData.value.date

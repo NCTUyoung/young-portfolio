@@ -169,7 +169,7 @@ export const useEventManagement = () => {
    */
   const removeEvent = (dateKey: string): boolean => {
     if (events.value[dateKey]) {
-      delete events.value[dateKey]
+      Reflect.deleteProperty(events.value, dateKey)
       return true
     }
     return false

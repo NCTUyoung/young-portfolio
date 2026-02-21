@@ -3,15 +3,15 @@
     <!-- ===== 不對稱 Hero ===== -->
     <section class="relative py-20 sm:py-28 overflow-hidden">
       <!-- 背景裝飾 -->
-      <div class="absolute top-0 left-0 w-2/5 h-full bg-stone-100/50 dark:bg-stone-800/30 rounded-r-[4rem] hidden lg:block"></div>
-      <div class="deco-line-v h-24 top-12 left-[38%] hidden lg:block"></div>
+      <div class="absolute top-0 left-0 w-2/5 h-full bg-stone-100/50 dark:bg-stone-800/30 rounded-r-[4rem] hidden lg:block"/>
+      <div class="deco-line-v h-24 top-12 left-[38%] hidden lg:block"/>
 
       <div class="relative max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           <!-- 左側：大裝飾數字/圖形 -->
           <div class="reveal flex-shrink-0 relative">
             <!-- 裝飾背景圓 -->
-            <div class="absolute inset-0 -m-8 rounded-full bg-accent-100/40 dark:bg-accent-900/20 blur-2xl"></div>
+            <div class="absolute inset-0 -m-8 rounded-full bg-accent-100/40 dark:bg-accent-900/20 blur-2xl"/>
             <div class="relative w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center">
               <!-- 浮動動畫圖示 -->
               <div class="animate-float">
@@ -20,8 +20,8 @@
                 </svg>
               </div>
               <!-- 呼吸圓點裝飾 -->
-              <div class="absolute top-4 right-4 w-4 h-4 rounded-full bg-accent-400/50 animate-breathe"></div>
-              <div class="absolute bottom-8 left-2 w-2.5 h-2.5 rounded-full bg-accent-300/40 animate-breathe" style="animation-delay: 1s"></div>
+              <div class="absolute top-4 right-4 w-4 h-4 rounded-full bg-accent-400/50 animate-breathe"/>
+              <div class="absolute bottom-8 left-2 w-2.5 h-2.5 rounded-full bg-accent-300/40 animate-breathe" style="animation-delay: 1s"/>
             </div>
           </div>
 
@@ -32,7 +32,7 @@
               文章專區
             </h1>
             <p class="reveal reveal-delay-2 mt-6 text-stone-500 dark:text-stone-400 font-light tracking-wide leading-relaxed max-w-md">
-              設計心得、技術筆記與創作故事，正在用心撰寫中。<br />
+              設計心得、技術筆記與創作故事，正在用心撰寫中。<br >
               敬請期待更多精彩內容。
             </p>
 
@@ -60,7 +60,7 @@
 
     <!-- ===== 預告內容 — 水平滾動 ===== -->
     <section class="py-20 lg:py-24 bg-stone-50/40 dark:bg-stone-800/20 relative">
-      <div class="deco-line-h w-full top-0 left-0"></div>
+      <div class="deco-line-h w-full top-0 left-0"/>
 
       <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-10 flex items-end gap-6">
@@ -68,7 +68,7 @@
             <p class="text-xs tracking-[0.3em] uppercase text-accent-500 dark:text-accent-400 font-light mb-3">Preview</p>
             <h2 class="text-2xl sm:text-3xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">即將帶來</h2>
           </div>
-          <div class="hidden sm:block h-px flex-1 max-w-[100px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"></div>
+          <div class="hidden sm:block h-px flex-1 max-w-[100px] bg-gradient-to-r from-accent-400/60 to-transparent mb-2"/>
         </div>
       </div>
 
@@ -81,7 +81,8 @@
             class="flex-shrink-0 w-72 sm:w-80 bg-white/80 dark:bg-stone-800/60 backdrop-blur-sm rounded-2xl border border-stone-200/60 dark:border-stone-700/60 p-8 hover:border-accent-200/60 dark:hover:border-accent-700/40 transition-all duration-500 group"
             :class="[`reveal-delay-${index + 1}`]"
           >
-            <div class="w-12 h-12 rounded-xl mb-6 flex items-center justify-center transition-colors duration-500"
+            <div
+class="w-12 h-12 rounded-xl mb-6 flex items-center justify-center transition-colors duration-500"
                  :class="preview.bgClass">
               <svg class="w-6 h-6" :class="preview.iconClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="preview.icon" />
@@ -95,7 +96,7 @@
           <div class="flex-shrink-0 w-48 flex items-center justify-center">
             <div class="text-center">
               <div class="text-3xl text-stone-200 dark:text-stone-700 mb-2">···</div>
-              <p class="text-xs text-stone-400 dark:text-stone-500 font-light tracking-wider">更多內容<br />敬請期待</p>
+              <p class="text-xs text-stone-400 dark:text-stone-500 font-light tracking-wider">更多內容<br >敬請期待</p>
             </div>
           </div>
         </div>
@@ -106,7 +107,7 @@
     <section class="reveal py-20 lg:py-28 relative overflow-hidden">
       <div class="max-w-3xl mx-auto px-6 text-center">
         <p class="text-2xl sm:text-3xl font-extralight text-stone-300 dark:text-stone-600 tracking-wider italic leading-relaxed">
-          "文字是思考的足跡，<br class="hidden sm:block" />每篇文章都是一次對話。"
+          "文字是思考的足跡，<br class="hidden sm:block" >每篇文章都是一次對話。"
         </p>
       </div>
     </section>

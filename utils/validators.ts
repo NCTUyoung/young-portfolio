@@ -142,7 +142,7 @@ export const validateEventData = (event: Partial<PhotoEvent>): { valid: boolean;
 /**
  * 驗證 EXIF 數據的有效性
  */
-export const validateExifData = (exif: any): { valid: boolean; errors: string[] } => {
+export const validateExifData = (exif: Record<string, unknown>): { valid: boolean; errors: string[] } => {
   const errors: string[] = []
 
   // 檢查必要的 EXIF 字段
@@ -326,7 +326,7 @@ export const validateDateString = (dateString: string): { valid: boolean; error?
 /**
  * 檢查是否為空值
  */
-export const isEmpty = (value: any): boolean => {
+export const isEmpty = (value: unknown): boolean => {
   if (value === null || value === undefined) return true
   if (typeof value === 'string') return value.trim().length === 0
   if (Array.isArray(value)) return value.length === 0

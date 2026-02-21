@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 工具列：搜尋 + 批次模式 -->
     <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
@@ -12,8 +12,8 @@
           type="text"
           placeholder="搜尋圖片名稱…"
           class="w-full pl-9 pr-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-        />
-        <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+        >
+        <button v-if="searchQuery" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" @click="searchQuery = ''">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -22,13 +22,13 @@
 
       <!-- 批次操作按鈕 -->
       <button
-        @click="toggleBatchMode"
         :class="[
           'px-3 py-1.5 text-xs font-light rounded-lg border transition-all duration-200 flex items-center space-x-1.5',
           batchMode
             ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
             : 'bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100'
         ]"
+        @click="toggleBatchMode"
       >
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -41,8 +41,8 @@
     <div v-if="adminStore.loading" class="text-center py-16">
       <div class="inline-flex items-center space-x-2 text-stone-400">
         <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
         </svg>
         <span class="text-sm font-light">載入中…</span>
       </div>
@@ -64,7 +64,7 @@
     <!-- 事件列表 -->
     <template v-else>
       <div
-        v-for="(group, gIdx) in filteredGroups"
+        v-for="group in filteredGroups"
         :key="group.eventName"
         class="mb-4 border border-stone-200 rounded-xl overflow-hidden"
       >
@@ -107,18 +107,18 @@
               <!-- 批次：全選/取消 -->
               <button
                 v-if="batchMode"
-                @click="toggleSelectGroup(group)"
                 class="px-2 py-1 text-xs font-light text-stone-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                 :title="isGroupAllSelected(group) ? '取消全選' : '全選此事件'"
+                @click="toggleSelectGroup(group)"
               >
                 {{ isGroupAllSelected(group) ? '取消' : '全選' }}
               </button>
 
               <!-- 編輯事件 -->
               <button
-                @click="adminStore.startEditEvent(group.eventName, group.description, group.location)"
                 class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
                 title="編輯事件"
+                @click="adminStore.startEditEvent(group.eventName, group.description, group.location)"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -127,9 +127,9 @@
 
               <!-- 新增圖片到此事件 -->
               <button
-                @click="$emit('switchToUpload', group.eventName)"
                 class="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                 title="新增圖片到此事件"
+                @click="$emit('switchToUpload', group.eventName)"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4" />
@@ -138,9 +138,9 @@
 
               <!-- 刪除整個事件 -->
               <button
-                @click="promptDeleteEvent(group.eventName, group.items.length)"
                 class="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 title="刪除整個事件"
+                @click="promptDeleteEvent(group.eventName, group.items.length)"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -161,35 +161,35 @@
               v-for="(item, itemIdx) in group.items"
               :key="item.filename"
               :draggable="adminStore.editMode"
-              @dragstart="handleDragStart(item.filename, group.eventName)"
-              @dragover.prevent
-              @drop="handleDrop(item.filename, group.eventName)"
               :class="[
                 'group relative aspect-square bg-stone-100 rounded-xl overflow-hidden transition-all duration-200',
                 adminStore.editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
                 selectedFiles.has(item.filename) ? 'ring-2 ring-amber-400' : 'hover:shadow-md',
                 dragOverFilename === item.filename && dragEventName === group.eventName ? 'ring-2 ring-amber-300 opacity-70' : ''
               ]"
+              @dragstart="handleDragStart(item.filename, group.eventName)"
+              @dragover.prevent
+              @drop="handleDrop(item.filename, group.eventName)"
               @click="handleImageClick(item, group.items, itemIdx)"
             >
               <img
                 :src="getImagePath(item.filename)"
                 :alt="item.title"
                 class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
-                @error="handleImageError"
                 loading="lazy"
-              />
+                @error="handleImageError"
+              >
 
               <!-- 批次 checkbox -->
               <div v-if="batchMode" class="absolute top-1.5 left-1.5 z-20" @click.stop>
                 <div
-                  @click="toggleSelectFile(item.filename)"
                   :class="[
                     'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
                     selectedFiles.has(item.filename)
                       ? 'bg-amber-500 border-amber-500'
                       : 'bg-white/80 border-stone-300 hover:border-amber-400'
                   ]"
+                  @click="toggleSelectFile(item.filename)"
                 >
                   <svg v-if="selectedFiles.has(item.filename)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -204,18 +204,18 @@
                 @click.stop
               >
                 <button
-                  @click="adminStore.startEditImage(item)"
                   class="p-1.5 bg-white/90 text-stone-600 rounded-lg hover:bg-stone-100 transition-colors shadow-sm"
                   title="編輯"
+                  @click="adminStore.startEditImage(item)"
                 >
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
                 <button
-                  @click="adminStore.showDeleteConfirm(item.filename, item.title)"
                   class="p-1.5 bg-white/90 text-red-500 rounded-lg hover:bg-red-50 transition-colors shadow-sm"
                   title="刪除"
+                  @click="adminStore.showDeleteConfirm(item.filename, item.title)"
                 >
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -241,13 +241,13 @@
               <!-- Checkbox -->
               <div v-if="batchMode" @click.stop>
                 <div
-                  @click="toggleSelectFile(item.filename)"
                   :class="[
                     'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all flex-shrink-0',
                     selectedFiles.has(item.filename)
                       ? 'bg-amber-500 border-amber-500'
                       : 'border-stone-300 hover:border-amber-400'
                   ]"
+                  @click="toggleSelectFile(item.filename)"
                 >
                   <svg v-if="selectedFiles.has(item.filename)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -259,21 +259,21 @@
                 :src="getImagePath(item.filename)"
                 :alt="item.title"
                 class="w-10 h-10 object-cover rounded-lg flex-shrink-0 cursor-pointer"
-                @error="handleImageError"
                 loading="lazy"
+                @error="handleImageError"
                 @click="openLightbox(item, group.items, group.items.indexOf(item))"
-              />
+              >
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-light text-stone-800 truncate">{{ item.title }}</p>
                 <p class="text-xs text-stone-400 font-light">{{ formatDate(item.time) }}</p>
               </div>
               <div v-if="adminStore.editMode" class="flex-shrink-0 flex space-x-1">
-                <button @click="adminStore.startEditImage(item)" class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors" title="編輯">
+                <button class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors" title="編輯" @click="adminStore.startEditImage(item)">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
-                <button @click="adminStore.showDeleteConfirm(item.filename, item.title)" class="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="刪除">
+                <button class="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="刪除" @click="adminStore.showDeleteConfirm(item.filename, item.title)">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
@@ -292,16 +292,16 @@
         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center space-x-4 bg-stone-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl"
       >
         <span class="text-sm font-light">已選 <span class="text-amber-400 font-medium">{{ selectedFiles.size }}</span> 張</span>
-        <div class="w-px h-4 bg-stone-700"></div>
+        <div class="w-px h-4 bg-stone-700"/>
         <button
-          @click="clearSelection"
           class="text-xs text-stone-400 hover:text-white transition-colors font-light"
+          @click="clearSelection"
         >
           取消選取
         </button>
         <button
-          @click="confirmBatchDelete"
           class="px-4 py-1.5 bg-red-600 text-white text-xs font-light rounded-lg hover:bg-red-500 transition-colors"
+          @click="confirmBatchDelete"
         >
           批次刪除
         </button>
@@ -351,7 +351,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits<{ switchToUpload: [eventName: string] }>()
+defineEmits<{ switchToUpload: [eventName: string] }>()
 
 const adminStore = useAdminStore()
 const { getImagePath } = useImagePath()
@@ -392,7 +392,7 @@ const toggleSelectFile = (filename: string) => {
   selectedFiles.value = new Set(selectedFiles.value) // 觸發響應性
 }
 
-const toggleSelectGroup = (group: { items: any[] }) => {
+const toggleSelectGroup = (group: { items: { filename: string; title: string; time: string }[] }) => {
   const filenames = group.items.map(i => i.filename)
   const allSelected = filenames.every(fn => selectedFiles.value.has(fn))
   if (allSelected) {
@@ -403,7 +403,7 @@ const toggleSelectGroup = (group: { items: any[] }) => {
   selectedFiles.value = new Set(selectedFiles.value)
 }
 
-const isGroupAllSelected = (group: { items: any[] }) =>
+const isGroupAllSelected = (group: { items: { filename: string; title: string; time: string }[] }) =>
   group.items.length > 0 && group.items.every(i => selectedFiles.value.has(i.filename))
 
 const clearSelection = () => {
@@ -472,13 +472,13 @@ const lightboxVisible = ref(false)
 const lightboxImages = ref<{ filename: string; title: string; time?: string }[]>([])
 const lightboxIndex = ref(0)
 
-const openLightbox = (item: any, items: any[], idx: number) => {
+const openLightbox = (item: { filename: string; title: string; time: string }, items: { filename: string; title: string; time: string }[], idx: number) => {
   lightboxImages.value = items.map(i => ({ filename: i.filename, title: i.title, time: i.time }))
   lightboxIndex.value = idx
   lightboxVisible.value = true
 }
 
-const handleImageClick = (item: any, items: any[], idx: number) => {
+const handleImageClick = (item: { filename: string; title: string; time: string }, items: { filename: string; title: string; time: string }[], idx: number) => {
   if (batchMode.value) {
     toggleSelectFile(item.filename)
   } else if (!adminStore.editMode) {
@@ -512,3 +512,7 @@ const formatDate = (dateString: string) => {
   transform: translateX(-50%) translateY(20px);
 }
 </style>
+
+
+
+

@@ -10,7 +10,7 @@
         :alt="item.title"
         class="w-16 h-16 object-cover rounded-lg flex-shrink-0 shadow-sm"
         loading="lazy"
-      />
+      >
       <div class="flex-1 min-w-0">
         <h4 class="text-sm font-light text-stone-800 truncate mb-1">{{ item.title }}</h4>
         <p class="text-sm text-stone-600 truncate mb-2">{{ item.content }}</p>
@@ -32,24 +32,24 @@
               'inline-block w-4 h-4 rounded-full border border-stone-300/50 shadow-sm',
               getColorClass((item as GalleryItem).color || 'blue')
             ]"
-          ></span>
+          />
         </div>
 
         <!-- 編輯模式按鈕 -->
         <div v-if="adminStore.editMode" class="flex space-x-2">
           <button
-            @click.stop="handleEditImage(item)"
             class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors duration-200"
             title="編輯圖片"
+            @click.stop="handleEditImage(item)"
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
             </svg>
           </button>
           <button
-            @click.stop="handleDeleteImage(item.filename, item.title)"
             class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
             title="刪除圖片"
+            @click.stop="handleDeleteImage(item.filename, item.title)"
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
@@ -71,7 +71,7 @@ interface Props {
     eventName: string
     description: string
     location: string
-    items: (GalleryItem | any)[]
+    items: GalleryItem[]
   }
 }
 
@@ -92,7 +92,7 @@ const handleDeleteImage = (filename: string, title: string) => {
 }
 
 // 編輯圖片處理
-const handleEditImage = (item: any) => {
+const handleEditImage = (item: GalleryItem) => {
   adminStore.startEditImage(item)
 }
 </script>

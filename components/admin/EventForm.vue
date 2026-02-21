@@ -13,7 +13,7 @@
               type="radio"
               value="new"
               class="mr-3 text-amber-500 focus:ring-amber-400"
-            />
+            >
             <span class="text-sm font-light text-stone-700">建立新事件</span>
           </label>
           <label v-if="availablePhotographyEvents.length > 0" class="flex items-center cursor-pointer">
@@ -22,7 +22,7 @@
               type="radio"
               value="existing"
               class="mr-3 text-amber-500 focus:ring-amber-400"
-            />
+            >
             <span class="text-sm font-light text-stone-700">加入現有事件</span>
           </label>
         </div>
@@ -54,7 +54,7 @@
           type="text"
           class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
           placeholder="例如：春日街拍、2024 新北耶誕城"
-        />
+        >
       </div>
 
       <!-- 事件詳細（新事件） -->
@@ -66,7 +66,7 @@
             type="text"
             class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
             placeholder="例如：城市日常生活紀錄"
-          />
+          >
         </div>
         <div>
           <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">拍攝地點</label>
@@ -75,7 +75,7 @@
             type="text"
             class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
             placeholder="例如：台北市"
-          />
+          >
         </div>
       </div>
 

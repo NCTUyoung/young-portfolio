@@ -12,8 +12,8 @@
       <div class="flex justify-between items-center p-6 border-b border-stone-200">
         <h3 class="text-lg font-medium text-stone-800">編輯事件</h3>
         <button
-          @click="$emit('cancel')"
           class="text-stone-400 hover:text-stone-600 transition-colors"
+          @click="$emit('cancel')"
         >
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -34,7 +34,7 @@
             class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg bg-stone-50 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all font-light text-stone-700"
             placeholder="輸入事件名稱"
             :disabled="loading"
-          />
+          >
         </div>
 
         <!-- 事件描述 -->
@@ -62,27 +62,27 @@
             class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg bg-stone-50 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all font-light text-stone-700"
             placeholder="輸入事件地點"
             :disabled="loading"
-          />
+          >
         </div>
       </div>
 
       <!-- 操作按鈕 -->
       <div class="flex justify-end space-x-3 p-6 border-t border-stone-200">
         <button
-          @click="$emit('cancel')"
           :disabled="loading"
           class="px-4 py-2.5 text-sm font-medium text-stone-600 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="$emit('cancel')"
         >
           取消
         </button>
         <button
-          @click="handleConfirm"
           :disabled="loading || !localEventName.trim()"
           class="px-4 py-2.5 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center"
+          @click="handleConfirm"
         >
           <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
           </svg>
           {{ loading ? '儲存中...' : '儲存' }}
         </button>

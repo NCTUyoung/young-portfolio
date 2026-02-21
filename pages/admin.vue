@@ -4,7 +4,7 @@
     <header class="bg-stone-950 border-b border-stone-800">
       <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <div class="w-1 h-6 bg-amber-500"></div>
+          <div class="w-1 h-6 bg-amber-500"/>
           <h1 class="text-lg font-light text-stone-100 tracking-wider">後台管理</h1>
         </div>
         <NuxtLink to="/" class="text-stone-400 hover:text-stone-100 text-sm transition-colors duration-200 flex items-center space-x-1">
@@ -23,13 +23,13 @@
           <button
             v-for="tab in tabs"
             :key="tab.id"
-            @click="activeTab = tab.id"
             :class="[
               'py-4 px-5 border-b-2 font-light text-sm transition-all duration-200 flex items-center space-x-2',
               activeTab === tab.id
                 ? 'border-amber-500 text-stone-900'
                 : 'border-transparent text-stone-400 hover:text-stone-700 hover:border-stone-300'
             ]"
+            @click="activeTab = tab.id"
           >
             <svg v-if="tab.id === 'overview'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -45,7 +45,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span>{{ tab.name }}</span>
-            <span v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
+            <span
+v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                   class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
               {{ adminStore.selectedFiles.length }}
             </span>
@@ -69,8 +70,8 @@
             <div class="flex items-center space-x-3">
               <select
                 v-model="adminStore.overviewCategory"
-                @change="adminStore.handleOverviewCategoryChange(adminStore.overviewCategory)"
                 class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                @change="adminStore.handleOverviewCategoryChange(adminStore.overviewCategory)"
               >
                 <option value="gallery">繪圖作品</option>
                 <option value="photography">攝影作品</option>
@@ -117,7 +118,7 @@
                 <div
                   class="w-full rounded-t-sm bg-amber-400/70 transition-all duration-300 min-h-[4px]"
                   :style="{ height: month.count > 0 ? `${Math.max(8, (month.count / maxMonthCount) * 80)}px` : '4px' }"
-                ></div>
+                />
                 <span class="text-xs text-stone-400 font-light">{{ month.label }}</span>
               </div>
             </div>
@@ -137,10 +138,10 @@
                   :src="getImagePath(item.filename)"
                   :alt="item.title"
                   class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
-                  @error="handleImageError"
                   loading="lazy"
-                />
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200"></div>
+                  @error="handleImageError"
+                >
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200"/>
                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <p class="text-white text-xs font-light truncate">{{ item.title }}</p>
                 </div>
@@ -166,8 +167,8 @@
               <label class="text-sm font-light text-stone-500">分類：</label>
               <select
                 v-model="adminStore.uploadCategory"
-                @change="adminStore.handleUploadCategoryChange(adminStore.uploadCategory)"
                 class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                @change="adminStore.handleUploadCategoryChange(adminStore.uploadCategory)"
               >
                 <option value="gallery">繪圖作品</option>
                 <option value="photography">攝影作品</option>
@@ -183,20 +184,20 @@
             <!-- 上傳按鈕和狀態 -->
             <div class="flex justify-end space-x-3 pt-6 border-t border-stone-100">
               <button
-                @click="adminStore.clearFiles"
                 class="px-5 py-2 text-sm font-light text-stone-600 bg-stone-100 border border-stone-200 rounded-lg hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-400 transition-all duration-200"
+                @click="adminStore.clearFiles"
               >
                 清除所有
               </button>
               <button
-                @click="adminStore.uploadFiles"
                 :disabled="!adminStore.canUpload || adminStore.uploading"
                 class="px-5 py-2 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+                @click="adminStore.uploadFiles"
               >
                 <span v-if="adminStore.uploading" class="flex items-center space-x-2">
                   <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                   </svg>
                   <span>上傳中…</span>
                 </span>
@@ -241,8 +242,8 @@
             <div class="flex flex-wrap items-center gap-2">
               <select
                 v-model="adminStore.manageCategory"
-                @change="adminStore.handleManageCategoryChange(adminStore.manageCategory)"
                 class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                @change="adminStore.handleManageCategoryChange(adminStore.manageCategory)"
               >
                 <option value="gallery">繪圖作品</option>
                 <option value="photography">攝影作品</option>
@@ -261,24 +262,24 @@
               <!-- 檢視切換 -->
               <div class="flex items-center bg-stone-100 rounded-lg p-1">
                 <button
-                  @click="adminStore.manageViewMode = 'grid'"
                   :class="[
                     'px-3 py-1 rounded-md transition-all duration-200 text-xs font-light',
                     adminStore.manageViewMode === 'grid'
                       ? 'bg-white text-stone-800 shadow-sm'
                       : 'text-stone-400 hover:text-stone-600'
                   ]"
+                  @click="adminStore.manageViewMode = 'grid'"
                 >
                   網格
                 </button>
                 <button
-                  @click="adminStore.manageViewMode = 'list'"
                   :class="[
                     'px-3 py-1 rounded-md transition-all duration-200 text-xs font-light',
                     adminStore.manageViewMode === 'list'
                       ? 'bg-white text-stone-800 shadow-sm'
                       : 'text-stone-400 hover:text-stone-600'
                   ]"
+                  @click="adminStore.manageViewMode = 'list'"
                 >
                   列表
                 </button>
@@ -286,13 +287,13 @@
 
               <!-- 編輯模式 -->
               <button
-                @click="adminStore.toggleEditMode"
                 :class="[
                   'px-3 py-1.5 text-xs font-light rounded-lg transition-all duration-200 flex items-center space-x-1.5',
                   adminStore.editMode
                     ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
                     : 'bg-stone-100 text-stone-600 hover:bg-stone-200 border border-stone-200'
                 ]"
+                @click="adminStore.toggleEditMode"
               >
                 <svg v-if="adminStore.editMode" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -304,9 +305,9 @@
               </button>
 
               <button
-                @click="adminStore.loadGalleryByCategory(adminStore.manageCategory)"
                 class="px-3 py-1.5 text-xs font-light text-stone-500 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors duration-200"
                 title="重新載入"
+                @click="adminStore.loadGalleryByCategory(adminStore.manageCategory)"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -345,8 +346,8 @@
                   <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">預設分類</label>
                   <select
                     v-model="adminStore.globalSettings.defaultUploadCategory"
-                    @change="adminStore.updateGlobalSettings({ defaultUploadCategory: adminStore.globalSettings.defaultUploadCategory })"
                     class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                    @change="adminStore.updateGlobalSettings({ defaultUploadCategory: adminStore.globalSettings.defaultUploadCategory })"
                   >
                     <option value="gallery">繪圖作品</option>
                     <option value="photography">攝影作品</option>
@@ -362,7 +363,7 @@
                         value="grid"
                         class="mr-2 text-amber-500 focus:ring-amber-400"
                         @change="adminStore.updateGlobalSettings({ defaultViewMode: 'grid' })"
-                      />
+                      >
                       網格
                     </label>
                     <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
@@ -372,7 +373,7 @@
                         value="list"
                         class="mr-2 text-amber-500 focus:ring-amber-400"
                         @change="adminStore.updateGlobalSettings({ defaultViewMode: 'list' })"
-                      />
+                      >
                       列表
                     </label>
                   </div>
@@ -396,7 +397,7 @@
                     step="5"
                     class="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-amber-500"
                     @change="adminStore.updateGlobalSettings({ imageQuality: parseInt(adminStore.globalSettings.imageQuality.toString()) })"
-                  />
+                  >
                   <div class="flex justify-between text-xs text-stone-400 mt-1">
                     <span>60%</span><span>100%</span>
                   </div>
@@ -413,7 +414,7 @@
                     step="5"
                     class="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-amber-500"
                     @change="adminStore.updateGlobalSettings({ batchSize: parseInt(adminStore.globalSettings.batchSize.toString()) })"
-                  />
+                  >
                   <div class="flex justify-between text-xs text-stone-400 mt-1">
                     <span>10</span><span>50</span>
                   </div>
@@ -431,9 +432,10 @@
                     <p class="text-xs text-stone-400 font-light">自動備份上傳的圖片</p>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="sr-only peer"
-                      @change="adminStore.updateGlobalSettings({ autoBackup: adminStore.globalSettings.autoBackup })" />
-                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                    <input
+v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="sr-only peer"
+                      @change="adminStore.updateGlobalSettings({ autoBackup: adminStore.globalSettings.autoBackup })" >
+                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"/>
                   </label>
                 </div>
                 <div class="flex items-center justify-between">
@@ -442,9 +444,10 @@
                     <p class="text-xs text-stone-400 font-light">在預覽中顯示 EXIF 資訊</p>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="sr-only peer"
-                      @change="adminStore.updateGlobalSettings({ showImageInfo: adminStore.globalSettings.showImageInfo })" />
-                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                    <input
+v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="sr-only peer"
+                      @change="adminStore.updateGlobalSettings({ showImageInfo: adminStore.globalSettings.showImageInfo })" >
+                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"/>
                   </label>
                 </div>
               </div>
@@ -458,13 +461,15 @@
                   <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">主題</label>
                   <div class="flex space-x-4">
                     <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
-                      <input v-model="adminStore.globalSettings.theme" type="radio" value="light" class="mr-2 text-amber-500 focus:ring-amber-400"
-                        @change="adminStore.updateGlobalSettings({ theme: 'light' })" />
+                      <input
+v-model="adminStore.globalSettings.theme" type="radio" value="light" class="mr-2 text-amber-500 focus:ring-amber-400"
+                        @change="adminStore.updateGlobalSettings({ theme: 'light' })" >
                       淺色
                     </label>
                     <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
-                      <input v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 text-amber-500 focus:ring-amber-400"
-                        @change="adminStore.updateGlobalSettings({ theme: 'dark' })" />
+                      <input
+v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 text-amber-500 focus:ring-amber-400"
+                        @change="adminStore.updateGlobalSettings({ theme: 'dark' })" >
                       深色
                     </label>
                   </div>
@@ -473,8 +478,8 @@
                   <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">語言</label>
                   <select
                     v-model="adminStore.globalSettings.language"
-                    @change="adminStore.updateGlobalSettings({ language: adminStore.globalSettings.language })"
                     class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                    @change="adminStore.updateGlobalSettings({ language: adminStore.globalSettings.language })"
                   >
                     <option value="zh-TW">繁體中文</option>
                     <option value="zh-CN">簡體中文</option>
@@ -545,23 +550,14 @@ const handleImageError = (event: Event) => {
   img.style.display = 'none'
 }
 
-// 格式化日期
-const formatDate = (dateString: string) => {
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'short', day: 'numeric' })
-  } catch {
-    return dateString
-  }
-}
-
 // 概覽分組（用於事件數量顯示）
 const groupedOverviewData = computed(() => {
   const data = adminStore.currentOverviewData || []
   const events = new Set<string>()
   data.forEach(item => {
-    if ((item as any).event?.name) {
-      events.add((item as any).event.name)
+    const itemEv = item as { event?: { name?: string }; time: string }
+    if (itemEv.event?.name) {
+      events.add(itemEv.event.name)
     } else {
       const year = new Date(item.time).getFullYear()
       events.add(`${year}年`)

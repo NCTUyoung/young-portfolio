@@ -1,5 +1,6 @@
 <template>
-  <div v-show="showNavigator && currentViewerImage"
+  <div
+v-show="showNavigator && currentViewerImage"
        class="navigator-panel fixed z-40 select-none"
        :style="{
          left: navigatorX + 'px',
@@ -7,44 +8,48 @@
          transition: navigatorDragging ? 'none' : 'all 0.2s ease'
        }"
        @wheel.stop>
-    <div class="bg-black bg-opacity-80 backdrop-blur-sm rounded-lg border border-white border-opacity-20 p-2"
-         @mousedown="handleNavigatorMouseDown"
-         :class="{ 'cursor-move': !navigatorDragging, 'cursor-grabbing': navigatorDragging }">
+    <div
+class="bg-black bg-opacity-80 backdrop-blur-sm rounded-lg border border-white border-opacity-20 p-2"
+         :class="{ 'cursor-move': !navigatorDragging, 'cursor-grabbing': navigatorDragging }"
+         @mousedown="handleNavigatorMouseDown">
       <div class="text-white text-xs mb-2 px-1 flex items-center justify-between">
         <span>導覽器</span>
         <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
         </svg>
       </div>
       <div ref="navigatorElement" class="relative w-32 h-32 overflow-hidden rounded border border-gray-600">
         <!-- 導覽器縮圖 -->
-        <img v-if="currentViewerImage"
+        <img
+v-if="currentViewerImage"
              ref="navigatorImageElement"
              :src="getImagePath(currentViewerImage.filename)"
              :alt="currentViewerImage.title"
              class="w-full h-full object-contain cursor-pointer"
-             @click="handleNavigatorClick"
-             draggable="false" />
+             draggable="false"
+             @click="handleNavigatorClick" >
 
         <!-- 可視區域指示框 -->
-        <div v-if="navigatorViewport"
+        <div
+v-if="navigatorViewport"
              class="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 pointer-events-none"
              :style="{
                left: navigatorViewport.left + 'px',
                top: navigatorViewport.top + 'px',
                width: navigatorViewport.width + 'px',
                height: navigatorViewport.height + 'px'
-             }"></div>
+             }"/>
       </div>
 
       <!-- 導覽器控制 -->
       <div class="flex items-center justify-between mt-2 text-xs text-gray-300">
         <span>{{ Math.round(viewerScale * 100) }}%</span>
-        <button @click="resetTransform"
-                class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors"
-                title="重置">
+        <button
+class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors"
+                title="重置"
+                @click="resetTransform">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
         </button>
       </div>
@@ -70,7 +75,6 @@ const {
   viewerTranslateY,
   showInfoPanel,
   infoPanelWidth,
-  dragSensitivity
 } = storeToRefs(imageViewerStore)
 
 const { resetTransform } = imageViewerStore

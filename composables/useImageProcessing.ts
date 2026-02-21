@@ -6,7 +6,6 @@ import {
   ISO_CATEGORIES,
   TAG_PRIORITY
 } from '~/config/constants'
-import { formatDateKey } from '~/utils/formatters'
 
 /**
  * 圖片處理相關的 composable
@@ -24,7 +23,7 @@ export const useImageProcessing = () => {
    * 根據焦距分類鏡頭類型
    */
   const categorizeFocalLength = (focalLength: number): string => {
-    for (const [key, category] of Object.entries(FOCAL_LENGTH_CATEGORIES)) {
+    for (const [_key, category] of Object.entries(FOCAL_LENGTH_CATEGORIES)) {
       if ('max' in category && focalLength <= category.max) {
         return category.label
       }
@@ -205,7 +204,7 @@ export const useImageProcessing = () => {
   /**
    * 驗證和清理 EXIF 數據
    */
-  const normalizeExifData = (exif: any): ExifData => {
+  const normalizeExifData = (exif: Record<string, unknown>): ExifData => {
     return {
       Make: exif?.Make || '',
       Model: exif?.Model || '',

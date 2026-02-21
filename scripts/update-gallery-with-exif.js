@@ -114,7 +114,7 @@ async function updateGalleryWithExif() {
           creationDate = await getWindowsFileCreationDate(filePath);
           console.log(`🗂️ ${filename}: 使用檔案系統日期 ${formatDate(creationDate)}`);
         }
-      } catch (error) {
+      } catch {
         // EXIF 讀取失敗，使用 Windows 系統的建立時間
         creationDate = await getWindowsFileCreationDate(filePath);
         console.log(`❌ ${filename}: EXIF 讀取失敗，使用檔案系統日期 ${formatDate(creationDate)}`);

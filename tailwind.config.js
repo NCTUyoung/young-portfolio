@@ -10,6 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // 日式字型 — Noto Serif JP 用於引言、漢字裝飾
+      fontFamily: {
+        jp: ['Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'serif'],
+      },
       // 暖調點綴色 — 赤陶 / 琥珀系
       colors: {
         accent: {

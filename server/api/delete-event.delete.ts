@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
-import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'DELETE') {
@@ -17,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const jsonFileName = category === 'photography' ? 'photographyList.json' : 'galleryList.json'
     const jsonPath = `./public/${jsonFileName}`
 
-    let categoryData: any
+    let categoryData: { Img: Record<string, unknown>[]; totalNumber: string; eventStats?: Record<string, unknown> }
     try {
       const jsonContent = readFileSync(jsonPath, 'utf-8')
       categoryData = JSON.parse(jsonContent)
@@ -26,15 +25,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // 找出屬於該事件的所有圖片
-    const toDelete: any[] = []
-    const remaining: any[] = []
+    const toDelete: Record<string, unknown>[] = []
+    const remaining: Record<string, unknown>[] = []
 
-    categoryData.Img.forEach((img: any) => {
+    categoryData.Img.forEach((img) => {
+      const imgWithEvent = img as Record<string, unknown> & { event?: { name?: string }; time?: string; filename?: string }
       let imgEvent = ''
-      if (img.event?.name) {
-        imgEvent = img.event.name
+      if (imgWithEvent.event?.name) {
+        imgEvent = imgWithEvent.event.name
       } else if (category === 'gallery') {
-        const year = new Date(img.time).getFullYear()
+        const year = new Date(imgWithEvent.time as string).getFullYear()
         imgEvent = `${year}年電繪作品`
       } else {
         imgEvent = '預設事件'
@@ -54,13 +54,14 @@ export default defineEventHandler(async (event) => {
     // 刪除實體檔案
     let deletedFiles = 0
     for (const img of toDelete) {
-      const imagePath = `./public/images/${img.filename}`
+      const { filename } = img as { filename?: string }
+      const imagePath = `./public/images/${filename}`
       if (existsSync(imagePath)) {
         try {
           unlinkSync(imagePath)
           deletedFiles++
         } catch (e) {
-          console.warn(`Failed to delete file: ${img.filename}`, e)
+          console.warn(`Failed to delete file: ${filename}`, e)
         }
       }
     }
@@ -71,7 +72,7 @@ export default defineEventHandler(async (event) => {
 
     // 清除 eventStats
     if (categoryData.eventStats && categoryData.eventStats[eventName]) {
-      delete categoryData.eventStats[eventName]
+      Reflect.deleteProperty(categoryData.eventStats, eventName)
     }
 
     writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
@@ -81,8 +82,9 @@ export default defineEventHandler(async (event) => {
       message: `成功刪除事件「${eventName}」，共刪除 ${toDelete.length} 張圖片（${deletedFiles} 個檔案）`,
       deletedCount: toDelete.length
     }
-  } catch (error: any) {
-    if (error.statusCode) throw error
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; message?: string }
+    if (err.statusCode) throw error
     throw createError({
       statusCode: 500,
       statusMessage: '刪除事件失敗: ' + (error instanceof Error ? error.message : String(error))

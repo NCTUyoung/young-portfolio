@@ -33,14 +33,14 @@
         <!-- Actions -->
         <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
           <button
-            @click="cancel"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+            @click="cancel"
           >
             取消
           </button>
           <button
-            @click="confirm"
             class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            @click="confirm"
           >
             確定刪除
           </button>
@@ -58,18 +58,13 @@ interface Props {
   details?: string
 }
 
-interface Emits {
-  (e: 'confirm'): void
-  (e: 'cancel'): void
-}
-
 withDefaults(defineProps<Props>(), {
   title: '確認操作',
   message: '您確定要執行此操作嗎？',
   details: ''
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{ (e: 'confirm' | 'cancel'): void }>()
 
 const confirm = () => {
   emit('confirm')

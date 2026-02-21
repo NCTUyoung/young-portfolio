@@ -17,11 +17,11 @@
             :src="file.preview"
             :alt="file.name"
             class="w-full h-44 object-cover"
-          />
+          >
           <button
-            @click="adminStore.removeFile(index)"
             class="absolute top-2 right-2 p-1.5 bg-white/80 text-stone-500 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors duration-200 shadow-sm"
             title="移除"
+            @click="adminStore.removeFile(index)"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -38,7 +38,7 @@
               type="text"
               class="w-full px-2.5 py-1.5 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
               :placeholder="file.name.split('.')[0]"
-            />
+            >
           </div>
           <div>
             <label class="block text-xs font-light text-stone-400 mb-1 tracking-wide">描述</label>
@@ -60,7 +60,7 @@
                 v-model="file.creationDate"
                 type="date"
                 class="w-full px-2.5 py-1.5 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
-              />
+              >
               <p class="text-xs text-stone-400 font-light mt-1">已從檔案修改時間自動推斷，可依需求調整</p>
             </div>
             <div>
@@ -88,7 +88,7 @@
               type="text"
               class="w-full px-2.5 py-1.5 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
               placeholder="例如：人像,街拍"
-            />
+            >
             <p class="text-xs text-stone-400 font-light mt-1">相機資訊會自動從照片讀取</p>
           </div>
         </div>

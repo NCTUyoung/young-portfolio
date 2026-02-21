@@ -1,5 +1,5 @@
 {
-  "totalNumber": "26",
+  "totalNumber": "30",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
@@ -7,7 +7,8 @@
     "2025 桃園三本柱": 5,
     "攝影社 米倉團拍": 4,
     "調色測試": 3,
-    "交大外拍": 5
+    "交大外拍": 5,
+    "2025 聖誕台北": 4
   },
   "Img": [
     {
@@ -581,6 +582,97 @@
       "aperture": 6.3,
       "iso": 100,
       "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/2025 聖誕台北/DSC_6432-編輯-1.jpg",
+      "time": "2025 Dec 13",
+      "title": "DSC_6432-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "超廣角",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 聖誕台北",
+        "description": "探訪聖誕樹",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 16,
+      "aperture": 3.5,
+      "iso": 200,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/2025 聖誕台北/DSC_6418-編輯-編輯-1.jpg",
+      "time": "2025 Dec 13",
+      "title": "DSC_6418-編輯-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 聖誕台北",
+        "description": "探訪聖誕樹",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 74,
+      "aperture": 4.5,
+      "iso": 2000,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/2025 聖誕台北/DSC_6428-編輯-1.jpg",
+      "time": "2025 Dec 13",
+      "title": "DSC_6428-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "超廣角",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 聖誕台北",
+        "description": "探訪聖誕樹",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 16,
+      "aperture": 3.5,
+      "iso": 200,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/2025 聖誕台北/DSC_6424-編輯-1.jpg",
+      "time": "2025 Dec 13",
+      "title": "DSC_6424-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "超廣角",
+        "淺景深",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "2025 聖誕台北",
+        "description": "探訪聖誕樹",
+        "location": "台北市"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 16,
+      "aperture": 1.9,
+      "iso": 200,
+      "shutterSpeed": 0.004
     }
   ]
 }

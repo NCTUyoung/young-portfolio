@@ -82,7 +82,6 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
 
   // 選擇框樣式計算
   const selectionBoxStyle = computed(() => {
-    const rect = selectionRect.value
     return {
       left: Math.min(selectionStart.value.x, selectionEnd.value.x) + 'px',
       top: Math.min(selectionStart.value.y, selectionEnd.value.y) + 'px',
@@ -457,7 +456,7 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
 
       // 清空位置映射
       Object.keys(posMap).forEach(key => {
-        delete posMap[Number(key)]
+        Reflect.deleteProperty(posMap, Number(key))
       })
 
       // 插值動畫
@@ -485,7 +484,7 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
 
     // 清空現有的位置映射
     Object.keys(posMap).forEach(key => {
-      delete posMap[Number(key)]
+      Reflect.deleteProperty(posMap, Number(key))
     })
 
     // 為可見的圖片計算位置

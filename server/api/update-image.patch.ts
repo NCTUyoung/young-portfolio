@@ -2,6 +2,9 @@ import { readFileSync, writeFileSync } from 'fs'
 import type { PhotographyData, GalleryData } from '~/types/gallery'
 import { formatDateFull } from '~/utils/formatters'
 
+type ImgRecord = Record<string, unknown>
+type CategoryData = (PhotographyData | GalleryData) & { Img: ImgRecord[] }
+
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'PATCH') {
     throw createError({
@@ -28,11 +31,11 @@ export default defineEventHandler(async (event) => {
     const jsonPath = `./public/${jsonFileName}`
 
     // 讀取 JSON 數據
-    let categoryData
+    let categoryData: CategoryData
     try {
       const jsonContent = readFileSync(jsonPath, 'utf-8')
       categoryData = JSON.parse(jsonContent)
-    } catch (error) {
+    } catch {
       throw createError({
         statusCode: 404,
         statusMessage: '找不到圖庫資料檔案'
@@ -40,7 +43,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 找到要更新的圖片
-    const imageIndex = categoryData.Img.findIndex((img: any) => img.filename === filename)
+    const imageIndex = categoryData.Img.findIndex((img) => img.filename === filename)
     if (imageIndex === -1) {
       throw createError({
         statusCode: 404,
@@ -49,7 +52,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 處理更新數據
-    const processedUpdates = { ...updates }
+    const processedUpdates: Record<string, unknown> = { ...updates }
 
     // 如果有日期更新，轉換為正確格式
     if (updates.date) {
@@ -60,15 +63,15 @@ export default defineEventHandler(async (event) => {
         const formattedDate = formatDateFull(date)
         console.log('Formatted date:', formattedDate)
         processedUpdates.time = formattedDate
-        delete processedUpdates.date // 移除原始 date 字段
-      } catch (error) {
-        console.warn('Invalid date format:', updates.date, error)
+        Reflect.deleteProperty(processedUpdates, 'date') // 移除原始 date 字段
+      } catch (err) {
+        console.warn('Invalid date format:', updates.date, err)
       }
     }
 
     // 更新圖片資訊
     const originalImage = categoryData.Img[imageIndex]
-    const updatedImage = { ...originalImage, ...processedUpdates }
+    const updatedImage: ImgRecord = { ...originalImage, ...processedUpdates }
 
     // 如果是攝影作品且有標籤更新，需要處理標籤格式
     if (category === 'photography' && updates.tags) {
@@ -92,11 +95,10 @@ export default defineEventHandler(async (event) => {
       message: '圖片資訊更新成功',
       updatedImage
     }
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update image error:', error)
-
-    if (error.statusCode) {
+    const err = error as { statusCode?: number }
+    if (err.statusCode) {
       throw error
     }
 

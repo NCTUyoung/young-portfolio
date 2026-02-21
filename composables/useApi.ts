@@ -10,7 +10,7 @@ export const useApi = () => {
   const toast = useGlobalToast()
 
   // 創建帶有錯誤處理和重試的 API 請求方法
-  const createApiRequest = <T = any>(
+  const createApiRequest = <T = unknown>(
     requestFn: () => Promise<T>,
     options: {
       retries?: number
@@ -36,7 +36,7 @@ export const useApi = () => {
       isLoading.value = true
       error.value = null
 
-      let lastError: any
+      let lastError: unknown
 
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
@@ -52,7 +52,7 @@ export const useApi = () => {
           }
 
           return result
-        } catch (err: any) {
+        } catch (err: unknown) {
           lastError = err
           console.warn(`API request attempt ${attempt + 1} failed:`, err)
 
@@ -64,7 +64,7 @@ export const useApi = () => {
       }
 
       // 所有重試都失敗了
-      const finalErrorMessage = errorMessage || lastError?.message || ERROR_MESSAGES.network
+      const finalErrorMessage = errorMessage || (lastError instanceof Error ? lastError.message : null) || ERROR_MESSAGES.network
       error.value = finalErrorMessage
 
       if (showToast) {
@@ -126,7 +126,7 @@ export const useApi = () => {
   }
 
   // 圖片更新方法
-  const updateImage = (imageData: any) => {
+  const updateImage = (imageData: Record<string, unknown>) => {
     return createApiRequest(
       () => $fetch('/api/update-image', {
         method: 'PATCH',
@@ -141,7 +141,7 @@ export const useApi = () => {
   }
 
   // 事件更新方法
-  const updateEvent = (eventData: any) => {
+  const updateEvent = (eventData: Record<string, unknown>) => {
     return createApiRequest(
       () => $fetch('/api/update-event', {
         method: 'PATCH',
@@ -171,7 +171,7 @@ export const useApi = () => {
     for (let i = 0; i < requests.length; i += concurrent) {
       const batch = requests.slice(i, i + concurrent)
 
-      const batchPromises = batch.map(async (request, index) => {
+      const batchPromises = batch.map(async (request, _index) => {
         try {
           const result = await request()
           completed++

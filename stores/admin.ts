@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed } from 'vue'
 import type { FileWithMeta, GalleryItem, PhotographyItem, CategoryType } from '~/types/gallery'
 
 type UnifiedGalleryItem = GalleryItem | PhotographyItem
@@ -112,8 +112,9 @@ export const useAdminStore = defineStore('admin', () => {
       let location = ''
 
       // 檢查是否有事件資訊 - 攝影和電繪作品都支援事件
-      if ((item as any).event) {
-        const event = (item as any).event
+      const itemWithEvent = item as GalleryItem & { event?: { name?: string; description?: string; location?: string } }
+      if (itemWithEvent.event) {
+        const event = itemWithEvent.event
         currentEventName = event.name || '預設事件'
         description = event.description || '未分類作品'
         location = event.location || ''
@@ -165,8 +166,9 @@ export const useAdminStore = defineStore('admin', () => {
     const events = new Set<string>()
 
     data.forEach(item => {
-      if ((item as any).event) {
-        events.add((item as any).event.name || '預設事件')
+      const itemEv = item as GalleryItem & { event?: { name?: string } }
+      if (itemEv.event) {
+        events.add(itemEv.event.name || '預設事件')
       } else if (manageCategory.value === 'gallery') {
         // 電繪作品按年份分組
         const year = new Date(item.time).getFullYear()
@@ -186,7 +188,7 @@ export const useAdminStore = defineStore('admin', () => {
     return {
       totalImages: data.length,
       uniqueCameras: overviewCategory.value === 'photography'
-        ? Array.from(new Set(data.map(item => (item as any).camera).filter(c => c && c !== 'Unknown')))
+        ? Array.from(new Set(data.map(item => (item as GalleryItem & { camera?: string }).camera).filter(c => c && c !== 'Unknown')))
         : [],
       uniqueColors: overviewCategory.value === 'gallery'
         ? Array.from(new Set(data.map(item => (item as GalleryItem).color).filter(c => c)))
@@ -200,7 +202,7 @@ export const useAdminStore = defineStore('admin', () => {
         }).length
       })(),
       events: overviewCategory.value === 'photography'
-        ? Array.from(new Set(data.map(item => (item as any).event?.name).filter(e => e)))
+        ? Array.from(new Set(data.map(item => (item as GalleryItem & { event?: { name?: string } }).event?.name).filter(e => e)))
         : []
     }
   })
@@ -219,8 +221,9 @@ export const useAdminStore = defineStore('admin', () => {
     const events = new Set<string>()
 
     data.forEach(item => {
-      if ((item as any).event && (item as any).event.name) {
-        events.add((item as any).event.name)
+      const pe = item as GalleryItem & { event?: { name?: string } }
+      if (pe.event && pe.event.name) {
+        events.add(pe.event.name)
       }
     })
 
@@ -338,7 +341,7 @@ export const useAdminStore = defineStore('admin', () => {
 
           // 如果是攝影分類，添加攝影專用欄位
           if (uploadCategory.value === 'photography') {
-            (newFile as any).tags = ''
+            newFile.tags = ''
           } else {
             // 如果是繪圖分類，從 file.lastModified 推斷創作日期
             // lastModified 為檔案最後修改時間（毫秒），通常接近創作時間
@@ -628,9 +631,9 @@ export const useAdminStore = defineStore('admin', () => {
 
         // 分類特定更新
         if (manageCategory.value === 'gallery' && updateData.color) {
-          (updatedImage as any).color = updateData.color
+          (updatedImage as GalleryItem & { color?: string }).color = updateData.color
         } else if (manageCategory.value === 'photography' && updateData.tags) {
-          (updatedImage as any).tags = updateData.tags
+          (updatedImage as GalleryItem & { tags?: string }).tags = updateData.tags
         }
 
         console.log('更新後的圖片:', updatedImage)
@@ -667,7 +670,7 @@ export const useAdminStore = defineStore('admin', () => {
           category: manageCategory.value,
           updates: updateData
         }
-      }) as { success: boolean; message: string; updatedImage: any }
+      }) as { success: boolean; message: string; updatedImage: GalleryItem }
 
       if (!response.success) {
         // 如果 API 失敗，回滾本地更新並顯示錯誤
@@ -748,7 +751,8 @@ export const useAdminStore = defineStore('admin', () => {
     const dataArray = manageCategory.value === 'gallery' ? galleryData.value : photographyData.value
     // 依照 newOrder 重新排列同一 event 的圖片
     const eventItems = dataArray.filter(img => {
-      if ((img as any).event?.name) return (img as any).event.name === eventName
+      const imgEv = img as GalleryItem & { event?: { name?: string } }
+      if (imgEv.event?.name) return imgEv.event.name === eventName
       const year = new Date(img.time).getFullYear()
       return `${year}年電繪作品` === eventName
     })

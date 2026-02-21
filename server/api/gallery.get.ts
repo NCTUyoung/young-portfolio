@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
     // 確保圖片按時間排序（新到舊）
     if (categoryData.Img && Array.isArray(categoryData.Img)) {
-      categoryData.Img.sort((a: any, b: any) => {
+      categoryData.Img.sort((a: { time: string }, b: { time: string }) => {
         return new Date(b.time).getTime() - new Date(a.time).getTime()
       })
     }

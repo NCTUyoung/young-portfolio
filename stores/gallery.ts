@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { useLocalStorage, useDebounceFn } from '@vueuse/core'
-import { useApi } from '~/composables/useApi'
 import {
   sortImagesByTime,
   calculateTimeRange
@@ -13,7 +12,11 @@ import type {
   PhotoEvent,
   EventGroup,
   MixedPhotoItem,
-  FilterState
+  FilterState,
+  DigitalArtItem,
+  PhotographyItem,
+  GalleryData,
+  PhotographyData
 } from '~/types/gallery'
 
 // 類型定義已移至 types/gallery.ts，通過上方 import 語句導入
@@ -22,7 +25,7 @@ import type {
 // 在 return 語句中會重新導出以保持向後兼容
 
 // 數據轉換工具函數
-const transformDigitalWork = (img: any): GalleryItem => ({
+const transformDigitalWork = (img: DigitalArtItem): GalleryItem => ({
   id: generateImageId('digital', img.filename),
   filename: img.filename,
   title: img.title,
@@ -35,7 +38,7 @@ const transformDigitalWork = (img: any): GalleryItem => ({
   visible: true
 })
 
-const transformPhotographyWork = (img: any): GalleryItem => ({
+const transformPhotographyWork = (img: PhotographyItem): GalleryItem => ({
   id: generateImageId('photography', img.filename),
   filename: img.filename,
   title: img.title,
@@ -55,7 +58,7 @@ const transformPhotographyWork = (img: any): GalleryItem => ({
 })
 
 // 在不同環境下穩健載入 JSON（本機 dev / GitHub Pages）
-const fetchJsonWithFallback = async (filename: string): Promise<any> => {
+const fetchJsonWithFallback = async (filename: string): Promise<unknown> => {
   const candidates = [
     // GitHub Pages 專案頁面（/young-portfolio/）
     `/young-portfolio/${filename}`,
@@ -65,12 +68,10 @@ const fetchJsonWithFallback = async (filename: string): Promise<any> => {
     filename
   ]
 
-  let lastError: any = null
+  let lastError: unknown = null
 
   for (const path of candidates) {
     try {
-      // eslint-disable-next-line no-console
-      console.debug('[gallery] trying JSON path:', path)
       return await $fetch(path)
     } catch (error) {
       lastError = error
@@ -81,7 +82,7 @@ const fetchJsonWithFallback = async (filename: string): Promise<any> => {
 }
 
 const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const data: any = await fetchJsonWithFallback('galleryList.json')
+  const data = await fetchJsonWithFallback('galleryList.json') as GalleryData
 
   const works = sortImagesByTime(
     data.Img.map(transformDigitalWork)
@@ -94,7 +95,7 @@ const fetchDigitalWorks = async (): Promise<{ works: GalleryItem[], eventStats: 
 }
 
 const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> => {
-  const data: any = await fetchJsonWithFallback('photographyList.json')
+  const data = await fetchJsonWithFallback('photographyList.json') as PhotographyData
 
   const works = sortImagesByTime(
     data.Img.map(transformPhotographyWork)
@@ -107,9 +108,6 @@ const fetchPhotographyWorks = async (): Promise<{ works: GalleryItem[], eventSta
 }
 
 export const useGalleryStore = defineStore('gallery', () => {
-  // 使用新的 API composable
-  const api = useApi()
-
   // 基本狀態
   const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
   const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
@@ -134,8 +132,8 @@ export const useGalleryStore = defineStore('gallery', () => {
     try {
       const result = await fetchDigitalWorks()
       digitalData.value = result
-    } catch (error: any) {
-      digitalError.value = error.message || '載入數位作品失敗'
+    } catch (error: unknown) {
+      digitalError.value = error instanceof Error ? error.message : '載入數位作品失敗'
     } finally {
       isLoadingDigital.value = false
     }
@@ -148,8 +146,8 @@ export const useGalleryStore = defineStore('gallery', () => {
     try {
       const result = await fetchPhotographyWorks()
       photographyData.value = result
-    } catch (error: any) {
-      photographyError.value = error.message || '載入攝影作品失敗'
+    } catch (error: unknown) {
+      photographyError.value = error instanceof Error ? error.message : '載入攝影作品失敗'
     } finally {
       isLoadingPhotography.value = false
     }
@@ -272,7 +270,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     currentWorks.value.forEach(work => {
       let groupKey = 'no-event'
       let groupName: string | null = null
-      let eventInfo: any = null
+      let eventInfo: PhotoEvent | undefined = undefined
 
       if (work.event) {
         groupKey = work.event.name
@@ -507,40 +505,6 @@ export const useGalleryStore = defineStore('gallery', () => {
     shouldShowEventOnTimeline,
     refreshData,
     clearCache,
-
-    // 重新導出工具函數以保持向後兼容（這些函數現在來自 utils/galleryUtils.ts）
-    formatDate: (date: Date) => {
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      return `${month}/${day}`
-    },
-    formatShutterSpeed: (speed: number) => {
-      if (speed >= 1) return `${speed}s`
-      return `1/${Math.round(1 / speed)}`
-    },
-    formatCameraName: (camera: string, model: string) => {
-      if (camera === 'NIKON CORPORATION') return model || 'Nikon Camera'
-      return `${camera} ${model}`.trim()
-    },
-    getDisplayTitle: (image: GalleryItem) => {
-      if (image.camera) {
-        const number = image.filename.match(/DSC_(\d+)/)?.[1]
-        return number ? `攝影 #${number}` : '攝影作品'
-      }
-      return image.title
-    },
-    getPrimaryTag: (image: GalleryItem) => {
-      if (!image.tags || image.tags.length === 0) return null
-      const priority = ['後製', '夜拍', '人像', '望遠', '廣角', '淺景深', '標準', '日光']
-      for (const tag of priority) {
-        if (image.tags.includes(tag)) return tag
-      }
-      return image.tags[0]
-    },
-    getImageClass: (index: number) => {
-      const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56']
-      return classes[index % classes.length]
-    },
 
     digitalError,
     photographyError
