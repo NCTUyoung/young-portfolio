@@ -233,8 +233,8 @@ export const useAdminStore = defineStore('admin', () => {
   // ===== Actions =====
 
     // 載入指定分類的圖片列表
-  const loadGalleryByCategory = async (category: CategoryType) => {
-    if (loading.value) return // 防止重複載入
+  const loadGalleryByCategory = async (category: CategoryType, options?: { force?: boolean }) => {
+    if (loading.value && !options?.force) return // 防止重複載入（force 時強制重新載入）
 
     loading.value = true
     try {
@@ -489,8 +489,8 @@ export const useAdminStore = defineStore('admin', () => {
         messageType.value = 'success'
         showEventEditDialog.value = false
         editingEventData.value = null
-        // 重新載入圖片列表
-        await loadGalleryByCategory(manageCategory.value)
+        // 強制重新載入圖片列表以取得更新後的事件資訊
+        await loadGalleryByCategory(manageCategory.value, { force: true })
       }
     } catch (error) {
       console.error('Update event failed:', error)
@@ -533,8 +533,7 @@ export const useAdminStore = defineStore('admin', () => {
       if (response.success) {
         message.value = '圖片刪除成功'
         messageType.value = 'success'
-        // 重新載入圖片列表
-        await loadGalleryByCategory(manageCategory.value)
+        await loadGalleryByCategory(manageCategory.value, { force: true })
       }
     } catch (error) {
       console.error('Delete failed:', error)
@@ -673,11 +672,9 @@ export const useAdminStore = defineStore('admin', () => {
       }) as { success: boolean; message: string; updatedImage: GalleryItem }
 
       if (!response.success) {
-        // 如果 API 失敗，回滾本地更新並顯示錯誤
         message.value = '同步到伺服器失敗，請重新整理頁面'
         messageType.value = 'error'
-        // 重新載入數據
-        await loadGalleryByCategory(manageCategory.value)
+        await loadGalleryByCategory(manageCategory.value, { force: true })
       }
     } catch (error) {
       console.error('API 同步失敗:', error)
@@ -706,7 +703,7 @@ export const useAdminStore = defineStore('admin', () => {
       if (response.success) {
         message.value = response.message
         messageType.value = 'success'
-        await loadGalleryByCategory(manageCategory.value)
+        await loadGalleryByCategory(manageCategory.value, { force: true })
       }
     } catch (error) {
       console.error('Delete event failed:', error)
@@ -736,7 +733,7 @@ export const useAdminStore = defineStore('admin', () => {
       }
       message.value = `成功刪除 ${successCount} 張圖片`
       messageType.value = 'success'
-      await loadGalleryByCategory(manageCategory.value)
+      await loadGalleryByCategory(manageCategory.value, { force: true })
     } catch (error) {
       console.error('Batch delete failed:', error)
       message.value = '批次刪除失敗'

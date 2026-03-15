@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <!-- 工具列：搜尋 + 批次模式 -->
     <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
@@ -150,11 +150,14 @@
           </div>
         </div>
 
-        <!-- 圖片區域 -->
-        <div
-          v-if="adminStore.expandedEvents.includes(group.eventName)"
-          class="p-4 bg-stone-50/30"
-        >
+        <!-- 圖片區域 — 日式過場：紙の展開 + 頂線裝飾 -->
+        <Transition name="collapse-fade">
+          <div
+            v-if="adminStore.expandedEvents.includes(group.eventName)"
+            class="collapse-content-admin relative p-4 bg-stone-50/30 overflow-hidden"
+          >
+            <!-- 頂線裝飾 — 隨內容淡入 -->
+            <div class="collapse-accent-line-admin absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-400/50 to-transparent opacity-0" />
           <!-- 網格檢視 -->
           <div v-if="adminStore.manageViewMode === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             <div
@@ -282,6 +285,7 @@
             </div>
           </div>
         </div>
+        </Transition>
       </div>
     </template>
 
@@ -510,6 +514,33 @@ const formatDate = (dateString: string) => {
 .slide-up-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(20px);
+}
+
+/* 日式過場：紙の展開 + 頂線裝飾 */
+.collapse-fade-enter-active {
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.collapse-fade-enter-active .collapse-accent-line-admin {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+  opacity: 1;
+}
+.collapse-fade-leave-active {
+  transition: opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.collapse-fade-leave-active .collapse-accent-line-admin {
+  transition: opacity 0.12s ease-out;
+  opacity: 0;
+}
+.collapse-fade-enter-from,
+.collapse-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+}
+.collapse-fade-enter-from .collapse-accent-line-admin,
+.collapse-fade-leave-to .collapse-accent-line-admin {
+  opacity: 0;
 }
 </style>
 

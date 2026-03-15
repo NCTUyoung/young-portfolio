@@ -330,23 +330,32 @@ export const useGalleryStore = defineStore('gallery', () => {
 
   const availableEvents = computed(() => {
     const eventCounts = new Map<string, number>()
+    const eventLatestTime = new Map<string, number>()
     const category = filterState.value.selectedCategory
+
+    const recordEvent = (work: GalleryItem) => {
+      if (!work.event) return
+
+      const name = work.event.name
+      const currentCount = eventCounts.get(name) || 0
+      eventCounts.set(name, currentCount + 1)
+
+      const time = new Date(work.time).getTime()
+      const latest = eventLatestTime.get(name) ?? -Infinity
+      if (time > latest) {
+        eventLatestTime.set(name, time)
+      }
+    }
 
     if (category === 'all' || category === 'digital') {
       digitalWorks.value.forEach(work => {
-        if (work.event) {
-          const count = eventCounts.get(work.event.name) || 0
-          eventCounts.set(work.event.name, count + 1)
-        }
+        recordEvent(work)
       })
     }
 
     if (category === 'all' || category === 'photography') {
       photographyWorks.value.forEach(work => {
-        if (work.event) {
-          const count = eventCounts.get(work.event.name) || 0
-          eventCounts.set(work.event.name, count + 1)
-        }
+        recordEvent(work)
       })
     }
 
@@ -369,8 +378,17 @@ export const useGalleryStore = defineStore('gallery', () => {
       })
     }
 
-    // 其他類別保持原有的字母順序
-    return events.sort((a, b) => a.name.localeCompare(b.name))
+    // 其他類別依事件「最新作品時間」倒序排列（較新的事件在前），若時間相同再用名稱排序
+    return events.sort((a, b) => {
+      const timeA = eventLatestTime.get(a.name) ?? 0
+      const timeB = eventLatestTime.get(b.name) ?? 0
+
+      if (timeA !== timeB) {
+        return timeB - timeA
+      }
+
+      return a.name.localeCompare(b.name)
+    })
   })
 
   const availableYears = computed(() => {

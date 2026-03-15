@@ -29,7 +29,7 @@
                 ? 'border-amber-500 text-stone-900'
                 : 'border-transparent text-stone-400 hover:text-stone-700 hover:border-stone-300'
             ]"
-            @click="activeTab = tab.id"
+            @click="setActiveTab(tab.id)"
           >
             <svg v-if="tab.id === 'overview'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -59,105 +59,118 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
     <main class="max-w-7xl mx-auto px-6 pb-12">
       <div class="bg-white rounded-b-xl border border-stone-200 border-t-0">
 
-        <!-- 概覽頁面 -->
-        <section v-if="activeTab === 'overview'" class="p-8">
-          <!-- 頁面標題和控制 -->
-          <header class="mb-8 flex justify-between items-start">
-            <div>
-              <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">系統概覽</h2>
-              <p class="text-stone-400 text-sm font-light">查看整體數據統計</p>
-            </div>
-            <div class="flex items-center space-x-3">
-              <select
-                v-model="adminStore.overviewCategory"
-                class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                @change="adminStore.handleOverviewCategoryChange(adminStore.overviewCategory)"
+        <!-- 概覽頁面 — 日式排版 -->
+        <section v-if="visitedTabs.has('overview')" v-show="activeTab === 'overview'" class="p-8 md:p-10">
+          <!-- 頂部裝飾細線 -->
+          <div class="deco-line-h w-full mb-6" />
+
+          <!-- 小標 + 分類切換（底線 Tab 風格） -->
+          <header class="mb-10">
+            <p class="jp-section-label mb-4">Overview</p>
+            <div class="flex flex-wrap items-center gap-x-1 gap-y-2">
+              <button
+                v-for="cat in [{ id: 'gallery', name: '繪圖作品' }, { id: 'photography', name: '攝影作品' }]"
+                :key="cat.id"
+                class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 rounded-none"
+                :class="adminStore.overviewCategory === cat.id
+                  ? 'text-stone-800'
+                  : 'text-stone-400 hover:text-stone-600'"
+                @click="adminStore.overviewCategory = cat.id; adminStore.handleOverviewCategoryChange(cat.id)"
               >
-                <option value="gallery">繪圖作品</option>
-                <option value="photography">攝影作品</option>
-              </select>
+                <span
+                  :class="[
+                    'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-300 ease-out',
+                    adminStore.overviewCategory === cat.id
+                      ? 'w-full bg-gradient-to-r from-transparent via-amber-500 to-transparent'
+                      : 'w-0 bg-transparent'
+                  ]"
+                />
+                <span class="text-sm">{{ cat.name }}</span>
+              </button>
             </div>
           </header>
 
-          <!-- 統計卡片 -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="border border-stone-100 rounded-xl p-5 bg-stone-50">
-              <p class="text-xs text-stone-400 font-light tracking-wider uppercase mb-2">總圖片數</p>
-              <p class="text-3xl font-extralight text-stone-800">{{ adminStore.overviewStats.totalImages }}</p>
+          <!-- 統計 — 橫向流式佈局，側線分隔 -->
+          <div class="flex flex-wrap gap-x-8 gap-y-6 mb-12 py-6 border-y border-stone-100">
+            <div class="flex items-baseline gap-3 min-w-0">
+              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">總數</span>
+              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">{{ adminStore.overviewStats.totalImages }}</span>
             </div>
-            <div class="border border-amber-100 rounded-xl p-5 bg-amber-50/40">
-              <p class="text-xs text-stone-400 font-light tracking-wider uppercase mb-2">本月新增</p>
-              <p class="text-3xl font-extralight text-amber-600">{{ adminStore.overviewStats.recentUploads }}</p>
+            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
+            <div class="flex items-baseline gap-3 min-w-0">
+              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">本月</span>
+              <span class="font-extralight text-2xl md:text-3xl text-amber-600 tabular-nums">{{ adminStore.overviewStats.recentUploads }}</span>
             </div>
-            <div class="border border-stone-100 rounded-xl p-5 bg-stone-50">
-              <p class="text-xs text-stone-400 font-light tracking-wider uppercase mb-2">
-                {{ adminStore.overviewCategory === 'photography' ? '相機型號' : '色彩類型' }}
-              </p>
-              <p class="text-3xl font-extralight text-stone-800">
+            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
+            <div class="flex items-baseline gap-3 min-w-0">
+              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">
+                {{ adminStore.overviewCategory === 'photography' ? '相機' : '色彩' }}
+              </span>
+              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">
                 {{ adminStore.overviewCategory === 'photography'
-                    ? adminStore.overviewStats.uniqueCameras.length
-                    : adminStore.overviewStats.uniqueColors.length }}
-              </p>
+                  ? adminStore.overviewStats.uniqueCameras.length
+                  : adminStore.overviewStats.uniqueColors.length }}
+              </span>
             </div>
-            <div class="border border-stone-100 rounded-xl p-5 bg-stone-50">
-              <p class="text-xs text-stone-400 font-light tracking-wider uppercase mb-2">事件數量</p>
-              <p class="text-3xl font-extralight text-stone-800">{{ adminStore.overviewStats.events.length || groupedOverviewData.length }}</p>
+            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
+            <div class="flex items-baseline gap-3 min-w-0">
+              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">事件</span>
+              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">{{ adminStore.overviewStats.events.length || groupedOverviewData.length }}</span>
             </div>
           </div>
 
-          <!-- 月份分布圖表 -->
-          <section class="mb-10">
-            <h3 class="text-sm font-light text-stone-500 tracking-wider uppercase mb-5">近 6 個月新增</h3>
-            <div class="flex items-end space-x-3 h-32">
+          <!-- 近 6 個月 — 細線柱狀，簡約 -->
+          <section class="mb-12">
+            <p class="jp-section-label mb-5">近 6 個月</p>
+            <div class="flex items-end gap-2 md:gap-4 h-28">
               <div
                 v-for="month in monthlyStats"
                 :key="month.label"
-                class="flex-1 flex flex-col items-center space-y-2"
+                class="flex-1 flex flex-col items-center gap-2"
               >
-                <span class="text-xs text-stone-500 font-light">{{ month.count }}</span>
+                <span class="text-xs text-stone-400 font-light tabular-nums">{{ month.count }}</span>
                 <div
-                  class="w-full rounded-t-sm bg-amber-400/70 transition-all duration-300 min-h-[4px]"
-                  :style="{ height: month.count > 0 ? `${Math.max(8, (month.count / maxMonthCount) * 80)}px` : '4px' }"
+                  class="w-full min-h-[2px] transition-all duration-500 rounded-sm bg-gradient-to-t from-amber-400/80 to-amber-300/50"
+                  :style="{ height: month.count > 0 ? `${Math.max(6, (month.count / maxMonthCount) * 72)}px` : '2px' }"
                 />
-                <span class="text-xs text-stone-400 font-light">{{ month.label }}</span>
+                <span class="text-[0.65rem] text-stone-400 font-light tracking-wider">{{ month.label }}</span>
               </div>
             </div>
           </section>
 
-          <!-- 最近上傳 -->
+          <!-- 最近上傳 — 余白感網格 -->
           <section>
-            <h3 class="text-sm font-light text-stone-500 tracking-wider uppercase mb-4">最近上傳</h3>
-            <div v-if="adminStore.recentItems.length > 0" class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            <p class="jp-section-label mb-5">最近上傳</p>
+            <div v-if="adminStore.recentItems.length > 0" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 md:gap-4">
               <div
                 v-for="item in adminStore.recentItems.slice(0, 16)"
                 :key="item.filename"
-                class="group relative aspect-square rounded-lg overflow-hidden bg-stone-100 cursor-pointer"
+                class="group relative aspect-square overflow-hidden cursor-pointer"
                 :title="item.title"
               >
+                <div class="absolute inset-0 border border-stone-100 group-hover:border-amber-300/50 transition-colors duration-300" />
                 <img
                   :src="getImagePath(item.filename)"
                   :alt="item.title"
-                  class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-full object-contain bg-stone-50/50 group-hover:scale-[1.02] transition-transform duration-500 ease-out"
                   loading="lazy"
                   @error="handleImageError"
                 >
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200"/>
-                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div class="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div class="absolute bottom-0 left-0 right-0 p-2.5 translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                   <p class="text-white text-xs font-light truncate">{{ item.title }}</p>
                 </div>
               </div>
             </div>
-            <div v-else class="text-center py-16 text-stone-400">
-              <svg class="w-10 h-10 mx-auto mb-3 text-stone-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p class="text-sm font-light">尚無上傳的作品</p>
+            <div v-else class="py-20 text-center">
+              <span class="font-jp text-7xl font-thin text-stone-200/80">無</span>
+              <p class="mt-4 text-sm text-stone-400 font-light tracking-wide">尚無上傳的作品</p>
             </div>
           </section>
         </section>
 
         <!-- 上傳頁面 -->
-        <section v-if="activeTab === 'upload'" class="p-8">
+        <section v-if="visitedTabs.has('upload')" v-show="activeTab === 'upload'" class="p-8">
           <header class="mb-8 flex justify-between items-start">
             <div>
               <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">上傳作品</h2>
@@ -233,7 +246,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
         </section>
 
         <!-- 管理頁面 -->
-        <section v-if="activeTab === 'manage'" class="p-8">
+        <section v-if="visitedTabs.has('manage')" v-show="activeTab === 'manage'" class="p-8">
           <header class="mb-6 flex flex-wrap gap-3 justify-between items-start">
             <div>
               <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">管理作品</h2>
@@ -331,7 +344,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
         </section>
 
         <!-- 設定頁面 -->
-        <section v-if="activeTab === 'settings'" class="p-8">
+        <section v-if="visitedTabs.has('settings')" v-show="activeTab === 'settings'" class="p-8">
           <header class="mb-8">
             <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">系統設定</h2>
             <p class="text-stone-400 text-sm font-light">配置系統偏好和功能選項</p>
@@ -526,8 +539,16 @@ useSeoMeta({
 const adminStore = useAdminStore()
 const { getImagePath } = useImagePath()
 
-// Tab 狀態
+// Tab 狀態 — 延遲掛載：僅在首次造訪時渲染，之後用 v-show 切換，避免卡頓
 const activeTab = ref('overview')
+const visitedTabs = ref(new Set<string>(['overview']))
+
+const setActiveTab = (tabId: string) => {
+  if (!visitedTabs.value.has(tabId)) {
+    visitedTabs.value = new Set([...visitedTabs.value, tabId])
+  }
+  activeTab.value = tabId
+}
 
 const tabs = [
   { id: 'overview', name: '概覽' },

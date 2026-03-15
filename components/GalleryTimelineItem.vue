@@ -92,14 +92,24 @@ v-if="eventInfo.location" class="text-stone-400 dark:text-stone-500 truncate fle
       </div>
     </div>
 
-    <!-- Content Slot -->
-    <div
-      v-if="shouldShowContent"
-      class="flex-1 md:max-w-2xl"
-      :class="index % 2 === 0 ? 'md:ml-16' : 'md:mr-16'"
-    >
-      <slot />
-    </div>
+    <!-- Content Slot — 日式過場：紙の展開 + 方向性滑入 + 側線 -->
+    <Transition name="collapse-fade" mode="out-in">
+      <div
+        v-if="shouldShowContent"
+        class="flex-1 md:max-w-2xl relative"
+        :class="[
+          index % 2 === 0 ? 'md:ml-16' : 'md:mr-16',
+          index % 2 === 0 ? 'collapse-from-left' : 'collapse-from-right'
+        ]"
+      >
+        <!-- 側線裝飾 — 隨內容淡入，延遲出現 -->
+        <div
+          class="collapse-accent-line absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-accent-400/50 dark:via-accent-500/40 to-transparent"
+          :class="index % 2 === 0 ? 'left-0' : 'right-0 left-auto'"
+        />
+        <slot />
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -142,3 +152,44 @@ const shouldShowContent = computed(() => {
   return !props.showEventControl || isExpanded.value
 })
 </script>
+
+<style scoped>
+/* 紙の展開 — 輕微 scale 如紙張落定 */
+/* 方向性滑入 — 依時間軸左右，自軸心滑出 */
+.collapse-fade-enter-active {
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.collapse-fade-enter-active .collapse-accent-line {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s;
+  opacity: 1;
+}
+.collapse-fade-leave-active {
+  transition: opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.collapse-fade-leave-active .collapse-accent-line {
+  transition: opacity 0.15s ease-out;
+  opacity: 0;
+}
+.collapse-fade-enter-from,
+.collapse-fade-leave-to {
+  opacity: 0;
+}
+.collapse-fade-enter-from.collapse-from-left,
+.collapse-fade-leave-to.collapse-from-left {
+  transform: translateX(-14px) translateY(-8px) scale(0.98);
+}
+.collapse-fade-enter-from.collapse-from-right,
+.collapse-fade-leave-to.collapse-from-right {
+  transform: translateX(14px) translateY(-8px) scale(0.98);
+}
+.collapse-fade-enter-to .collapse-accent-line,
+.collapse-fade-leave-from .collapse-accent-line {
+  opacity: 1;
+}
+.collapse-fade-enter-from .collapse-accent-line,
+.collapse-fade-leave-to .collapse-accent-line {
+  opacity: 0;
+}
+</style>
