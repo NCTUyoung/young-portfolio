@@ -19,6 +19,16 @@ import type {
   PhotographyData
 } from '~/types/gallery'
 
+type EventLocationPoint = {
+  name: string
+  lat: number
+  lng: number
+  coverFilename: string
+  timeRange: string
+  count: number
+  location?: string
+}
+
 // 類型定義已移至 types/gallery.ts，通過上方 import 語句導入
 
 // 這些工具函數已移至 utils/galleryUtils.ts
@@ -328,6 +338,67 @@ export const useGalleryStore = defineStore('gallery', () => {
     return sorted
   })
 
+  // 事件地點資訊（供前台地圖使用）
+  const EVENT_COORDS: Record<string, { lat: number, lng: number }> = {
+    '春日街拍': { lat: 25.0478, lng: 121.5319 }, // 台北市
+    '2024新北耶誕城': { lat: 25.0119, lng: 121.4657 }, // 新北市板橋區
+    '2025 桃猿三本柱': { lat: 25.0013, lng: 121.2016 }, // 樂天桃園棒球場
+    '攝影社 米倉團拍': { lat: 24.7959, lng: 120.9848 }, // 交大新竹校區
+    '調色測試': { lat: 24.8212, lng: 121.1818 }, // 六福村
+    '交大外拍': { lat: 24.7959, lng: 120.9848 }, // 交大新竹校區
+    '2025 聖誕台北': { lat: 25.0478, lng: 121.5319 }, // 台北市
+    '峨嵋湖風鈴木': { lat: 24.6784, lng: 120.9851 } // 峨眉湖
+  }
+
+  const eventLocations = computed<EventLocationPoint[]>(() => {
+    const groups = new Map<string, { images: GalleryItem[], timeRange: string, eventInfo?: PhotoEvent | null }>()
+
+    photographyWorks.value.forEach(work => {
+      if (!work.event?.name) return
+      const name = work.event.name
+
+      if (!groups.has(name)) {
+        groups.set(name, { images: [], timeRange: '', eventInfo: work.event })
+      }
+      groups.get(name)!.images.push(work)
+    })
+
+    const result: EventLocationPoint[] = []
+
+    groups.forEach((group, name) => {
+      const imagesSorted = sortImagesByTime(group.images)
+      const cover = imagesSorted[0]
+      const timeRange = calculateTimeRange(imagesSorted)
+
+      const info = group.eventInfo
+      const coordFromEvent = info?.lat !== undefined && info?.lng !== undefined
+        ? { lat: info.lat, lng: info.lng }
+        : undefined
+      const coord = coordFromEvent || EVENT_COORDS[name]
+
+      if (!coord) {
+        return
+      }
+
+      result.push({
+        name,
+        lat: coord.lat,
+        lng: coord.lng,
+        coverFilename: cover.filename,
+        timeRange,
+        count: imagesSorted.length,
+        location: info?.location
+      })
+    })
+
+    // 依事件最新時間降冪排序，較新的事件在前
+    return result.sort((a, b) => {
+      const aLatest = Math.max(...groups.get(a.name)!.images.map(img => new Date(img.time).getTime()))
+      const bLatest = Math.max(...groups.get(b.name)!.images.map(img => new Date(img.time).getTime()))
+      return bLatest - aLatest
+    })
+  })
+
   const availableEvents = computed(() => {
     const eventCounts = new Map<string, number>()
     const eventLatestTime = new Map<string, number>()
@@ -507,6 +578,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     filteredItems,
     groupedWorks,
     mixedPhotoItems,
+    eventLocations,
     availableEvents,
     availableYears,
     categoryStats,

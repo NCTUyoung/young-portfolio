@@ -11,6 +11,8 @@ export interface PhotoEvent {
   name: string
   description: string
   location: string
+  lat?: number
+  lng?: number
 }
 
 // 統一的圖片項目接口

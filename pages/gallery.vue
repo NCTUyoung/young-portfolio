@@ -55,6 +55,19 @@
         </div>
       </div>
 
+      <!-- 地點地圖：僅在攝影作品分類顯示 -->
+      <section
+        v-if="eventLocations && eventLocations.length && currentCategory === 'photography'"
+        ref="mapSectionRef"
+        class="mb-16 max-w-6xl mx-auto"
+      >
+        <p class="jp-section-label mb-3">Visited Places</p>
+        <EventMap
+          :events="eventLocations"
+          @focus-event="handleFocusEvent"
+        />
+      </section>
+
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
       <div v-if="!isLoading" :key="currentCategory">
@@ -73,69 +86,79 @@
           <!-- Timeline Layout for Photography -->
           <div class="hidden md:block">
             <div class="space-y-32 max-w-6xl mx-auto">
-              <GalleryTimelineItem
+              <div
                 v-for="(item, index) in photographyEventItems"
                 :key="item.key"
-                :index="index"
-                :time-label="item.timeRange || ''"
-                :event-info="item.eventInfo"
-                :event-key="item.eventName || 'no-event'"
-                :show-event-control="!!item.eventName"
-                :show-event-info="!!item.eventName"
+                :ref="el => setEventRef(item.eventName || 'no-event', el)"
+                :class="[
+                  'transition-colors duration-500',
+                  focusedEventName === item.eventName
+                    ? 'bg-amber-50/40 dark:bg-amber-900/10 rounded-2xl -mx-4 px-4 py-2'
+                    : ''
+                ]"
               >
-                <!-- 日式雙欄佈局 -->
-                <div class="mb-12">
-                  <div class="mb-6">
-                    <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
-                      {{ item.eventName || '其他作品' }}
-                    </h3>
-                    <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
-                  </div>
+                <GalleryTimelineItem
+                  :index="index"
+                  :time-label="item.timeRange || ''"
+                  :event-info="item.eventInfo"
+                  :event-key="item.eventName || 'no-event'"
+                  :show-event-control="!!item.eventName"
+                  :show-event-info="!!item.eventName"
+                >
+                  <!-- 日式雙欄佈局 -->
+                  <div class="mb-12">
+                    <div class="mb-6">
+                      <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
+                        {{ item.eventName || '其他作品' }}
+                      </h3>
+                      <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+                    </div>
 
-                  <div class="space-y-3">
-                    <div
-v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-                         :key="`row-${rowIdx}`"
-                         class="flex gap-3"
-                         :style="{ height: getRowHeight(rowIdx, index) }">
+                    <div class="space-y-3">
                       <div
-v-for="(image, imgIdx) in rowImages"
-                           :key="image.filename"
-                           :class="[
-                             getImageWidth(imgIdx, rowIdx, index),
-                             'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
-                             isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                           ]"
-                           @click="openImageViewer(image, item.images || [])">
-                        <img
-                          :src="getImagePath(image.filename)"
-                          :alt="image.title"
-                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                          loading="lazy"
-                          @load="markImageLoaded(image.filename)"
-                        >
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                          <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
-                          <div class="text-white/80 text-xs space-y-1 font-light">
-                            <div v-if="image.camera || image.model" class="flex items-center gap-2">
-                              <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
-                              </svg>
-                              <span>{{ image.camera }} {{ image.model }}</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-white/70">
-                              <span v-if="image.aperture">f/{{ image.aperture }}</span>
-                              <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
-                              <span v-if="image.iso">ISO {{ image.iso }}</span>
-                              <span v-if="image.focalLength">{{ image.focalLength }}mm</span>
+                        v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
+                        :key="`row-${rowIdx}`"
+                        class="flex gap-3"
+                        :style="{ height: getRowHeight(rowIdx, index) }">
+                        <div
+                          v-for="(image, imgIdx) in rowImages"
+                          :key="image.filename"
+                          :class="[
+                            getImageWidth(imgIdx, rowIdx, index),
+                            'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
+                            isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
+                          ]"
+                          @click="openImageViewer(image, item.images || [])">
+                          <img
+                            :src="getImagePath(image.filename)"
+                            :alt="image.title"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                            loading="lazy"
+                            @load="markImageLoaded(image.filename)"
+                          >
+                          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                            <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
+                            <div class="text-white/80 text-xs space-y-1 font-light">
+                              <div v-if="image.camera || image.model" class="flex items-center gap-2">
+                                <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                                </svg>
+                                <span>{{ image.camera }} {{ image.model }}</span>
+                              </div>
+                              <div class="flex items-center gap-3 text-white/70">
+                                <span v-if="image.aperture">f/{{ image.aperture }}</span>
+                                <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
+                                <span v-if="image.iso">ISO {{ image.iso }}</span>
+                                <span v-if="image.focalLength">{{ image.focalLength }}mm</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </GalleryTimelineItem>
+                </GalleryTimelineItem>
+              </div>
             </div>
           </div>
 
@@ -240,11 +263,31 @@ v-for="image in rowImages"
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
+
+    <!-- 回到地圖：桌機右側膠囊按鈕 -->
+    <button
+      v-if="showBackToMap && currentCategory === 'photography'"
+      class="hidden md:flex fixed right-[10%] top-1/2 -translate-y-1/2 px-3 py-1.5 text-[0.7rem] tracking-[0.3em] rounded-full bg-white/90 border border-stone-200 text-stone-500 hover:text-accent-600 hover:border-accent-300 shadow-japanese transition-all"
+      type="button"
+      @click="scrollToMap"
+    >
+      MAP
+    </button>
+
+    <!-- 回到地圖：手機右下圓形按鈕 -->
+    <button
+      v-if="showBackToMap && currentCategory === 'photography'"
+      class="md:hidden fixed bottom-20 right-5 w-10 h-10 rounded-full bg-white/95 border border-stone-200 text-[0.7rem] tracking-[0.2em] text-stone-500 shadow-japanese flex items-center justify-center active:scale-95 transition-all"
+      type="button"
+      @click="scrollToMap"
+    >
+      MAP
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, computed, ref } from 'vue'
+import { onMounted, onBeforeUnmount, watch, computed, ref, type ComponentPublicInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import type { GalleryItem } from '~/types/gallery'
@@ -255,12 +298,14 @@ import { useGlobalToast } from '~/composables/useToast'
 import GalleryTabBar from '~/components/GalleryTabBar.vue'
 import EventFilter from '~/components/EventFilter.vue'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
+import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
 // ===== Store 和 Composables =====
 const galleryStore = useGalleryStore()
 const {
   mixedPhotoItems,
+  eventLocations,
   isLoading,
   digitalError,
   photographyError,
@@ -277,6 +322,8 @@ const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
 const { getImagePath } = useImagePath()
 const pageRef = ref<HTMLElement | null>(null)
+const mapSectionRef = ref<HTMLElement | null>(null)
+const showBackToMap = ref(false)
 
 // 攝影作品載入狀態（用於優雅的 loading 效果）
 const loadedPhotographyImages = ref<Record<string, boolean>>({})
@@ -330,6 +377,56 @@ const photographyEventItems = computed(() => {
     item.images && item.images.some(img => img.category === 'photography')
   )
 })
+
+// 地圖點擊 → 導覽到下方事件區塊
+const eventRefs = ref<Record<string, HTMLElement | null>>({})
+const focusedEventName = ref<string | null>(null)
+let focusTimer: number | null = null
+
+const setEventRef = (name: string | null, el: Element | ComponentPublicInstance | null) => {
+  if (!name || !el) return
+  const target = ('$el' in el ? (el.$el as HTMLElement) : (el as HTMLElement))
+  eventRefs.value[name] = target
+}
+
+const handleFocusEvent = (eventName: string) => {
+  const target = eventRefs.value[eventName]
+  if (!target) return
+
+  const offset = 96
+  const top = target.getBoundingClientRect().top + window.scrollY - offset
+
+  window.scrollTo({
+    top,
+    behavior: 'smooth'
+  })
+
+   focusedEventName.value = eventName
+   if (focusTimer !== null) {
+     window.clearTimeout(focusTimer)
+   }
+   focusTimer = window.setTimeout(() => {
+     focusedEventName.value = null
+   }, 900)
+}
+
+const handleScroll = () => {
+  if (!mapSectionRef.value) return
+  const mapBottom = mapSectionRef.value.getBoundingClientRect().bottom
+  const threshold = 80
+  showBackToMap.value = mapBottom < threshold
+}
+
+const scrollToMap = () => {
+  if (!mapSectionRef.value) return
+  const offset = 80
+  const top = mapSectionRef.value.getBoundingClientRect().top + window.scrollY - offset
+
+  window.scrollTo({
+    top,
+    behavior: 'smooth'
+  })
+}
 
 // 收集所有無分類的圖片（保留供未來擴展用）
 const _ungroupedImages = computed(() => {
@@ -431,14 +528,21 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 onMounted(async () => {
   try {
     await loadAllWorks()
-
-
   } catch (error) {
     console.error('Failed to load works:', error)
   }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+  }
 })
 
-
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', handleScroll)
+  }
+})
 
 // ===== SEO =====
 useSeoMeta({
@@ -518,8 +622,8 @@ useSeoMeta({
   -webkit-backdrop-filter: blur(8px) saturate(120%);
 }
 
-/* 按鈕懸停效果 */
-button:hover {
+/* 按鈕懸停效果（僅標記了 .btn-float 的按鈕會上浮） */
+.btn-float:hover {
   transform: translateY(-1px);
   transition: all 0.3s ease;
 }
