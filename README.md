@@ -1,39 +1,86 @@
-# Young Portfolio - 個人作品集網站
+# Young Portfolio – 個人作品集網站
 
-基於 Nuxt 3 開發的個人作品集網站，包含繪圖作品和攝影作品展示，以及完整的後台管理系統。
+一個從 **Pinterest 排版靈感** 出發、漸漸長成的個人作品集網站。  
+以 **日式排版感** 做為視覺主軸，整合「電繪作品」、「攝影事件時間軸」與「後台管理」成一個完整的工作流程。
 
-## 🌟 功能特色
+---
 
-- **作品展示**：支援繪圖作品和攝影作品分類展示
-- **響應式設計**：適配各種螢幕尺寸
-- **後台管理系統**：完整的圖片上傳、編輯、刪除功能
-- **事件管理**：按事件分組管理作品
-- **EXIF 資訊**：自動讀取攝影作品的相機設定
-- **靜態部署**：支援 GitHub Pages 部署
+## 專案概念（Concept）
 
-## 🚀 線上網站
+![首頁 Hero](docs/readme/home-hero.png)
+
+- **靈感來源**：一開始只是從 Pinterest 收藏各種 editorial / Japanese layout 的排版截圖，想做一個「看起來像雜誌」的個人頁面。
+- **視覺方向**：
+  - 細線、豎排小字、留白和超大漢字，營造安靜的日式空氣感。
+  - 攝影區塊用 Timeline 與事件分組，讓「一次外拍」在版面上有自己的故事節奏。
+- **產品目標**：讓作者可以
+  - 有儀式感地展示電繪與攝影作品
+  - 在後台用事件管理上傳／整理素材
+  - 長期維護一個「真的會更新」的作品集
+
+### 概念圖：從靈感到作品集
+
+```mermaid
+flowchart LR
+  A[ Pinterest 靈感板<br/>排版截圖 / 日式雜誌 ] --> B[版面草稿<br/>區塊切分 / Flow]
+  B --> C[Nuxt 3 前端實作<br/>Tailwind + 自訂 CSS]
+  C --> D[Gallery 前台<br/>電繪 / 攝影 Timeline]
+  C --> E[Admin 後台<br/>上傳 / 事件管理]
+  D --> F[訪客瀏覽作品]
+  E --> D
+```
+
+---
+
+## 功能特色
+
+- **作品展示**
+  - 支援電繪作品與攝影作品兩種主要類別
+  - 攝影作品以「事件時間軸」＋摺疊卡片呈現
+- **日式排版與動態**
+  - 豎排小標、細線、留白、紙感陰影
+  - Timeline 區塊有細緻的摺疊 / 展開過場動畫
+- **攝影地圖（Photography Map）**
+  - 只在「攝影」類別顯示
+  - 使用 Leaflet + OpenStreetMap，將每個拍攝事件標在地圖上
+  - Hover 顯示事件小卡與代表照片，點擊平滑捲動到下方該事件區塊
+
+![攝影作品地圖](docs/readme/gallery-map-full.png)
+- **後台管理系統**
+  - 上傳圖片、編輯事件、刪除作品
+  - 自動讀取攝影 EXIF 資訊
+  - 針對 Tab 切換與資料更新做過 UX 優化
+- **靜態部署**
+  - 支援 GitHub Pages 靜態部署
+  - 前台與後台共用同一個 Nuxt 專案結構
+
+---
+
+## 線上網站
 
 - **主網站**：[https://nctuyoung.github.io/young-portfolio/](https://nctuyoung.github.io/young-portfolio/)
 - **後台管理**：[https://nctuyoung.github.io/young-portfolio/admin](https://nctuyoung.github.io/young-portfolio/admin)
 
-## 📁 專案結構
+---
 
-```
-├── components/           # Vue 組件
-│   ├── admin/           # 後台管理組件
-│   └── gallery/         # 圖庫展示組件
-├── pages/               # 頁面路由
-│   ├── index.vue        # 首頁
-│   ├── gallery.vue      # 作品集頁面
-│   ├── about.vue        # 關於頁面
-│   └── admin.vue        # 後台管理頁面
-├── stores/              # Pinia 狀態管理
-├── server/api/          # API 端點
-├── public/              # 靜態資源
-│   ├── images/          # 圖片檔案
-│   ├── galleryList.json # 繪圖作品資料
-│   └── photographyList.json # 攝影作品資料
-└── scripts/             # 部署腳本
+## 專案結構（Overview）
+
+```bash
+├── components/
+│   ├── admin/               # 後台管理組件
+│   ├── EventMap.vue         # 攝影事件地圖
+│   └── GalleryTimelineItem.vue
+├── pages/
+│   ├── index.vue            # 首頁（故事 + 精選作品）
+│   ├── gallery.vue          # 作品集頁面（電繪 / 攝影）
+│   └── admin.vue            # 後台入口
+├── stores/                  # Pinia 狀態管理（gallery / admin / viewer）
+├── server/api/              # 上傳 / 管理 API
+├── public/
+│   ├── images/              # 圖片檔案
+│   ├── galleryList.json     # 電繪作品資料
+│   └── photographyList.json # 攝影作品資料（含事件）
+└── scripts/                 # 部署腳本
 ```
 
 ## 🛠️ 開發環境設置
@@ -52,7 +99,9 @@ npm run dev
 
 開發伺服器將在 `http://localhost:3000` 啟動
 
-## 📝 後台管理系統使用說明
+## 後台管理系統使用說明
+
+![後台概覽](docs/readme/admin-overview.png)
 
 後台管理系統提供四個主要功能頁面：
 
@@ -99,7 +148,7 @@ npm run dev
    - 查看總圖片數、事件數等統計
    - 瀏覽最近上傳的作品
 
-## 🚀 部署流程
+## 部署流程
 
 ### 自動部署到 GitHub Pages
 
@@ -125,7 +174,7 @@ npm run preview
 npm run generate
 ```
 
-## 🔧 技術棧
+## 技術棧
 
 - **框架**：Nuxt 3
 - **UI 框架**：Tailwind CSS
@@ -134,7 +183,7 @@ npm run generate
 - **檔案上傳**：Formidable
 - **部署**：GitHub Pages
 
-## 📂 資料格式
+## 資料格式
 
 ### 繪圖作品 (galleryList.json)
 ```json
@@ -173,7 +222,7 @@ npm run generate
 }
 ```
 
-## 🤝 貢獻指南
+## 貢獻指南
 
 1. Fork 此專案
 2. 建立功能分支 (`git checkout -b feature/AmazingFeature`)
@@ -181,11 +230,11 @@ npm run generate
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 開啟 Pull Request
 
-## 📄 授權
+## 授權
 
 此專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 檔案
 
-## 📞 聯絡資訊
+## 聯絡資訊
 
 - **作者**：Young
 - **GitHub**：[NCTUyoung](https://github.com/NCTUyoung)
@@ -193,18 +242,18 @@ npm run generate
 
 ---
 
-## 🔄 更新日誌
+## 更新日誌
 
 ### v2.0.0 (2024-06-15)
-- 🎉 全新後台管理系統
-- 🎨 Tab 導航設計（概覽、上傳、管理、設定）
-- 🔧 大幅簡化巢狀結構
-- ✨ 新增圖片編輯和刪除功能
-- 🎯 事件管理功能
-- 🐛 修復事件時間排序問題
-- 💅 統一設計語言和響應式佈局
+- 全新後台管理系統
+- Tab 導航設計（概覽、上傳、管理、設定）
+- 大幅簡化巢狀結構
+- 新增圖片編輯和刪除功能
+- 事件管理功能
+- 修復事件時間排序問題
+- 統一設計語言和響應式佈局
 
 ### v1.0.0
-- 🎨 基本作品集展示功能
-- 📱 響應式設計
-- 🖼️ 圖庫和攝影作品分類
+- 基本作品集展示功能
+- 響應式設計
+- 圖庫和攝影作品分類
