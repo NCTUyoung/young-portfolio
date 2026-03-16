@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { useDark } from '@vueuse/core'
 
 interface EventLocation {
   name: string
@@ -55,11 +56,30 @@ const emit = defineEmits<{
 
 const mapContainer = ref<HTMLDivElement | null>(null)
 const hoveredEvent = ref<EventLocation | null>(null)
+const isDark = useDark()
 
 const { getImagePath } = useImagePath()
 
 let map: any = null
 let markersLayer: any = null
+let tileLayer: any = null
+
+const TILE_URLS = {
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+}
+
+const setTileLayer = async (dark: boolean) => {
+  if (!map || !process.client) return
+  const L = await import('leaflet')
+  const url = dark ? TILE_URLS.dark : TILE_URLS.light
+  if (tileLayer) {
+    map.removeLayer(tileLayer)
+  }
+  tileLayer = L.tileLayer(url, {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  }).addTo(map)
+}
 
 const initMap = async () => {
   if (!process.client || map || !mapContainer.value) return
@@ -72,10 +92,7 @@ const initMap = async () => {
     zoomControl: false
   })
 
-  // 使用偏簡約的 CartoDB light 風格，減少街道細節干擾
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-  }).addTo(map)
+  await setTileLayer(isDark.value)
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers(L)
@@ -88,15 +105,12 @@ const renderMarkers = (L: any) => {
   if (!props.events.length) return
 
   const bounds: any[] = []
+  const dark = isDark.value
+  const baseStyle = dark
+    ? { radius: 7, color: '#e4b07a', weight: 1, fillColor: '#e8a84a', fillOpacity: 0.85 }
+    : { radius: 7, color: '#e4b07a', weight: 1, fillColor: '#db7b2e', fillOpacity: 0.8 }
 
   props.events.forEach(event => {
-    const baseStyle = {
-      radius: 7,
-      color: '#e4b07a',
-      weight: 1,
-      fillColor: '#db7b2e',
-      fillOpacity: 0.8
-    }
 
     const marker = L.circleMarker([event.lat, event.lng], baseStyle)
 
@@ -151,6 +165,13 @@ watch(
   { deep: true }
 )
 
+watch(isDark, async (dark) => {
+  if (!process.client || !map) return
+  await setTileLayer(dark)
+  const L = await import('leaflet')
+  renderMarkers(L)
+})
+
 onBeforeUnmount(() => {
   if (map) {
     map.remove()
@@ -177,14 +198,23 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 讓地圖本身更「乾淨」：微灰階與對比 */
+/* 淺色模式：微灰階與對比；深色模式：地圖已是深色，僅微調 */
 .event-map-container :deep(.leaflet-tile-pane) {
   filter: grayscale(0.9) contrast(1.05);
+}
+.dark .event-map-container :deep(.leaflet-tile-pane) {
+  filter: grayscale(0.6) contrast(1.02);
 }
 
 .event-map-container :deep(.leaflet-control-attribution) {
   font-size: 0.6rem;
   opacity: 0.45;
+}
+.dark .event-map-container :deep(.leaflet-control-attribution) {
+  opacity: 0.35;
+}
+.dark .event-map-container :deep(.leaflet-control-attribution a) {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .event-map-hover-card {
@@ -203,6 +233,11 @@ onBeforeUnmount(() => {
   z-index: 1000;
   pointer-events: none;
   max-width: 260px;
+}
+.dark .event-map-hover-card {
+  background: rgba(38, 38, 38, 0.92);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(68, 64, 60, 0.6);
 }
 
 .event-map-hover-image {
@@ -231,16 +266,25 @@ onBeforeUnmount(() => {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.dark .event-map-hover-title {
+  color: rgb(245 245 244);
+}
 
 .event-map-hover-sub {
   font-size: 0.7rem;
   color: rgb(120 113 108);
   margin-bottom: 0.08rem;
 }
+.dark .event-map-hover-sub {
+  color: rgb(168 162 158);
+}
 
 .event-map-hover-meta {
   font-size: 0.65rem;
   color: rgb(168 162 158);
+}
+.dark .event-map-hover-meta {
+  color: rgb(120 113 108);
 }
 
 .event-map-hover-enter-active,

@@ -287,7 +287,7 @@ v-for="image in rowImages"
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, watch, computed, ref, type ComponentPublicInstance } from 'vue'
+import { onMounted, onBeforeUnmount, watch, computed, ref, nextTick, type ComponentPublicInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import type { GalleryItem } from '~/types/gallery'
@@ -315,7 +315,8 @@ const {
 } = storeToRefs(galleryStore)
 
 const {
-  loadAllWorks
+  loadAllWorks,
+  setSelectedEvent
 } = galleryStore
 
 const imageViewerStore = useImageViewerStore()
@@ -384,13 +385,26 @@ const focusedEventName = ref<string | null>(null)
 let focusTimer: number | null = null
 
 const setEventRef = (name: string | null, el: Element | ComponentPublicInstance | null) => {
-  if (!name || !el) return
+  if (!name) return
+  if (!el) {
+    eventRefs.value[name] = null
+    return
+  }
   const target = ('$el' in el ? (el.$el as HTMLElement) : (el as HTMLElement))
   eventRefs.value[name] = target
 }
 
-const handleFocusEvent = (eventName: string) => {
-  const target = eventRefs.value[eventName]
+const handleFocusEvent = async (eventName: string) => {
+  let target = eventRefs.value[eventName]
+
+  // 若目標事件被篩選掉、不在 DOM 中，先切換到該事件再捲動
+  if (!target && filterState.value.selectedEvent !== eventName) {
+    setSelectedEvent(eventName)
+    await nextTick()
+    await nextTick() // 再等一幀，確保 ref 已設定
+    target = eventRefs.value[eventName]
+  }
+
   if (!target) return
 
   const offset = 96
@@ -401,13 +415,13 @@ const handleFocusEvent = (eventName: string) => {
     behavior: 'smooth'
   })
 
-   focusedEventName.value = eventName
-   if (focusTimer !== null) {
-     window.clearTimeout(focusTimer)
-   }
-   focusTimer = window.setTimeout(() => {
-     focusedEventName.value = null
-   }, 900)
+  focusedEventName.value = eventName
+  if (focusTimer !== null) {
+    window.clearTimeout(focusTimer)
+  }
+  focusTimer = window.setTimeout(() => {
+    focusedEventName.value = null
+  }, 900)
 }
 
 const handleScroll = () => {
