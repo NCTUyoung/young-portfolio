@@ -1,5 +1,5 @@
 {
-  "totalNumber": "43",
+  "totalNumber": "55",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
@@ -9,7 +9,8 @@
     "調色測試": 3,
     "交大外拍": 5,
     "2025 聖誕台北": 4,
-    "峨嵋湖風鈴木": 13
+    "峨嵋湖風鈴木": 13,
+    "WBC 2026": 12
   },
   "Img": [
     {
@@ -969,6 +970,268 @@
       "model": "NIKON Z f",
       "focalLength": 72,
       "aperture": 5,
+      "iso": 100,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9991-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9991-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 400,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9996-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9996-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 400,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_0582-編輯-1.jpg",
+      "time": "2026 Mar 07",
+      "title": "DSC_0582-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 130,
+      "aperture": 5,
+      "iso": 2000,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_0483-編輯-1.jpg",
+      "time": "2026 Mar 07",
+      "title": "DSC_0483-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 800,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9964-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9964-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 70,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9968-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9968-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "標準",
+        "日光"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 70,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9960-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9960-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 85,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_0466-編輯-1.jpg",
+      "time": "2026 Mar 07",
+      "title": "DSC_0466-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 114,
+      "aperture": 5,
+      "iso": 800,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9971-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9971-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 400,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_0542-編輯-1.jpg",
+      "time": "2026 Mar 07",
+      "title": "DSC_0542-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "人像",
+        "夜拍",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 75,
+      "aperture": 4.5,
+      "iso": 800,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9971-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9971-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 300,
+      "aperture": 6.3,
+      "iso": 400,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/WBC 2026/DSC_9966-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "DSC_9966-編輯-1",
+      "content": "數位單眼相機拍攝作品",
+      "tags": [
+        "望遠",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC 2026",
+        "description": "經典賽台灣應援",
+        "location": "東京巨蛋"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 171,
+      "aperture": 5.3,
       "iso": 100,
       "shutterSpeed": 0.002
     }

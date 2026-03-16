@@ -347,7 +347,8 @@ export const useGalleryStore = defineStore('gallery', () => {
     '調色測試': { lat: 24.8212, lng: 121.1818 }, // 六福村
     '交大外拍': { lat: 24.7959, lng: 120.9848 }, // 交大新竹校區
     '2025 聖誕台北': { lat: 25.0478, lng: 121.5319 }, // 台北市
-    '峨嵋湖風鈴木': { lat: 24.6784, lng: 120.9851 } // 峨眉湖
+    '峨嵋湖風鈴木': { lat: 24.6784, lng: 120.9851 }, // 峨眉湖
+    'WBC 2026': { lat: 35.7058, lng: 139.7518 } // 東京巨蛋
   }
 
   const eventLocations = computed<EventLocationPoint[]>(() => {
