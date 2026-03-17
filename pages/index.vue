@@ -2,16 +2,17 @@
   <div ref="pageRef">
     <!-- ===== 全屏 Hero — 攝影作品背景 ===== -->
     <section class="relative h-[92vh] min-h-[600px] overflow-hidden">
-      <!-- 背景圖片 -->
+      <!-- 背景：純照片 + 左側漸層遮罩 -->
       <div class="absolute inset-0">
         <img
-          :src="getImagePath('photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg')"
-          alt="Featured photography"
-          class="w-full h-full object-cover"
+          :src="heroImageSrc"
+          alt=""
+          class="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
         >
-        <!-- 多層漸層遮罩 -->
-        <div class="absolute inset-0 bg-gradient-to-r from-white/85 via-white/50 to-transparent dark:from-stone-900/90 dark:via-stone-900/60 dark:to-transparent"/>
-        <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/30 dark:from-stone-900 dark:via-transparent dark:to-stone-900/30"/>
+        <div class="absolute inset-0 bg-white/30 dark:bg-stone-900/25 pointer-events-none"/>
+        <div class="absolute inset-y-0 left-0 w-[55%] max-w-[520px] bg-gradient-to-r from-white via-white to-transparent dark:from-stone-900 dark:via-stone-900 dark:to-transparent pointer-events-none"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-white/10 dark:from-stone-900/10 dark:via-transparent dark:to-stone-900/10 pointer-events-none"/>
       </div>
 
       <!-- 裝飾性元素 -->
@@ -29,20 +30,32 @@
       <!-- Hero 內容 — 品牌標語 -->
       <div class="relative z-10 h-full flex items-center">
         <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
-          <div class="max-w-xl">
-            <!-- 小標 -->
-            <p class="reveal text-sm tracking-[0.3em] uppercase text-accent-600 dark:text-accent-400 font-light mb-4">
-              Digital Art &amp; Photography
-            </p>
+          <div class="max-w-xl pl-8 pr-6 py-10 relative">
+            <!-- 左側裝飾線（侘寂風格） -->
+            <div class="absolute left-0 top-8 bottom-16 w-px bg-gradient-to-b from-accent-400/40 via-accent-300/30 to-transparent dark:from-accent-500/30 dark:via-accent-600/20 dark:to-transparent"/>
+
+            <!-- 小標 + 橫線裝飾 -->
+            <div class="reveal flex items-center gap-4 mb-6">
+              <p class="text-sm tracking-[0.3em] uppercase text-accent-600 dark:text-accent-400 font-light">
+                Digital Art &amp; Photography
+              </p>
+              <div class="h-px flex-1 max-w-[80px] bg-gradient-to-r from-accent-300/50 to-transparent dark:from-accent-600/40"/>
+            </div>
 
             <!-- 主標題 -->
-            <h1 class="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-extralight text-stone-800 dark:text-stone-100 tracking-wider leading-[1.1]">
+            <h1 class="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-extralight text-stone-800 dark:text-stone-100 tracking-wider leading-[1.1] drop-shadow-sm">
               <span class="block">Young</span>
-              <span class="block mt-2 text-3xl sm:text-4xl lg:text-5xl text-stone-500 dark:text-stone-400">Portfolio</span>
+              <span class="block mt-2 text-3xl sm:text-4xl lg:text-5xl text-stone-600 dark:text-stone-300 font-light">Portfolio</span>
             </h1>
 
+            <!-- 主標與 CTA 之間的細線 -->
+            <div class="reveal reveal-delay-2 mt-8 flex items-center gap-3">
+              <div class="w-8 h-px bg-stone-300/50 dark:bg-stone-600/40"/>
+              <div class="w-1 h-1 rounded-full bg-accent-400/60 dark:bg-accent-500/50"/>
+            </div>
+
             <!-- CTA -->
-            <div class="reveal reveal-delay-2 mt-10">
+            <div class="reveal reveal-delay-2 mt-6">
               <NuxtLink
                 to="/gallery"
                 class="inline-flex items-center px-7 py-3.5 bg-accent-600 hover:bg-accent-700 text-white font-light tracking-wider rounded-lg transition-all duration-300 group shadow-lg shadow-accent-600/20"
@@ -470,6 +483,7 @@ const pageRef = ref<HTMLElement | null>(null)
 
 // ===== 圖片路徑 =====
 const avatarPath = getImagePath('gallery/2024年電繪作品/55.jpg')
+const heroImageSrc = getImagePath('photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg')
 
 // ===== About 資料 =====
 const digitalTags = ['電繪插畫', '角色設計', '風景繪製', '概念藝術', '幾何風格']
@@ -529,13 +543,5 @@ useSeoMeta({
 </script>
 
 <style scoped>
-/* Hero 圖片淡入 */
-section:first-child img {
-  animation: fade-in 1.2s ease-out both;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: scale(1.05); }
-  to   { opacity: 1; transform: scale(1); }
-}
+/* Hero collage 由組件內建動畫處理 */
 </style>
