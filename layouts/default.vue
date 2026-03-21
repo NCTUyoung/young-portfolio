@@ -36,19 +36,34 @@
               <span class="absolute -bottom-2 left-0 w-0 h-px bg-accent-400 dark:bg-accent-500 transition-all duration-300 group-hover:w-full"/>
             </NuxtLink>
 
-            <!-- Dark Mode Toggle -->
-            <button
-              class="p-2.5 rounded-xl hover:bg-stone-100/50 dark:hover:bg-stone-700/50 transition-all duration-300 border border-stone-200/60 dark:border-stone-600/60 hover:border-accent-300/60 dark:hover:border-accent-600/60 group"
-              :title="isDark ? '切換到淺色模式' : '切換到深色模式'"
-              @click="toggleDark()"
-            >
-              <svg v-if="isDark" class="w-4.5 h-4.5 text-stone-400 group-hover:text-accent-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
-              </svg>
-              <svg v-else class="w-4.5 h-4.5 text-stone-600 group-hover:text-accent-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-              </svg>
-            </button>
+            <!-- Dark Mode Toggle (ClientOnly: avoids SSR vs client theme mismatch hydration warnings) -->
+            <ClientOnly>
+              <button
+                type="button"
+                class="p-2.5 rounded-xl hover:bg-stone-100/50 dark:hover:bg-stone-700/50 transition-all duration-300 border border-stone-200/60 dark:border-stone-600/60 hover:border-accent-300/60 dark:hover:border-accent-600/60 group"
+                :title="isDark ? '切換到淺色模式' : '切換到深色模式'"
+                @click="toggleDark()"
+              >
+                <svg v-if="isDark" class="w-4.5 h-4.5 text-stone-400 group-hover:text-accent-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                </svg>
+                <svg v-else class="w-4.5 h-4.5 text-stone-600 group-hover:text-accent-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+              </button>
+              <template #fallback>
+                <button
+                  type="button"
+                  class="p-2.5 rounded-xl border border-stone-200/60 dark:border-stone-600/60 opacity-70 pointer-events-none"
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <svg class="w-4.5 h-4.5 text-stone-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                  </svg>
+                </button>
+              </template>
+            </ClientOnly>
           </div>
 
           <!-- 手機版漢堡選單 -->
@@ -83,21 +98,37 @@
                     </HeadlessMenuItem>
                     <div class="border-t border-stone-200/40 dark:border-stone-700/40 my-2"/>
                     <HeadlessMenuItem v-slot="{ active }">
-                      <button
-                        :class="[
-                          active ? 'bg-stone-50/60 dark:bg-stone-700/60 text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400',
-                          'w-full text-left px-4 py-3 text-sm font-light tracking-wide rounded-lg flex items-center transition-all duration-200'
-                        ]"
-                        @click="toggleDark()"
-                      >
-                        <svg v-if="isDark" class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
-                        </svg>
-                        <svg v-else class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-                        </svg>
-                        {{ isDark ? '淺色模式' : '深色模式' }}
-                      </button>
+                      <ClientOnly>
+                        <button
+                          type="button"
+                          :class="[
+                            active ? 'bg-stone-50/60 dark:bg-stone-700/60 text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400',
+                            'w-full text-left px-4 py-3 text-sm font-light tracking-wide rounded-lg flex items-center transition-all duration-200'
+                          ]"
+                          @click="toggleDark()"
+                        >
+                          <svg v-if="isDark" class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                          </svg>
+                          <svg v-else class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                          </svg>
+                          {{ isDark ? '淺色模式' : '深色模式' }}
+                        </button>
+                        <template #fallback>
+                          <button
+                            type="button"
+                            class="w-full text-left px-4 py-3 text-sm font-light tracking-wide rounded-lg flex items-center text-stone-600 dark:text-stone-400 opacity-70 pointer-events-none"
+                            aria-hidden="true"
+                            tabindex="-1"
+                          >
+                            <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                            深色模式
+                          </button>
+                        </template>
+                      </ClientOnly>
                     </HeadlessMenuItem>
                   </div>
                 </HeadlessMenuItems>

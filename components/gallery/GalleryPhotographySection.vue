@@ -184,11 +184,15 @@ function bindStripRef (
   if (!html) return
 
   const apply = () => {
-    const w = html.clientWidth
+    const w = Math.round(html.clientWidth)
     if (w <= 0) return
     if (mode === 'desktop') {
+      const prev = stripWidthDesktop.value[key]
+      if (prev === w) return
       stripWidthDesktop.value = { ...stripWidthDesktop.value, [key]: w }
     } else {
+      const prev = stripWidthMobile.value[key]
+      if (prev === w) return
       stripWidthMobile.value = { ...stripWidthMobile.value, [key]: w }
     }
   }
@@ -233,12 +237,15 @@ function justifiedRowsMobile (images: GalleryItem[], eventKey: string) {
 function onImgLoad (filename: string, ev: Event) {
   const el = ev.target as HTMLImageElement
   if (el.naturalWidth > 0 && el.naturalHeight > 0) {
-    aspectRatios.value = {
-      ...aspectRatios.value,
-      [filename]: el.naturalWidth / el.naturalHeight
+    const next = el.naturalWidth / el.naturalHeight
+    const prev = aspectRatios.value[filename]
+    if (prev === undefined || Math.abs(prev - next) > 1e-5) {
+      aspectRatios.value = { ...aspectRatios.value, [filename]: next }
     }
   }
-  loadedPhotographyImages.value[filename] = true
+  if (!loadedPhotographyImages.value[filename]) {
+    loadedPhotographyImages.value = { ...loadedPhotographyImages.value, [filename]: true }
+  }
 }
 
 const isImageLoaded = (filename: string) => {
