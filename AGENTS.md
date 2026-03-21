@@ -2,6 +2,7 @@
 
 - **部署**：GitHub Pages，`app.baseURL` = `/young-portfolio/`；靜態資源與 `useImagePath` 依此組路徑。
 - **圖片庫路由**：`pages/gallery/[[category]].vue`；分類 `all` | `digital` | `photography`。Lightbox 與 `?image=<id>` 由 `useGalleryImageRoute` 同步。列表篩選邏輯在 `stores/gallerySelectors.ts`。
+- **攝影作品網格**：`GalleryPhotographySection` 為 **justified rows**（`utils/justifiedGalleryLayout.ts`）：依容器寬與長寬比決定 **每列張數**，同列等高、寬度依比例分配並填滿列寬（類 Google Images）；非固定雙欄。需 `ResizeObserver` + 圖片 `naturalWidth/Height` 更新比例。
 - **檢視器**：僅使用 Pinia `stores/imageViewer`，勿再引入已刪除的 viewer composable。
 - **Composables**：說明見 `composables/README.md`；勿加 `composables/index.ts` barrel（與 Nuxt auto-import 衝突）。
 - **健檢／重構優先級**：見 `docs/PROJECT_HEALTH.md`；維護目錄與指令見 `docs/MAINTENANCE.md`。

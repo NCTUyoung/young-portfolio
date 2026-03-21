@@ -22,7 +22,7 @@
 ### P0（影響正確性或體驗）
 
 - **`stores/gallery.ts`**：JSON 載入見 `galleryLoaders`、座標見 `galleryConstants`；篩選／分組／混合佈局／地圖點見 `stores/gallerySelectors.ts`（store 只組裝 computed 與快取）。
-- **`pages/gallery/[[category]].vue`**：已拆 `components/gallery/GalleryPhotographySection.vue`、`GalleryAllMixedSection.vue`，路由同步用 `useGalleryCategoryRoute`，攝影佈局用 `useGalleryPhotographyLayout`。
+- **`pages/gallery/[[category]].vue`**：已拆 `components/gallery/GalleryAllMixedSection.vue`；攝影為 `GalleryPhotographySection.vue`（justified rows，`utils/justifiedGalleryLayout.ts`）。路由同步用 `useGalleryCategoryRoute`。
 
 ### P1（維護成本）
 

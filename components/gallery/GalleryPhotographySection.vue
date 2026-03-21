@@ -1,5 +1,5 @@
 <template>
-  <!-- Desktop -->
+  <!-- Desktop: width must be measured on the timeline *content* strip, not the outer max-w-7xl -->
   <div class="hidden md:block">
     <div class="space-y-32 max-w-7xl mx-auto">
       <div
@@ -21,7 +21,10 @@
           :show-event-control="!!item.eventName"
           :show-event-info="!!item.eventName"
         >
-          <div class="mb-12 w-full min-w-0">
+          <div
+            :ref="el => bindStripRef(item.key, el, 'desktop')"
+            class="mb-12 w-full min-w-0 overflow-x-hidden"
+          >
             <div class="mb-6">
               <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                 {{ item.eventName || '其他作品' }}
@@ -29,33 +32,31 @@
               <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
             </div>
 
-            <div class="space-y-3">
+            <div class="flex flex-col" :style="{ gap: GAP_DESKTOP + 'px' }">
               <div
-                v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-                :key="`row-${rowIdx}`"
-                class="grid w-full gap-3"
-                :style="{
-                  gridTemplateColumns: rowImages.length === 1 ? 'minmax(0, 1fr)' : getRowGridTemplateColumns(rowIdx, index),
-                  height: getRowHeight(rowIdx, index),
-                }"
+                v-for="(row, ri) in justifiedRowsDesktop(item.images || [], item.key)"
+                :key="`d-${item.key}-${ri}`"
+                class="flex w-full min-w-0 max-w-full flex-row flex-nowrap items-start justify-start"
+                :style="{ gap: GAP_DESKTOP + 'px' }"
               >
                 <div
-                  v-for="image in rowImages"
+                  v-for="(image, ci) in row.items"
                   :key="image.filename"
                   :class="[
-                    'min-w-0 min-h-0 relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
+                    'relative max-w-full shrink-0 overflow-hidden rounded-lg cursor-pointer group hover:shadow-lg transition-all duration-300',
                     isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                   ]"
+                  :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
                   @click="openImageViewer(image, item.images || [])"
                 >
                   <img
                     :src="getImagePath(image.filename)"
                     :alt="image.title"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    class="h-full w-full object-cover align-top group-hover:scale-[1.01] transition-transform duration-500 ease-out"
                     loading="lazy"
-                    @load="markImageLoaded(image.filename)"
+                    @load="onImgLoad(image.filename, $event)"
                   >
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3">
                     <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
                     <div class="text-white/80 text-xs space-y-1 font-light">
                       <div v-if="image.camera || image.model" class="flex items-center gap-2">
@@ -91,29 +92,35 @@
           </h3>
           <p class="text-xs text-stone-400 dark:text-stone-500 font-light">{{ item.images?.length || 0 }} 張作品</p>
         </div>
-        <div class="space-y-2">
-          <div
-            v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
-            :key="`row-${rowIdx}`"
-            class="flex gap-2"
-            style="height: 150px"
-          >
+        <div
+          :ref="el => bindStripRef(item.key, el, 'mobile')"
+          class="w-full min-w-0 overflow-x-hidden"
+        >
+          <div class="flex flex-col" :style="{ gap: GAP_MOBILE + 'px' }">
             <div
-              v-for="image in rowImages"
-              :key="image.filename"
-              :class="[
-                'flex-1 rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-all duration-200 relative',
-                isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-              ]"
-              @click="openImageViewer(image, item.images || [])"
+              v-for="(row, ri) in justifiedRowsMobile(item.images || [], item.key)"
+              :key="`m-${item.key}-${ri}`"
+              class="flex w-full min-w-0 max-w-full flex-row flex-nowrap items-start justify-start"
+              :style="{ gap: GAP_MOBILE + 'px' }"
             >
-              <img
-                :src="getImagePath(image.filename)"
-                :alt="image.title"
-                class="w-full h-full object-cover"
-                loading="lazy"
-                @load="markImageLoaded(image.filename)"
+              <div
+                v-for="(image, ci) in row.items"
+                :key="image.filename"
+                :class="[
+                  'relative max-w-full shrink-0 overflow-hidden rounded-lg cursor-pointer group active:scale-[0.99] transition-transform duration-200',
+                  isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
+                ]"
+                :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
+                @click="openImageViewer(image, item.images || [])"
               >
+                <img
+                  :src="getImagePath(image.filename)"
+                  :alt="image.title"
+                  class="h-full w-full object-cover align-top"
+                  loading="lazy"
+                  @load="onImgLoad(image.filename, $event)"
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -123,12 +130,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type ComponentPublicInstance } from 'vue'
+import { onBeforeUnmount, ref, type ComponentPublicInstance } from 'vue'
 import type { GalleryItem, MixedPhotoItem } from '~/types/gallery'
 import { formatShutterSpeed } from '~/utils/formatters'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
-import { useGalleryPhotographyLayout } from '~/composables/useGalleryPhotographyLayout'
 import { useImageViewerStore } from '~/stores/imageViewer'
+import { computeJustifiedRows, DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
 
 const props = defineProps<{
   items: MixedPhotoItem[]
@@ -137,13 +144,100 @@ const props = defineProps<{
   registerEventRef: (name: string | null, el: Element | ComponentPublicInstance | null) => void
 }>()
 
-const { getImageRows, getRowHeight, getRowGridTemplateColumns } = useGalleryPhotographyLayout()
+const GAP_DESKTOP = 12
+const GAP_MOBILE = 8
+const IDEAL_ROW_DESKTOP = 220
+const IDEAL_ROW_MOBILE = 180
+const FALLBACK_WIDTH_DESKTOP = 1200
+const FALLBACK_WIDTH_MOBILE = 360
+
 const { getImagePath } = useImagePath()
 const imageViewerStore = useImageViewerStore()
 
+/** Measured width of the actual gallery column (inside timeline content slot) */
+const stripWidthDesktop = ref<Record<string, number>>({})
+const stripWidthMobile = ref<Record<string, number>>({})
+
+const aspectRatios = ref<Record<string, number>>({})
+
 const loadedPhotographyImages = ref<Record<string, boolean>>({})
 
-const markImageLoaded = (filename: string) => {
+const resizeObservers = new Map<string, ResizeObserver>()
+
+function resolveEl (el: Element | ComponentPublicInstance | null): HTMLElement | null {
+  if (!el) return null
+  if (el instanceof HTMLElement) return el
+  const v = el as ComponentPublicInstance
+  return v.$el instanceof HTMLElement ? v.$el : null
+}
+
+function bindStripRef (
+  key: string,
+  el: Element | ComponentPublicInstance | null,
+  mode: 'desktop' | 'mobile'
+) {
+  const mapKey = `${mode}:${key}`
+  resizeObservers.get(mapKey)?.disconnect()
+  resizeObservers.delete(mapKey)
+
+  const html = resolveEl(el)
+  if (!html) return
+
+  const apply = () => {
+    const w = html.clientWidth
+    if (w <= 0) return
+    if (mode === 'desktop') {
+      stripWidthDesktop.value = { ...stripWidthDesktop.value, [key]: w }
+    } else {
+      stripWidthMobile.value = { ...stripWidthMobile.value, [key]: w }
+    }
+  }
+
+  const ro = new ResizeObserver(apply)
+  ro.observe(html)
+  resizeObservers.set(mapKey, ro)
+  apply()
+}
+
+onBeforeUnmount(() => {
+  resizeObservers.forEach(o => o.disconnect())
+  resizeObservers.clear()
+})
+
+function ratioOf (filename: string): number {
+  return aspectRatios.value[filename] ?? DEFAULT_ASPECT_RATIO
+}
+
+function justifiedRowsDesktop (images: GalleryItem[], eventKey: string) {
+  const w = stripWidthDesktop.value[eventKey] ?? FALLBACK_WIDTH_DESKTOP
+  return computeJustifiedRows(
+    images,
+    ratioOf,
+    w,
+    GAP_DESKTOP,
+    IDEAL_ROW_DESKTOP
+  )
+}
+
+function justifiedRowsMobile (images: GalleryItem[], eventKey: string) {
+  const w = stripWidthMobile.value[eventKey] ?? FALLBACK_WIDTH_MOBILE
+  return computeJustifiedRows(
+    images,
+    ratioOf,
+    w,
+    GAP_MOBILE,
+    IDEAL_ROW_MOBILE
+  )
+}
+
+function onImgLoad (filename: string, ev: Event) {
+  const el = ev.target as HTMLImageElement
+  if (el.naturalWidth > 0 && el.naturalHeight > 0) {
+    aspectRatios.value = {
+      ...aspectRatios.value,
+      [filename]: el.naturalWidth / el.naturalHeight
+    }
+  }
   loadedPhotographyImages.value[filename] = true
 }
 

@@ -51,7 +51,7 @@ nctuyoung.github.io/
 
 | 項目 | 說明 |
 |------|------|
-| 圖片庫 | 路由分類、`useGalleryImageRoute`、`useGalleryCategoryRoute`、`useGalleryPhotographyLayout`、子元件拆分 |
+| 圖片庫 | 路由分類、`useGalleryImageRoute`、`useGalleryCategoryRoute`、攝影 justified 版面（`utils/justifiedGalleryLayout`）、子元件拆分 |
 | Gallery store | `galleryLoaders` / `galleryConstants` 與 store 分離 |
 | 後台 | `adminApiClient` + `adminTypes`；`useApi().createApiRequest`（後台多為 `showToast: false`）；`admin.vue` 首次載入用 `pageReady` + loading／全域錯誤條 |
 | 測試 | `utils/galleryUtils`、`formatters`、`validators`；selectors 見 `*Selectors.test.ts`（見 `*.test.ts`） |
