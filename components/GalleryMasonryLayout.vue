@@ -30,10 +30,13 @@
           @click="$emit('imageClick', item, sortedItems)"
         >
           <img
-            :src="getImagePath(item.filename)"
+            :src="getThumbPath(item.filename, 800)"
+            :srcset="getGridImageSrcset(item.filename)"
+            :sizes="gridImageSizes"
             :alt="item.title"
             class="w-full h-auto block rounded-sm transition-all duration-500 ease-out"
             :loading="rowIndex < 3 ? 'eager' : 'lazy'"
+            decoding="async"
             @load="(e) => onImageLoad(e, row.key, itemIndex)"
             @error="() => onImageError(row.key, itemIndex)"
           >
@@ -62,10 +65,13 @@
           @click="$emit('imageClick', item, sortedItems)"
         >
           <img
-            :src="getImagePath(item.filename)"
+            :src="getThumbPath(item.filename, 800)"
+            :srcset="getGridImageSrcset(item.filename)"
+            :sizes="gridImageSizes"
             :alt="item.title"
             class="w-full h-auto rounded-sm"
             loading="lazy"
+            decoding="async"
           >
           <div class="mt-2">
             <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1">{{ item.title }}</h4>
@@ -95,7 +101,7 @@ defineEmits<{
   imageClick: [item: GalleryItem, items: GalleryItem[]]
 }>()
 
-const { getImagePath } = useImagePath()
+const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 
 // 狀態
 const rowsLoaded = ref<Record<string, boolean>>({})

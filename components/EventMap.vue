@@ -8,10 +8,11 @@
         class="event-map-hover-card"
       >
         <img
-          :src="getImagePath(hoveredEvent.coverFilename)"
+          :src="getThumbPath(hoveredEvent.coverFilename, 400)"
           :alt="hoveredEvent.name"
           class="event-map-hover-image"
           loading="lazy"
+          decoding="async"
         >
         <div class="event-map-hover-text">
           <p class="event-map-hover-title">
@@ -62,7 +63,7 @@ const mapContainer = ref<HTMLDivElement | null>(null)
 const hoveredEvent = ref<EventLocation | null>(null)
 const isDark = useDark()
 
-const { getImagePath } = useImagePath()
+const { getThumbPath } = useImagePath()
 
 let map: LeafletMap | null = null
 let markersLayer: LayerGroup | null = null

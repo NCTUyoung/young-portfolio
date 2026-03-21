@@ -7,10 +7,13 @@
     >
       <div class="aspect-square">
         <img
-          :src="getImagePath(item.filename)"
+          :src="getThumbPath(item.filename, 800)"
+          :srcset="getGridImageSrcset(item.filename)"
+          :sizes="gridImageSizes"
           :alt="item.title"
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
         >
       </div>
       <!-- 編輯模式刪除按鈕 -->
@@ -77,7 +80,7 @@ interface Props {
 defineProps<Props>()
 
 const adminStore = useAdminStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 
 // 顏色樣式對應
 const getColorClass = (color?: string) => {

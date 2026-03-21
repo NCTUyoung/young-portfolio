@@ -6,7 +6,7 @@ Nuxt 會自動匯入 `composables/*.ts` 內的 `use*` 函式，頁面與元件�
 
 | 檔案 | 用途 |
 |------|------|
-| `useImagePath.ts` | 依 `app.baseURL` 組出 `/images/...` 路徑與完整 URL |
+| `useImagePath.ts` | `getImagePath` 原圖；`getThumbPath` / `getGridImageSrcset` / `gridImageSizes` 網格用 WebP 縮圖（`npm run thumbs`） |
 | `useToast.ts` | Toast UI；`useGlobalToast()` 為單例，供多處共用 |
 | `useScrollReveal.ts` | IntersectionObserver，`.reveal` 等進場動畫 |
 | `useGalleryImageRoute.ts` | 圖片庫頁：`?image=<id>` 與 lightbox 狀態同步 |

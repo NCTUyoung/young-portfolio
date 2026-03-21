@@ -176,10 +176,13 @@
               @click="handleImageClick(item, group.items, itemIdx)"
             >
               <img
-                :src="getImagePath(item.filename)"
+                :src="getThumbPath(item.filename, 800)"
+                :srcset="getGridImageSrcset(item.filename)"
+                :sizes="gridImageSizes"
                 :alt="item.title"
                 class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
+                decoding="async"
                 @error="handleImageError"
               >
 
@@ -259,10 +262,11 @@
               </div>
 
               <img
-                :src="getImagePath(item.filename)"
+                :src="getThumbPath(item.filename, 400)"
                 :alt="item.title"
                 class="w-10 h-10 object-cover rounded-lg flex-shrink-0 cursor-pointer"
                 loading="lazy"
+                decoding="async"
                 @error="handleImageError"
                 @click="openLightbox(item, group.items, group.items.indexOf(item))"
               >
@@ -358,7 +362,7 @@
 defineEmits<{ switchToUpload: [eventName: string] }>()
 
 const adminStore = useAdminStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 
 // ===== 搜尋 =====
 const searchQuery = ref('')

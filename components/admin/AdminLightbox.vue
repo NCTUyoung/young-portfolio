@@ -36,6 +36,7 @@
         <img
           v-if="currentImage"
           :src="getImagePath(currentImage.filename)"
+          decoding="async"
           :alt="currentImage.title"
           class="max-w-full max-h-[75vh] object-contain rounded-lg select-none"
           @error="handleError"

@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
+import { removeThumbsForPublicImageFilename } from '../utils/thumbFromSource'
 
 type ImgRecord = {
   filename: string
@@ -59,10 +60,11 @@ export default defineEventHandler(async (event) => {
 
     const imageRecord = categoryData.Img[imageIndex]
 
-    // 刪除檔案系統中的圖片
+    // 刪除檔案系統中的圖片與對應 WebP 縮圖
     if (existsSync(imagePath)) {
       unlinkSync(imagePath)
     }
+    removeThumbsForPublicImageFilename(filename)
 
     // 從 JSON 資料中移除圖片記錄
     categoryData.Img.splice(imageIndex, 1)

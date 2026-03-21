@@ -11,6 +11,7 @@ import {
 import { formatDateFull } from '~/utils/formatters'
 import { inferEventFromTime } from '~/utils/eventUtils'
 import type { PhotographyData, GalleryData } from '~/types/gallery'
+import { generateThumbsForPublicImage } from '../utils/thumbFromSource'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'POST') {
@@ -136,6 +137,12 @@ export default defineEventHandler(async (event) => {
           const fs = await import('fs/promises')
           await fs.rename(file.filepath, newPath)
 
+          try {
+            await generateThumbsForPublicImage(newPath)
+          } catch (e) {
+            console.warn(`縮圖產生失敗（仍保留原圖）: ${newPath}`, e)
+          }
+
           // 生成標題和描述
           const { title: autoTitle, description: autoDescription } = generateTitleAndDescription(originalName)
 
@@ -210,6 +217,12 @@ export default defineEventHandler(async (event) => {
           const newPath = join(eventDir, originalName)
           const fs = await import('fs/promises')
           await fs.rename(file.filepath, newPath)
+
+          try {
+            await generateThumbsForPublicImage(newPath)
+          } catch (e) {
+            console.warn(`縮圖產生失敗（仍保留原圖）: ${newPath}`, e)
+          }
 
           uploadedFiles.push({
             filename: `${category}/${eventInfo.name}/${originalName}`,

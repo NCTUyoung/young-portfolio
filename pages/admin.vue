@@ -186,10 +186,11 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               >
                 <div class="absolute inset-0 border border-stone-100 group-hover:border-amber-300/50 transition-colors duration-300" />
                 <img
-                  :src="getImagePath(item.filename)"
+                  :src="getThumbPath(item.filename, 400)"
                   :alt="item.title"
                   class="w-full h-full object-contain bg-stone-50/50 group-hover:scale-[1.02] transition-transform duration-500 ease-out"
                   loading="lazy"
+                  decoding="async"
                   @error="handleImageError"
                 >
                 <div class="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -573,7 +574,7 @@ useSeoMeta({
 })
 
 const adminStore = useAdminStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath } = useImagePath()
 
 /** 首次雙分類載入完成前不渲染主內容，避免空白閃爍 */
 const pageReady = ref(false)

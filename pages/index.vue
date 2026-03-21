@@ -8,6 +8,8 @@
           :src="heroImageSrc"
           alt=""
           class="absolute inset-0 w-full h-full object-cover"
+          fetchpriority="high"
+          decoding="async"
           loading="eager"
         >
         <div class="absolute inset-0 bg-white/30 dark:bg-stone-900/25 pointer-events-none"/>
@@ -136,6 +138,8 @@
                 :src="avatarPath"
                 alt="Young"
                 class="w-full h-full object-cover"
+                decoding="async"
+                loading="lazy"
               >
             </div>
             <!-- 浮動裝飾點 -->
@@ -373,10 +377,13 @@ v-for="(milestone, index) in milestones" :key="index"
           >
             <div :class="work.tall ? 'h-72 lg:h-[28rem]' : 'h-36 lg:h-52'">
               <img
-                :src="getImagePath(work.src)"
+                :src="getThumbPath(work.src, 800)"
+                :srcset="getGridImageSrcset(work.src)"
+                :sizes="gridImageSizes"
                 :alt="work.title"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
+                decoding="async"
               >
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"/>
               <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
@@ -421,9 +428,13 @@ v-for="(milestone, index) in milestones" :key="index"
           <div class="reveal group">
             <NuxtLink to="/gallery" class="block relative overflow-hidden rounded-2xl h-72 lg:h-80">
               <img
-                :src="getImagePath('gallery/2024年電繪作品/23.jpg')"
+                :src="getThumbPath('gallery/2024年電繪作品/23.jpg', 800)"
+                :srcset="getGridImageSrcset('gallery/2024年電繪作品/23.jpg')"
+                :sizes="gridImageSizes"
                 alt="Gallery preview"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
               >
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"/>
               <div class="absolute top-6 right-6 w-3 h-3 rounded-full bg-accent-400 opacity-70 group-hover:opacity-100 transition-opacity"/>
@@ -477,13 +488,13 @@ import { ref, onMounted } from 'vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useImagePath } from '~/composables/useImagePath'
 
-const { getImagePath } = useImagePath()
+const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 const { observeAll } = useScrollReveal()
 const pageRef = ref<HTMLElement | null>(null)
 
-// ===== 圖片路徑 =====
-const avatarPath = getImagePath('gallery/2024年電繪作品/55.jpg')
-const heroImageSrc = getImagePath('photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg')
+// ===== 圖片路徑（Hero / 頭像用縮圖以減少 LCP 與流量；og:image 仍指向原圖 URL）=====
+const avatarPath = getThumbPath('gallery/2024年電繪作品/55.jpg', 400)
+const heroImageSrc = getThumbPath('photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg', 800)
 
 // ===== About 資料 =====
 const digitalTags = ['電繪插畫', '角色設計', '風景繪製', '概念藝術', '幾何風格']

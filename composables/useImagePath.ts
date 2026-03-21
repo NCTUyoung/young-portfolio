@@ -1,7 +1,12 @@
 /**
  * 圖片路徑處理 composable
  * 統一處理圖片路徑，支援 GitHub Pages baseURL
+ *
+ * - getImagePath：原圖（lightbox、後台編輯、histogram）
+ * - getThumbPath / getGridImageSrcset：網格用 WebP 縮圖（npm run thumbs）
  */
+import { buildThumbPath, GRID_IMAGE_SIZES, type ThumbWidth } from '~/utils/imagePaths'
+
 export const useImagePath = () => {
   // 直接使用 Nuxt 的 app.baseURL，避免手動從網址解析
   const config = useRuntimeConfig()
@@ -15,6 +20,20 @@ export const useImagePath = () => {
   const getImagePath = (filename: string): string => {
     const cleanFilename = filename.startsWith('/') ? filename.slice(1) : filename
     return `${normalizedBase}images/${cleanFilename}`
+  }
+
+  /**
+   * WebP thumbnail path (400w / 800w). Run `npm run thumbs` after adding images.
+   */
+  const getThumbPath = (filename: string, width: ThumbWidth = 800): string => {
+    return buildThumbPath(filename, width, normalizedBase)
+  }
+
+  /**
+   * Responsive srcset for gallery grids (400w + 800w assets).
+   */
+  const getGridImageSrcset = (filename: string): string => {
+    return `${getThumbPath(filename, 400)} 400w, ${getThumbPath(filename, 800)} 800w`
   }
 
   /**
@@ -35,6 +54,9 @@ export const useImagePath = () => {
 
   return {
     getImagePath,
+    getThumbPath,
+    getGridImageSrcset,
+    gridImageSizes: GRID_IMAGE_SIZES,
     getFullImageUrl
   }
 }

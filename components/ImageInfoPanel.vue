@@ -32,9 +32,12 @@ class="absolute left-0 top-0 w-2 h-full cursor-col-resize hover:bg-blue-500 hove
       <div class="text-center">
         <div class="inline-block border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
           <img
-:src="getImagePath(currentViewerImage.filename)"
+:src="getThumbPath(currentViewerImage.filename, 400)"
                :alt="imageInfo.title"
-               class="w-32 h-32 object-contain" >
+               class="w-32 h-32 object-contain"
+               decoding="async"
+               loading="lazy"
+          >
         </div>
         <div class="mt-2 text-sm text-gray-300 text-center font-medium">{{ imageInfo.title }}</div>
       </div>
@@ -147,7 +150,7 @@ import { useImageViewerStore } from '~/stores/imageViewer'
 import ImageHistogram from './ImageHistogram.vue'
 
 const imageViewerStore = useImageViewerStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath } = useImagePath()
 const {
   showInfoPanel,
   infoPanelWidth,

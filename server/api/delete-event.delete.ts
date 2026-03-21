@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
+import { removeThumbsForPublicImageFilename } from '../utils/thumbFromSource'
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'DELETE') {
@@ -63,6 +64,9 @@ export default defineEventHandler(async (event) => {
         } catch (e) {
           console.warn(`Failed to delete file: ${filename}`, e)
         }
+      }
+      if (filename) {
+        removeThumbsForPublicImageFilename(filename)
       }
     }
 

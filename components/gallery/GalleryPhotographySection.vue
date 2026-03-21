@@ -7,6 +7,7 @@
         :key="item.key"
         :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
         :class="[
+          '[content-visibility:auto]',
           'transition-colors duration-500',
           focusedEventName === item.eventName
             ? 'bg-amber-50/40 dark:bg-amber-900/10 rounded-2xl -mx-4 px-4 py-2'
@@ -50,10 +51,13 @@
                   @click="openImageViewer(image, item.images || [])"
                 >
                   <img
-                    :src="getImagePath(image.filename)"
+                    :src="getThumbPath(image.filename, 800)"
+                    :srcset="getGridImageSrcset(image.filename)"
+                    :sizes="gridImageSizes"
                     :alt="image.title"
                     class="h-full w-full object-cover align-top group-hover:scale-[1.01] transition-transform duration-500 ease-out"
                     loading="lazy"
+                    decoding="async"
                     @load="onImgLoad(image.filename, $event)"
                   >
                   <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3">
@@ -85,7 +89,7 @@
   <!-- Mobile -->
   <div class="md:hidden block">
     <div class="space-y-12">
-      <div v-for="item in items" :key="item.key">
+      <div v-for="item in items" :key="item.key" class="[content-visibility:auto]">
         <div v-if="item.eventName" class="mb-4">
           <h3 class="text-base font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
             {{ item.eventName }}
@@ -114,10 +118,13 @@
                 @click="openImageViewer(image, item.images || [])"
               >
                 <img
-                  :src="getImagePath(image.filename)"
+                  :src="getThumbPath(image.filename, 800)"
+                  :srcset="getGridImageSrcset(image.filename)"
+                  :sizes="gridImageSizes"
                   :alt="image.title"
                   class="h-full w-full object-cover align-top"
                   loading="lazy"
+                  decoding="async"
                   @load="onImgLoad(image.filename, $event)"
                 >
               </div>
@@ -151,7 +158,7 @@ const IDEAL_ROW_MOBILE = 180
 const FALLBACK_WIDTH_DESKTOP = 1200
 const FALLBACK_WIDTH_MOBILE = 360
 
-const { getImagePath } = useImagePath()
+const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 const imageViewerStore = useImageViewerStore()
 
 /** Measured width of the actual gallery column (inside timeline content slot) */

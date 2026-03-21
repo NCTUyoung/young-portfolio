@@ -115,6 +115,7 @@ v-if="currentViewerImage"
                :style="imageStyle"
                draggable="false"
                loading="lazy"
+               decoding="async"
                @click.stop
                @mousedown="handleMouseDown"
                @touchstart="handleTouchStart"

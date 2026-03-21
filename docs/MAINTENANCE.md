@@ -64,8 +64,15 @@ nctuyoung.github.io/
 ### 日常
 
 - [ ] 圖片與 JSON（`public/*.json`）路徑與 `useImagePath` 一致  
+- [ ] **縮圖**：後台 **本機 `nuxt dev` 上傳**（`/api/upload`）會自動為新檔產生 `_thumbs/{400w,800w}`；若你**手動複製**原圖到 `public/images/**`、或需全庫重產，仍執行 `npm run thumbs`。刪除單圖／整個事件時，API 會一併刪除對應 WebP 縮圖。  
 - [ ] 響應式與圖片庫分類切換  
 - [ ] SEO meta（圖片庫見 `pages/gallery/[[category]].vue`）
+
+### 圖片效能（縮圖與 `@nuxt/image`）
+
+- **網格／列表**：使用 `useImagePath()` 的 `getThumbPath`、`getGridImageSrcset`、`gridImageSizes`；實體檔由 **`scripts/generate-thumbs.mjs`** 全量掃描，或 **`server/utils/thumbFromSource.ts`** 在上傳成功時單檔產生（與腳本相同 **sharp** 參數）。  
+- **原圖**：`getImagePath` 用於 `ImageViewer`、histogram、後台編輯／lightbox 等需像素級檢視處。  
+- **`@nuxt/image`**：已安裝但未用於上述網格；GitHub Pages 為純靜態，**離線 WebP 縮圖**路徑較可預期；若未來要接 IPX／雲端 provider，需另驗 `nuxt generate` 產物。
 
 ### 發版前
 
@@ -88,6 +95,7 @@ npm install
 npm run dev
 npm run build
 npm run preview
+npm run thumbs        # 掃描 public/images 產生 _thumbs/400w、800w WebP（新增照片後建議執行）
 npm run test          # Vitest 單次
 npm run test:watch    # 監聽模式
 ```
@@ -121,7 +129,8 @@ npm run test:watch    # 監聽模式
 
 ### 中期（可選）
 
-- [ ] 大量圖片時懶載入／虛擬列表評估  
+- [x] 網格載入 **WebP 縮圖** + `srcset`／`sizes`（見 `utils/imagePaths.ts`、`npm run thumbs`）  
+- [ ] 大量圖片時虛擬列表評估  
 - [ ] 擴充 Vitest 覆蓋面（composables 需 Nuxt 測試環境時再評估）  
 
 ### 長期（可選）

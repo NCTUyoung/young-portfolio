@@ -24,6 +24,7 @@ class="bg-black bg-opacity-80 backdrop-blur-sm rounded-lg border border-white bo
 v-if="currentViewerImage"
              ref="navigatorImageElement"
              :src="getImagePath(currentViewerImage.filename)"
+             decoding="async"
              :alt="currentViewerImage.title"
              class="w-full h-full object-contain cursor-pointer"
              draggable="false"

@@ -2,7 +2,7 @@
   <div class="flex items-start relative" :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'">
     <!-- Timeline Section -->
     <div
-      class="md:w-40 flex-shrink-0 text-right md:text-left mb-4 md:mb-0 relative"
+      class="md:w-40 flex-shrink-0 text-right md:text-left mb-4 md:mb-0 relative overflow-visible"
       :class="index % 2 === 0 ? 'md:mr-16' : 'md:ml-16 md:text-right'"
     >
       <!-- Timeline 節點 — 菱形日式設計 -->
@@ -56,9 +56,13 @@
         </button>
       </div>
 
-      <!-- Time Label -->
-      <div class="text-sm text-stone-400 dark:text-stone-500 font-light tracking-wide mb-10">
-        <span class="transform md:-rotate-90 origin-center whitespace-nowrap inline-block font-jp">
+      <!-- Time Label: -rotate-90 makes visual height ≈ horizontal text width; reserve min-height or glyphs clip -->
+      <div
+        class="text-sm text-stone-400 dark:text-stone-500 font-light tracking-wide mb-10 overflow-visible md:flex md:items-center md:justify-center md:min-h-[28ch]"
+      >
+        <span
+          class="transform md:-rotate-90 md:origin-center whitespace-nowrap inline-block font-jp select-none leading-normal"
+        >
           {{ timeLabel }}
         </span>
       </div>
