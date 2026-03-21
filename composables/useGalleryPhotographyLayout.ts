@@ -7,25 +7,14 @@ const HEIGHT_PATTERNS = [
   ['300px', '220px', '240px', '260px', '200px']
 ] as const
 
-const WIDTH_PATTERNS = [
-  [
-    ['w-3/5', 'w-2/5'],
-    ['w-1/2', 'w-1/2'],
-    ['w-2/5', 'w-3/5'],
-    ['w-2/3', 'w-1/3']
-  ],
-  [
-    ['w-1/2', 'w-1/2'],
-    ['w-1/3', 'w-2/3'],
-    ['w-3/5', 'w-2/5'],
-    ['w-1/2', 'w-1/2']
-  ],
-  [
-    ['w-2/3', 'w-1/3'],
-    ['w-2/5', 'w-3/5'],
-    ['w-1/2', 'w-1/2'],
-    ['w-3/5', 'w-2/5']
-  ]
+/**
+ * Per-row `grid-template-columns` (two tracks). Inline style — not Tailwind — so ratios
+ * always apply (arbitrary `flex-[n]` classes are easy to purge / miss in production).
+ */
+const ROW_GRID_TEMPLATE_PATTERNS = [
+  ['3fr 2fr', '1fr 1fr', '2fr 3fr', '2fr 1fr'],
+  ['1fr 1fr', '1fr 2fr', '3fr 2fr', '1fr 1fr'],
+  ['2fr 1fr', '2fr 3fr', '1fr 1fr', '3fr 2fr']
 ] as const
 
 /**
@@ -49,19 +38,18 @@ export function getRowHeight (rowIndex: number, groupIndex: number): string {
 }
 
 /**
- * Tailwind width classes for each slot in a row.
+ * Two-column track template for one row (use with CSS Grid + `gap`).
  */
-export function getImageWidth (imageIndex: number, rowIndex: number, groupIndex: number): string {
-  const patternIndex = groupIndex % WIDTH_PATTERNS.length
-  const rowPatterns = WIDTH_PATTERNS[patternIndex]
-  const rowPattern = rowPatterns[rowIndex % rowPatterns.length]
-  return rowPattern[imageIndex] || 'w-1/2'
+export function getRowGridTemplateColumns (rowIndex: number, groupIndex: number): string {
+  const patternIndex = groupIndex % ROW_GRID_TEMPLATE_PATTERNS.length
+  const pattern = ROW_GRID_TEMPLATE_PATTERNS[patternIndex]
+  return pattern[rowIndex % pattern.length]
 }
 
 export function useGalleryPhotographyLayout () {
   return {
     getImageRows,
     getRowHeight,
-    getImageWidth
+    getRowGridTemplateColumns
   }
 }

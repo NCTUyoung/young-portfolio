@@ -1,6 +1,6 @@
 <template>
   <div class="hidden md:block">
-    <div class="space-y-32 max-w-6xl mx-auto">
+    <div class="space-y-32 max-w-7xl mx-auto">
       <GalleryTimelineItem
         v-for="(item, index) in items"
         :key="item.key"

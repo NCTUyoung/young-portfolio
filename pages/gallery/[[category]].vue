@@ -59,7 +59,7 @@
       <section
         v-if="eventLocations && eventLocations.length && currentCategory === 'photography'"
         ref="mapSectionRef"
-        class="mb-16 max-w-6xl mx-auto"
+        class="mb-16 max-w-7xl mx-auto"
       >
         <p class="jp-section-label mb-3">Visited Places</p>
         <EventMap

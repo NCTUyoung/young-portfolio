@@ -96,7 +96,7 @@ v-if="eventInfo.location" class="text-stone-400 dark:text-stone-500 truncate fle
     <Transition name="collapse-fade" mode="out-in">
       <div
         v-if="shouldShowContent"
-        class="flex-1 md:max-w-2xl relative"
+        class="flex-1 min-w-0 relative"
         :class="[
           index % 2 === 0 ? 'md:ml-16' : 'md:mr-16',
           index % 2 === 0 ? 'collapse-from-left' : 'collapse-from-right'

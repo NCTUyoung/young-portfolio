@@ -11,7 +11,7 @@ Nuxt 會自動匯入 `composables/*.ts` 內的 `use*` 函式，頁面與元件�
 | `useScrollReveal.ts` | IntersectionObserver，`.reveal` 等進場動畫 |
 | `useGalleryImageRoute.ts` | 圖片庫頁：`?image=<id>` 與 lightbox 狀態同步 |
 | `useGalleryCategoryRoute.ts` | 圖片庫：`/gallery/:category` 與 Pinia `selectedCategory` 同步 |
-| `useGalleryPhotographyLayout.ts` | 攝影區桌面雙欄：行高／寬度 class、`getImageRows` |
+| `useGalleryPhotographyLayout.ts` | 攝影區桌面雙欄：行高、`getImageRows`、`getRowGridTemplateColumns`（CSS Grid `grid-template-columns` 字串，避免 Tailwind 任意 class 被 purge） |
 
 ## 工具／預留
 

@@ -1,7 +1,7 @@
 <template>
   <!-- Desktop -->
   <div class="hidden md:block">
-    <div class="space-y-32 max-w-6xl mx-auto">
+    <div class="space-y-32 max-w-7xl mx-auto">
       <div
         v-for="(item, index) in items"
         :key="item.key"
@@ -21,7 +21,7 @@
           :show-event-control="!!item.eventName"
           :show-event-info="!!item.eventName"
         >
-          <div class="mb-12">
+          <div class="mb-12 w-full min-w-0">
             <div class="mb-6">
               <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
                 {{ item.eventName || '其他作品' }}
@@ -33,15 +33,17 @@
               <div
                 v-for="(rowImages, rowIdx) in getImageRows(item.images || [])"
                 :key="`row-${rowIdx}`"
-                class="flex gap-3"
-                :style="{ height: getRowHeight(rowIdx, index) }"
+                class="grid w-full gap-3"
+                :style="{
+                  gridTemplateColumns: rowImages.length === 1 ? 'minmax(0, 1fr)' : getRowGridTemplateColumns(rowIdx, index),
+                  height: getRowHeight(rowIdx, index),
+                }"
               >
                 <div
-                  v-for="(image, imgIdx) in rowImages"
+                  v-for="image in rowImages"
                   :key="image.filename"
                   :class="[
-                    getImageWidth(imgIdx, rowIdx, index),
-                    'relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
+                    'min-w-0 min-h-0 relative rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300',
                     isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                   ]"
                   @click="openImageViewer(image, item.images || [])"
@@ -135,7 +137,7 @@ const props = defineProps<{
   registerEventRef: (name: string | null, el: Element | ComponentPublicInstance | null) => void
 }>()
 
-const { getImageRows, getRowHeight, getImageWidth } = useGalleryPhotographyLayout()
+const { getImageRows, getRowHeight, getRowGridTemplateColumns } = useGalleryPhotographyLayout()
 const { getImagePath } = useImagePath()
 const imageViewerStore = useImageViewerStore()
 
