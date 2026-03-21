@@ -1,10 +1,22 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { FileWithMeta, GalleryItem, PhotographyItem, CategoryType } from '~/types/gallery'
-
-type UnifiedGalleryItem = GalleryItem | PhotographyItem
+import type { GalleryListApiResponse, UnifiedGalleryItem } from '~/stores/adminTypes'
+import {
+  computeCanUpload,
+  pickDataByCategory,
+  buildGroupedManageData,
+  buildAvailableEventsForManage,
+  buildOverviewStats,
+  buildRecentOverviewItems,
+  extractPhotographyEventNames
+} from '~/stores/adminSelectors'
+import { API_CONFIG } from '~/config/constants'
+import { useApi } from '~/composables/useApi'
+import * as adminApi from '~/stores/adminApiClient'
 
 export const useAdminStore = defineStore('admin', () => {
+  const { createApiRequest } = useApi()
   // ===== 基本狀態 =====
   const loading = ref(false)
   const uploading = ref(false)
@@ -67,182 +79,63 @@ export const useAdminStore = defineStore('admin', () => {
   const galleryData = ref<UnifiedGalleryItem[]>([])
   const photographyData = ref<UnifiedGalleryItem[]>([])
 
-  // ===== 計算屬性 =====
-  const canUpload = computed(() => {
-    if (selectedFiles.value.length === 0 || uploading.value) {
-      return false
-    }
+  // ===== 計算屬性（純邏輯見 adminSelectors）=====
+  const canUpload = computed(() => computeCanUpload({
+    fileCount: selectedFiles.value.length,
+    uploading: uploading.value,
+    uploadCategory: uploadCategory.value,
+    eventMode: eventMode.value,
+    eventName: eventName.value,
+    selectedExistingEvent: selectedExistingEvent.value
+  }))
 
-    // 如果是攝影作品，需要根據事件模式檢查
-    if (uploadCategory.value === 'photography') {
-      if (eventMode.value === 'new') {
-        return eventName.value.trim() !== ''
-      } else if (eventMode.value === 'existing') {
-        return selectedExistingEvent.value.trim() !== ''
-      }
-    }
+  const currentManageData = computed(() =>
+    pickDataByCategory(manageCategory.value, galleryData.value, photographyData.value)
+  )
 
-    // 繪圖作品不需要額外檢查，系統會自動推斷事件
-    return true
-  })
+  const currentOverviewData = computed(() =>
+    pickDataByCategory(overviewCategory.value, galleryData.value, photographyData.value)
+  )
 
-  // 獲取當前管理頁面的數據
-  const currentManageData = computed(() => {
-    return manageCategory.value === 'gallery' ? (galleryData.value || []) : (photographyData.value || [])
-  })
-
-  // 獲取當前概覽頁面的數據
-  const currentOverviewData = computed(() => {
-    return overviewCategory.value === 'gallery' ? (galleryData.value || []) : (photographyData.value || [])
-  })
-
-  // 按事件分組的圖片數據 (管理頁面用)
-  const groupedManageData = computed(() => {
-    const data = currentManageData.value || []
-    const groups: Record<string, {
-      eventName: string
-      description: string
-      location: string
-      items: UnifiedGalleryItem[]
-    }> = {}
-
-    data.forEach(item => {
-      let currentEventName = '預設事件'
-      let description = '未分類作品'
-      let location = ''
-
-      // 檢查是否有事件資訊 - 攝影和電繪作品都支援事件
-      const itemWithEvent = item as GalleryItem & { event?: { name?: string; description?: string; location?: string } }
-      if (itemWithEvent.event) {
-        const event = itemWithEvent.event
-        currentEventName = event.name || '預設事件'
-        description = event.description || '未分類作品'
-        location = event.location || ''
-      } else if (manageCategory.value === 'gallery') {
-        // 電繪作品按年份分組
-        const year = new Date(item.time).getFullYear()
-        currentEventName = `${year}年電繪作品`
-        description = `${year} 年創作的電繪作品`
-        location = ''
-      }
-
-      if (!groups[currentEventName]) {
-        groups[currentEventName] = {
-          eventName: currentEventName,
-          description,
-          location,
-          items: []
-        }
-      }
-
-      groups[currentEventName].items.push(item)
-    })
-
-    // 轉換為陣列並按時間排序
-    let result = Object.values(groups).map(group => ({
-      ...group,
-      items: group.items.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()),
-      // 計算事件的最新時間（用於事件間排序）
-      latestTime: Math.max(...group.items.map(item => new Date(item.time).getTime()))
-    })).sort((a, b) => {
-      // 優先按最新圖片時間排序（新事件在前）
-      const timeDiff = b.latestTime - a.latestTime
-      if (timeDiff !== 0) return timeDiff
-      // 時間相同時按圖片數量排序
-      return b.items.length - a.items.length
-    })
-
-    // 如果有選中特定事件，只返回該事件
-    if (selectedEvent.value && selectedEvent.value !== '') {
-      result = result.filter(group => group.eventName === selectedEvent.value)
-    }
-
-    return result
-  })
-
-    // 可用事件列表 (管理頁面篩選用)
-  const availableEvents = computed(() => {
-    const data = currentManageData.value || []
-    const events = new Set<string>()
-
-    data.forEach(item => {
-      const itemEv = item as GalleryItem & { event?: { name?: string } }
-      if (itemEv.event) {
-        events.add(itemEv.event.name || '預設事件')
-      } else if (manageCategory.value === 'gallery') {
-        // 電繪作品按年份分組
-        const year = new Date(item.time).getFullYear()
-        events.add(`${year}年電繪作品`)
-      } else {
-        events.add('預設事件')
-      }
-    })
-
-    return Array.from(events).sort()
-  })
-
-    // 統計資訊 (概覽頁面用)
-  const overviewStats = computed(() => {
-    const data = currentOverviewData.value || []
-
-    return {
-      totalImages: data.length,
-      uniqueCameras: overviewCategory.value === 'photography'
-        ? Array.from(new Set(data.map(item => (item as GalleryItem & { camera?: string }).camera).filter(c => c && c !== 'Unknown')))
-        : [],
-      uniqueColors: overviewCategory.value === 'gallery'
-        ? Array.from(new Set(data.map(item => (item as GalleryItem).color).filter(c => c)))
-        : [],
-      recentUploads: (() => {
-        const now = new Date()
-        const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-        return data.filter(item => {
-          const itemDate = new Date(item.time)
-          return itemDate >= thisMonth
-        }).length
-      })(),
-      events: overviewCategory.value === 'photography'
-        ? Array.from(new Set(data.map(item => (item as GalleryItem & { event?: { name?: string } }).event?.name).filter(e => e)))
-        : []
-    }
-  })
-
-  // 最近項目 (概覽頁面用)
-  const recentItems = computed(() => {
-    const data = currentOverviewData.value || []
-    return data.slice(0, 20).sort((a, b) =>
-      new Date(b.time).getTime() - new Date(a.time).getTime()
+  const groupedManageData = computed(() =>
+    buildGroupedManageData(
+      currentManageData.value || [],
+      manageCategory.value,
+      selectedEvent.value
     )
-  })
+  )
 
-  // 攝影作品可用事件列表 (上傳頁面用)
-  const availablePhotographyEvents = computed(() => {
-    const data = photographyData.value || []
-    const events = new Set<string>()
+  const availableEvents = computed(() =>
+    buildAvailableEventsForManage(currentManageData.value || [], manageCategory.value)
+  )
 
-    data.forEach(item => {
-      const pe = item as GalleryItem & { event?: { name?: string } }
-      if (pe.event && pe.event.name) {
-        events.add(pe.event.name)
-      }
-    })
+  const overviewStats = computed(() =>
+    buildOverviewStats(currentOverviewData.value || [], overviewCategory.value)
+  )
 
-    return Array.from(events).sort()
-  })
+  const recentItems = computed(() =>
+    buildRecentOverviewItems(currentOverviewData.value || [])
+  )
+
+  const availablePhotographyEvents = computed(() =>
+    extractPhotographyEventNames(photographyData.value || [])
+  )
 
   // ===== Actions =====
 
-    // 載入指定分類的圖片列表
+    // 載入指定分類的圖片列表（經 useApi 重試；不顯示全域 toast，沿用頁面 message）
   const loadGalleryByCategory = async (category: CategoryType, options?: { force?: boolean }) => {
     if (loading.value && !options?.force) return // 防止重複載入（force 時強制重新載入）
 
     loading.value = true
     try {
-      const response = await $fetch('/api/gallery', {
-        query: { category }
-      }) as { success: boolean; data: { Img: UnifiedGalleryItem[] } }
+      const { execute } = createApiRequest(
+        () => adminApi.fetchGalleryList(category),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute() as GalleryListApiResponse | null
 
-      if (response.success && response.data) {
+      if (response?.success && response.data) {
         const sortedData = (response.data.Img || []).sort((a, b) => {
           return new Date(b.time).getTime() - new Date(a.time).getTime()
         })
@@ -411,12 +304,13 @@ export const useAdminStore = defineStore('admin', () => {
         }
       })
 
-      const response = await $fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      })
+      const { execute } = createApiRequest(
+        () => adminApi.postUpload(formData),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute()
 
-      if (response.success) {
+      if (response?.success) {
         message.value = response.message
         messageType.value = 'success'
         selectedFiles.value = []
@@ -468,23 +362,25 @@ export const useAdminStore = defineStore('admin', () => {
 
   // 確認編輯事件
   const confirmEditEvent = async (data: { eventName: string; description: string; location: string }) => {
-    if (!editingEventData.value) return
+    const editing = editingEventData.value
+    if (!editing) return
 
     loading.value = true
 
     try {
-      const response = await $fetch('/api/update-event', {
-        method: 'PATCH',
-        body: {
-          originalEventName: editingEventData.value.originalName,
+      const { execute } = createApiRequest(
+        () => adminApi.patchUpdateEvent({
+          originalEventName: editing.originalName,
           newEventName: data.eventName,
           newDescription: data.description,
           newLocation: data.location,
           category: manageCategory.value
-        }
-      }) as { success: boolean; message: string; updatedCount: number }
+        }),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute()
 
-      if (response.success) {
+      if (response?.success) {
         message.value = response.message
         messageType.value = 'success'
         showEventEditDialog.value = false
@@ -522,15 +418,16 @@ export const useAdminStore = defineStore('admin', () => {
     showConfirmDialog.value = false
 
     try {
-      const response = await $fetch('/api/delete-image', {
-        method: 'DELETE',
-        body: {
+      const { execute } = createApiRequest(
+        () => adminApi.deleteImageRequest({
           filename: pendingDeleteFilename.value,
           category: manageCategory.value
-        }
-      }) as { success: boolean; message: string }
+        }),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute()
 
-      if (response.success) {
+      if (response?.success) {
         message.value = '圖片刪除成功'
         messageType.value = 'success'
         await loadGalleryByCategory(manageCategory.value, { force: true })
@@ -614,7 +511,11 @@ export const useAdminStore = defineStore('admin', () => {
         // 建立更新後的圖片對象
         const updatedImage = { ...dataArray[imageIndex] }
         updatedImage.title = updateData.title
-        updatedImage.content = updateData.content
+        if (manageCategory.value === 'gallery') {
+          (updatedImage as GalleryItem).description = updateData.content
+        } else {
+          (updatedImage as PhotographyItem).content = updateData.content
+        }
 
         // 處理日期格式轉換
         if (updateData.date) {
@@ -632,7 +533,7 @@ export const useAdminStore = defineStore('admin', () => {
         if (manageCategory.value === 'gallery' && updateData.color) {
           (updatedImage as GalleryItem & { color?: string }).color = updateData.color
         } else if (manageCategory.value === 'photography' && updateData.tags) {
-          (updatedImage as GalleryItem & { tags?: string }).tags = updateData.tags
+          (updatedImage as GalleryItem).tags = updateData.tags
         }
 
         console.log('更新後的圖片:', updatedImage)
@@ -662,16 +563,17 @@ export const useAdminStore = defineStore('admin', () => {
     try {
       loading.value = true
 
-      const response = await $fetch('/api/update-image', {
-        method: 'PATCH',
-        body: {
+      const { execute } = createApiRequest(
+        () => adminApi.patchUpdateImage({
           filename: originalImage.filename,
           category: manageCategory.value,
           updates: updateData
-        }
-      }) as { success: boolean; message: string; updatedImage: GalleryItem }
+        }),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute()
 
-      if (!response.success) {
+      if (!response?.success) {
         message.value = '同步到伺服器失敗，請重新整理頁面'
         messageType.value = 'error'
         await loadGalleryByCategory(manageCategory.value, { force: true })
@@ -695,12 +597,13 @@ export const useAdminStore = defineStore('admin', () => {
   const deleteEvent = async (eventName: string) => {
     loading.value = true
     try {
-      const response = await $fetch('/api/delete-event', {
-        method: 'DELETE',
-        body: { eventName, category: manageCategory.value }
-      }) as { success: boolean; message: string; deletedCount: number }
+      const { execute } = createApiRequest(
+        () => adminApi.deleteEventRequest({ eventName, category: manageCategory.value }),
+        { showToast: false, retries: API_CONFIG.retryAttempts }
+      )
+      const response = await execute()
 
-      if (response.success) {
+      if (response?.success) {
         message.value = response.message
         messageType.value = 'success'
         await loadGalleryByCategory(manageCategory.value, { force: true })
@@ -722,10 +625,7 @@ export const useAdminStore = defineStore('admin', () => {
     try {
       for (const filename of filenames) {
         try {
-          await $fetch('/api/delete-image', {
-            method: 'DELETE',
-            body: { filename, category: manageCategory.value }
-          })
+          await adminApi.deleteImageRequest({ filename, category: manageCategory.value })
           successCount++
         } catch (e) {
           console.error(`Failed to delete ${filename}:`, e)

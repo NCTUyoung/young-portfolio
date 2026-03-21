@@ -55,9 +55,45 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
       </div>
     </nav>
 
+    <!-- 全域錯誤（載入／API）：不與上傳區塊內訊息衝突時顯示於頂部 -->
+    <div
+      v-if="pageReady && adminStore.message && adminStore.messageType === 'error' && activeTab !== 'upload'"
+      class="max-w-7xl mx-auto px-6 pt-4"
+      role="alert"
+    >
+      <div class="flex items-start justify-between gap-3 rounded-xl border border-red-200/80 bg-red-50/95 px-4 py-3 text-red-900 shadow-sm">
+        <p class="text-sm font-light leading-relaxed">{{ adminStore.message }}</p>
+        <button
+          type="button"
+          class="shrink-0 text-xs text-red-700/80 underline underline-offset-2 hover:text-red-900"
+          @click="adminStore.message = ''"
+        >
+          關閉
+        </button>
+      </div>
+    </div>
+
     <!-- 主要內容區域 -->
     <main class="max-w-7xl mx-auto px-6 pb-12">
-      <div class="bg-white rounded-b-xl border border-stone-200 border-t-0">
+      <!-- 首次載入：與前台 Gallery 類似的日式 loading -->
+      <div
+        v-if="!pageReady"
+        class="bg-white rounded-b-xl border border-stone-200 border-t-0 flex flex-col items-center justify-center py-24 gap-5 min-h-[min(55vh,380px)]"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="relative w-10 h-10">
+          <div class="absolute inset-0 border border-amber-300/60 rounded-full animate-spin" style="animation-duration: 2s;" />
+          <div
+            class="absolute inset-[6px] border border-amber-400/40 rounded-full animate-spin"
+            style="animation-duration: 3s; animation-direction: reverse;"
+          />
+        </div>
+        <p class="jp-section-label text-stone-500">Loading</p>
+        <p class="text-xs text-stone-400 font-light tracking-wide">載入作品資料中…</p>
+      </div>
+
+      <div v-else class="bg-white rounded-b-xl border border-stone-200 border-t-0">
 
         <!-- 概覽頁面 — 日式排版 -->
         <section v-if="visitedTabs.has('overview')" v-show="activeTab === 'overview'" class="p-8 md:p-10">
@@ -539,6 +575,9 @@ useSeoMeta({
 const adminStore = useAdminStore()
 const { getImagePath } = useImagePath()
 
+/** 首次雙分類載入完成前不渲染主內容，避免空白閃爍 */
+const pageReady = ref(false)
+
 // Tab 狀態 — 延遲掛載：僅在首次造訪時渲染，之後用 v-show 切換，避免卡頓
 const activeTab = ref('overview')
 const visitedTabs = ref(new Set<string>(['overview']))
@@ -621,6 +660,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to initialize admin page:', error)
+  } finally {
+    pageReady.value = true
   }
 })
 </script>

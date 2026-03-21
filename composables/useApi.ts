@@ -42,41 +42,44 @@ export const useApi = () => {
 
       let lastError: unknown
 
-      for (let attempt = 0; attempt <= retries; attempt++) {
-        try {
-          if (loadingMessage && showToast) {
-            toast.loading(loadingMessage)
-          }
+      try {
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            if (loadingMessage && showToast) {
+              toast.loading(loadingMessage)
+            }
 
-          const result = await requestFn()
-          data.value = result
+            const result = await requestFn()
+            data.value = result
 
-          if (successMessage && showToast) {
-            toast.success(successMessage)
-          }
+            if (successMessage && showToast) {
+              toast.success(successMessage)
+            }
 
-          return result
-        } catch (err: unknown) {
-          lastError = err
-          console.warn(`API request attempt ${attempt + 1} failed:`, err)
+            return result
+          } catch (err: unknown) {
+            lastError = err
+            console.warn(`API request attempt ${attempt + 1} failed:`, err)
 
-          // 如果不是最後一次嘗試，等待後重試
-          if (attempt < retries) {
-            await new Promise(resolve => setTimeout(resolve, API_CONFIG.retryDelay * (attempt + 1)))
+            // 如果不是最後一次嘗試，等待後重試
+            if (attempt < retries) {
+              await new Promise(resolve => setTimeout(resolve, API_CONFIG.retryDelay * (attempt + 1)))
+            }
           }
         }
+
+        // 所有重試都失敗了
+        const finalErrorMessage = errorMessage || (lastError instanceof Error ? lastError.message : null) || ERROR_MESSAGES.network
+        error.value = finalErrorMessage
+
+        if (showToast) {
+          toast.error('請求失敗', finalErrorMessage)
+        }
+
+        throw lastError
+      } finally {
+        isLoading.value = false
       }
-
-      // 所有重試都失敗了
-      const finalErrorMessage = errorMessage || (lastError instanceof Error ? lastError.message : null) || ERROR_MESSAGES.network
-      error.value = finalErrorMessage
-
-      if (showToast) {
-        toast.error('請求失敗', finalErrorMessage)
-      }
-
-      isLoading.value = false
-      throw lastError
     }
 
     return {

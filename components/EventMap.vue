@@ -35,6 +35,10 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useDark } from '@vueuse/core'
+import type * as LeafletNS from 'leaflet'
+import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple } from 'leaflet'
+
+type LeafletModule = typeof LeafletNS
 
 interface EventLocation {
   name: string
@@ -60,9 +64,9 @@ const isDark = useDark()
 
 const { getImagePath } = useImagePath()
 
-let map: any = null
-let markersLayer: any = null
-let tileLayer: any = null
+let map: LeafletMap | null = null
+let markersLayer: LayerGroup | null = null
+let tileLayer: TileLayer | null = null
 
 const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -70,7 +74,7 @@ const TILE_URLS = {
 }
 
 const setTileLayer = async (dark: boolean) => {
-  if (!map || !process.client) return
+  if (!map || !import.meta.client) return
   const L = await import('leaflet')
   const url = dark ? TILE_URLS.dark : TILE_URLS.light
   if (tileLayer) {
@@ -82,7 +86,7 @@ const setTileLayer = async (dark: boolean) => {
 }
 
 const initMap = async () => {
-  if (!process.client || map || !mapContainer.value) return
+  if (!import.meta.client || map || !mapContainer.value) return
 
   const L = await import('leaflet')
 
@@ -98,13 +102,15 @@ const initMap = async () => {
   renderMarkers(L)
 }
 
-const renderMarkers = (L: any) => {
-  if (!markersLayer) return
-  markersLayer.clearLayers()
+const renderMarkers = (L: LeafletModule) => {
+  const mapInstance = map
+  const markers = markersLayer
+  if (!mapInstance || !markers) return
+  markers.clearLayers()
 
   if (!props.events.length) return
 
-  const bounds: any[] = []
+  const bounds: LatLngTuple[] = []
   const dark = isDark.value
   const baseStyle = dark
     ? { radius: 7, color: '#e4b07a', weight: 1, fillColor: '#e8a84a', fillOpacity: 0.85 }
@@ -133,14 +139,14 @@ const renderMarkers = (L: any) => {
       emit('focus-event', event.name)
     })
 
-    marker.addTo(markersLayer)
+    marker.addTo(markers)
     bounds.push([event.lat, event.lng])
   })
 
   if (bounds.length > 1) {
-    map.fitBounds(bounds, { padding: [30, 30] })
+    mapInstance.fitBounds(bounds, { padding: [30, 30] })
   } else if (bounds.length === 1) {
-    map.setView(bounds[0], 10)
+    mapInstance.setView(bounds[0], 10)
   }
 }
 
@@ -151,7 +157,7 @@ onMounted(async () => {
 watch(
   () => props.events,
   async () => {
-    if (!process.client) return
+    if (!import.meta.client) return
     const L = await import('leaflet')
     if (!map) {
       await initMap()
@@ -159,14 +165,14 @@ watch(
     }
     renderMarkers(L)
     setTimeout(() => {
-      map.invalidateSize()
+      map?.invalidateSize()
     }, 200)
   },
   { deep: true }
 )
 
 watch(isDark, async (dark) => {
-  if (!process.client || !map) return
+  if (!import.meta.client || !map) return
   await setTileLayer(dark)
   const L = await import('leaflet')
   renderMarkers(L)

@@ -1,220 +1,138 @@
 # 項目維護指南
 
-## 📋 項目概述
+## 項目概述
 
-這是一個使用 Nuxt.js 3 構建的現代作品集網站，主要展示數位藝術和攝影作品。
+Nuxt 3 作品集（數位繪圖 + 攝影），部署於 **GitHub Pages**，`app.baseURL` 為 `/young-portfolio/`。
 
 ### 技術棧
-- **框架**: Nuxt.js 3 + Vue 3 + TypeScript
-- **狀態管理**: Pinia
-- **樣式**: Tailwind CSS
-- **工具庫**: VueUse, HeadlessUI
-- **部署**: GitHub Pages
 
-## 🏗️ 項目結構
+- **框架**: Nuxt 3、Vue 3、TypeScript  
+- **狀態**: Pinia（`gallery`、`imageViewer`、`admin`）  
+- **樣式**: Tailwind CSS  
+- **工具**: VueUse、HeadlessUI、Leaflet（地圖）  
+- **測試**: Vitest（`npm run test`）
+
+## 目錄結構（精簡）
 
 ```
 nctuyoung.github.io/
-├── 📁 pages/                    # 頁面路由
-│   ├── index.vue               # 首頁
-│   ├── gallery.vue             # 作品集展示頁
-│   ├── admin.vue               # 管理後台
-│   ├── article.vue             # 文章頁面
-│   └── about.vue               # 關於頁面
-├── 📁 components/               # 可重用組件
-│   ├── 📁 admin/               # 管理相關組件
-│   ├── ImageViewer.vue         # 圖片檢視器
-│   ├── GalleryMasonryLayout.vue # 瀑布流佈局
-│   └── ...                     # 其他組件
-├── 📁 composables/              # 組合式函數
-│   ├── useImagePath.ts         # 圖片路徑處理
-│   ├── useImageViewer.ts       # 圖片檢視器邏輯
-│   ├── useToast.ts             # 提示訊息
-│   └── useGalleryFilters.ts    # 畫廊篩選邏輯 (新增)
-├── 📁 stores/                   # Pinia 狀態管理
-│   ├── gallery.ts              # 作品集狀態
-│   ├── imageViewer.ts          # 圖片檢視器狀態
-│   └── admin.ts                # 管理功能狀態
-├── 📁 types/                    # TypeScript 類型定義
-│   └── gallery.ts              # 統一的介面定義 (已優化)
-├── 📁 utils/                    # 工具函數
-│   ├── photoUtils.ts           # 攝影相關工具
-│   └── galleryUtils.ts         # 畫廊工具函數 (新增)
-├── 📁 config/                   # 配置文件
-│   └── constants.ts            # 項目常數配置 (新增)
-└── 📁 docs/                     # 文檔
-    └── MAINTENANCE.md          # 本維護指南
+├── pages/
+│   ├── index.vue
+│   ├── gallery/[[category]].vue   # /gallery/all|digital|photography
+│   ├── admin.vue
+│   └── article.vue
+├── components/
+│   ├── gallery/                   # GalleryPhotographySection、GalleryAllMixedSection
+│   ├── EventMap.vue
+│   ├── ImageViewer.vue
+│   └── ...
+├── composables/                   # 見 composables/README.md（勿加 index.ts barrel）
+├── stores/
+│   ├── gallery.ts
+│   ├── gallerySelectors.ts       # 篩選／分組／混合佈局／地圖點（純函式）
+│   ├── galleryLoaders.ts          # 公開 JSON 載入
+│   ├── galleryConstants.ts      # 地圖後備座標
+│   ├── imageViewer.ts
+│   ├── admin.ts
+│   ├── adminSelectors.ts        # 後台管理／概覽純計算
+│   ├── adminApiClient.ts        # 後台 API $fetch
+│   └── adminTypes.ts
+├── utils/
+│   ├── galleryUtils.ts、formatters.ts、validators.ts、imageUtils.ts
+│   └── *.test.ts                # Vitest
+├── types/gallery.ts
+├── config/constants.ts
+└── docs/
+    ├── MAINTENANCE.md            # 本檔
+    └── PROJECT_HEALTH.md         # 健檢與後續優先級
 ```
 
-## 🔧 最近整理項目
+## 已完成的重構（摘要）
 
-### 1. 類型定義統一 (`types/gallery.ts`)
-- ✅ 統一了 `GalleryItem` 介面定義
-- ✅ 新增 `PhotoEvent` 介面
-- ✅ 整合所有相關類型定義
-- ✅ 向後兼容舊介面
+| 項目 | 說明 |
+|------|------|
+| 圖片庫 | 路由分類、`useGalleryImageRoute`、`useGalleryCategoryRoute`、`useGalleryPhotographyLayout`、子元件拆分 |
+| Gallery store | `galleryLoaders` / `galleryConstants` 與 store 分離 |
+| 後台 | `adminApiClient` + `adminTypes`；`useApi().createApiRequest`（後台多為 `showToast: false`）；`admin.vue` 首次載入用 `pageReady` + loading／全域錯誤條 |
+| 測試 | `utils/galleryUtils`、`formatters`、`validators`；selectors 見 `*Selectors.test.ts`（見 `*.test.ts`） |
+| ESLint | `consistent-type-imports`（warn，type-aware：`projectService` + `tsconfigRootDir`） |
 
-### 2. 工具函數模組化 (`utils/galleryUtils.ts`)
-- ✅ 提取並統一常用工具函數
-- ✅ 包含日期格式化、圖片篩選、分組等功能
-- ✅ 純函數設計，便於測試和重用
+**已移除／不存在於倉庫**：`useGalleryFilters`、`useRadialNavigation`、`GalleryFilter.vue`（舊文檔誤載，請勿再引用）。
 
-### 3. 篩選邏輯組合化 (`composables/useGalleryFilters.ts`)
-- ✅ 統一管理所有篩選邏輯
-- ✅ 包含搜尋、年份、類別、事件篩選
-- ✅ 提供統計數據和快速篩選功能
+## 維護檢查清單
 
-### 4. 配置集中管理 (`config/constants.ts`)
-- ✅ 統一管理所有項目常數
-- ✅ 包含 UI 配置、動畫設定、錯誤訊息等
-- ✅ 便於維護和修改
+### 日常
 
-### 5. **Pinia Stores 重構** (✅ 新完成)
-- ✅ `gallery.ts` 簡化並移除重複工具函數
-- ✅ 統一使用 `types/gallery.ts` 中的類型定義
-- ✅ 引入 `useApi` composable 統一 API 處理
-- ✅ 使用 `utils/galleryUtils.ts` 工具函數
+- [ ] 圖片與 JSON（`public/*.json`）路徑與 `useImagePath` 一致  
+- [ ] 響應式與圖片庫分類切換  
+- [ ] SEO meta（圖片庫見 `pages/gallery/[[category]].vue`）
 
-### 6. **API 處理統一化** (`composables/useApi.ts`) (✅ 新建立)
-- ✅ 統一的錯誤處理和重試機制
-- ✅ 標準化 API 請求格式
-- ✅ 載入狀態和提示訊息管理
-- ✅ 批量操作支援
+### 發版前
 
-### 7. **複雜邏輯模組化** (`composables/useRadialNavigation.ts`) (✅ 新建立)
-- ✅ 從 `imageViewer.ts` 提取放射型導航邏輯
-- ✅ 獨立的動畫和位置計算
-- ✅ 可重用的導航組件邏輯
-
-### 8. **組件優化** (`components/GalleryFilter.vue`) (✅ 重構完成)
-- ✅ 使用新的 `useGalleryFilters` composable
-- ✅ 簡化組件邏輯，提高可維護性
-- ✅ 更好的狀態管理和響應性
-
-## 📝 維護檢查清單
-
-### 日常維護
-- [ ] 檢查圖片載入速度
-- [ ] 驗證響應式設計在不同裝置上的表現
-- [ ] 測試篩選和搜尋功能
-- [ ] 檢查 SEO 設定是否正確
-
-### 每月維護
-- [ ] 更新 npm 依賴包
-- [ ] 檢查 GitHub Pages 部署狀態
-- [ ] 審查控制台錯誤和警告
-- [ ] 檢查網站載入性能
+```bash
+npm run lint
+npm run test
+npm run build
+```
 
 ### 新增功能時
-- [ ] 更新相關類型定義
-- [ ] 使用統一的工具函數和 composables
-- [ ] 優先使用 `useApi` composable 處理 API 請求
-- [ ] 遵循現有的命名規範
-- [ ] 更新配置常數（如需要）
-- [ ] 考慮將複雜邏輯提取到獨立的 composable
 
-## 🚀 開發指南
+- 型別以 `types/gallery.ts` 為主，`import type`  
+- 後台新 API：先 `adminApiClient`，再在 store 用 `createApiRequest`  
+- 純邏輯放 `utils/`，並可補 `*.test.ts`
 
-### 本地開發
+## 開發指令
+
 ```bash
-# 安裝依賴
 npm install
-
-# 啟動開發服務器
 npm run dev
-
-# 構建生產版本
 npm run build
-
-# 預覽生產版本
 npm run preview
+npm run test          # Vitest 單次
+npm run test:watch    # 監聽模式
 ```
 
-### 代碼規範
-1. **類型安全**: 使用 TypeScript 嚴格模式
-2. **組合式 API**: 優先使用 Composition API
-3. **響應式設計**: 使用 Tailwind CSS 響應式類別
-4. **組件命名**: 使用 PascalCase
-5. **文件命名**: 使用 camelCase
+## 故障排除
 
-### 新增圖片
-1. 將圖片放置在 `public/images/` 相應目錄
-2. 更新 JSON 數據文件
-3. 確保使用 `useImagePath` 組合式函數處理路徑
+### 圖片無法載入
 
-### 新增頁面
-1. 在 `pages/` 目錄建立 Vue 文件
-2. 設定適當的 SEO meta 標籤
-3. 遵循現有的樣式設計語言
+1. `nuxt.config` 的 `baseURL` / `app.baseURL`  
+2. `useImagePath` 組出的路徑  
+3. GitHub Pages 子路徑是否為 `/young-portfolio/`
 
-## 🔍 故障排除
+### 圖片庫篩選異常
 
-### 常見問題
+1. Pinia `gallery` 的 `filterState`（含 `useLocalStorage`）  
+2. `EventFilter` / `GalleryTabBar` 與路由同步
 
-#### 圖片無法載入
-1. 檢查圖片路徑是否正確
-2. 確認 `useImagePath` 使用正確
-3. 檢查 GitHub Pages 的 baseURL 設定
+### 建置失敗
 
-#### 篩選功能異常
-1. 檢查 `FilterState` 型別定義
-2. 確認使用 `useGalleryFilters` 組合式函數
-3. 檢查本地儲存數據是否損壞
+1. TypeScript／ESLint 錯誤  
+2. `npm ci` 與 Node 版本  
+3. 見 `docs/PROJECT_HEALTH.md`
 
-#### 建置失敗
-1. 檢查 TypeScript 類型錯誤
-2. 確認所有依賴都已安裝
-3. 檢查 Nuxt 配置文件
+## 優化路線圖（滾動）
 
-### 性能優化
+### 短期（可選）
 
-#### 圖片優化
-- 使用適當的圖片格式 (WebP > JPEG > PNG)
-- 實施懶載入 (Lazy Loading)
-- 添加圖片壓縮
+- [x] 篩選／分組邏輯已抽 `stores/gallerySelectors.ts`（快取仍留在 `gallery` store）  
+- [x] 後台管理／概覽統計已抽 `stores/adminSelectors.ts`（`admin` store 保留狀態與 actions）  
+- [ ] 元件層 loading / error 一致性  
 
-#### 代碼優化
-- 使用 `computed` 快取計算結果
-- 實施虛擬滾動（大量圖片時）
-- 代碼分割和按需載入
+### 中期（可選）
 
-## 🚀 進一步優化建議
+- [ ] 大量圖片時懶載入／虛擬列表評估  
+- [ ] 擴充 Vitest 覆蓋面（composables 需 Nuxt 測試環境時再評估）  
 
-### 短期優化 (接下來1-2週)
-- [ ] 完成 `imageViewer.ts` store 的重構，使用 `useRadialNavigation`
-- [ ] 重構 `admin.ts` store，分離為多個小型 composables
-- [ ] 為所有組件添加 loading 和 error 狀態處理
-- [ ] 統一使用 `useApi` composable 替換直接的 `$fetch` 調用
+### 長期（可選）
 
-### 中期優化 (1-2個月)
-- [ ] 實施圖片懶載入和虛擬滾動
-- [ ] 添加單元測試覆蓋核心 composables 和工具函數
-- [ ] 實施圖片預載入策略
-- [ ] 優化 SEO 和 meta 標籤管理
+- [ ] PWA、i18n、進階圖像處理等  
 
-### 長期優化 (3個月以上)
-- [ ] 考慮實施 PWA 功能
-- [ ] 添加國際化支援
-- [ ] 實施更進階的圖片處理功能
-- [ ] 考慮使用 WebAssembly 進行圖片處理
+## 相關資源
 
-## 📚 相關資源
-
-- [Nuxt.js 官方文檔](https://nuxt.com/)
-- [Vue 3 Composition API](https://vuejs.org/guide/extras/composition-api-faq.html)
-- [Pinia 狀態管理](https://pinia.vuejs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [VueUse 工具庫](https://vueuse.org/)
-
-## 📞 聯絡與支持
-
-如果遇到問題或需要協助，請：
-1. 查看此維護指南
-2. 檢查 GitHub Issues
-3. 聯絡項目維護者
+- [Nuxt](https://nuxt.com/)、[Pinia](https://pinia.vuejs.org/)、[Tailwind](https://tailwindcss.com/)  
+- 倉庫內：[composables/README.md](../composables/README.md)、[PROJECT_HEALTH.md](./PROJECT_HEALTH.md)
 
 ---
 
-*最後更新: 2025年1月*
-*維護者: NCTU Young Team*
-*最新重構: Pinia Stores 優化和 Composables 模組化*
+*最後更新：2026-03（與目前目錄對齊）*
