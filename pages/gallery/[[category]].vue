@@ -290,7 +290,7 @@ v-for="image in rowImages"
 import { onMounted, onBeforeUnmount, watch, computed, ref, nextTick, type ComponentPublicInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
-import type { GalleryItem } from '~/types/gallery'
+import type { GalleryItem, FilterState } from '~/types/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGlobalToast } from '~/composables/useToast'
 
@@ -301,7 +301,16 @@ import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
+const VALID_CATEGORIES = ['all', 'digital', 'photography'] as const
+type ValidCategory = (typeof VALID_CATEGORIES)[number]
+
+function isValidCategory (s: string): s is ValidCategory {
+  return (VALID_CATEGORIES as readonly string[]).includes(s)
+}
+
 // ===== Store 和 Composables =====
+const route = useRoute()
+const router = useRouter()
 const galleryStore = useGalleryStore()
 const {
   mixedPhotoItems,
@@ -316,11 +325,15 @@ const {
 
 const {
   loadAllWorks,
-  setSelectedEvent
+  setSelectedEvent,
+  setSelectedCategory,
 } = galleryStore
 
 const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
+
+/** Lightbox 與 `?image=` 網址同步（見 composables/useGalleryImageRoute.ts） */
+useGalleryImageRoute()
 const { getImagePath } = useImagePath()
 const pageRef = ref<HTMLElement | null>(null)
 const mapSectionRef = ref<HTMLElement | null>(null)
@@ -459,7 +472,6 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
 }
 
 
-
 // ===== 網格佈局輔助函數 =====
 // 將圖片分成每行兩張
 const getImageRows = (images: GalleryItem[]) => {
@@ -528,6 +540,36 @@ const formatShutterSpeed = (speed: number) => {
   return `1/${Math.round(1 / speed)}`
 }
 
+// ===== URL ↔ 分類（以 URL 為準）=====
+function paramToCategory (raw: string | string[] | undefined): string | undefined {
+  if (raw === undefined || raw === '') return undefined
+  return Array.isArray(raw) ? raw[0] : raw
+}
+
+function syncCategoryFromRoute () {
+  const cat = paramToCategory(route.params.category)
+
+  if (cat === undefined) {
+    // /gallery 無 segment：客戶端導向目前儲存的分類（保留 localStorage 偏好）
+    const next = filterState.value.selectedCategory
+    if (import.meta.client) {
+      router.replace({ path: `/gallery/${next}` })
+    }
+    return
+  }
+
+  if (!isValidCategory(cat)) {
+    navigateTo({ path: '/gallery/all', replace: true })
+    return
+  }
+
+  setSelectedCategory(cat)
+}
+
+watch(() => route.params.category, () => {
+  syncCategoryFromRoute()
+}, { immediate: true })
+
 // ===== 監聽器 =====
 watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
   if (digitalErr) {
@@ -559,13 +601,24 @@ onBeforeUnmount(() => {
 })
 
 // ===== SEO =====
+const seoTitles: Record<FilterState['selectedCategory'], string> = {
+  all: 'Works - 作品集',
+  digital: 'Works - 數位繪圖',
+  photography: 'Works - 攝影作品',
+}
+
+const galleryOgUrl = computed(() => {
+  const cat = filterState.value.selectedCategory
+  return `https://nctuyoung.github.io/young-portfolio/gallery/${cat}`
+})
+
 useSeoMeta({
-  title: 'Works - 作品集',
+  title: computed(() => seoTitles[currentCategory.value] || seoTitles.all),
   description: '數位藝術與攝影作品集，包含數位插畫與攝影紀錄。',
   ogTitle: 'Works - 數位藝術與攝影作品集',
   ogDescription: '瀏覽 Young 的數位插畫與攝影作品，以事件與時間軸呈現創作與生活紀錄。',
   ogType: 'website',
-  ogUrl: 'https://nctuyoung.github.io/young-portfolio/gallery',
+  ogUrl: galleryOgUrl,
   ogImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg',
   twitterCard: 'summary_large_image'
 })

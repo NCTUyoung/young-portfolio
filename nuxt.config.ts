@@ -47,7 +47,13 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'github-pages',
     prerender: {
-      routes: ['/']
+      routes: [
+        '/',
+        '/gallery',
+        '/gallery/all',
+        '/gallery/digital',
+        '/gallery/photography',
+      ]
     }
   },
 

@@ -118,7 +118,8 @@ v-if="currentViewerImage"
                @click.stop
                @mousedown="handleMouseDown"
                @touchstart="handleTouchStart"
-               @contextmenu.prevent >
+               @contextmenu.stop
+          >
 
           <!-- 載入中 -->
           <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">

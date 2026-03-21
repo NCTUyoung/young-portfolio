@@ -1,3 +1,7 @@
+/**
+ * 圖片處理（預留：目前沒有頁面 import，與 utils 搭配後台時可接）
+ * @see composables/README.md
+ */
 import { ref, computed } from 'vue'
 import type { GalleryItem, ExifData } from '~/types/gallery'
 import {

@@ -1,3 +1,7 @@
+/**
+ * 事件管理（預留：目前沒有頁面 import，後台或重構時可接）
+ * @see composables/README.md
+ */
 import { ref, computed } from 'vue'
 import type { PhotoEvent } from '~/types/gallery'
 import { PREDEFINED_EVENTS } from '~/utils/eventUtils'

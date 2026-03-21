@@ -1,4 +1,8 @@
-import { ref } from 'vue'
+/**
+ * 統一 API 包裝（後台目前多用 `$fetch`；新程式可優先接此 composable）
+ * @see composables/README.md
+ */
+import { ref, readonly } from 'vue'
 import { API_CONFIG, ERROR_MESSAGES, LOADING_MESSAGES } from '~/config/constants'
 import { useGlobalToast } from './useToast'
 
