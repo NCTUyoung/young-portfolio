@@ -128,7 +128,7 @@
     <!-- 回到地圖：桌機右側膠囊按鈕 -->
     <button
       v-if="showBackToMap && currentCategory === 'photography'"
-      class="hidden md:flex fixed right-[10%] top-1/2 -translate-y-1/2 px-3 py-1.5 text-[0.7rem] tracking-[0.3em] rounded-full bg-white/90 border border-stone-200 text-stone-500 hover:text-accent-600 hover:border-accent-300 shadow-japanese transition-all"
+      class="hidden md:flex fixed right-[10%] top-1/2 z-[1005] -translate-y-1/2 px-3 py-1.5 text-[0.7rem] tracking-[0.3em] rounded-full bg-white/90 border border-stone-200 text-stone-500 hover:text-accent-600 hover:border-accent-300 shadow-japanese transition-all"
       type="button"
       @click="scrollToMap"
     >
@@ -138,7 +138,7 @@
     <!-- 回到地圖：手機右下圓形按鈕 -->
     <button
       v-if="showBackToMap && currentCategory === 'photography'"
-      class="md:hidden fixed bottom-20 right-5 w-10 h-10 rounded-full bg-white/95 border border-stone-200 text-[0.7rem] tracking-[0.2em] text-stone-500 shadow-japanese flex items-center justify-center active:scale-95 transition-all"
+      class="md:hidden fixed bottom-20 right-5 z-[1005] w-10 h-10 rounded-full bg-white/95 border border-stone-200 text-[0.7rem] tracking-[0.2em] text-stone-500 shadow-japanese flex items-center justify-center active:scale-95 transition-all"
       type="button"
       @click="scrollToMap"
     >

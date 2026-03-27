@@ -1,6 +1,6 @@
 <template>
   <HeadlessTransitionRoot appear :show="visibleToasts.length > 0" as="template">
-    <div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+    <div class="fixed top-4 right-4 z-[1250] space-y-2 max-w-sm">
       <TransitionGroup
         enter="transform ease-out duration-300 transition"
         enter-from="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"

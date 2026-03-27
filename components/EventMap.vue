@@ -191,6 +191,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .event-map-wrapper {
   @apply rounded-2xl border border-stone-200/80 dark:border-stone-700/70 overflow-hidden bg-stone-50/60 dark:bg-stone-900/40 relative;
+  /* Isolate Leaflet panes (z-index up to ~1000) so they cannot stack above the fixed navbar */
+  isolation: isolate;
   box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
 }
 

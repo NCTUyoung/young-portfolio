@@ -3,7 +3,7 @@
     <!-- 導航欄 — 滾動感知 -->
     <nav
       :class="[
-        'fixed top-0 left-0 right-0 z-40 transition-all duration-500',
+        'fixed top-0 left-0 right-0 z-[1100] transition-all duration-500',
         isScrolled
           ? 'bg-white/92 dark:bg-stone-900/92 nav-scrolled border-b border-stone-200/40 dark:border-stone-700/40 shadow-sm'
           : 'bg-transparent border-b border-transparent'
@@ -83,7 +83,7 @@
                 leave-from-class="transform scale-100 opacity-100"
                 leave-to-class="transform scale-95 opacity-0"
               >
-                <HeadlessMenuItems class="absolute right-0 mt-3 w-64 origin-top-right bg-white/90 dark:bg-stone-800/90 backdrop-blur-md rounded-xl border border-stone-200/60 dark:border-stone-700/60 ring-1 ring-stone-100/40 dark:ring-stone-700/40 focus:outline-none z-50">
+                <HeadlessMenuItems class="absolute right-0 mt-3 w-64 origin-top-right bg-white/90 dark:bg-stone-800/90 backdrop-blur-md rounded-xl border border-stone-200/60 dark:border-stone-700/60 ring-1 ring-stone-100/40 dark:ring-stone-700/40 focus:outline-none z-[1200]">
                   <div class="p-2">
                     <HeadlessMenuItem v-for="link in navLinks" :key="link.to" v-slot="{ active }">
                       <NuxtLink
