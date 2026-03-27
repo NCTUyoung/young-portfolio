@@ -1,5 +1,5 @@
 {
-  "totalNumber": "55",
+  "totalNumber": "63",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
@@ -10,7 +10,8 @@
     "交大外拍": 5,
     "2025 聖誕台北": 4,
     "峨嵋湖風鈴木": 13,
-    "WBC 2026": 12
+    "WBC 2026": 12,
+    "WBC東京 台澳": 8
   },
   "Img": [
     {
@@ -1234,6 +1235,203 @@
       "aperture": 5.3,
       "iso": 100,
       "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9872-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "第一鳥居與拜殿",
+      "content": "巨大的第一鳥居框住拜殿與白色幕布，碎石參道上的長影與藍天。",
+      "tags": [
+        "人像",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 74,
+      "aperture": 5,
+      "iso": 200,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9864-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "早櫻與樹影",
+      "content": "初開的櫻花與尚疏的枝幹，碎石地上被陽光拉長的樹影。",
+      "tags": [
+        "標準",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 70,
+      "aperture": 5,
+      "iso": 200,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9885-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "長椅與參道",
+      "content": "參道旁的長椅與燈柱，逆光下略為虛化的社殿屋頂。",
+      "tags": [
+        "人像",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 109,
+      "aperture": 4.8,
+      "iso": 100,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9939-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "日章旗與社殿屋簷",
+      "content": "日章旗在社殿深簷與林蔭之間飄揚，仰角下的傳統屋瓦與木構。",
+      "tags": [
+        "人像",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 130,
+      "aperture": 5,
+      "iso": 100,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9863-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "社務所與午後影",
+      "content": "社務所前的碎石與步道，樹影斜長落在地面。",
+      "tags": [
+        "標準",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 70,
+      "aperture": 5,
+      "iso": 200,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9865-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "石燈籠與櫻",
+      "content": "石燈籠與盛開的櫻枝交疊，遠方可見社殿屋脊與市景。",
+      "tags": [
+        "人像",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 77,
+      "aperture": 5,
+      "iso": 200,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9941-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "東京街角",
+      "content": "電線、老建築與玻璃高樓交錯的尋常午後，行人與陰影拉長。",
+      "tags": [
+        "人像",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 71,
+      "aperture": 4.5,
+      "iso": 100,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/WBC東京 台澳/DSC_9877-編輯-1.jpg",
+      "time": "2026 Mar 05",
+      "title": "櫻枝與晴空",
+      "content": "仰角下的盛開櫻花與深褐枝幹，前景白幕與藍天對比。",
+      "tags": [
+        "標準",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "WBC東京 台澳",
+        "description": "經典賽東京行｜靖國神社與早櫻、街角一日",
+        "location": "靖國神社",
+        "lat": 35.6942,
+        "lng": 139.7436
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 70,
+      "aperture": 5,
+      "iso": 200,
+      "shutterSpeed": 0.001
     }
   ]
 }
