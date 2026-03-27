@@ -188,6 +188,7 @@ const toast = useGlobalToast()
 /** Lightbox 與 `?image=` 網址同步（見 composables/useGalleryImageRoute.ts） */
 useGalleryImageRoute()
 useGalleryCategoryRoute()
+useGalleryEventRoute()
 const pageRef = ref<HTMLElement | null>(null)
 const mapSectionRef = ref<HTMLElement | null>(null)
 const showBackToMap = ref(false)

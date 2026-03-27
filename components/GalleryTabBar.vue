@@ -3,7 +3,7 @@
     <template v-for="(tab, index) in tabs" :key="tab.key">
       <!-- 標籤連結：與 /gallery/:category 同步 -->
       <NuxtLink
-        :to="`/gallery/${tab.key}`"
+        :to="{ path: `/gallery/${tab.key}`, query: route.query }"
         :class="[
           'relative px-5 py-2.5 font-light tracking-wide transition-all duration-300 group',
           isActive(tab.key)
