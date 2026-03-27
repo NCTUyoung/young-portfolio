@@ -18,7 +18,12 @@ export function useGalleryEventRoute () {
   const route = useRoute()
   const router = useRouter()
   const galleryStore = useGalleryStore()
-  const { filterState, availableEvents, isLoading } = storeToRefs(galleryStore)
+  const {
+    filterState,
+    availableEvents,
+    isLoading,
+    galleryDataReady
+  } = storeToRefs(galleryStore)
   const { setSelectedEvent } = galleryStore
 
   const syncingFromRoute = ref(false)
@@ -40,6 +45,9 @@ export function useGalleryEventRoute () {
     }
 
     if (cat !== 'photography' && cat !== 'digital') return
+
+    // 必須等 hydrate / loadAllWorks 完成，否則 availableEvents 仍為空，會誤清 ?event=（與 useAsyncData 的競態）
+    if (!galleryDataReady.value) return
 
     const raw = route.query.event
     const q = Array.isArray(raw) ? raw[0] : raw
@@ -71,7 +79,13 @@ export function useGalleryEventRoute () {
   }
 
   watch(
-    [() => route.query.event, isLoading, availableEvents, () => filterState.value.selectedCategory],
+    [
+      () => route.query.event,
+      isLoading,
+      availableEvents,
+      () => filterState.value.selectedCategory,
+      galleryDataReady
+    ],
     applyEventFromQuery,
     { immediate: true }
   )

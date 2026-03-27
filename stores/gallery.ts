@@ -28,11 +28,11 @@ export const useGalleryStore = defineStore('gallery', () => {
   const digitalError = ref<string | null>(null)
   const photographyError = ref<string | null>(null)
 
-  // 計算屬性
-  const digitalWorks = computed(() => digitalData.value.works)
-  const digitalEventStats = computed(() => digitalData.value.eventStats)
-  const photographyWorks = computed(() => photographyData.value.works)
-  const eventStats = computed(() => photographyData.value.eventStats)
+  // 計算屬性（?. 防 corrupted / 部分 hydrate 導致整包 undefined）
+  const digitalWorks = computed(() => digitalData.value?.works ?? [])
+  const digitalEventStats = computed(() => digitalData.value?.eventStats ?? {})
+  const photographyWorks = computed(() => photographyData.value?.works ?? [])
+  const eventStats = computed(() => photographyData.value?.eventStats ?? {})
 
   const isLoading = computed(() => isLoadingDigital.value || isLoadingPhotography.value)
 
@@ -73,6 +73,9 @@ export const useGalleryStore = defineStore('gallery', () => {
   })
 
   const expandedGroups = ref<Record<string, boolean>>({})
+
+  /** 至少完成一次 hydrate 或 loadAllWorks，供 ?event= 路由邏輯避免在資料未到前誤清網址 */
+  const galleryDataReady = ref(false)
 
   const cache = ref(new Map())
 
@@ -139,10 +142,32 @@ export const useGalleryStore = defineStore('gallery', () => {
   })
 
   const loadAllWorks = async () => {
-    await Promise.all([
-      loadDigitalWorks(),
-      loadPhotographyWorks()
-    ])
+    try {
+      await Promise.all([
+        loadDigitalWorks(),
+        loadPhotographyWorks()
+      ])
+    } finally {
+      galleryDataReady.value = true
+    }
+  }
+
+  /** SSR / useAsyncData：一次寫入兩類作品，避免重複 fetch */
+  const hydrateFromPayload = (payload: {
+    digital?: { works: GalleryItem[], eventStats: Record<string, number> }
+    photography?: { works: GalleryItem[], eventStats: Record<string, number> }
+  }) => {
+    if (payload.digital && Array.isArray(payload.digital.works)) {
+      digitalData.value = payload.digital
+    }
+    if (payload.photography && Array.isArray(payload.photography.works)) {
+      photographyData.value = payload.photography
+    }
+    digitalError.value = null
+    photographyError.value = null
+    isLoadingDigital.value = false
+    isLoadingPhotography.value = false
+    galleryDataReady.value = true
   }
 
   const debouncedSetSearchQuery = useDebounceFn((query: string) => {
@@ -222,6 +247,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     expandedGroups,
     isLoading,
     filterState,
+    galleryDataReady,
 
     allWorks,
     currentWorks,
@@ -234,6 +260,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     categoryStats,
 
     loadAllWorks,
+    hydrateFromPayload,
     loadDigitalWorks,
     loadPhotographyWorks,
     setSelectedCategory,

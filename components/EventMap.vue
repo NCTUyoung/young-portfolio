@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
 import { useDark } from '@vueuse/core'
 import type * as LeafletNS from 'leaflet'
 import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple } from 'leaflet'
@@ -68,6 +68,12 @@ const { getThumbPath } = useImagePath()
 let map: LeafletMap | null = null
 let markersLayer: LayerGroup | null = null
 let tileLayer: TileLayer | null = null
+let resizeObserver: ResizeObserver | null = null
+
+function invalidateMapSize () {
+  if (!map) return
+  map.invalidateSize({ animate: false })
+}
 
 const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -101,6 +107,11 @@ const initMap = async () => {
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers(L)
+
+  await nextTick()
+  invalidateMapSize()
+  requestAnimationFrame(() => invalidateMapSize())
+  setTimeout(() => invalidateMapSize(), 200)
 }
 
 const renderMarkers = (L: LeafletModule) => {
@@ -153,6 +164,12 @@ const renderMarkers = (L: LeafletModule) => {
 
 onMounted(async () => {
   await initMap()
+  if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      invalidateMapSize()
+    })
+    resizeObserver.observe(mapContainer.value)
+  }
 })
 
 watch(
@@ -166,7 +183,7 @@ watch(
     }
     renderMarkers(L)
     setTimeout(() => {
-      map?.invalidateSize()
+      invalidateMapSize()
     }, 200)
   },
   { deep: true }
@@ -180,6 +197,13 @@ watch(isDark, async (dark) => {
 })
 
 onBeforeUnmount(() => {
+  if (resizeObserver) {
+    if (mapContainer.value) {
+      resizeObserver.unobserve(mapContainer.value)
+    }
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
   if (map) {
     map.remove()
     map = null
@@ -190,7 +214,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .event-map-wrapper {
-  @apply rounded-2xl border border-stone-200/80 dark:border-stone-700/70 overflow-hidden bg-stone-50/60 dark:bg-stone-900/40 relative;
+  @apply w-full min-w-0 rounded-2xl border border-stone-200/80 dark:border-stone-700/70 overflow-hidden bg-stone-50/60 dark:bg-stone-900/40 relative;
   /* Isolate Leaflet panes (z-index up to ~1000) so they cannot stack above the fixed navbar */
   isolation: isolate;
   box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
@@ -198,6 +222,7 @@ onBeforeUnmount(() => {
 
 .event-map-container {
   width: 100%;
+  min-width: 0;
   height: 420px;
 }
 

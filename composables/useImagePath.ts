@@ -5,7 +5,7 @@
  * - getImagePath：原圖（lightbox、後台編輯、histogram）
  * - getThumbPath / getGridImageSrcset：網格用 WebP 縮圖（npm run thumbs）
  */
-import { buildThumbPath, GRID_IMAGE_SIZES, type ThumbWidth } from '~/utils/imagePaths'
+import { buildThumbPath, encodePublicUrlPath, GRID_IMAGE_SIZES, type ThumbWidth } from '~/utils/imagePaths'
 
 export const useImagePath = () => {
   // 直接使用 Nuxt 的 app.baseURL，避免手動從網址解析
@@ -19,14 +19,15 @@ export const useImagePath = () => {
    */
   const getImagePath = (filename: string): string => {
     const cleanFilename = filename.startsWith('/') ? filename.slice(1) : filename
-    return `${normalizedBase}images/${cleanFilename}`
+    const raw = `${normalizedBase}images/${cleanFilename}`
+    return encodePublicUrlPath(raw)
   }
 
   /**
    * WebP thumbnail path (400w / 800w). Run `npm run thumbs` after adding images.
    */
   const getThumbPath = (filename: string, width: ThumbWidth = 800): string => {
-    return buildThumbPath(filename, width, normalizedBase)
+    return encodePublicUrlPath(buildThumbPath(filename, width, normalizedBase))
   }
 
   /**

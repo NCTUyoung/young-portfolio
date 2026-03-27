@@ -1,6 +1,7 @@
 /**
- * Gallery 公開資料載入：JSON 路徑 fallback、轉成 GalleryItem
+ * Gallery 公開資料載入：JSON 路徑（依 app.baseURL）、轉成 GalleryItem
  */
+import { joinURL } from 'ufo'
 import { sortImagesByTime } from '~/utils/galleryUtils'
 import { generateImageId } from '~/utils/imageUtils'
 import type {
@@ -47,25 +48,35 @@ export function transformPhotographyWork (img: PhotographyItem): GalleryItem {
   }
 }
 
-/** 在不同環境下穩健載入 JSON（本機 dev / GitHub Pages） */
-export async function fetchJsonWithFallback (filename: string): Promise<unknown> {
-  const candidates = [
-    `/young-portfolio/${filename}`,
-    `/${filename}`,
-    filename
-  ]
-
-  let lastError: unknown = null
-
-  for (const path of candidates) {
-    try {
-      return await $fetch(path)
-    } catch (error) {
-      lastError = error
+/**
+ * Site 根路徑（public/ 底下的靜態檔掛在這裡），不是 `/_nuxt/`。
+ * `import.meta.env.BASE_URL` 在部分打包情境會變成 `.../_nuxt/`，若直接 join 會變成 `.../_nuxt/galleryList.json` → 404。
+ */
+function getPublicSiteBase (): string {
+  try {
+    const app = useRuntimeConfig().app as { baseURL?: string } | undefined
+    const u = app?.baseURL
+    if (u && typeof u === 'string' && u.length > 0) {
+      return u.endsWith('/') ? u : `${u}/`
     }
+  } catch {
+    // 非 Nuxt 內容（例如純 Vitest）則走下方 fallback
   }
 
-  throw lastError
+  let b = import.meta.env.BASE_URL || '/'
+  b = b.replace(/\/?_nuxt\/?$/, '/')
+  if (!b.endsWith('/')) b += '/'
+  return b
+}
+
+/**
+ * 載入 public 根目錄的 JSON（路徑 = site base + 檔名，見 `nuxt.config` 的 `app.baseURL`）。
+ */
+export async function fetchJsonWithFallback (filename: string): Promise<unknown> {
+  const path = joinURL(getPublicSiteBase(), filename)
+  // 一律用根絕對路徑，避免 ofetch 把相對路徑接到錯誤的 base（例如 _nuxt）
+  const absolute = path.startsWith('/') ? path : `/${path}`
+  return await $fetch(absolute)
 }
 
 export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> {

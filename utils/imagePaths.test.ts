@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { buildThumbPath, toThumbRelativeWebp } from './imagePaths'
+import { buildThumbPath, encodePublicUrlPath, toThumbRelativeWebp } from './imagePaths'
 
 describe('toThumbRelativeWebp', () => {
   it('strips extension and appends webp', () => {
     expect(toThumbRelativeWebp('gallery/foo.jpg')).toBe('gallery/foo.webp')
     expect(toThumbRelativeWebp('/gallery/foo.JPEG')).toBe('gallery/foo.webp')
+  })
+})
+
+describe('encodePublicUrlPath', () => {
+  it('replaces spaces only so srcset parses; leaves CJK segments unencoded', () => {
+    const raw = '/young-portfolio/images/_thumbs/400w/photography/攝影社 米倉團拍/DSC_1.webp'
+    const out = encodePublicUrlPath(raw)
+    expect(out).not.toContain(' ')
+    expect(out).toContain('%20')
+    expect(out).toContain('攝影社')
   })
 })
 

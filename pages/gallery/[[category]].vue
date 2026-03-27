@@ -43,7 +43,7 @@
     <!-- Gallery Content -->
     <div class="container mx-auto px-6 relative">
       <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-28">
+      <div v-if="isGalleryLoading" class="text-center py-28">
         <!-- 日式菱形旋轉動畫 -->
         <div class="inline-flex flex-col items-center gap-6">
           <div class="relative w-10 h-10">
@@ -70,7 +70,7 @@
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
-      <div v-if="!isLoading" :key="currentCategory">
+      <div v-if="!isGalleryLoading" :key="currentCategory">
         <!-- 數位繪圖 - Pinterest 風格瀑布流佈局 -->
         <div v-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
           <GalleryMasonryLayout
@@ -151,6 +151,14 @@
 import { onMounted, onBeforeUnmount, watch, computed, ref, nextTick, type ComponentPublicInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
+import { fetchDigitalWorks, fetchPhotographyWorks } from '~/stores/galleryLoaders'
+import { SEO_CONFIG } from '~/config/constants'
+import {
+  resolveGalleryShareMeta,
+  parseGalleryImageIdFromRoute,
+  parseGalleryEventFromRoute,
+  absoluteUrlFromSitePath
+} from '~/utils/gallerySeo'
 import type { GalleryItem, FilterState } from '~/types/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGlobalToast } from '~/composables/useToast'
@@ -170,17 +178,33 @@ const {
   mixedPhotoItems,
   eventLocations,
   isLoading,
+  allWorks,
   digitalError,
   photographyError,
   filterState,
   digitalWorks,
+  photographyWorks,
   currentWorks,
 } = storeToRefs(galleryStore)
 
 const {
   loadAllWorks,
+  hydrateFromPayload,
   setSelectedEvent,
 } = galleryStore
+
+const { getImagePath, getThumbPath } = useImagePath()
+
+const { data: galleryPayload, pending: galleryPending } = await useAsyncData('gallery-works', async () => {
+  const [digital, photo] = await Promise.all([fetchDigitalWorks(), fetchPhotographyWorks()])
+  return { digital, photo }
+})
+
+watch(galleryPayload, (v) => {
+  if (v) hydrateFromPayload(v)
+}, { immediate: true })
+
+const isGalleryLoading = computed(() => galleryPending.value || isLoading.value)
 
 const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
@@ -317,8 +341,13 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 
 // ===== 生命週期 =====
 onMounted(async () => {
+  // 僅在「兩邊都空」才補抓會漏掉「只灌到數位、攝影仍為 []」的狀況（需手動重整才正常）
   try {
-    await loadAllWorks()
+    if (!digitalError.value && !photographyError.value) {
+      if (digitalWorks.value.length === 0 || photographyWorks.value.length === 0) {
+        await loadAllWorks()
+      }
+    }
   } catch (error) {
     console.error('Failed to load works:', error)
   }
@@ -335,27 +364,72 @@ onBeforeUnmount(() => {
   }
 })
 
-// ===== SEO =====
+// ===== SEO（SSR：useAsyncData 先灌入作品，才能依 ?image= / ?event= 產生 OG／Twitter／JSON-LD）=====
 const seoTitles: Record<FilterState['selectedCategory'], string> = {
   all: 'Works - 作品集',
   digital: 'Works - 數位繪圖',
   photography: 'Works - 攝影作品',
 }
 
-const galleryOgUrl = computed(() => {
-  const cat = filterState.value.selectedCategory
-  return `https://nctuyoung.github.io/young-portfolio/gallery/${cat}`
+const seoDefaultDescription = '數位藝術與攝影作品集，包含數位插畫與攝影紀錄。'
+
+const defaultOgImageAbs = absoluteUrlFromSitePath(
+  SEO_CONFIG.siteUrl,
+  'images/photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg'
+)
+
+const route = useRoute()
+const requestUrl = useRequestURL()
+
+const shareUrl = computed(() => {
+  if (import.meta.client) return window.location.href
+  return `${requestUrl.origin}${requestUrl.pathname}${requestUrl.search}`
 })
 
+const absPathClean = (filename: string) => {
+  const p = getImagePath(filename)
+  return absoluteUrlFromSitePath(SEO_CONFIG.siteUrl, p.replace(/^\//, ''))
+}
+
+const absThumb800Clean = (filename: string) => {
+  const p = getThumbPath(filename, 800)
+  return absoluteUrlFromSitePath(SEO_CONFIG.siteUrl, p.replace(/^\//, ''))
+}
+
+const gallerySeoResolved = computed(() =>
+  resolveGalleryShareMeta({
+    category: currentCategory.value,
+    categoryTitle: seoTitles[currentCategory.value] || seoTitles.all,
+    imageId: parseGalleryImageIdFromRoute(route.query as Record<string, unknown>),
+    eventName: parseGalleryEventFromRoute(route.query as Record<string, unknown>),
+    allWorks: allWorks.value,
+    absPath: absPathClean,
+    absThumb800: absThumb800Clean,
+    defaultOgImageAbs,
+    defaultTitle: seoTitles[currentCategory.value] || seoTitles.all,
+    defaultDescription: seoDefaultDescription
+  })
+)
+
 useSeoMeta({
-  title: computed(() => seoTitles[currentCategory.value] || seoTitles.all),
-  description: '數位藝術與攝影作品集，包含數位插畫與攝影紀錄。',
-  ogTitle: 'Works - 數位藝術與攝影作品集',
-  ogDescription: '瀏覽 Young 的數位插畫與攝影作品，以事件與時間軸呈現創作與生活紀錄。',
+  title: computed(() => gallerySeoResolved.value.title),
+  description: computed(() => gallerySeoResolved.value.description),
+  ogTitle: computed(() => gallerySeoResolved.value.title),
+  ogDescription: computed(() => gallerySeoResolved.value.description),
   ogType: 'website',
-  ogUrl: galleryOgUrl,
-  ogImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg',
-  twitterCard: 'summary_large_image'
+  ogUrl: shareUrl,
+  ogImage: computed(() => gallerySeoResolved.value.ogImage),
+  ogImageAlt: computed(() => gallerySeoResolved.value.ogImageAlt),
+  twitterCard: 'summary_large_image',
+  twitterImage: computed(() => gallerySeoResolved.value.ogImage)
+})
+
+useHead({
+  script: computed(() => {
+    const ld = gallerySeoResolved.value.jsonLd
+    if (!ld) return []
+    return [{ type: 'application/ld+json', innerHTML: JSON.stringify(ld) }]
+  })
 })
 </script>
 
