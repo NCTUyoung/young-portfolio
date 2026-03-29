@@ -11,5 +11,6 @@ export const GALLERY_EVENT_COORDS_FALLBACK: Record<string, { lat: number, lng: n
   '2025 聖誕台北': { lat: 25.0478, lng: 121.5319 },
   '峨嵋湖風鈴木': { lat: 24.6784, lng: 120.9851 },
   'WBC 2026': { lat: 35.7058, lng: 139.7518 },
-  'WBC東京 台澳': { lat: 35.6942, lng: 139.7436 }
+  'WBC東京 台澳': { lat: 35.6942, lng: 139.7436 },
+  'Annber 外拍': { lat: 24.7867, lng: 120.9975 }
 }

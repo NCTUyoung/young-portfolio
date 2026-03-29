@@ -1,5 +1,5 @@
 {
-  "totalNumber": "63",
+  "totalNumber": "72",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
@@ -11,7 +11,8 @@
     "2025 聖誕台北": 4,
     "峨嵋湖風鈴木": 13,
     "WBC 2026": 12,
-    "WBC東京 台澳": 8
+    "WBC東京 台澳": 8,
+    "Annber 外拍": 9
   },
   "Img": [
     {
@@ -1432,6 +1433,235 @@
       "aperture": 5,
       "iso": 200,
       "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2702-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "光復校園步道上的笑意",
+      "content": "白蕾絲與灰長裙，站在林蔭步道中央，逆光裡輕快回眸。",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 69,
+      "aperture": 2.8,
+      "iso": 160,
+      "shutterSpeed": 0.001
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2216-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "廊架下的紫藤與伸手",
+      "content": "白色格狀廊架垂下紫藤花串，抬手輕觸花穗，裙擺與落瓣點綴地面。",
+      "tags": [
+        "標準",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 47,
+      "aperture": 4,
+      "iso": 100,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2187-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "樹墩上的林下片刻",
+      "content": "坐於草坡樹墩，抬手遮光，身後是綠林與點點野花。",
+      "tags": [
+        "人像",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 85,
+      "aperture": 4,
+      "iso": 100,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2502-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "環形雕塑裡的背對背",
+      "content": "深色金屬圓環內背對背而坐，白洋裝與黑上衣形成簡潔對比。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 74,
+      "aperture": 2.5,
+      "iso": 200,
+      "shutterSpeed": 0.00025
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2533-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "鏡面圓環與遠方 I LOVE U",
+      "content": "鏡面雕塑的圓洞框住笑臉，草皮遠方可見校園裝置字樣。",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 44,
+      "aperture": 2.5,
+      "iso": 200,
+      "shutterSpeed": 0.00025
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2937-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "跑道五號線上的揮手",
+      "content": "紅色跑道與白線數字「5」前席地揮手，白裙與黑鞋對比鮮明。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "日光",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 123,
+      "aperture": 2.8,
+      "iso": 200,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2792-編輯-2-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "販賣機之間的趣味平衡",
+      "content": "兩台藍色自動販賣機對稱構圖，水瓶頂在頭上，俏皮定格。",
+      "tags": [
+        "廣角",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 125,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2817-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "藍色販賣機前選飲",
+      "content": "側身操作面板選飲，鐵網圍籬與校園建築在後方柔焦。",
+      "tags": [
+        "廣角",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 125,
+      "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/Annber 外拍/DSC_2980-編輯-1.jpg",
+      "time": "2026 Mar 29",
+      "title": "五與六跑道之間",
+      "content": "紅跑道大字「5」「6」之間站姿、雙手叉腰，遠方可見球門與看台。",
+      "tags": [
+        "標準",
+        "淺景深",
+        "日光",
+        "高速快門",
+        "後製"
+      ],
+      "event": {
+        "name": "Annber 外拍",
+        "description": "與 annber.kuo 於光復校區外拍｜迴廊花藤、金屬雕塑、販賣機與跑道的人像紀錄",
+        "location": "交通大學",
+        "lat": 24.7867,
+        "lng": 120.9975
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 37,
+      "aperture": 2.5,
+      "iso": 200,
+      "shutterSpeed": 0.002
     }
   ]
 }
