@@ -5,35 +5,35 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       @click.self="cancel"
     >
-      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+      <div class="mx-4 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl transition-transform dark:bg-stone-900 dark:ring-1 dark:ring-stone-700">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="border-b border-gray-200 px-6 py-4 dark:border-stone-700">
           <div class="flex items-center">
-            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/80">
+              <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-stone-100">{{ title }}</h3>
             </div>
           </div>
         </div>
 
         <!-- Content -->
         <div class="px-6 py-4">
-          <p class="text-sm text-gray-600 leading-relaxed">
+          <p class="text-sm leading-relaxed text-gray-600 dark:text-stone-300">
             {{ message }}
           </p>
-          <div v-if="details" class="mt-3 p-3 bg-gray-50 rounded-lg">
-            <p class="text-xs text-gray-500">{{ details }}</p>
+          <div v-if="details" class="mt-3 rounded-lg bg-gray-50 p-3 dark:bg-stone-800/80">
+            <p class="text-xs text-gray-500 dark:text-stone-400">{{ details }}</p>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+        <div class="flex justify-end space-x-3 bg-gray-50 px-6 py-4 dark:bg-stone-800/50">
           <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700 dark:focus:ring-offset-stone-900"
             @click="cancel"
           >
             取消

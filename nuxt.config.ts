@@ -17,10 +17,22 @@ export default defineNuxtConfig({
     prefix: 'Headless'
   },
 
-  // 字型設定：改由 @nuxt/fonts 管理，取代 CSS @import
-  // 支援自動子集化、本地緩存，效能更佳
+  // 字型：@nuxt/fonts（子集化／快取）
+  // - Outfit：拉丁 UI／標題幾何感
+  // - Noto Sans TC：繁中與 Outfit 未覆蓋字元
+  // - Noto Serif JP：豎排／引言等日式裝飾（font-jp）
   fonts: {
     families: [
+      {
+        name: 'Outfit',
+        weights: [200, 300, 400, 500, 600, 700, 800, 900],
+        provider: 'google'
+      },
+      {
+        name: 'Noto Sans TC',
+        weights: [200, 300, 400, 500, 600, 700, 900],
+        provider: 'google'
+      },
       {
         name: 'Noto Serif JP',
         weights: [100, 200, 300],
@@ -75,7 +87,7 @@ export default defineNuxtConfig({
         lang: 'zh-Hant'
       },
       charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1',
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       titleTemplate: '%s | Young Portfolio',
       meta: [
         {

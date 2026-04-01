@@ -1,7 +1,7 @@
 <template>
   <div ref="pageRef" class="min-h-screen transition-colors duration-300">
     <!-- Header — 個性化設計 -->
-    <div class="container mx-auto px-6 py-12 md:py-20 relative">
+    <div class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative">
       <!-- 裝飾線 -->
       <div class="deco-line-v h-20 top-4 right-[8%] hidden lg:block"/>
       <div class="deco-dot top-4 right-[8%] hidden lg:block" style="transform: translate(-2px, -8px)"/>
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Gallery Content -->
-    <div class="container mx-auto px-6 relative">
+    <div class="container mx-auto px-4 sm:px-6 relative">
       <!-- Loading State -->
       <div v-if="isGalleryLoading" class="text-center py-28">
         <!-- 日式菱形旋轉動畫 -->
@@ -59,11 +59,12 @@
       <section
         v-if="eventLocations && eventLocations.length && currentCategory === 'photography'"
         ref="mapSectionRef"
-        class="mb-16 max-w-7xl mx-auto"
+        class="mb-16 max-w-7xl mx-auto scroll-mt-24"
       >
         <p class="jp-section-label mb-3">Visited Places</p>
         <EventMap
           :events="eventLocations"
+          :selected-event-name="filterState.selectedEvent"
           @focus-event="handleFocusEvent"
         />
       </section>
@@ -99,8 +100,8 @@
     </div>
 
     <!-- Footer — 根據分類變化 -->
-    <div class="container mx-auto px-6 py-20 lg:py-28 text-center relative overflow-hidden">
-      <div class="deco-line-h w-40 top-0 left-1/2 -translate-x-1/2"/>
+    <div class="container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:py-28 text-center relative overflow-hidden">
+      <div class="deco-line-h absolute left-1/2 top-0 w-40 -translate-x-1/2"/>
 
       <!-- 背景漢字裝飾 -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
@@ -138,7 +139,7 @@
     <!-- 回到地圖：手機右下圓形按鈕 -->
     <button
       v-if="showBackToMap && currentCategory === 'photography'"
-      class="md:hidden fixed bottom-20 right-5 z-[1005] w-10 h-10 rounded-full bg-white/95 border border-stone-200 text-[0.7rem] tracking-[0.2em] text-stone-500 shadow-japanese flex items-center justify-center active:scale-95 transition-all"
+      class="md:hidden fixed z-[1005] flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-stone-200 bg-white/95 text-[0.65rem] tracking-[0.2em] text-stone-500 shadow-japanese transition-all active:scale-95 right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(5rem+env(safe-area-inset-bottom))]"
       type="button"
       @click="scrollToMap"
     >
@@ -272,6 +273,13 @@ const setEventRef = (name: string | null, el: Element | ComponentPublicInstance 
     return
   }
   const target = ('$el' in el ? (el.$el as HTMLElement) : (el as HTMLElement))
+  if (typeof window !== 'undefined') {
+    if (typeof target.checkVisibility === 'function') {
+      if (!target.checkVisibility()) return
+    } else if (target.getClientRects().length === 0) {
+      return
+    }
+  }
   eventRefs.value[name] = target
 }
 
@@ -288,13 +296,7 @@ const handleFocusEvent = async (eventName: string) => {
 
   if (!target) return
 
-  const offset = 96
-  const top = target.getBoundingClientRect().top + window.scrollY - offset
-
-  window.scrollTo({
-    top,
-    behavior: 'smooth'
-  })
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   focusedEventName.value = eventName
   if (focusTimer !== null) {
@@ -312,15 +314,24 @@ const handleScroll = () => {
   showBackToMap.value = mapBottom < threshold
 }
 
-const scrollToMap = () => {
-  if (!mapSectionRef.value) return
-  const offset = 80
-  const top = mapSectionRef.value.getBoundingClientRect().top + window.scrollY - offset
+/** 地圖區是否已貼在導覽列下方；區塊高於視窗時只檢查頂緣對齊（避免矮螢幕誤判） */
+const isMapComfortablyVisible = () => {
+  const el = mapSectionRef.value
+  if (!el) return true
+  const r = el.getBoundingClientRect()
+  const vh = window.innerHeight
+  const navReserve = 88
+  if (r.top > navReserve + 56) return false
+  if (r.top < 52) return false
+  if (r.height >= vh - navReserve - 24) {
+    return r.top >= navReserve - 16 && r.top <= navReserve + 48
+  }
+  if (r.bottom > vh - 10) return false
+  return true
+}
 
-  window.scrollTo({
-    top,
-    behavior: 'smooth'
-  })
+const scrollToMap = () => {
+  mapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 // ===== 圖片檢視器方法 =====
@@ -330,6 +341,30 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
 
 
 // ===== 監聽器 =====
+/** 篩選某一事件時：地圖 flyTo（EventMap）；僅在需要時捲到「整塊地圖區」對齊視窗上方，避免半張地圖＋半張作品 */
+watch(
+  () => filterState.value.selectedEvent,
+  async (name) => {
+    if (currentCategory.value !== 'photography' || !name) return
+    await nextTick()
+    await nextTick()
+
+    if (focusTimer !== null) {
+      window.clearTimeout(focusTimer)
+      focusTimer = null
+    }
+    focusedEventName.value = name
+    focusTimer = window.setTimeout(() => {
+      focusedEventName.value = null
+      focusTimer = null
+    }, 1200)
+
+    if (!isMapComfortablyVisible()) {
+      scrollToMap()
+    }
+  }
+)
+
 watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
   if (digitalErr) {
     toast.error('載入數位作品失敗', '請檢查網路連線或稍後再試')

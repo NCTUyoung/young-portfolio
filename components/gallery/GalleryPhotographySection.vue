@@ -8,6 +8,7 @@
         :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
         :class="[
           '[content-visibility:auto]',
+          'scroll-mt-24',
           'transition-colors duration-500',
           focusedEventName === item.eventName
             ? 'bg-amber-50/40 dark:bg-amber-900/10 rounded-2xl -mx-4 px-4 py-2'
@@ -89,7 +90,12 @@
   <!-- Mobile -->
   <div class="md:hidden block">
     <div class="space-y-12">
-      <div v-for="item in items" :key="item.key" class="[content-visibility:auto]">
+      <div
+        v-for="item in items"
+        :key="item.key"
+        :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
+        class="[content-visibility:auto] scroll-mt-24"
+      >
         <div v-if="item.eventName" class="mb-4">
           <h3 class="text-base font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
             {{ item.eventName }}

@@ -31,11 +31,13 @@
 <script setup lang="ts">
 import { ref, watch, reactive, nextTick, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
 const { getImagePath } = useImagePath()
 const { currentViewerImage, showInfoPanel, infoPanelWidth } = storeToRefs(imageViewerStore)
+const isDesktopHistogramLayout = useMediaQuery('(min-width: 768px)')
 
 const histogramCanvas = ref<HTMLCanvasElement>()
 const histogramData = reactive({
@@ -46,9 +48,11 @@ const histogramData = reactive({
 
 // 動態計算畫布寬度
 const canvasWidth = computed(() => {
-  // 根據面板寬度調整畫布寬度，扣除 padding 和邊框
-  const baseWidth = Math.max(200, infoPanelWidth.value - 80)
-  return Math.min(baseWidth, 400) // 限制最大寬度
+  const vw =
+    typeof window !== 'undefined' ? Math.max(200, window.innerWidth - 80) : 320
+  const fromPanel = Math.max(200, infoPanelWidth.value - 80)
+  const baseWidth = isDesktopHistogramLayout.value ? fromPanel : vw
+  return Math.min(baseWidth, 400)
 })
 
 // 生成直方圖

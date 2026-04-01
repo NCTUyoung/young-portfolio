@@ -162,7 +162,9 @@ const handleNavigatorMouseDown = (event: MouseEvent) => {
       const newX = e.clientX - startX
       const newY = e.clientY - startY
 
-      const rightPanelOffset = showInfoPanel.value ? infoPanelWidth.value : 0
+      const desktop = window.matchMedia('(min-width: 768px)').matches
+      const rightPanelOffset =
+        showInfoPanel.value && desktop ? infoPanelWidth.value : 0
       const maxX = window.innerWidth - rightPanelOffset - 180 // 導覽器寬度 + 邊距
       const maxY = window.innerHeight - 200 // 導覽器高度 + 邊距
 

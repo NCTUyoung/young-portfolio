@@ -290,7 +290,10 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
   }
 
   const initNavigatorPosition = () => {
-    const rightOffset = showInfoPanel.value ? infoPanelWidth.value + 20 : 20
+    if (typeof window === 'undefined') return
+    const desktop = window.matchMedia('(min-width: 768px)').matches
+    const rightOffset =
+      showInfoPanel.value && desktop ? infoPanelWidth.value + 20 : 20
     navigatorX.value = window.innerWidth - rightOffset - 180
     navigatorY.value = window.innerHeight - 220
   }

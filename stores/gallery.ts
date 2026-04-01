@@ -239,6 +239,28 @@ export const useGalleryStore = defineStore('gallery', () => {
     clearCache(['allWorks', 'mixedItems'])
   }, { deep: true })
 
+  /**
+   * localStorage 可能留下舊的 selectedEvent；與目前類別的 availableEvents 對不上時會篩出 0 張，畫面空白。
+   */
+  watch(
+    [availableEvents, () => filterState.value.selectedEvent, () => filterState.value.selectedCategory, galleryDataReady],
+    () => {
+      if (import.meta.server) return
+      if (!galleryDataReady.value) return
+      const cat = filterState.value.selectedCategory
+      if (cat !== 'digital' && cat !== 'photography') return
+      const sel = filterState.value.selectedEvent
+      if (sel === null) return
+      const evs = availableEvents.value
+      if (evs.length === 0) return
+      const valid = new Set(evs.map(e => e.name))
+      if (!valid.has(sel)) {
+        setSelectedEvent(null)
+      }
+    },
+    { flush: 'post' }
+  )
+
   return {
     digitalWorks,
     photographyWorks,

@@ -60,7 +60,7 @@
 
     <!-- ===== 預告內容 — 水平滾動 ===== -->
     <section class="py-20 lg:py-24 bg-stone-50/40 dark:bg-stone-800/20 relative">
-      <div class="deco-line-h w-full top-0 left-0"/>
+      <div class="deco-line-h absolute left-0 top-0 w-full"/>
 
       <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-10 flex items-end gap-6">

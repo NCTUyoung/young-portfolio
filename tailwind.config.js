@@ -10,8 +10,17 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // 日式字型 — Noto Serif JP 用於引言、漢字裝飾
+      // 全站 sans：Outfit（拉丁）→ Noto Sans TC（繁中）；日式裝飾用 font-jp
       fontFamily: {
+        sans: [
+          'Outfit',
+          'Noto Sans TC',
+          'PingFang TC',
+          'Microsoft JhengHei',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+        ],
         jp: ['Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'serif'],
       },
       // 暖調點綴色 — 赤陶 / 琥珀系

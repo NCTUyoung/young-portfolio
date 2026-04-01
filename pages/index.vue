@@ -1,7 +1,7 @@
 <template>
   <div ref="pageRef">
     <!-- ===== 全屏 Hero — 攝影作品背景 ===== -->
-    <section class="relative h-[92vh] min-h-[600px] overflow-hidden">
+    <section class="relative min-h-[85dvh] overflow-hidden md:h-[92vh] md:min-h-[600px]">
       <!-- 背景：純照片 + 左側漸層遮罩 -->
       <div class="absolute inset-0">
         <img
@@ -26,41 +26,45 @@
         <span class="writing-vertical font-jp text-xs tracking-[0.5em] text-stone-300/60 dark:text-stone-600/40">作品集</span>
         <div class="w-px h-8 bg-gradient-to-b from-stone-300/40 dark:from-stone-600/30 to-transparent"/>
       </div>
-      <div class="deco-line-h w-32 bottom-32 right-[10%] hidden lg:block"/>
+      <div class="deco-line-h absolute bottom-32 right-[10%] hidden w-32 lg:block"/>
       <div class="deco-dot bottom-32 right-[10%] hidden lg:block" style="transform: translateX(36px) translateY(-2px);"/>
 
       <!-- Hero 內容 — 品牌標語 -->
       <div class="relative z-10 h-full flex items-center">
-        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
-          <div class="max-w-xl pl-8 pr-6 py-10 relative">
-            <!-- 左側裝飾線（侘寂風格） -->
-            <div class="absolute left-0 top-8 bottom-16 w-px bg-gradient-to-b from-accent-400/40 via-accent-300/30 to-transparent dark:from-accent-500/30 dark:via-accent-600/20 dark:to-transparent"/>
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 w-full">
+          <div class="max-w-xl pl-8 pr-6 py-8 sm:py-10 max-[380px]:pl-4 max-[380px]:pr-4 relative">
+            <!-- 左側裝飾線：單色豎線（與導覽 LOGO 直條呼應） -->
+            <div class="absolute left-0 top-8 bottom-16 w-px bg-gradient-to-b from-stone-900/50 via-stone-600/35 to-transparent dark:from-stone-100/55 dark:via-stone-400/30 dark:to-transparent"/>
 
-            <!-- 小標 + 橫線裝飾 -->
+            <!-- 小標 + 橫線：高對比小字，避免淺棕難讀 -->
             <div class="reveal flex items-center gap-4 mb-6">
-              <p class="text-sm tracking-[0.3em] uppercase text-accent-600 dark:text-accent-400 font-light">
+              <p class="text-xs sm:text-sm tracking-[0.28em] uppercase text-stone-900 dark:text-stone-100 font-semibold">
                 Digital Art &amp; Photography
               </p>
-              <div class="h-px flex-1 max-w-[80px] bg-gradient-to-r from-accent-300/50 to-transparent dark:from-accent-600/40"/>
+              <div class="h-px flex-1 max-w-[80px] bg-gradient-to-r from-stone-500/45 to-transparent dark:from-stone-400/50"/>
             </div>
 
-            <!-- 主標題 -->
-            <h1 class="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-extralight text-stone-800 dark:text-stone-100 tracking-wider leading-[1.1] drop-shadow-sm">
+            <!-- 主標題：粗黑主字 + 次行輕量（對齊全站單色標題感） -->
+            <h1
+              class="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-black tracking-[-0.03em] text-stone-900 dark:text-stone-50 leading-[1.05] [text-shadow:0_1px_0_rgba(255,255,255,0.35)] dark:[text-shadow:0_2px_12px_rgba(0,0,0,0.45)]"
+            >
               <span class="block">Young</span>
-              <span class="block mt-2 text-3xl sm:text-4xl lg:text-5xl text-stone-600 dark:text-stone-300 font-light">Portfolio</span>
+              <span class="block mt-2 text-3xl sm:text-4xl lg:text-5xl font-extralight tracking-[0.14em] text-stone-700 dark:text-stone-300">
+                Portfolio
+              </span>
             </h1>
 
-            <!-- 主標與 CTA 之間的細線 -->
+            <!-- 主標與 CTA：細線 + 琥珀點（全區唯一強調色） -->
             <div class="reveal reveal-delay-2 mt-8 flex items-center gap-3">
-              <div class="w-8 h-px bg-stone-300/50 dark:bg-stone-600/40"/>
-              <div class="w-1 h-1 rounded-full bg-accent-400/60 dark:bg-accent-500/50"/>
+              <div class="w-8 h-px bg-stone-400/70 dark:bg-stone-500/80"/>
+              <div class="w-1.5 h-1.5 rounded-full bg-accent-500 dark:bg-accent-400 ring-1 ring-stone-900/10 dark:ring-white/15"/>
             </div>
 
             <!-- CTA -->
             <div class="reveal reveal-delay-2 mt-6">
               <NuxtLink
                 to="/gallery"
-                class="inline-flex items-center px-7 py-3.5 bg-accent-600 hover:bg-accent-700 text-white font-light tracking-wider rounded-lg transition-all duration-300 group shadow-lg shadow-accent-600/20"
+                class="inline-flex min-h-[44px] items-center justify-center px-7 py-3.5 touch-manipulation bg-accent-600 hover:bg-accent-700 active:bg-accent-800 text-white font-light tracking-wider rounded-lg transition-all duration-300 group shadow-lg shadow-accent-600/20"
               >
                 瀏覽作品
                 <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +77,7 @@
       </div>
 
       <!-- 底部滾動提示 -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 dark:text-stone-500">
+      <div class="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 dark:text-stone-500">
         <span class="text-xs tracking-[0.2em] font-light">SCROLL</span>
         <div class="w-px h-8 bg-gradient-to-b from-stone-400 to-transparent dark:from-stone-500 animate-pulse"/>
       </div>
@@ -151,7 +155,7 @@
 
     <!-- ===== 創作領域 — 左右交錯 ===== -->
     <section class="py-20 lg:py-28 bg-stone-50/40 dark:bg-stone-800/20 relative">
-      <div class="deco-line-h w-full top-0 left-0"/>
+      <div class="deco-line-h absolute left-0 top-0 w-full"/>
 
       <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-16">
@@ -267,7 +271,7 @@ v-for="(tool, index) in tools" :key="tool.category"
 
     <!-- ===== 大引言區塊 — 視覺間斷 ===== -->
     <section class="reveal relative py-24 lg:py-32 overflow-hidden">
-      <div class="deco-line-h w-full top-0 left-0"/>
+      <div class="deco-line-h absolute left-0 top-0 w-full"/>
 
       <!-- 背景大字裝飾 -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
@@ -307,7 +311,7 @@ v-for="(tool, index) in tools" :key="tool.category"
         </div>
       </div>
 
-      <div class="deco-line-h w-full bottom-0 left-0"/>
+      <div class="deco-line-h absolute bottom-0 left-0 w-full"/>
     </section>
 
     <!-- ===== 創作歷程 Timeline ===== -->
@@ -411,8 +415,8 @@ v-for="(milestone, index) in milestones" :key="index"
 
     <!-- ===== 導航卡片 ===== -->
     <section class="relative py-24 lg:py-32 bg-stone-50/40 dark:bg-stone-800/20">
-      <div class="deco-line-h w-full top-0 left-0"/>
-      <div class="deco-line-v h-40 -top-20 right-[15%] hidden lg:block"/>
+      <div class="deco-line-h absolute left-0 top-0 w-full"/>
+      <div class="deco-line-v absolute -top-20 right-[15%] hidden h-40 lg:block"/>
 
       <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="reveal mb-16 max-w-lg">

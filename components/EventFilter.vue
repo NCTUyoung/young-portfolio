@@ -9,11 +9,14 @@
     <!-- 小標 -->
     <p class="jp-section-label mb-3">Event</p>
 
-    <!-- 底線 Tab 篩選列 -->
-    <div class="flex flex-wrap gap-x-1 gap-y-1">
+    <!-- 底線 Tab 篩選列（窄螢幕可橫向捲動，避免多事件時換行過多） -->
+    <div
+      class="-mx-1 flex w-full max-w-full min-w-0 gap-x-1 gap-y-1 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible sm:pb-0"
+    >
       <!-- 全部事件 -->
       <button
-        class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
+        type="button"
+        class="relative flex-shrink-0 touch-manipulation px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
         :class="filterState.selectedEvent === null
           ? 'text-stone-800 dark:text-stone-100'
           : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"
@@ -40,12 +43,13 @@
       </button>
 
       <!-- 垂直分隔線 -->
-      <span class="self-center w-px h-4 bg-stone-200/60 dark:bg-stone-700/50 mx-1"/>
+      <span class="hidden flex-shrink-0 self-center sm:block w-px h-4 bg-stone-200/60 dark:bg-stone-700/50 mx-1"/>
 
       <!-- 各事件 -->
       <template v-for="(event, index) in availableEvents" :key="event.name">
         <button
-          class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
+          type="button"
+          class="relative flex-shrink-0 touch-manipulation px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
           :class="filterState.selectedEvent === event.name
             ? 'text-stone-800 dark:text-stone-100'
             : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"

@@ -34,12 +34,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
-import { useDark } from '@vueuse/core'
+import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
+import { useDark, useDebounceFn } from '@vueuse/core'
 import type * as LeafletNS from 'leaflet'
-import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple } from 'leaflet'
+import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple, CircleMarker } from 'leaflet'
 
 type LeafletModule = typeof LeafletNS
+
+/** Leaflet 未公開型別：縮放／慣性平移動畫期間避免 invalidateSize */
+type LeafletMapWithInternals = LeafletMap & {
+  _animatingZoom?: boolean
+  _panAnim?: { _inProgress?: boolean }
+}
 
 interface EventLocation {
   name: string
@@ -51,9 +57,14 @@ interface EventLocation {
   location?: string
 }
 
-const props = defineProps<{
-  events: EventLocation[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    events: EventLocation[]
+    /** 與 Event 篩選同步：選中時地圖飛到該點並強調標記；null 時縮放至全部範圍 */
+    selectedEventName?: string | null
+  }>(),
+  { selectedEventName: null }
+)
 
 const emit = defineEmits<{
   (e: 'focus-event', name: string): void
@@ -69,11 +80,54 @@ let map: LeafletMap | null = null
 let markersLayer: LayerGroup | null = null
 let tileLayer: TileLayer | null = null
 let resizeObserver: ResizeObserver | null = null
+/** 防止 onMounted 與 watch 並發各建一張圖、重疊標記 */
+let mapInitPromise: Promise<void> | null = null
+
+/** 事件名稱 → 圓點（每事件名唯一），供篩選同步時改樣式與 flyTo */
+const markerByName = new Map<string, CircleMarker>()
+
+/** 僅在資料變更時重畫標記，避免 deep watch 過度觸發 */
+const eventsSignature = computed(() =>
+  props.events.map(e => `${e.name}:${e.lat}:${e.lng}`).join('|')
+)
 
 function invalidateMapSize () {
   if (!map) return
   map.invalidateSize({ animate: false })
 }
+
+/** flyTo 完成後 Leaflet 不會清 _flyToFrame，不可用內部 RAF 判斷；改由程式標記 */
+let programmaticFlyActive = false
+let flyToOpId = 0
+
+function isMapInMotion (mapInstance: LeafletMap): boolean {
+  if (programmaticFlyActive) return true
+  const m = mapInstance as LeafletMapWithInternals
+  if (m._animatingZoom) return true
+  if (m._panAnim?._inProgress) return true
+  return false
+}
+
+/** 動畫中延後到 moveend 再 invalidate，避免與 flyTo／慣性平移打架 */
+let invalidatePendingAfterMoveEnd = false
+function runInvalidateWhenIdle () {
+  if (!map) return
+  if (isMapInMotion(map)) {
+    if (invalidatePendingAfterMoveEnd) return
+    invalidatePendingAfterMoveEnd = true
+    map.once('moveend', () => {
+      invalidatePendingAfterMoveEnd = false
+      invalidateMapSize()
+    })
+    return
+  }
+  invalidateMapSize()
+}
+
+/** ResizeObserver 若在動畫期間反覆 invalidate，圓點標記會抖動 */
+const debouncedInvalidateMapSize = useDebounceFn(() => {
+  runInvalidateWhenIdle()
+}, 120)
 
 const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -94,24 +148,115 @@ const setTileLayer = async (dark: boolean) => {
 
 const initMap = async () => {
   if (!import.meta.client || map || !mapContainer.value) return
+  if (mapInitPromise) {
+    await mapInitPromise
+    return
+  }
 
-  const L = await import('leaflet')
+  mapInitPromise = (async () => {
+    const L = await import('leaflet')
+    if (map || !mapContainer.value) return
 
-  map = L.map(mapContainer.value, {
-    center: [23.7, 121],
-    zoom: 7,
-    zoomControl: false
-  })
+    map = L.map(mapContainer.value, {
+      center: [23.7, 121],
+      zoom: 7,
+      zoomControl: false
+    })
 
-  await setTileLayer(isDark.value)
+    await setTileLayer(isDark.value)
 
-  markersLayer = L.layerGroup().addTo(map)
-  renderMarkers(L)
+    await nextTick()
+    invalidateMapSize()
 
-  await nextTick()
-  invalidateMapSize()
-  requestAnimationFrame(() => invalidateMapSize())
-  setTimeout(() => invalidateMapSize(), 200)
+    markersLayer = L.layerGroup().addTo(map)
+    renderMarkers(L)
+
+    await nextTick()
+    runInvalidateWhenIdle()
+    debouncedInvalidateMapSize()
+  })()
+
+  try {
+    await mapInitPromise
+  } finally {
+    mapInitPromise = null
+  }
+}
+
+/**
+ * 與 tailwind.config accent（赤陶／琥珀）+ stone 主題一致：細邊、低飽和填色，避免螢光黃橘
+ * @see tailwind.config.js colors.accent
+ */
+const getMarkerStyles = (dark: boolean) => {
+  const base = dark
+    ? {
+        radius: 6,
+        color: '#e4964a',
+        weight: 1.5,
+        fillColor: '#292524',
+        fillOpacity: 0.94
+      }
+    : {
+        radius: 6,
+        color: '#c46023',
+        weight: 1.5,
+        fillColor: '#fdf8f0',
+        fillOpacity: 0.98
+      }
+  const selected = dark
+    ? {
+        radius: 9,
+        color: '#f4d5b0',
+        weight: 2,
+        fillColor: '#db7b2e',
+        fillOpacity: 0.96
+      }
+    : {
+        radius: 9,
+        color: '#a3491f',
+        weight: 2,
+        fillColor: '#faecd9',
+        fillOpacity: 1
+      }
+  return { base, selected }
+}
+
+const styleForEvent = (eventName: string, dark: boolean) => {
+  const { base, selected } = getMarkerStyles(dark)
+  return props.selectedEventName === eventName ? selected : base
+}
+
+const applyMapViewForSelection = (L: LeafletModule) => {
+  const mapInstance = map
+  if (!mapInstance || !props.events.length) return
+
+  const name = props.selectedEventName
+  const flyDuration = 1.15
+
+  const runFly = (fn: () => void) => {
+    programmaticFlyActive = true
+    const op = ++flyToOpId
+    mapInstance.once('moveend', () => {
+      if (op === flyToOpId) programmaticFlyActive = false
+    })
+    fn()
+  }
+
+  if (name) {
+    const ev = props.events.find(e => e.name === name)
+    if (ev) {
+      runFly(() => mapInstance.flyTo([ev.lat, ev.lng], 12, { duration: flyDuration }))
+      return
+    }
+  }
+
+  const bounds = props.events.map(e => [e.lat, e.lng] as LatLngTuple)
+  if (bounds.length === 1) {
+    runFly(() => mapInstance.flyTo(bounds[0], 10, { duration: flyDuration }))
+  } else if (bounds.length > 1) {
+    const b = L.latLngBounds(bounds)
+    runFly(() => mapInstance.flyToBounds(b, { padding: [36, 36], duration: flyDuration, maxZoom: 12 }))
+  }
 }
 
 const renderMarkers = (L: LeafletModule) => {
@@ -119,32 +264,41 @@ const renderMarkers = (L: LeafletModule) => {
   const markers = markersLayer
   if (!mapInstance || !markers) return
   markers.clearLayers()
+  markerByName.clear()
 
   if (!props.events.length) return
 
-  const bounds: LatLngTuple[] = []
   const dark = isDark.value
-  const baseStyle = dark
-    ? { radius: 7, color: '#e4b07a', weight: 1, fillColor: '#e8a84a', fillOpacity: 0.85 }
-    : { radius: 7, color: '#e4b07a', weight: 1, fillColor: '#db7b2e', fillOpacity: 0.8 }
+  const { base, selected } = getMarkerStyles(dark)
 
   props.events.forEach(event => {
-
-    const marker = L.circleMarker([event.lat, event.lng], baseStyle)
+    const initialStyle = styleForEvent(event.name, dark)
+    const marker = L.circleMarker([event.lat, event.lng], initialStyle)
+    markerByName.set(event.name, marker)
 
     marker.on('mouseover', () => {
       hoveredEvent.value = event
-      marker.setStyle({
-        radius: 9,
-        weight: 1.6,
-        fillOpacity: 0.95
-      })
-      // 不主動開 Popup，讓畫面更乾淨，資訊交給右下角圖片卡片
+      const isSel = props.selectedEventName === event.name
+      if (isSel) {
+        marker.setStyle({
+          ...selected,
+          radius: 10,
+          weight: 2.25,
+          fillOpacity: 1
+        })
+      } else {
+        marker.setStyle({
+          ...base,
+          radius: 8,
+          weight: 2,
+          fillOpacity: dark ? 0.98 : 1
+        })
+      }
     })
 
     marker.on('mouseout', () => {
       hoveredEvent.value = null
-      marker.setStyle(baseStyle)
+      marker.setStyle(styleForEvent(event.name, dark))
     })
 
     marker.on('click', () => {
@@ -152,28 +306,23 @@ const renderMarkers = (L: LeafletModule) => {
     })
 
     marker.addTo(markers)
-    bounds.push([event.lat, event.lng])
   })
 
-  if (bounds.length > 1) {
-    mapInstance.fitBounds(bounds, { padding: [30, 30] })
-  } else if (bounds.length === 1) {
-    mapInstance.setView(bounds[0], 10)
-  }
+  applyMapViewForSelection(L)
 }
 
 onMounted(async () => {
   await initMap()
   if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(() => {
-      invalidateMapSize()
+      debouncedInvalidateMapSize()
     })
     resizeObserver.observe(mapContainer.value)
   }
 })
 
 watch(
-  () => props.events,
+  eventsSignature,
   async () => {
     if (!import.meta.client) return
     const L = await import('leaflet')
@@ -182,11 +331,8 @@ watch(
       return
     }
     renderMarkers(L)
-    setTimeout(() => {
-      invalidateMapSize()
-    }, 200)
-  },
-  { deep: true }
+    debouncedInvalidateMapSize()
+  }
 )
 
 watch(isDark, async (dark) => {
@@ -195,6 +341,19 @@ watch(isDark, async (dark) => {
   const L = await import('leaflet')
   renderMarkers(L)
 })
+
+watch(
+  () => props.selectedEventName,
+  async () => {
+    if (!import.meta.client || !map || !props.events.length || markerByName.size === 0) return
+    const L = await import('leaflet')
+    const dark = isDark.value
+    markerByName.forEach((marker, eventName) => {
+      marker.setStyle(styleForEvent(eventName, dark))
+    })
+    applyMapViewForSelection(L)
+  }
+)
 
 onBeforeUnmount(() => {
   if (resizeObserver) {
@@ -240,6 +399,8 @@ onBeforeUnmount(() => {
   filter: grayscale(0.6) contrast(1.02);
 }
 
+/* 不在 SVG 上使用 filter：flyTo 平移時部分瀏覽器會出現路徑重影，誤以為多一顆標記 */
+
 .event-map-container :deep(.leaflet-control-attribution) {
   font-size: 0.6rem;
   opacity: 0.45;
@@ -260,18 +421,18 @@ onBeforeUnmount(() => {
   gap: 0.75rem;
   padding: 0.65rem 0.9rem;
   border-radius: 1rem;
-  background: rgba(250, 249, 247, 0.92);
+  background: rgba(253, 248, 240, 0.94);
   backdrop-filter: blur(10px);
-  box-shadow: 0 12px 30px rgba(41, 37, 36, 0.18);
-  border: 1px solid rgba(214, 211, 209, 0.7);
+  box-shadow: 0 8px 24px rgba(41, 37, 36, 0.1), 0 2px 8px rgba(196, 96, 35, 0.06);
+  border: 1px solid rgba(196, 96, 35, 0.2);
   z-index: 1000;
   pointer-events: none;
   max-width: 260px;
 }
 .dark .event-map-hover-card {
-  background: rgba(38, 38, 38, 0.92);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(68, 64, 60, 0.6);
+  background: rgba(28, 25, 23, 0.94);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(228, 150, 74, 0.22);
 }
 
 .event-map-hover-image {

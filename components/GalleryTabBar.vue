@@ -1,9 +1,12 @@
 <template>
-  <div class="flex items-center gap-0 mb-8">
+  <div
+    class="-mx-1 mb-8 flex items-center gap-0 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] md:mx-0 md:overflow-visible md:px-0"
+  >
     <template v-for="(tab, index) in tabs" :key="tab.key">
       <!-- 標籤連結：與 /gallery/:category 同步 -->
       <NuxtLink
         :to="{ path: `/gallery/${tab.key}`, query: route.query }"
+        class="flex-shrink-0 touch-manipulation"
         :class="[
           'relative px-5 py-2.5 font-light tracking-wide transition-all duration-300 group',
           isActive(tab.key)

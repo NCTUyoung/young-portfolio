@@ -4,16 +4,16 @@
     <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
       <!-- 搜尋框 -->
       <div class="relative flex-1 max-w-xs">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400 dark:text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
           v-model="searchQuery"
           type="text"
           placeholder="搜尋圖片名稱…"
-          class="w-full pl-9 pr-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+          class="w-full rounded-lg border border-stone-200 bg-stone-50 py-1.5 pl-9 pr-3 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
         >
-        <button v-if="searchQuery" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" @click="searchQuery = ''">
+        <button v-if="searchQuery" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300" @click="searchQuery = ''">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -25,8 +25,8 @@
         :class="[
           'px-3 py-1.5 text-xs font-light rounded-lg border transition-all duration-200 flex items-center space-x-1.5',
           batchMode
-            ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
-            : 'bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100'
+            ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950/30'
+            : 'border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700'
         ]"
         @click="toggleBatchMode"
       >
@@ -39,7 +39,7 @@
 
     <!-- 載入中 -->
     <div v-if="adminStore.loading" class="text-center py-16">
-      <div class="inline-flex items-center space-x-2 text-stone-400">
+      <div class="inline-flex items-center space-x-2 text-stone-400 dark:text-stone-500">
         <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
@@ -50,7 +50,7 @@
 
     <!-- 無數據 -->
     <div v-else-if="adminStore.groupedManageData.length === 0" class="text-center py-20">
-      <svg class="w-12 h-12 mx-auto mb-4 text-stone-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="mx-auto mb-4 h-12 w-12 text-stone-200 dark:text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
       <p class="text-stone-400 text-sm font-light">尚無作品，請先上傳圖片</p>
@@ -66,11 +66,11 @@
       <div
         v-for="group in filteredGroups"
         :key="group.eventName"
-        class="mb-4 border border-stone-200 rounded-xl overflow-hidden"
+          class="mb-4 overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700"
       >
         <!-- 事件標題欄 -->
         <div
-          class="px-4 py-3 bg-white border-b border-stone-100 cursor-pointer hover:bg-stone-50 transition-colors duration-200"
+          class="cursor-pointer border-b border-stone-100 bg-white px-4 py-3 transition-colors duration-200 hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-900/60 dark:hover:bg-stone-800/80"
           @click="adminStore.toggleEventExpand(group.eventName)"
         >
           <div class="flex items-center justify-between">
@@ -90,12 +90,12 @@
 
               <div class="min-w-0">
                 <div class="flex items-center space-x-2">
-                  <h4 class="text-sm font-light text-stone-800">{{ group.eventName }}</h4>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-light bg-amber-100 text-amber-700">
+                  <h4 class="text-sm font-light text-stone-800 dark:text-stone-100">{{ group.eventName }}</h4>
+                  <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-light text-amber-700 dark:bg-amber-900/50 dark:text-amber-200">
                     {{ group.items.length }} 張
                   </span>
                 </div>
-                <div v-if="group.description || group.location" class="mt-0.5 text-xs text-stone-400 font-light">
+                <div v-if="group.description || group.location" class="mt-0.5 text-xs font-light text-stone-400 dark:text-stone-500">
                   <span v-if="group.description">{{ group.description }}</span>
                   <span v-if="group.location" class="ml-2">📍 {{ group.location }}</span>
                 </div>
@@ -154,7 +154,7 @@
         <Transition name="collapse-fade">
           <div
             v-if="adminStore.expandedEvents.includes(group.eventName)"
-            class="collapse-content-admin relative p-4 bg-stone-50/30 overflow-hidden"
+            class="collapse-content-admin relative overflow-hidden bg-stone-50/30 p-4 dark:bg-stone-950/40"
           >
             <!-- 頂線裝飾 — 隨內容淡入 -->
             <div class="collapse-accent-line-admin absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-400/50 to-transparent opacity-0" />
@@ -165,7 +165,7 @@
               :key="item.filename"
               :draggable="adminStore.editMode"
               :class="[
-                'group relative aspect-square bg-stone-100 rounded-xl overflow-hidden transition-all duration-200',
+                'group relative aspect-square overflow-hidden rounded-xl bg-stone-100 transition-all duration-200 dark:bg-stone-800',
                 adminStore.editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
                 selectedFiles.has(item.filename) ? 'ring-2 ring-amber-400' : 'hover:shadow-md',
                 dragOverFilename === item.filename && dragEventName === group.eventName ? 'ring-2 ring-amber-300 opacity-70' : ''
@@ -180,7 +180,7 @@
                 :srcset="getGridImageSrcset(item.filename)"
                 :sizes="gridImageSizes"
                 :alt="item.title"
-                class="w-full h-full object-contain bg-stone-100 group-hover:scale-105 transition-transform duration-300"
+                class="h-full w-full bg-stone-100 object-contain transition-transform duration-300 group-hover:scale-105 dark:bg-stone-800"
                 loading="lazy"
                 decoding="async"
                 @error="handleImageError"
@@ -242,7 +242,7 @@
             <div
               v-for="item in group.items"
               :key="item.filename"
-              class="flex items-center space-x-3 px-3 py-2.5 bg-white rounded-xl border border-stone-100 hover:border-stone-200 transition-all"
+              class="flex items-center space-x-3 rounded-xl border border-stone-100 bg-white px-3 py-2.5 transition-all hover:border-stone-200 dark:border-stone-700 dark:bg-stone-900/50 dark:hover:border-stone-600"
             >
               <!-- Checkbox -->
               <div v-if="batchMode" @click.stop>
@@ -271,8 +271,8 @@
                 @click="openLightbox(item, group.items, group.items.indexOf(item))"
               >
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-light text-stone-800 truncate">{{ item.title }}</p>
-                <p class="text-xs text-stone-400 font-light">{{ formatDate(item.time) }}</p>
+                <p class="truncate text-sm font-light text-stone-800 dark:text-stone-100">{{ item.title }}</p>
+                <p class="text-xs font-light text-stone-400 dark:text-stone-500">{{ formatDate(item.time) }}</p>
               </div>
               <div v-if="adminStore.editMode" class="flex-shrink-0 flex space-x-1">
                 <button class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors" title="編輯" @click="adminStore.startEditImage(item)">

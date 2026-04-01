@@ -3,24 +3,44 @@
     <!-- 導航欄 — 滾動感知 -->
     <nav
       :class="[
-        'fixed top-0 left-0 right-0 z-[1100] transition-all duration-500',
+        'fixed top-0 left-0 right-0 z-[1100] pt-[env(safe-area-inset-top,0px)] transition-all duration-500',
         isScrolled
           ? 'bg-white/92 dark:bg-stone-900/92 nav-scrolled border-b border-stone-200/40 dark:border-stone-700/40 shadow-sm'
           : 'bg-transparent border-b border-transparent'
       ]"
     >
-      <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between transition-all duration-500" :class="isScrolled ? 'h-16' : 'h-20'">
           <div class="flex">
-            <NuxtLink to="/" class="flex items-center group">
+            <NuxtLink
+              to="/"
+              class="group relative flex items-center gap-2 sm:gap-2.5"
+              aria-label="NCTU Young — 首頁"
+            >
+              <!-- 單色直條：標題字左緣／漫畫標題卡常見豎線 -->
               <span
-                class="font-extralight text-stone-800 dark:text-stone-200 tracking-wider group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-all duration-300"
-                :class="isScrolled ? 'text-xl' : 'text-2xl'"
-              >
-                NCTU Young
+                class="hidden h-[1.2em] w-[2px] shrink-0 rounded-[1px] bg-stone-900 sm:block dark:bg-stone-100"
+                aria-hidden="true"
+              />
+              <span class="flex items-baseline gap-1.5 sm:gap-2">
+                <!-- 主標：極粗黑體感，平面單色；hover 才帶入琥珀（呼應字體裝飾拼貼的強對比） -->
+                <span
+                  class="font-black tracking-[-0.04em] text-stone-900 transition-all duration-300 group-hover:text-accent-700 group-hover:drop-shadow-[0_1px_0_rgba(196,96,35,0.25)] dark:text-stone-50 dark:group-hover:text-accent-400 dark:group-hover:drop-shadow-[0_0_12px_rgba(228,150,74,0.2)]"
+                  :class="isScrolled ? 'text-xl sm:text-xl' : 'text-2xl sm:text-[1.65rem]'"
+                >
+                  NCTU
+                </span>
+                <span
+                  class="font-extralight uppercase tracking-[0.38em] text-stone-500 transition-colors duration-300 group-hover:text-stone-700 dark:text-stone-500 dark:group-hover:text-stone-300"
+                  :class="isScrolled ? 'text-[0.6rem]' : 'text-[0.65rem] sm:text-xs'"
+                >
+                  Young
+                </span>
               </span>
-              <!-- Accent dot -->
-              <div class="w-1.5 h-1.5 rounded-full bg-accent-400 ml-1 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+              <span
+                class="absolute -right-0.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-accent-500 opacity-0 ring-1 ring-stone-900/10 transition-opacity duration-300 group-hover:opacity-100 dark:bg-accent-400 dark:ring-white/10"
+                aria-hidden="true"
+              />
             </NuxtLink>
           </div>
 
@@ -139,11 +159,16 @@
       </div>
     </nav>
 
-    <!-- Navbar spacer -->
-    <div :class="isScrolled ? 'h-16' : 'h-20'" class="transition-all duration-500"/>
+    <!-- Navbar spacer（含瀏海安全區，避免主內容被固定列遮住） -->
+    <div
+      class="transition-all duration-500 shrink-0"
+      :style="{
+        minHeight: `calc(env(safe-area-inset-top, 0px) + ${isScrolled ? '4rem' : '5rem'})`
+      }"
+    />
 
     <!-- 主要內容（帶頁面轉場） -->
-    <main class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <slot />
     </main>
 
@@ -152,7 +177,7 @@
       <!-- 上方裝飾線 -->
       <div class="deco-line-h w-full top-0 left-0 absolute"/>
 
-      <div class="max-w-7xl mx-auto py-10 px-6 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto py-10 px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
 
           <!-- 左側：品牌 + 豎排日文裝飾 -->

@@ -2,10 +2,8 @@
   <!-- 放射型輪盤縮圖導航 -->
   <div
 v-if="viewerImages.length > 1"
-       class="fixed bottom-8 transform -translate-x-1/2 z-30"
-       :style="{
-         left: showInfoPanel ? `calc(50% - ${infoPanelWidth / 2}px)` : '50%'
-       }">
+       class="fixed bottom-6 z-30 -translate-x-1/2 transform sm:bottom-8"
+       :style="{ left: radialClusterLeft }">
     <div class="relative">
       <!-- 放射型縮圖 -->
       <div class="relative">
@@ -61,11 +59,13 @@ v-if="visibleImage.originalIndex === currentImageIndex"
 </template>
 
 <script setup lang="ts">
-import { watch, onMounted } from 'vue'
+import { watch, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
+const isDesktopRadialLayout = useMediaQuery('(min-width: 768px)')
 const { getThumbPath } = useImagePath()
 const {
   viewerImages,
@@ -78,6 +78,11 @@ const {
   infoPanelWidth,
   getVisibleRadialImages
 } = storeToRefs(imageViewerStore)
+
+const radialClusterLeft = computed(() => {
+  if (!showInfoPanel.value || !isDesktopRadialLayout.value) return '50%'
+  return `calc(50% - ${infoPanelWidth.value / 2}px)`
+})
 
 const {
   selectRadialImage,

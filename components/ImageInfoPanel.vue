@@ -1,13 +1,13 @@
 <template>
   <div
 v-if="showInfoPanel && currentViewerImage && imageInfo"
-       class="info-panel fixed top-0 right-0 h-full bg-black bg-opacity-90 backdrop-blur-md border-l border-gray-600 overflow-y-auto z-50 transition-all duration-300"
-       :style="{ width: infoPanelWidth + 'px' }"
+       class="info-panel fixed top-0 right-0 z-50 h-full overflow-y-auto border-l border-gray-600 bg-black bg-opacity-90 backdrop-blur-md transition-all duration-300 max-md:left-0 max-md:w-full max-md:border-l-0"
+       :style="panelWidthStyle"
        @wheel.stop>
 
-    <!-- 可拖拽的調整邊界 -->
+    <!-- 可拖拽的調整邊界（僅桌面） -->
     <div
-class="absolute left-0 top-0 w-2 h-full cursor-col-resize hover:bg-blue-500 hover:bg-opacity-30 transition-colors z-10"
+class="absolute left-0 top-0 z-10 hidden h-full w-2 cursor-col-resize transition-colors hover:bg-blue-500 hover:bg-opacity-30 md:block"
          @mousedown="startResize"
          @touchstart="startResize">
       <!-- 調整握把 -->
@@ -146,6 +146,7 @@ v-for="tag in imageInfo.tags"
 <script setup lang="ts">
 import { computed, ref, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import ImageHistogram from './ImageHistogram.vue'
 
@@ -156,6 +157,13 @@ const {
   infoPanelWidth,
   currentViewerImage
 } = storeToRefs(imageViewerStore)
+
+const isDesktopInfoLayout = useMediaQuery('(min-width: 768px)')
+
+const panelWidthStyle = computed(() => {
+  if (!isDesktopInfoLayout.value) return {}
+  return { width: `${infoPanelWidth.value}px` }
+})
 
 // 拖拽調整寬度相關狀態
 const isResizing = ref(false)

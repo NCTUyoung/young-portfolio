@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-stone-50">
+  <div class="min-h-screen bg-stone-50 text-stone-900 transition-colors dark:bg-stone-950 dark:text-stone-100">
     <!-- 頂部導航 -->
-    <header class="bg-stone-950 border-b border-stone-800">
+    <header class="border-b border-stone-800 bg-stone-950 dark:border-stone-800">
       <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
           <div class="w-1 h-6 bg-amber-500"/>
@@ -18,7 +18,7 @@
 
     <!-- Tab 導航 -->
     <nav class="max-w-7xl mx-auto px-6 pt-6">
-      <div class="bg-white rounded-t-xl border border-stone-200 border-b-0">
+      <div class="rounded-t-xl border border-stone-200 border-b-0 bg-white dark:border-stone-700 dark:bg-stone-900/90">
         <div class="flex space-x-0 px-2">
           <button
             v-for="tab in tabs"
@@ -26,8 +26,8 @@
             :class="[
               'py-4 px-5 border-b-2 font-light text-sm transition-all duration-200 flex items-center space-x-2',
               activeTab === tab.id
-                ? 'border-amber-500 text-stone-900'
-                : 'border-transparent text-stone-400 hover:text-stone-700 hover:border-stone-300'
+                ? 'border-amber-500 text-stone-900 dark:text-stone-50'
+                : 'border-transparent text-stone-400 hover:border-stone-300 hover:text-stone-700 dark:text-stone-500 dark:hover:border-stone-600 dark:hover:text-stone-200'
             ]"
             @click="setActiveTab(tab.id)"
           >
@@ -47,7 +47,7 @@
             <span>{{ tab.name }}</span>
             <span
 v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
-                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                  class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
               {{ adminStore.selectedFiles.length }}
             </span>
           </button>
@@ -61,11 +61,11 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
       class="max-w-7xl mx-auto px-6 pt-4"
       role="alert"
     >
-      <div class="flex items-start justify-between gap-3 rounded-xl border border-red-200/80 bg-red-50/95 px-4 py-3 text-red-900 shadow-sm">
+      <div class="flex items-start justify-between gap-3 rounded-xl border border-red-200/80 bg-red-50/95 px-4 py-3 text-red-900 shadow-sm dark:border-red-900/50 dark:bg-red-950/60 dark:text-red-100">
         <p class="text-sm font-light leading-relaxed">{{ adminStore.message }}</p>
         <button
           type="button"
-          class="shrink-0 text-xs text-red-700/80 underline underline-offset-2 hover:text-red-900"
+          class="shrink-0 text-xs text-red-700/80 underline underline-offset-2 hover:text-red-900 dark:text-red-300 dark:hover:text-red-100"
           @click="adminStore.message = ''"
         >
           關閉
@@ -78,22 +78,22 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
       <!-- 首次載入：與前台 Gallery 類似的日式 loading -->
       <div
         v-if="!pageReady"
-        class="bg-white rounded-b-xl border border-stone-200 border-t-0 flex flex-col items-center justify-center py-24 gap-5 min-h-[min(55vh,380px)]"
+        class="flex min-h-[min(55vh,380px)] flex-col items-center justify-center gap-5 rounded-b-xl border border-stone-200 border-t-0 bg-white py-24 dark:border-stone-700 dark:bg-stone-900/80"
         role="status"
         aria-live="polite"
       >
         <div class="relative w-10 h-10">
-          <div class="absolute inset-0 border border-amber-300/60 rounded-full animate-spin" style="animation-duration: 2s;" />
+          <div class="absolute inset-0 border border-amber-300/60 rounded-full animate-spin dark:border-amber-500/50" style="animation-duration: 2s;" />
           <div
-            class="absolute inset-[6px] border border-amber-400/40 rounded-full animate-spin"
+            class="absolute inset-[6px] border border-amber-400/40 rounded-full animate-spin dark:border-amber-400/35"
             style="animation-duration: 3s; animation-direction: reverse;"
           />
         </div>
-        <p class="jp-section-label text-stone-500">Loading</p>
-        <p class="text-xs text-stone-400 font-light tracking-wide">載入作品資料中…</p>
+        <p class="jp-section-label text-stone-500 dark:text-stone-400">Loading</p>
+        <p class="text-xs font-light tracking-wide text-stone-400 dark:text-stone-500">載入作品資料中…</p>
       </div>
 
-      <div v-else class="bg-white rounded-b-xl border border-stone-200 border-t-0">
+      <div v-else class="rounded-b-xl border border-stone-200 border-t-0 bg-white dark:border-stone-700 dark:bg-stone-900/80">
 
         <!-- 概覽頁面 — 日式排版 -->
         <section v-if="visitedTabs.has('overview')" v-show="activeTab === 'overview'" class="p-8 md:p-10">
@@ -109,8 +109,8 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 :key="cat.id"
                 class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 rounded-none"
                 :class="adminStore.overviewCategory === cat.id
-                  ? 'text-stone-800'
-                  : 'text-stone-400 hover:text-stone-600'"
+                  ? 'text-stone-800 dark:text-stone-100'
+                  : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'"
                 @click="adminStore.overviewCategory = cat.id; adminStore.handleOverviewCategoryChange(cat.id)"
               >
                 <span
@@ -127,31 +127,31 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
           </header>
 
           <!-- 統計 — 橫向流式佈局，側線分隔 -->
-          <div class="flex flex-wrap gap-x-8 gap-y-6 mb-12 py-6 border-y border-stone-100">
-            <div class="flex items-baseline gap-3 min-w-0">
-              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">總數</span>
-              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">{{ adminStore.overviewStats.totalImages }}</span>
+          <div class="mb-12 flex flex-wrap gap-x-8 gap-y-6 border-y border-stone-100 py-6 dark:border-stone-800">
+            <div class="flex min-w-0 items-baseline gap-3">
+              <span class="shrink-0 text-xs font-light uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">總數</span>
+              <span class="font-extralight text-2xl tabular-nums text-stone-800 md:text-3xl dark:text-stone-100">{{ adminStore.overviewStats.totalImages }}</span>
             </div>
-            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
-            <div class="flex items-baseline gap-3 min-w-0">
-              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">本月</span>
-              <span class="font-extralight text-2xl md:text-3xl text-amber-600 tabular-nums">{{ adminStore.overviewStats.recentUploads }}</span>
+            <div class="hidden h-8 w-px self-center bg-gradient-to-b from-transparent via-stone-200 to-transparent dark:via-stone-600 sm:block" />
+            <div class="flex min-w-0 items-baseline gap-3">
+              <span class="shrink-0 text-xs font-light uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">本月</span>
+              <span class="font-extralight text-2xl tabular-nums text-amber-600 md:text-3xl dark:text-amber-400">{{ adminStore.overviewStats.recentUploads }}</span>
             </div>
-            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
-            <div class="flex items-baseline gap-3 min-w-0">
-              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">
+            <div class="hidden h-8 w-px self-center bg-gradient-to-b from-transparent via-stone-200 to-transparent dark:via-stone-600 sm:block" />
+            <div class="flex min-w-0 items-baseline gap-3">
+              <span class="shrink-0 text-xs font-light uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">
                 {{ adminStore.overviewCategory === 'photography' ? '相機' : '色彩' }}
               </span>
-              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">
+              <span class="font-extralight text-2xl tabular-nums text-stone-800 md:text-3xl dark:text-stone-100">
                 {{ adminStore.overviewCategory === 'photography'
                   ? adminStore.overviewStats.uniqueCameras.length
                   : adminStore.overviewStats.uniqueColors.length }}
               </span>
             </div>
-            <div class="hidden sm:block w-px h-8 bg-gradient-to-b from-transparent via-stone-200 to-transparent self-center" />
-            <div class="flex items-baseline gap-3 min-w-0">
-              <span class="text-xs text-stone-400 font-light tracking-[0.2em] uppercase shrink-0">事件</span>
-              <span class="font-extralight text-2xl md:text-3xl text-stone-800 tabular-nums">{{ adminStore.overviewStats.events.length || groupedOverviewData.length }}</span>
+            <div class="hidden h-8 w-px self-center bg-gradient-to-b from-transparent via-stone-200 to-transparent dark:via-stone-600 sm:block" />
+            <div class="flex min-w-0 items-baseline gap-3">
+              <span class="shrink-0 text-xs font-light uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">事件</span>
+              <span class="font-extralight text-2xl tabular-nums text-stone-800 md:text-3xl dark:text-stone-100">{{ adminStore.overviewStats.events.length || groupedOverviewData.length }}</span>
             </div>
           </div>
 
@@ -164,12 +164,12 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 :key="month.label"
                 class="flex-1 flex flex-col items-center gap-2"
               >
-                <span class="text-xs text-stone-400 font-light tabular-nums">{{ month.count }}</span>
+                <span class="text-xs font-light tabular-nums text-stone-400 dark:text-stone-500">{{ month.count }}</span>
                 <div
-                  class="w-full min-h-[2px] transition-all duration-500 rounded-sm bg-gradient-to-t from-amber-400/80 to-amber-300/50"
+                  class="min-h-[2px] w-full rounded-sm bg-gradient-to-t from-amber-400/80 to-amber-300/50 transition-all duration-500 dark:from-amber-500/70 dark:to-amber-600/40"
                   :style="{ height: month.count > 0 ? `${Math.max(6, (month.count / maxMonthCount) * 72)}px` : '2px' }"
                 />
-                <span class="text-[0.65rem] text-stone-400 font-light tracking-wider">{{ month.label }}</span>
+                <span class="text-[0.65rem] font-light tracking-wider text-stone-400 dark:text-stone-500">{{ month.label }}</span>
               </div>
             </div>
           </section>
@@ -184,11 +184,11 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 class="group relative aspect-square overflow-hidden cursor-pointer"
                 :title="item.title"
               >
-                <div class="absolute inset-0 border border-stone-100 group-hover:border-amber-300/50 transition-colors duration-300" />
+                <div class="absolute inset-0 border border-stone-100 transition-colors duration-300 group-hover:border-amber-300/50 dark:border-stone-700 dark:group-hover:border-amber-500/40" />
                 <img
                   :src="getThumbPath(item.filename, 400)"
                   :alt="item.title"
-                  class="w-full h-full object-contain bg-stone-50/50 group-hover:scale-[1.02] transition-transform duration-500 ease-out"
+                  class="h-full w-full bg-stone-50/50 object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02] dark:bg-stone-800/50"
                   loading="lazy"
                   decoding="async"
                   @error="handleImageError"
@@ -200,8 +200,8 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               </div>
             </div>
             <div v-else class="py-20 text-center">
-              <span class="font-jp text-7xl font-thin text-stone-200/80">無</span>
-              <p class="mt-4 text-sm text-stone-400 font-light tracking-wide">尚無上傳的作品</p>
+              <span class="font-jp text-7xl font-thin text-stone-200/80 dark:text-stone-700">無</span>
+              <p class="mt-4 text-sm font-light tracking-wide text-stone-400 dark:text-stone-500">尚無上傳的作品</p>
             </div>
           </section>
         </section>
@@ -210,14 +210,14 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
         <section v-if="visitedTabs.has('upload')" v-show="activeTab === 'upload'" class="p-8">
           <header class="mb-8 flex justify-between items-start">
             <div>
-              <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">上傳作品</h2>
-              <p class="text-stone-400 text-sm font-light">新增圖片到您的作品集</p>
+              <h2 class="mb-1 text-xl font-light tracking-wide text-stone-900 dark:text-stone-100">上傳作品</h2>
+              <p class="text-sm font-light text-stone-400 dark:text-stone-500">新增圖片到您的作品集</p>
             </div>
             <div class="flex items-center space-x-2">
-              <label class="text-sm font-light text-stone-500">分類：</label>
+              <label class="text-sm font-light text-stone-500 dark:text-stone-400">分類：</label>
               <select
                 v-model="adminStore.uploadCategory"
-                class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                 @change="adminStore.handleUploadCategoryChange(adminStore.uploadCategory)"
               >
                 <option value="gallery">繪圖作品</option>
@@ -232,16 +232,16 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <AdminFilePreview />
 
             <!-- 上傳按鈕和狀態 -->
-            <div class="flex justify-end space-x-3 pt-6 border-t border-stone-100">
+            <div class="flex justify-end space-x-3 border-t border-stone-100 pt-6 dark:border-stone-800">
               <button
-                class="px-5 py-2 text-sm font-light text-stone-600 bg-stone-100 border border-stone-200 rounded-lg hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-400 transition-all duration-200"
+                class="rounded-lg border border-stone-200 bg-stone-100 px-5 py-2 text-sm font-light text-stone-600 transition-all duration-200 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 dark:focus:ring-offset-stone-900"
                 @click="adminStore.clearFiles"
               >
                 清除所有
               </button>
               <button
                 :disabled="!adminStore.canUpload || adminStore.uploading"
-                class="px-5 py-2 text-sm font-light text-white bg-stone-800 border border-transparent rounded-lg hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+                class="rounded-lg border border-transparent bg-stone-800 px-5 py-2 text-sm font-light text-white transition-all duration-200 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-amber-700 dark:hover:bg-amber-600 dark:focus:ring-amber-500 dark:focus:ring-offset-stone-900"
                 @click="adminStore.uploadFiles"
               >
                 <span v-if="adminStore.uploading" class="flex items-center space-x-2">
@@ -264,10 +264,10 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <div v-if="adminStore.message" class="mt-4">
               <div
                 :class="[
-                  'p-4 rounded-lg border flex items-start space-x-3',
+                  'flex items-start space-x-3 rounded-lg border p-4',
                   adminStore.messageType === 'success'
-                    ? 'bg-stone-50 text-stone-700 border-stone-200'
-                    : 'bg-red-50 text-red-700 border-red-200'
+                    ? 'border-stone-200 bg-stone-50 text-stone-700 dark:border-stone-600 dark:bg-stone-800/80 dark:text-stone-200'
+                    : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-200'
                 ]"
               >
                 <svg v-if="adminStore.messageType === 'success'" class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,15 +284,15 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
 
         <!-- 管理頁面 -->
         <section v-if="visitedTabs.has('manage')" v-show="activeTab === 'manage'" class="p-8">
-          <header class="mb-6 flex flex-wrap gap-3 justify-between items-start">
+          <header class="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">管理作品</h2>
-              <p class="text-stone-400 text-sm font-light">編輯和管理您的作品集</p>
+              <h2 class="mb-1 text-xl font-light tracking-wide text-stone-900 dark:text-stone-100">管理作品</h2>
+              <p class="text-sm font-light text-stone-400 dark:text-stone-500">編輯和管理您的作品集</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <select
                 v-model="adminStore.manageCategory"
-                class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                 @change="adminStore.handleManageCategoryChange(adminStore.manageCategory)"
               >
                 <option value="gallery">繪圖作品</option>
@@ -301,7 +301,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
 
               <select
                 v-model="adminStore.selectedEvent"
-                class="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
               >
                 <option value="">所有事件</option>
                 <option v-for="event in adminStore.availableEvents" :key="event" :value="event">
@@ -310,13 +310,13 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               </select>
 
               <!-- 檢視切換 -->
-              <div class="flex items-center bg-stone-100 rounded-lg p-1">
+              <div class="flex items-center rounded-lg bg-stone-100 p-1 dark:bg-stone-800">
                 <button
                   :class="[
-                    'px-3 py-1 rounded-md transition-all duration-200 text-xs font-light',
+                    'rounded-md px-3 py-1 text-xs font-light transition-all duration-200',
                     adminStore.manageViewMode === 'grid'
-                      ? 'bg-white text-stone-800 shadow-sm'
-                      : 'text-stone-400 hover:text-stone-600'
+                      ? 'bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100'
+                      : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
                   ]"
                   @click="adminStore.manageViewMode = 'grid'"
                 >
@@ -324,10 +324,10 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 </button>
                 <button
                   :class="[
-                    'px-3 py-1 rounded-md transition-all duration-200 text-xs font-light',
+                    'rounded-md px-3 py-1 text-xs font-light transition-all duration-200',
                     adminStore.manageViewMode === 'list'
-                      ? 'bg-white text-stone-800 shadow-sm'
-                      : 'text-stone-400 hover:text-stone-600'
+                      ? 'bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100'
+                      : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
                   ]"
                   @click="adminStore.manageViewMode = 'list'"
                 >
@@ -338,10 +338,10 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               <!-- 編輯模式 -->
               <button
                 :class="[
-                  'px-3 py-1.5 text-xs font-light rounded-lg transition-all duration-200 flex items-center space-x-1.5',
+                  'flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-light transition-all duration-200',
                   adminStore.editMode
-                    ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200 border border-stone-200'
+                    ? 'border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/70'
+                    : 'border border-stone-200 bg-stone-100 text-stone-600 hover:bg-stone-200 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
                 ]"
                 @click="adminStore.toggleEditMode"
               >
@@ -355,7 +355,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               </button>
 
               <button
-                class="px-3 py-1.5 text-xs font-light text-stone-500 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors duration-200"
+                class="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-light text-stone-500 transition-colors duration-200 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                 title="重新載入"
                 @click="adminStore.loadGalleryByCategory(adminStore.manageCategory)"
               >
@@ -367,12 +367,12 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
           </header>
 
           <!-- 統計資訊 -->
-          <div class="mb-5 flex items-center space-x-4 text-xs text-stone-400 font-light bg-stone-50 rounded-lg px-4 py-2.5 border border-stone-100">
-            <span>共 <span class="font-medium text-stone-700">{{ adminStore.currentManageData.length }}</span> 張圖片</span>
-            <span class="text-stone-200">•</span>
-            <span><span class="font-medium text-stone-700">{{ adminStore.groupedManageData.length }}</span> 個事件</span>
-            <span v-if="adminStore.selectedEvent" class="text-stone-200">•</span>
-            <span v-if="adminStore.selectedEvent" class="text-amber-600 font-medium">
+          <div class="mb-5 flex items-center space-x-4 rounded-lg border border-stone-100 bg-stone-50 px-4 py-2.5 text-xs font-light text-stone-400 dark:border-stone-800 dark:bg-stone-800/60 dark:text-stone-500">
+            <span>共 <span class="font-medium text-stone-700 dark:text-stone-200">{{ adminStore.currentManageData.length }}</span> 張圖片</span>
+            <span class="text-stone-200 dark:text-stone-600">•</span>
+            <span><span class="font-medium text-stone-700 dark:text-stone-200">{{ adminStore.groupedManageData.length }}</span> 個事件</span>
+            <span v-if="adminStore.selectedEvent" class="text-stone-200 dark:text-stone-600">•</span>
+            <span v-if="adminStore.selectedEvent" class="font-medium text-amber-600 dark:text-amber-400">
               篩選：{{ adminStore.selectedEvent }}
             </span>
           </div>
@@ -383,20 +383,20 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
         <!-- 設定頁面 -->
         <section v-if="visitedTabs.has('settings')" v-show="activeTab === 'settings'" class="p-8">
           <header class="mb-8">
-            <h2 class="text-xl font-light text-stone-900 mb-1 tracking-wide">系統設定</h2>
-            <p class="text-stone-400 text-sm font-light">配置系統偏好和功能選項</p>
+            <h2 class="mb-1 text-xl font-light tracking-wide text-stone-900 dark:text-stone-100">系統設定</h2>
+            <p class="text-sm font-light text-stone-400 dark:text-stone-500">配置系統偏好和功能選項</p>
           </header>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- 預設設定 -->
-            <div class="border border-stone-100 rounded-xl p-6 bg-stone-50/50">
-              <h3 class="text-sm font-medium text-stone-700 mb-5 tracking-wide">預設設定</h3>
+            <div class="rounded-xl border border-stone-100 bg-stone-50/50 p-6 dark:border-stone-800 dark:bg-stone-900/50">
+              <h3 class="mb-5 text-sm font-medium tracking-wide text-stone-700 dark:text-stone-200">預設設定</h3>
               <div class="space-y-5">
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">預設分類</label>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">預設分類</label>
                   <select
                     v-model="adminStore.globalSettings.defaultUploadCategory"
-                    class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                     @change="adminStore.updateGlobalSettings({ defaultUploadCategory: adminStore.globalSettings.defaultUploadCategory })"
                   >
                     <option value="gallery">繪圖作品</option>
@@ -404,9 +404,9 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">預設檢視模式</label>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">預設檢視模式</label>
                   <div class="flex space-x-4">
-                    <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
+                    <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
                         v-model="adminStore.globalSettings.defaultViewMode"
                         type="radio"
@@ -416,7 +416,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                       >
                       網格
                     </label>
-                    <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
+                    <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
                         v-model="adminStore.globalSettings.defaultViewMode"
                         type="radio"
@@ -432,12 +432,12 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             </div>
 
             <!-- 圖片處理 -->
-            <div class="border border-stone-100 rounded-xl p-6 bg-stone-50/50">
-              <h3 class="text-sm font-medium text-stone-700 mb-5 tracking-wide">圖片處理</h3>
+            <div class="rounded-xl border border-stone-100 bg-stone-50/50 p-6 dark:border-stone-800 dark:bg-stone-900/50">
+              <h3 class="mb-5 text-sm font-medium tracking-wide text-stone-700 dark:text-stone-200">圖片處理</h3>
               <div class="space-y-5">
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">
-                    圖片品質：<span class="text-amber-600">{{ adminStore.globalSettings.imageQuality }}%</span>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                    圖片品質：<span class="text-amber-600 dark:text-amber-400">{{ adminStore.globalSettings.imageQuality }}%</span>
                   </label>
                   <input
                     v-model="adminStore.globalSettings.imageQuality"
@@ -445,16 +445,16 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     min="60"
                     max="100"
                     step="5"
-                    class="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-amber-500"
+                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-amber-500 dark:bg-stone-700"
                     @change="adminStore.updateGlobalSettings({ imageQuality: parseInt(adminStore.globalSettings.imageQuality.toString()) })"
                   >
-                  <div class="flex justify-between text-xs text-stone-400 mt-1">
+                  <div class="mt-1 flex justify-between text-xs text-stone-400 dark:text-stone-500">
                     <span>60%</span><span>100%</span>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">
-                    批次大小：<span class="text-amber-600">{{ adminStore.globalSettings.batchSize }}</span>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                    批次大小：<span class="text-amber-600 dark:text-amber-400">{{ adminStore.globalSettings.batchSize }}</span>
                   </label>
                   <input
                     v-model="adminStore.globalSettings.batchSize"
@@ -462,10 +462,10 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     min="10"
                     max="50"
                     step="5"
-                    class="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-amber-500"
+                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-amber-500 dark:bg-stone-700"
                     @change="adminStore.updateGlobalSettings({ batchSize: parseInt(adminStore.globalSettings.batchSize.toString()) })"
                   >
-                  <div class="flex justify-between text-xs text-stone-400 mt-1">
+                  <div class="mt-1 flex justify-between text-xs text-stone-400 dark:text-stone-500">
                     <span>10</span><span>50</span>
                   </div>
                 </div>
@@ -473,50 +473,50 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             </div>
 
             <!-- 系統功能 -->
-            <div class="border border-stone-100 rounded-xl p-6 bg-stone-50/50">
-              <h3 class="text-sm font-medium text-stone-700 mb-5 tracking-wide">系統功能</h3>
+            <div class="rounded-xl border border-stone-100 bg-stone-50/50 p-6 dark:border-stone-800 dark:bg-stone-900/50">
+              <h3 class="mb-5 text-sm font-medium tracking-wide text-stone-700 dark:text-stone-200">系統功能</h3>
               <div class="space-y-5">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-light text-stone-700">自動備份</p>
-                    <p class="text-xs text-stone-400 font-light">自動備份上傳的圖片</p>
+                    <p class="text-sm font-light text-stone-700 dark:text-stone-200">自動備份</p>
+                    <p class="text-xs font-light text-stone-400 dark:text-stone-500">自動備份上傳的圖片</p>
                   </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
+                  <label class="relative inline-flex cursor-pointer items-center">
                     <input
-v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="sr-only peer"
+v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="peer sr-only"
                       @change="adminStore.updateGlobalSettings({ autoBackup: adminStore.globalSettings.autoBackup })" >
-                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"/>
+                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-amber-300 dark:bg-stone-600"/>
                   </label>
                 </div>
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-light text-stone-700">顯示圖片資訊</p>
-                    <p class="text-xs text-stone-400 font-light">在預覽中顯示 EXIF 資訊</p>
+                    <p class="text-sm font-light text-stone-700 dark:text-stone-200">顯示圖片資訊</p>
+                    <p class="text-xs font-light text-stone-400 dark:text-stone-500">在預覽中顯示 EXIF 資訊</p>
                   </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
+                  <label class="relative inline-flex cursor-pointer items-center">
                     <input
-v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="sr-only peer"
+v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="peer sr-only"
                       @change="adminStore.updateGlobalSettings({ showImageInfo: adminStore.globalSettings.showImageInfo })" >
-                    <div class="w-10 h-5 bg-stone-200 peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"/>
+                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-amber-300 dark:bg-stone-600"/>
                   </label>
                 </div>
               </div>
             </div>
 
             <!-- 介面偏好 -->
-            <div class="border border-stone-100 rounded-xl p-6 bg-stone-50/50">
-              <h3 class="text-sm font-medium text-stone-700 mb-5 tracking-wide">介面偏好</h3>
+            <div class="rounded-xl border border-stone-100 bg-stone-50/50 p-6 dark:border-stone-800 dark:bg-stone-900/50">
+              <h3 class="mb-5 text-sm font-medium tracking-wide text-stone-700 dark:text-stone-200">介面偏好</h3>
               <div class="space-y-5">
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">主題</label>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">主題</label>
                   <div class="flex space-x-4">
-                    <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
+                    <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
 v-model="adminStore.globalSettings.theme" type="radio" value="light" class="mr-2 text-amber-500 focus:ring-amber-400"
                         @change="adminStore.updateGlobalSettings({ theme: 'light' })" >
                       淺色
                     </label>
-                    <label class="flex items-center text-sm font-light text-stone-600 cursor-pointer">
+                    <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
 v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 text-amber-500 focus:ring-amber-400"
                         @change="adminStore.updateGlobalSettings({ theme: 'dark' })" >
@@ -525,10 +525,10 @@ v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 
                   </div>
                 </div>
                 <div>
-                  <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">語言</label>
+                  <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">語言</label>
                   <select
                     v-model="adminStore.globalSettings.language"
-                    class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                     @change="adminStore.updateGlobalSettings({ language: adminStore.globalSettings.language })"
                   >
                     <option value="zh-TW">繁體中文</option>

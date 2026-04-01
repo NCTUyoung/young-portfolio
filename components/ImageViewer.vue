@@ -8,29 +8,27 @@
     <div class="relative w-full h-full flex">
       <!-- 圖片檢視區域 -->
       <div
-class="image-viewer-area flex-1 flex items-center justify-center p-4 transition-all duration-300"
+class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 transition-all duration-300"
            :style="{
-             marginRight: showInfoPanel ? infoPanelWidth + 'px' : '0px'
+             marginRight: panelLayoutOffsetPx
            }"
            @wheel.prevent="handleWheel">
 
-        <!-- 頂部工具列 -->
+        <!-- 頂部工具列（手機改為兩列，避免按鈕與標題擠成一行） -->
         <div
-class="absolute top-4 left-4 z-10 flex items-center justify-between"
-             :style="{
-               right: showInfoPanel ? (infoPanelWidth + 16) + 'px' : '16px'
-             }">
+class="absolute top-2 left-2 z-10 flex flex-col gap-2 sm:top-4 sm:left-4 sm:flex-row sm:items-start sm:justify-between"
+             :style="toolbarInsetStyle">
 
           <!-- 圖片資訊 -->
-          <div class="flex items-center space-x-4 bg-black bg-opacity-50 backdrop-blur-sm rounded-lg px-4 py-2">
-            <div class="text-white">
-              <h3 class="font-medium">{{ currentViewerImage?.title || '未命名' }}</h3>
+          <div class="min-w-0 flex max-w-full items-center space-x-4 rounded-lg bg-black bg-opacity-50 px-3 py-2 backdrop-blur-sm sm:px-4">
+            <div class="min-w-0 text-white">
+              <h3 class="truncate font-medium">{{ currentViewerImage?.title || '未命名' }}</h3>
               <p class="text-sm text-gray-300">{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>
             </div>
           </div>
 
           <!-- 操作按鈕 -->
-          <div class="flex items-center space-x-2 bg-black bg-opacity-50 backdrop-blur-sm rounded-lg px-2 py-2">
+          <div class="flex flex-shrink-0 flex-wrap items-center justify-end gap-1 rounded-lg bg-black bg-opacity-50 px-1 py-1 backdrop-blur-sm sm:gap-2 sm:px-2 sm:py-2">
             <!-- 縮放控制 -->
             <button
 :disabled="!canZoomOut" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -134,7 +132,7 @@ v-if="currentViewerImage"
         <!-- 導航按鈕 -->
         <button
 v-if="viewerImages.length > 1 && hasPrevious"
-                class="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
+                class="absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2 p-2.5 sm:p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
                 title="上一張 (←)"
                 @click="goToPreviousImage">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,10 +142,8 @@ v-if="viewerImages.length > 1 && hasPrevious"
 
         <button
 v-if="viewerImages.length > 1 && hasNext"
-                class="absolute top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
-                :style="{
-                  right: showInfoPanel ? (infoPanelWidth + 16) + 'px' : '16px'
-                }"
+                class="absolute top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
+                :style="nextNavButtonStyle"
                 title="下一張 (→)"
                 @click="goToNextImage">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,8 +165,9 @@ v-if="viewerImages.length > 1 && hasNext"
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import ImageInfoPanel from './ImageInfoPanel.vue'
 import ImageNavigator from './ImageNavigator.vue'
@@ -209,6 +206,26 @@ const {
   toggleInfoPanel,
   initNavigatorPosition
 } = imageViewerStore
+
+const isDesktopViewerLayout = useMediaQuery('(min-width: 768px)')
+
+/** 僅桌面側欄模式時為主圖區讓出寬度；手機改為全螢幕覆蓋面板，避免主圖被壓扁 */
+const panelLayoutOffsetPx = computed(() => {
+  if (!showInfoPanel.value || !isDesktopViewerLayout.value) return '0px'
+  return `${infoPanelWidth.value}px`
+})
+
+const toolbarInsetStyle = computed(() => {
+  const pad = 16
+  const offset = showInfoPanel.value && isDesktopViewerLayout.value ? infoPanelWidth.value + pad : pad
+  return { right: `${offset}px` }
+})
+
+const nextNavButtonStyle = computed(() => {
+  const pad = 16
+  const offset = showInfoPanel.value && isDesktopViewerLayout.value ? infoPanelWidth.value + pad : pad
+  return { right: `${offset}px` }
+})
 
 const imageElement = ref<HTMLImageElement>()
 

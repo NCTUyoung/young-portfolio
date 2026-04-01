@@ -1,5 +1,5 @@
 <template>
-  <div class="row-gallery-container">
+  <div ref="rootEl" class="row-gallery-container">
     <!-- Desktop Row Layout -->
     <div class="hidden md:block space-y-4">
       <div
@@ -37,6 +37,8 @@
             class="w-full h-auto block rounded-sm transition-all duration-500 ease-out"
             :loading="rowIndex < 3 ? 'eager' : 'lazy'"
             decoding="async"
+            :data-row-key="row.key"
+            :data-item-index="itemIndex"
             @load="(e) => onImageLoad(e, row.key, itemIndex)"
             @error="() => onImageError(row.key, itemIndex)"
           >
@@ -102,6 +104,8 @@ defineEmits<{
 }>()
 
 const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
+
+const rootEl = ref<HTMLElement | null>(null)
 
 // 狀態
 const rowsLoaded = ref<Record<string, boolean>>({})
@@ -305,11 +309,32 @@ const maybeMarkRowReady = (rowKey: string) => {
   }
 }
 
+/**
+ * 瀏覽器快取已載入的圖片可能不會再觸發 load，導致 rowsLoaded 永遠 false、桌面版維持 opacity-0。
+ */
+const flushCompleteImages = async () => {
+  await nextTick()
+  const root = rootEl.value
+  if (!root) return
+  root.querySelectorAll<HTMLImageElement>('img[data-row-key]').forEach((img) => {
+    if (!img.complete || !img.naturalWidth) return
+    const rowKey = img.dataset.rowKey
+    const itemIndex = Number(img.dataset.itemIndex)
+    if (!rowKey || Number.isNaN(itemIndex)) return
+    const row = imageRows.value.find(r => r.key === rowKey)
+    const item = row?.items[itemIndex]
+    if (!item) return
+    markImageLoaded(item.filename)
+    maybeMarkRowReady(rowKey)
+  })
+}
+
 // 強制重新計算佈局（用於篩選器變化時）
 const forceRelayout = async () => {
   resetLayout()
   await nextTick()
   await nextTick()
+  await flushCompleteImages()
 }
 
 // 重置佈局狀態
@@ -333,8 +358,13 @@ watch(() => props.items, () => {
   forceRelayout()
 }, { deep: true })
 
+watch(imageRows, () => {
+  void flushCompleteImages()
+}, { flush: 'post' })
+
 onMounted(() => {
   resetLayout()
+  void flushCompleteImages()
 })
 </script>
 

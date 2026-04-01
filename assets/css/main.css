@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 全站字型： Outfit + Noto Sans TC（見 tailwind fontFamily.sans） */
+@layer base {
+  html {
+    @apply font-sans antialiased;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+}
+
 /* ===== 滾動揭示動畫 ===== */
 .reveal {
   opacity: 0;
@@ -84,8 +92,9 @@
     transparent
   );
 }
+/* 預設為文件流，避免僅 w-full 時無定位父層導致線條相對視窗寬度溢出；需貼邊時請加 Tailwind `absolute` */
 .deco-line-h {
-  position: absolute;
+  display: block;
   height: 1px;
   background: linear-gradient(
     to right,
