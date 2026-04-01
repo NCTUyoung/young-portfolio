@@ -182,18 +182,19 @@ export const STORAGE_KEYS = {
 // SEO 設定
 export const SEO_CONFIG = {
   siteName: 'NCTU Young Portfolio',
-  siteDescription: '交大青年的數位作品與攝影作品集',
+  siteDescription: 'NCTU Young 個人作品集：數位電繪與攝影；圖片庫依類別與事件，攝影附地圖與拍攝資訊。',
   siteUrl: 'https://nctuyoung.github.io/young-portfolio/',
   defaultImage: '/images/og-image.jpg',
   twitterHandle: '@nctuyoung',
 } as const
 
-// 社群連結
+// 社群連結（前台 About / Footer 共用）
 export const SOCIAL_LINKS = {
   github: 'https://github.com/NCTUyoung',
-  instagram: '#',
-  facebook: '#',
-  email: 'mailto:contact@nctuyoung.example.com',
+  facebook: 'https://www.facebook.com/yang.yong.xiang.393566',
+  instagram: 'https://www.instagram.com/jimmyyoung1995/',
+  threads: 'https://www.threads.com/@jimmyyoung1995',
+  email: 'mailto:nctuyoung@gmail.com',
 } as const
 
 // 開發模式設定

@@ -92,7 +92,8 @@ export default defineNuxtConfig({
       meta: [
         {
           name: 'description',
-          content: 'Young 的個人作品集，包含數位插畫與攝影作品，展現創作與攝影紀錄。'
+          content:
+            'NCTU Young 個人作品集：數位電繪與攝影；圖片庫依類別與事件，攝影附地圖與拍攝資訊。'
         },
         { property: 'og:site_name', content: 'Young Portfolio' },
         { property: 'og:type', content: 'website' },
