@@ -5,16 +5,16 @@
       class="md:w-40 flex-shrink-0 text-right md:text-left mb-4 md:mb-0 relative overflow-visible"
       :class="index % 2 === 0 ? 'md:mr-16' : 'md:ml-16 md:text-right'"
     >
-      <!-- Timeline 節點 — 菱形日式設計 -->
+      <!-- Timeline 節點 — 菱形日式設計（hairline + 墨點） -->
       <div
         class="absolute hidden md:block z-10"
         :class="index % 2 === 0 ? 'left-[-4.5rem]' : 'right-[-4.5rem]'"
         style="top: 0.2rem;"
       >
-        <!-- 外框菱形 -->
-        <div class="w-4 h-4 bg-white dark:bg-stone-900 border border-accent-400/60 dark:border-accent-500/60 rotate-45 relative">
-          <!-- 內部小菱形 -->
-          <div class="absolute inset-[3px] bg-accent-400 dark:bg-accent-500 rotate-0"/>
+        <!-- 外框菱形 hairline -->
+        <div class="w-4 h-4 border border-stone-400/60 dark:border-stone-500/60 rotate-45 relative">
+          <!-- 內部墨點 -->
+          <div class="absolute inset-[4px] bg-stone-700/70 dark:bg-stone-300/70 rotate-0"/>
         </div>
       </div>
 
@@ -27,17 +27,17 @@
       >
         <button
           :class="[
-            'w-5 h-5 rounded-full transition-all duration-200 flex items-center justify-center group shadow-sm border',
+            'w-5 h-5 rounded-full transition-colors duration-200 flex items-center justify-center group border',
             isExpanded
-              ? 'bg-stone-100 dark:bg-stone-700 border-stone-300 dark:border-stone-600 hover:bg-stone-200 dark:hover:bg-stone-600'
-              : 'bg-accent-500 dark:bg-accent-600 border-accent-600 dark:border-accent-500 hover:bg-accent-600'
+              ? 'bg-stone-100/90 dark:bg-stone-800/80 border-stone-300 dark:border-stone-600 hover:bg-stone-200 dark:hover:bg-stone-700'
+              : 'bg-stone-700/90 dark:bg-stone-200/90 border-stone-600 dark:border-stone-300 hover:bg-stone-800 dark:hover:bg-stone-100'
           ]"
           :title="`${isExpanded ? '折疊' : '展開'} ${eventName} 的作品`"
           @click="eventKey && toggleGroupExpansion(eventKey)"
         >
           <svg
             class="w-2.5 h-2.5 transition-colors duration-200"
-            :class="isExpanded ? 'text-stone-500 dark:text-stone-400' : 'text-white'"
+            :class="isExpanded ? 'text-stone-500 dark:text-stone-400' : 'text-stone-50 dark:text-stone-900'"
             fill="currentColor" viewBox="0 0 20 20"
           >
             <path
@@ -67,16 +67,18 @@
         </span>
       </div>
 
-      <!-- Event Info — 日式側線設計 -->
+      <!-- Event Info — 日式側線設計（去背景色塊，只留 hairline + 側線） -->
       <div
         v-if="eventInfo && showEventInfo && (eventInfo.description || eventInfo.location)"
         class="hidden md:block"
         :class="index % 2 === 0 ? '' : 'text-right'"
       >
         <div
-          class="py-2 pr-2 bg-stone-50/80 dark:bg-stone-800/50 backdrop-blur-sm rounded-r text-xs max-w-32"
+          class="text-xs max-w-32"
           :class="[
-            index % 2 === 0 ? 'border-l-2 border-accent-300/50 dark:border-accent-600/40 pl-3 text-left' : 'border-r-2 border-accent-300/50 dark:border-accent-600/40 pr-3 text-right pl-2'
+            index % 2 === 0
+              ? 'pl-3 text-left border-l border-stone-300/60 dark:border-stone-600/60'
+              : 'pr-3 text-right border-r border-stone-300/60 dark:border-stone-600/60'
           ]"
         >
           <div v-if="eventInfo.description" class="text-stone-600 dark:text-stone-300 mb-1 truncate font-light tracking-wide">
@@ -85,11 +87,8 @@
           <div
 v-if="eventInfo.location" class="text-stone-400 dark:text-stone-500 truncate flex items-center gap-1"
                :class="index % 2 !== 0 ? 'justify-end' : ''">
-            <!-- SVG 位置圖示 -->
-            <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
+            <!-- 墨點替代圖示 -->
+            <span class="jp-sumi-dot !w-1 !h-1 flex-shrink-0" aria-hidden="true"/>
             <span>{{ eventInfo.location }}</span>
           </div>
         </div>

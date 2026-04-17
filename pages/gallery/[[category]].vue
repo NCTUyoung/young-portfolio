@@ -2,12 +2,10 @@
   <div ref="pageRef" class="min-h-screen transition-colors duration-300">
     <!-- Header — 個性化設計 -->
     <div class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative">
-      <!-- 裝飾線 -->
-      <div class="deco-line-v h-20 top-4 right-[8%] hidden lg:block"/>
-      <div class="deco-dot top-4 right-[8%] hidden lg:block" style="transform: translate(-2px, -8px)"/>
-      <!-- 右側豎排裝飾字 -->
-      <div class="absolute top-8 right-[8%] hidden lg:flex flex-col items-center gap-2 select-none pointer-events-none" style="transform: translateX(20px)">
-        <span class="writing-vertical font-jp text-[0.6rem] tracking-[0.5em] text-stone-300/50 dark:text-stone-700/40">記録と創作</span>
+      <!-- 右側縦書き裝飾字（配 hairline 收尾，不再孤立色點） -->
+      <div class="absolute top-10 right-[6%] hidden lg:flex flex-col items-center gap-4 select-none pointer-events-none">
+        <span class="jp-hairline-v h-16"/>
+        <span class="jp-vertical-caption text-stone-400/60 dark:text-stone-600/60">記録と創作</span>
       </div>
 
       <div class="max-w-7xl mx-auto">
@@ -111,11 +109,11 @@
       </div>
 
       <div class="relative">
-        <!-- 上方裝飾 -->
+        <!-- 上方裝飾：hairline + 墨點 -->
         <div class="flex items-center justify-center gap-3 mb-6">
-          <div class="h-px w-12 bg-gradient-to-r from-transparent to-accent-300/40 dark:to-accent-600/30"/>
-          <div class="w-1 h-1 rounded-full bg-accent-400/50"/>
-          <div class="h-px w-12 bg-gradient-to-l from-transparent to-accent-300/40 dark:to-accent-600/30"/>
+          <div class="h-px w-12 bg-gradient-to-r from-transparent to-stone-300/60 dark:to-stone-600/40"/>
+          <span class="jp-sumi-dot opacity-70"/>
+          <div class="h-px w-12 bg-gradient-to-l from-transparent to-stone-300/60 dark:to-stone-600/40"/>
         </div>
 
         <div class="font-jp text-2xl md:text-3xl font-thin text-stone-300 dark:text-stone-600 tracking-wider">{{ footerQuote }}</div>
@@ -469,130 +467,22 @@ useHead({
 </script>
 
 <style scoped>
-/* ===== Category 切換過場 ===== */
+/* 僅保留頁面內過場與響應式 h1 調整；共用樣式（shadow-japanese、backdrop-blur-japanese、scrollbar 等）已遷入 assets/css/main.css */
 .gallery-fade-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
 .gallery-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
 .gallery-fade-enter-from { opacity: 0; transform: translateY(12px); }
 .gallery-fade-leave-to   { opacity: 0; transform: translateY(-8px); }
 
-/* ===== 日式排版優化樣式 ===== */
-
-/* 滾動條樣式 - 更細緻的設計 */
-.overflow-x-auto::-webkit-scrollbar {
-  height: 2px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-track {
-  background: rgba(168, 162, 158, 0.1);
-  border-radius: 1px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb {
-  background: rgba(168, 162, 158, 0.3);
-  border-radius: 1px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 162, 158, 0.5);
-}
-
-/* 文字選擇樣式 */
-::selection {
-  background: rgba(168, 162, 158, 0.2);
-  color: rgba(41, 37, 36, 0.9);
-}
-
-/* 優化動畫效果 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* 細緻的陰影效果 */
-.shadow-japanese {
-  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
-}
-
-.shadow-japanese-hover {
-  box-shadow: 0 4px 16px rgba(168, 162, 158, 0.15), 0 2px 6px rgba(168, 162, 158, 0.08);
-}
-
-/* 毛玻璃效果優化 */
-.backdrop-blur-japanese {
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-}
-
-/* 按鈕懸停效果（僅標記了 .btn-float 的按鈕會上浮） */
-.btn-float:hover {
-  transform: translateY(-1px);
-  transition: all 0.3s ease;
-}
-
-/* 圖片懸停效果 */
-.group:hover img {
-  filter: brightness(1.05) contrast(1.02);
-}
-
-/* 響應式設計優化 */
 @media (max-width: 768px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  /* 標題尺寸調整 */
   h1 {
     font-size: 2rem !important;
     line-height: 1.2;
   }
-
-  /* 手機版卡片佈局 */
-  .grid-cols-2 > * {
-    transition: transform 0.2s ease;
-  }
-
-  /* 觸控反饋 */
-  .active\:scale-95:active {
-    transform: scale(0.95);
-  }
-
-  /* 移除桌面版懸停效果 */
-  .group:hover img {
-    filter: none;
-    transform: none;
-  }
 }
 
-/* 極小螢幕優化 */
 @media (max-width: 480px) {
-  .container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
   h1 {
     font-size: 1.75rem !important;
-  }
-
-  /* 調整卡片間距 */
-  .gap-3 {
-    gap: 0.5rem;
-  }
-
-  /* 調整分類標題 */
-  .text-lg {
-    font-size: 1rem !important;
   }
 }
 </style>

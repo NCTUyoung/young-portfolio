@@ -11,7 +11,7 @@
           'scroll-mt-24',
           'transition-colors duration-500',
           focusedEventName === item.eventName
-            ? 'bg-amber-50/40 dark:bg-amber-900/10 rounded-2xl -mx-4 px-4 py-2'
+            ? 'bg-stone-100/60 dark:bg-stone-800/30 -mx-4 px-4 py-2 border-l border-accent-400/40 dark:border-accent-500/40'
             : ''
         ]"
       >
@@ -28,10 +28,12 @@
             class="mb-12 w-full min-w-0 overflow-x-hidden"
           >
             <div class="mb-6">
-              <h3 class="text-lg font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
+              <h3 class="text-lg font-jp font-extralight text-stone-700 dark:text-stone-200 tracking-wider">
                 {{ item.eventName || '其他作品' }}
               </h3>
-              <p class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-light tracking-wide">{{ item.images?.length || 0 }} 張作品</p>
+              <p class="text-[0.65rem] text-stone-400 dark:text-stone-500 mt-1.5 font-light tracking-[0.3em] jp-kansuji">
+                {{ item.images?.length || 0 }} <span class="text-stone-400 dark:text-stone-600">·</span> 作品
+              </p>
             </div>
 
             <div class="flex flex-col" :style="{ gap: GAP_DESKTOP + 'px' }">
@@ -45,7 +47,7 @@
                   v-for="(image, ci) in row.items"
                   :key="image.filename"
                   :class="[
-                    'relative max-w-full shrink-0 overflow-hidden rounded-lg cursor-pointer group hover:shadow-lg transition-all duration-300',
+                    'relative max-w-full shrink-0 overflow-hidden cursor-pointer group transition-[filter] duration-500 ease-out hover:brightness-105 motion-reduce:transition-none',
                     isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                   ]"
                   :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
@@ -56,21 +58,20 @@
                     :srcset="getGridImageSrcset(image.filename)"
                     :sizes="gridImageSizes"
                     :alt="image.title"
-                    class="h-full w-full object-cover align-top group-hover:scale-[1.01] transition-transform duration-500 ease-out"
+                    class="h-full w-full object-cover align-top"
                     loading="lazy"
                     decoding="async"
                     @load="onImgLoad(image.filename, $event)"
                   >
-                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3">
-                    <h4 class="text-white text-sm font-light mb-2 truncate">{{ image.title || '未命名' }}</h4>
-                    <div class="text-white/80 text-xs space-y-1 font-light">
-                      <div v-if="image.camera || image.model" class="flex items-center gap-2">
-                        <svg class="w-3 h-3 opacity-70" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                        </svg>
-                        <span>{{ image.camera }} {{ image.model }}</span>
+                  <!-- Hover overlay — 墨色和紙、jp-eyebrow 風 -->
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/85 via-stone-900/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3 motion-reduce:transition-none">
+                    <h4 class="text-stone-100 text-sm font-jp font-light tracking-wider mb-1.5 truncate">{{ image.title || '未命名' }}</h4>
+                    <div class="text-stone-300 text-xs space-y-1 font-light">
+                      <div v-if="image.camera || image.model" class="flex items-center gap-2 tracking-[0.15em]">
+                        <span aria-hidden="true" class="text-[0.7rem]">📷</span>
+                        <span class="truncate">{{ image.camera }} {{ image.model }}</span>
                       </div>
-                      <div class="flex items-center gap-3 text-white/70">
+                      <div class="flex items-center gap-3 text-stone-400 jp-kansuji">
                         <span v-if="image.aperture">f/{{ image.aperture }}</span>
                         <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
                         <span v-if="image.iso">ISO {{ image.iso }}</span>
@@ -97,10 +98,12 @@
         class="[content-visibility:auto] scroll-mt-24"
       >
         <div v-if="item.eventName" class="mb-4">
-          <h3 class="text-base font-extralight text-stone-700 dark:text-stone-300 tracking-wider">
+          <h3 class="text-base font-jp font-extralight text-stone-700 dark:text-stone-200 tracking-wider">
             {{ item.eventName }}
           </h3>
-          <p class="text-xs text-stone-400 dark:text-stone-500 font-light">{{ item.images?.length || 0 }} 張作品</p>
+          <p class="text-[0.65rem] text-stone-400 dark:text-stone-500 mt-1 font-light tracking-[0.3em] jp-kansuji">
+            {{ item.images?.length || 0 }} <span class="text-stone-400 dark:text-stone-600">·</span> 作品
+          </p>
         </div>
         <div
           :ref="el => bindStripRef(item.key, el, 'mobile')"
@@ -117,7 +120,7 @@
                 v-for="(image, ci) in row.items"
                 :key="image.filename"
                 :class="[
-                  'relative max-w-full shrink-0 overflow-hidden rounded-lg cursor-pointer group active:scale-[0.99] transition-transform duration-200',
+                  'relative max-w-full shrink-0 overflow-hidden cursor-pointer group active:opacity-80 transition-opacity duration-200',
                   isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
                 ]"
                 :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"

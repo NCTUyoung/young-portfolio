@@ -1,24 +1,27 @@
 <template>
   <div
 v-if="showInfoPanel && currentViewerImage && imageInfo"
-       class="info-panel fixed top-0 right-0 z-50 h-full overflow-y-auto border-l border-gray-600 bg-black bg-opacity-90 backdrop-blur-md transition-all duration-300 max-md:left-0 max-md:w-full max-md:border-l-0"
+       class="info-panel fixed top-0 right-0 z-50 h-full overflow-y-auto border-l border-stone-700/60 bg-stone-950/97 backdrop-blur-md transition-all duration-300 max-md:left-0 max-md:w-full max-md:border-l-0"
        :style="panelWidthStyle"
        @wheel.stop>
 
     <!-- 可拖拽的調整邊界（僅桌面） -->
     <div
-class="absolute left-0 top-0 z-10 hidden h-full w-2 cursor-col-resize transition-colors hover:bg-blue-500 hover:bg-opacity-30 md:block"
+class="absolute left-0 top-0 z-10 hidden h-full w-2 cursor-col-resize transition-colors hover:bg-stone-600/30 md:block"
          @mousedown="startResize"
          @touchstart="startResize">
-      <!-- 調整握把 -->
-      <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-20 bg-gray-400 rounded-r opacity-70 hover:opacity-100 transition-opacity"/>
+      <!-- 調整握把（hairline） -->
+      <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-px h-16 bg-stone-500/70 hover:bg-stone-300 transition-colors"/>
     </div>
 
-    <!-- 面板標題 -->
-    <div class="sticky top-0 bg-black bg-opacity-75 backdrop-blur-sm border-b border-gray-600 p-4">
+    <!-- 面板標題 — 和紙小標 -->
+    <div class="sticky top-0 bg-stone-950/85 backdrop-blur-md border-b border-stone-700/50 p-4 z-10">
       <div class="flex items-center justify-between">
-        <h3 class="text-white font-medium">圖片資訊</h3>
-        <button class="p-1 text-gray-400 hover:text-white transition-colors" @click="imageViewerStore.toggleInfoPanel">
+        <div>
+          <p class="jp-section-label mb-0.5">Info</p>
+          <h3 class="text-stone-100 font-jp font-light tracking-wider text-base">圖片資訊</h3>
+        </div>
+        <button class="p-1 text-stone-400 hover:text-stone-100 transition-colors" @click="imageViewerStore.toggleInfoPanel">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -27,10 +30,10 @@ class="absolute left-0 top-0 z-10 hidden h-full w-2 cursor-col-resize transition
     </div>
 
     <!-- 面板內容 -->
-    <div class="p-4 space-y-6">
-      <!-- 縮圖預覽 -->
+    <div class="p-5 space-y-7">
+      <!-- 縮圖預覽 — 去圓角，走 jp-frame 風格 -->
       <div class="text-center">
-        <div class="inline-block border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
+        <div class="inline-block border border-stone-700/60 overflow-hidden bg-stone-900">
           <img
 :src="getThumbPath(currentViewerImage.filename, 400)"
                :alt="imageInfo.title"
@@ -39,106 +42,106 @@ class="absolute left-0 top-0 z-10 hidden h-full w-2 cursor-col-resize transition
                loading="lazy"
           >
         </div>
-        <div class="mt-2 text-sm text-gray-300 text-center font-medium">{{ imageInfo.title }}</div>
+        <div class="mt-3 text-sm text-stone-300 text-center font-jp font-light tracking-wider">{{ imageInfo.title }}</div>
       </div>
 
       <!-- 基本資訊 -->
-      <div class="space-y-3">
-        <h4 class="text-white font-medium border-b border-gray-600 pb-2">基本資訊</h4>
+      <section class="space-y-3">
+        <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">基本資訊</h4>
 
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <span class="text-gray-400">檔名：</span>
-            <span class="text-gray-200 font-mono">{{ imageInfo.filename }}</span>
+        <div class="space-y-2 text-sm font-light">
+          <div class="flex justify-between gap-4">
+            <span class="text-stone-500 flex-shrink-0">檔名</span>
+            <span class="text-stone-200 font-mono text-xs truncate">{{ imageInfo.filename }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">格式：</span>
-            <span class="text-gray-200">{{ imageInfo.format }}</span>
+            <span class="text-stone-500">格式</span>
+            <span class="text-stone-200">{{ imageInfo.format }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">尺寸：</span>
-            <span class="text-gray-200">{{ imageInfo.dimensions }}</span>
+            <span class="text-stone-500">尺寸</span>
+            <span class="text-stone-200 jp-kansuji">{{ imageInfo.dimensions }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">檔案大小：</span>
-            <span class="text-gray-200">{{ formattedFileSize }}</span>
+            <span class="text-stone-500">檔案大小</span>
+            <span class="text-stone-200 jp-kansuji">{{ formattedFileSize }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">類別：</span>
-            <span class="text-gray-200">{{ imageInfo.category === 'digital' ? '數位藝術' : '攝影作品' }}</span>
+            <span class="text-stone-500">類別</span>
+            <span class="text-stone-200">{{ imageInfo.category === 'digital' ? '數位藝術' : '攝影作品' }}</span>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- 時間資訊 -->
-      <div class="space-y-3">
-        <h4 class="text-white font-medium border-b border-gray-600 pb-2">時間資訊</h4>
+      <section class="space-y-3">
+        <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">時間資訊</h4>
 
-        <div class="space-y-2 text-sm">
+        <div class="space-y-2 text-sm font-light">
           <div class="flex justify-between">
-            <span class="text-gray-400">日期：</span>
-            <span class="text-gray-200">{{ currentViewerImage.date || '未知' }}</span>
+            <span class="text-stone-500">日期</span>
+            <span class="text-stone-200 jp-kansuji">{{ currentViewerImage.date || '未知' }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">時間：</span>
-            <span class="text-gray-200">{{ currentViewerImage.time || '未知' }}</span>
+            <span class="text-stone-500">時間</span>
+            <span class="text-stone-200 jp-kansuji">{{ currentViewerImage.time || '未知' }}</span>
           </div>
           <div v-if="imageInfo.createdAt" class="flex justify-between">
-            <span class="text-gray-400">建立時間：</span>
-            <span class="text-gray-200">{{ formatDate(imageInfo.createdAt) }}</span>
+            <span class="text-stone-500">建立時間</span>
+            <span class="text-stone-200 jp-kansuji">{{ formatDate(imageInfo.createdAt) }}</span>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- 攝影參數 (如果有) -->
-      <div v-if="imageInfo.category === 'photography' && (imageInfo.iso || imageInfo.aperture || imageInfo.shutterSpeed || imageInfo.focalLength)" class="space-y-3">
-        <h4 class="text-white font-medium border-b border-gray-600 pb-2">攝影參數</h4>
+      <section v-if="imageInfo.category === 'photography' && (imageInfo.iso || imageInfo.aperture || imageInfo.shutterSpeed || imageInfo.focalLength)" class="space-y-3">
+        <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">攝影參數</h4>
 
-        <div class="space-y-2 text-sm">
+        <div class="space-y-2 text-sm font-light">
           <div v-if="imageInfo.iso" class="flex justify-between">
-            <span class="text-gray-400">ISO：</span>
-            <span class="text-gray-200">{{ imageInfo.iso }}</span>
+            <span class="text-stone-500">ISO</span>
+            <span class="text-stone-200 jp-kansuji">{{ imageInfo.iso }}</span>
           </div>
           <div v-if="imageInfo.aperture" class="flex justify-between">
-            <span class="text-gray-400">光圈：</span>
-            <span class="text-gray-200">f/{{ imageInfo.aperture }}</span>
+            <span class="text-stone-500">光圈</span>
+            <span class="text-stone-200 jp-kansuji">f/{{ imageInfo.aperture }}</span>
           </div>
           <div v-if="imageInfo.shutterSpeed" class="flex justify-between">
-            <span class="text-gray-400">快門：</span>
-            <span class="text-gray-200">1/{{ imageInfo.shutterSpeed }}s</span>
+            <span class="text-stone-500">快門</span>
+            <span class="text-stone-200 jp-kansuji">1/{{ imageInfo.shutterSpeed }}s</span>
           </div>
           <div v-if="imageInfo.focalLength" class="flex justify-between">
-            <span class="text-gray-400">焦距：</span>
-            <span class="text-gray-200">{{ imageInfo.focalLength }}mm</span>
+            <span class="text-stone-500">焦距</span>
+            <span class="text-stone-200 jp-kansuji">{{ imageInfo.focalLength }}mm</span>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- 直方圖 -->
       <ImageHistogram />
 
       <!-- 標籤 -->
-      <div v-if="imageInfo.tags && imageInfo.tags.length > 0" class="space-y-3">
-        <h4 class="text-white font-medium border-b border-gray-600 pb-2">標籤</h4>
+      <section v-if="imageInfo.tags && imageInfo.tags.length > 0" class="space-y-3">
+        <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">標籤</h4>
 
         <div class="flex flex-wrap gap-2">
           <span
 v-for="tag in imageInfo.tags"
                 :key="tag"
-                class="px-2 py-1 bg-gray-700 text-gray-300 rounded-full text-xs border border-gray-600">
+                class="px-2.5 py-0.5 bg-stone-800/70 text-stone-300 text-xs border border-stone-700/60 font-light tracking-wide">
             {{ tag }}
           </span>
         </div>
-      </div>
+      </section>
 
       <!-- 描述 -->
-      <div v-if="imageInfo.description" class="space-y-3">
-        <h4 class="text-white font-medium border-b border-gray-600 pb-2">描述</h4>
+      <section v-if="imageInfo.description" class="space-y-3">
+        <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">描述</h4>
 
-        <p class="text-gray-300 text-sm leading-relaxed">
+        <p class="jp-body !text-sm !leading-[1.9] !text-stone-300">
           {{ imageInfo.description }}
         </p>
-      </div>
+      </section>
     </div>
   </div>
 </template>

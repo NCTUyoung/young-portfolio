@@ -9,18 +9,18 @@
         :class="{ 'justify-center': row.items.length === 1 }"
         :style="{ transitionDelay: `${rowIndex * 80}ms` }"
       >
-        <!-- Skeleton overlay -->
+        <!-- Skeleton overlay — 靜素：單色墨色方塊 -->
         <div
           v-if="!rowsLoaded[row.key]"
-          class="absolute inset-0 rounded-lg bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 dark:from-stone-700 dark:via-stone-800 dark:to-stone-700 animate-pulse pointer-events-none z-10"
+          class="absolute inset-0 bg-stone-100 dark:bg-stone-800 animate-pulse pointer-events-none z-10"
         />
 
         <div
           v-for="(item, itemIndex) in row.items"
           :key="item.filename"
           :class="[
-            'gallery-item relative cursor-pointer group rounded-sm hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out overflow-hidden z-20',
-            rowsLoaded[row.key] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
+            'gallery-item relative cursor-pointer group transition-opacity duration-500 ease-out overflow-hidden z-20',
+            rowsLoaded[row.key] ? 'opacity-100' : 'opacity-0 pointer-events-none'
           ]"
           :style="{
             flex: row.items.length === 1 ? '0 0 auto' : `${item.flex} 1 0`,
@@ -34,7 +34,7 @@
             :srcset="getGridImageSrcset(item.filename)"
             :sizes="gridImageSizes"
             :alt="item.title"
-            class="w-full h-auto block rounded-sm transition-all duration-500 ease-out"
+            class="w-full h-auto block group-hover:brightness-110 transition-[filter] duration-500 ease-out"
             :loading="rowIndex < 3 ? 'eager' : 'lazy'"
             decoding="async"
             :data-row-key="row.key"
@@ -42,15 +42,11 @@
             @load="(e) => onImageLoad(e, row.key, itemIndex)"
             @error="() => onImageError(row.key, itemIndex)"
           >
-          <!-- Hover Overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex items-end justify-start p-4 rounded-sm">
-            <div class="text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-100">
-              <h3 class="text-lg font-light mb-1 drop-shadow-lg">{{ item.title }}</h3>
-              <p class="text-sm opacity-90 drop-shadow-md">{{ item.time }}</p>
-              <div v-if="item.color" class="flex items-center gap-2 mt-2 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 delay-200">
-                <div :class="`w-3 h-3 rounded-full bg-${item.color}-500 shadow-lg`"/>
-                <span class="text-xs opacity-80 capitalize drop-shadow-sm">{{ item.color }}</span>
-              </div>
+          <!-- Hover caption — 和紙低調 -->
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-900/85 via-stone-900/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out flex items-end p-4 motion-reduce:transition-none">
+            <div class="text-stone-100 font-light">
+              <h3 class="font-jp text-base tracking-wider mb-0.5">{{ item.title }}</h3>
+              <p v-if="item.time" class="text-xs text-stone-300 tracking-[0.2em] jp-kansuji">{{ item.time }}</p>
             </div>
           </div>
         </div>
@@ -63,7 +59,7 @@
         <div
           v-for="item in sortedItems"
           :key="item.filename"
-          class="cursor-pointer active:scale-95 transition-transform duration-200"
+          class="cursor-pointer active:opacity-80 transition-opacity duration-200"
           @click="$emit('imageClick', item, sortedItems)"
         >
           <img
@@ -71,13 +67,13 @@
             :srcset="getGridImageSrcset(item.filename)"
             :sizes="gridImageSizes"
             :alt="item.title"
-            class="w-full h-auto rounded-sm"
+            class="w-full h-auto"
             loading="lazy"
             decoding="async"
           >
           <div class="mt-2">
-            <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1">{{ item.title }}</h4>
-            <p class="text-xs text-stone-400 dark:text-stone-500">{{ item.time }}</p>
+            <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1 font-jp tracking-wide">{{ item.title }}</h4>
+            <p class="text-xs text-stone-400 dark:text-stone-500 jp-kansuji">{{ item.time }}</p>
           </div>
         </div>
       </div>
@@ -267,15 +263,7 @@ const onImageLoad = (event: Event, rowKey: string, itemIndex: number) => {
     }
   }
 
-  // 添加載入動畫
-  img.style.opacity = '0'
-  img.style.transform = 'scale(0.95)'
-
-  setTimeout(() => {
-    img.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out'
-    img.style.opacity = '1'
-    img.style.transform = 'scale(1)'
-  }, 50)
+  // 載入後的浮現由 row-level 的 opacity-0 → opacity-100 控制，避免逐張 scale 造成碎動
 }
 
 const onImageError = (rowKey: string, itemIndex: number) => {

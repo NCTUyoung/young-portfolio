@@ -9,16 +9,16 @@ v-show="showNavigator && currentViewerImage"
        }"
        @wheel.stop>
     <div
-class="bg-black bg-opacity-80 backdrop-blur-sm rounded-lg border border-white border-opacity-20 p-2"
+class="bg-stone-900/85 backdrop-blur-md border border-stone-700/60 p-2"
          :class="{ 'cursor-move': !navigatorDragging, 'cursor-grabbing': navigatorDragging }"
          @mousedown="handleNavigatorMouseDown">
-      <div class="text-white text-xs mb-2 px-1 flex items-center justify-between">
+      <div class="text-stone-300 text-[0.65rem] tracking-[0.3em] mb-2 px-1 flex items-center justify-between font-jp font-light">
         <span>導覽器</span>
-        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3 h-3 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
         </svg>
       </div>
-      <div ref="navigatorElement" class="relative w-32 h-32 overflow-hidden rounded border border-gray-600">
+      <div ref="navigatorElement" class="relative w-32 h-32 overflow-hidden border border-stone-700/60">
         <!-- 導覽器縮圖 -->
         <img
 v-if="currentViewerImage"
@@ -30,10 +30,10 @@ v-if="currentViewerImage"
              draggable="false"
              @click="handleNavigatorClick" >
 
-        <!-- 可視區域指示框 -->
+        <!-- 可視區域指示框 — 墨色 accent，輕飽和 -->
         <div
 v-if="navigatorViewport"
-             class="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 pointer-events-none"
+             class="absolute border border-accent-400/80 bg-accent-400/15 pointer-events-none"
              :style="{
                left: navigatorViewport.left + 'px',
                top: navigatorViewport.top + 'px',
@@ -43,10 +43,10 @@ v-if="navigatorViewport"
       </div>
 
       <!-- 導覽器控制 -->
-      <div class="flex items-center justify-between mt-2 text-xs text-gray-300">
-        <span>{{ Math.round(viewerScale * 100) }}%</span>
+      <div class="flex items-center justify-between mt-2 text-xs text-stone-400 font-light">
+        <span class="jp-kansuji">{{ Math.round(viewerScale * 100) }}%</span>
         <button
-class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors"
+class="px-2 py-1 bg-stone-800/80 hover:bg-stone-700/70 border border-stone-700/60 text-stone-200 transition-colors"
                 title="重置"
                 @click="resetTransform">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

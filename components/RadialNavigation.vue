@@ -22,38 +22,30 @@ v-for="visibleImage in getVisibleRadialImages"
                   transition: 'opacity 0.4s ease-out, transform 0.4s ease-out, box-shadow 0.3s ease'
                 }"
                 :class="[
-                  'rounded-full border-2 overflow-hidden bg-gray-900 bg-opacity-90 hover:scale-110 transition-all duration-300 backdrop-blur-md',
+                  'rounded-full border overflow-hidden bg-stone-900/80 hover:scale-105 transition-all duration-300 backdrop-blur-md',
                   visibleImage.originalIndex === currentImageIndex
-                    ? 'border-white shadow-2xl shadow-blue-500/60 radial-nav-active'
-                    : 'border-gray-500 hover:border-white hover:shadow-lg hover:shadow-white/30'
+                    ? 'border-stone-100/90 shadow-[0_0_0_2px_rgba(231,229,228,0.15)]'
+                    : 'border-stone-600/50 hover:border-stone-200/80'
                 ]"
                 :title="`${visibleImage.title} (${visibleImage.originalIndex + 1}/${viewerImages.length})`"
                 @click="selectRadialImage(visibleImage.originalIndex)">
           <!-- 縮圖圖片 -->
           <img :src="getThumbPath(visibleImage.filename, 400)" :alt="visibleImage.title" class="w-full h-full object-cover" decoding="async" loading="lazy">
-
-          <!-- 當前圖片的特殊效果 -->
-          <div
-v-if="visibleImage.originalIndex === currentImageIndex"
-               class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-pulse"/>
         </button>
       </div>
 
-      <!-- 中心控制按鈕 -->
-      <button class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-black bg-opacity-80 backdrop-blur-md rounded-full border-2 border-white border-opacity-40 hover:border-opacity-70 hover:bg-opacity-90 transition-all duration-200 flex items-center justify-center z-40" @click="handleCenterButtonClick">
-        <div class="text-white text-xs font-medium leading-tight">
+      <!-- 中心控制按鈕 — 墨色和紙小印 -->
+      <button class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-stone-900/85 backdrop-blur-md rounded-full border border-stone-600/50 hover:border-stone-300/80 hover:bg-stone-800/90 transition-all duration-200 flex items-center justify-center z-40" @click="handleCenterButtonClick">
+        <div class="text-stone-100 text-xs font-jp font-light leading-tight jp-kansuji">
           <div>{{ currentImageIndex + 1 }}</div>
-          <div class="text-gray-300">/{{ viewerImages.length }}</div>
+          <div class="text-stone-400">/{{ viewerImages.length }}</div>
         </div>
       </button>
 
       <!-- 圖片過多指示器 -->
-      <div v-if="viewerImages.length > 7" class="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs opacity-80">
-        顯示 {{ getVisibleRadialImages.length }}/{{ viewerImages.length }}
+      <div v-if="viewerImages.length > 7" class="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-stone-900/70 backdrop-blur-sm px-3 py-1 text-stone-300 text-[0.65rem] tracking-[0.25em] font-light border border-stone-700/50">
+        {{ getVisibleRadialImages.length }}/{{ viewerImages.length }}
       </div>
-
-      <!-- 背景光暈 -->
-      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 opacity-10 scale-150 animate-pulse pointer-events-none w-20 h-20"/>
     </div>
   </div>
 </template>
@@ -105,7 +97,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ===== 放射型導航動畫 ===== */
+/* 保留簡潔的 fade-in，去除藍紫 pulse 與光暈（違反色點稀有化／靜素原則） */
 @keyframes radialFadeIn {
   from {
     opacity: 0;
@@ -115,27 +107,5 @@ onMounted(() => {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-@keyframes radialPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6), 0 0 20px rgba(147, 51, 234, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0), 0 0 30px rgba(147, 51, 234, 0.6);
-  }
-}
-
-@keyframes currentGlow {
-  0%, 100% {
-    filter: brightness(1) saturate(1);
-  }
-  50% {
-    filter: brightness(1.2) saturate(1.3);
-  }
-}
-
-.radial-nav-active {
-  animation: radialPulse 2s infinite, currentGlow 1.5s ease-in-out infinite;
 }
 </style>

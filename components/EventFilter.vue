@@ -3,10 +3,7 @@
     v-if="(filterState.selectedCategory === 'photography' || filterState.selectedCategory === 'digital') && availableEvents.length > 0"
     class="mb-8"
   >
-    <!-- 頂部裝飾細線 -->
-    <div class="deco-line-h w-full mb-4"/>
-
-    <!-- 小標 -->
+    <!-- 小標（上方不再加 hairline，避免雙線堆疊） -->
     <p class="jp-section-label mb-3">Event</p>
 
     <!-- 底線 Tab 篩選列（窄螢幕可橫向捲動，避免多事件時換行過多） -->
@@ -83,8 +80,8 @@
       </template>
     </div>
 
-    <!-- 底部裝飾細線 -->
-    <div class="deco-line-h w-full mt-4"/>
+    <!-- 底部 hairline（兩端漸淡） -->
+    <div class="jp-hairline w-full mt-4"/>
   </div>
 </template>
 

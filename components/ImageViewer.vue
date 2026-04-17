@@ -1,6 +1,6 @@
 <template>
-    <!-- 圖片檢視器 -->
-  <div v-if="isOpen" class="fixed inset-0 z-[9999] bg-black bg-opacity-90 backdrop-blur-sm">
+    <!-- 圖片檢視器 — 墨色背景（stone），延續全站 palette -->
+  <div v-if="isOpen" class="fixed inset-0 z-[9999] bg-stone-950/97 backdrop-blur-sm">
     <!-- 背景點擊關閉 -->
     <div class="absolute inset-0" @click="closeImageViewer"/>
 
@@ -19,19 +19,19 @@ class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 tran
 class="absolute top-2 left-2 z-10 flex flex-col gap-2 sm:top-4 sm:left-4 sm:flex-row sm:items-start sm:justify-between"
              :style="toolbarInsetStyle">
 
-          <!-- 圖片資訊 -->
-          <div class="min-w-0 flex max-w-full items-center space-x-4 rounded-lg bg-black bg-opacity-50 px-3 py-2 backdrop-blur-sm sm:px-4">
-            <div class="min-w-0 text-white">
-              <h3 class="truncate font-medium">{{ currentViewerImage?.title || '未命名' }}</h3>
-              <p class="text-sm text-gray-300">{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>
+          <!-- 圖片資訊 — 和紙卡片 -->
+          <div class="min-w-0 flex max-w-full items-center space-x-4 bg-stone-900/75 px-3 py-2 backdrop-blur-md border border-stone-700/50 sm:px-4">
+            <div class="min-w-0 text-stone-100">
+              <h3 class="truncate font-jp font-light tracking-wider">{{ currentViewerImage?.title || '未命名' }}</h3>
+              <p class="text-xs text-stone-400 font-light tracking-[0.2em] jp-kansuji">{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>
             </div>
           </div>
 
           <!-- 操作按鈕 -->
-          <div class="flex flex-shrink-0 flex-wrap items-center justify-end gap-1 rounded-lg bg-black bg-opacity-50 px-1 py-1 backdrop-blur-sm sm:gap-2 sm:px-2 sm:py-2">
+          <div class="flex flex-shrink-0 flex-wrap items-center justify-end gap-1 bg-stone-900/75 px-1 py-1 backdrop-blur-md border border-stone-700/50 sm:gap-2 sm:px-2 sm:py-2">
             <!-- 縮放控制 -->
             <button
-:disabled="!canZoomOut" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+:disabled="!canZoomOut" class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     title="縮小 (Ctrl + -)"
                     @click="zoomOut">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,10 +39,10 @@ class="absolute top-2 left-2 z-10 flex flex-col gap-2 sm:top-4 sm:left-4 sm:flex
               </svg>
             </button>
 
-            <span class="text-white text-sm min-w-[60px] text-center">{{ Math.round(viewerScale * 100) }}%</span>
+            <span class="text-stone-200 text-sm min-w-[60px] text-center font-light jp-kansuji">{{ Math.round(viewerScale * 100) }}%</span>
 
             <button
-:disabled="!canZoomIn" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+:disabled="!canZoomIn" class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     title="放大 (Ctrl + +)"
                     @click="zoomIn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@ class="absolute top-2 left-2 z-10 flex flex-col gap-2 sm:top-4 sm:left-4 sm:flex
 
             <!-- 適應螢幕/原始大小切換 -->
             <button
-class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
                     :title="fitToScreen ? '顯示原始大小' : '適應螢幕'"
                     @click="toggleFitToScreen">
               <svg v-if="fitToScreen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colo
 
             <!-- 重置縮放 -->
             <button
-class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
                     title="重置縮放 (0)"
                     @click="resetTransform">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,8 +77,8 @@ class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colo
 
             <!-- 資訊面板切換 -->
             <button
-class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-                    :class="{ 'bg-white bg-opacity-20': showInfoPanel }"
+class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
+                    :class="{ 'bg-stone-700/60 text-stone-50': showInfoPanel }"
                     title="圖片資訊 (I)"
                     @click="toggleInfoPanel">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +88,7 @@ class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colo
 
             <!-- 關閉按鈕 -->
             <button
-class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
                     title="關閉 (Esc)"
                     @click="closeImageViewer">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,9 +122,9 @@ v-if="currentViewerImage"
 
           <!-- 載入中 -->
           <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">
-            <div class="text-white text-center">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"/>
-              <p>載入中...</p>
+            <div class="text-stone-200 text-center font-light">
+              <div class="animate-spin rounded-full h-10 w-10 border border-stone-500 border-t-stone-200 mx-auto mb-4"/>
+              <p class="tracking-[0.3em] text-xs">LOADING</p>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ v-if="currentViewerImage"
         <!-- 導航按鈕 -->
         <button
 v-if="viewerImages.length > 1 && hasPrevious"
-                class="absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2 p-2.5 sm:p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
+                class="absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2 p-2.5 sm:p-3 bg-stone-900/70 backdrop-blur-md border border-stone-700/50 text-stone-200 rounded-full hover:bg-stone-800/85 hover:text-stone-50 transition-colors"
                 title="上一張 (←)"
                 @click="goToPreviousImage">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@ v-if="viewerImages.length > 1 && hasPrevious"
 
         <button
 v-if="viewerImages.length > 1 && hasNext"
-                class="absolute top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3 bg-black bg-opacity-50 backdrop-blur-sm text-white rounded-full hover:bg-opacity-70 transition-colors"
+                class="absolute top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3 bg-stone-900/70 backdrop-blur-md border border-stone-700/50 text-stone-200 rounded-full hover:bg-stone-800/85 hover:text-stone-50 transition-colors"
                 :style="nextNavButtonStyle"
                 title="下一張 (→)"
                 @click="goToNextImage">

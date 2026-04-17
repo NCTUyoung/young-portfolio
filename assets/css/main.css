@@ -59,6 +59,18 @@
 .reveal-delay-4 { transition-delay: 0.4s; }
 .reveal-delay-5 { transition-delay: 0.5s; }
 
+/* reduced motion：一次顯示，不搬動 */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ===== 頁面轉場 ===== */
 .page-enter-active,
 .page-leave-active {
@@ -223,4 +235,241 @@
       theme('colors.stone.700 / 15%') 39px,
       theme('colors.stone.700 / 15%') 40px
     );
+}
+
+/* =========================================================
+   日式排版 — 間 / 余白 / 簡素 / 不均整
+   ========================================================= */
+
+/* 和欧混植 — 小標（eyebrow）：中文 + 拉丁以細線分隔 */
+.jp-eyebrow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-weight: 300;
+  color: theme('colors.stone.500');
+}
+.dark .jp-eyebrow { color: theme('colors.stone.400'); }
+.jp-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  transform: translateY(-0.22em);
+}
+
+/* 節標題：漢字（粗細朝體）＋ 下方羅馬字註 */
+.jp-section-title {
+  font-family: theme('fontFamily.jp');
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: theme('colors.stone.800');
+  line-height: 1.15;
+}
+.dark .jp-section-title { color: theme('colors.stone.100'); }
+
+.jp-section-ruby {
+  display: block;
+  font-family: theme('fontFamily.sans');
+  font-weight: 300;
+  font-size: 0.65rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: theme('colors.stone.400');
+  margin-top: 0.4em;
+}
+.dark .jp-section-ruby { color: theme('colors.stone.500'); }
+
+/* Hairline 分隔線 — 極細 + 兩端漸淡 */
+.jp-hairline {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    theme('colors.stone.300 / 80%') 20%,
+    theme('colors.stone.300 / 80%') 80%,
+    transparent
+  );
+}
+.dark .jp-hairline {
+  background: linear-gradient(
+    to right,
+    transparent,
+    theme('colors.stone.600 / 70%') 20%,
+    theme('colors.stone.600 / 70%') 80%,
+    transparent
+  );
+}
+.jp-hairline-v {
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    theme('colors.stone.300 / 70%') 15%,
+    theme('colors.stone.300 / 70%') 85%,
+    transparent
+  );
+}
+.dark .jp-hairline-v {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    theme('colors.stone.600 / 60%') 15%,
+    theme('colors.stone.600 / 60%') 85%,
+    transparent
+  );
+}
+
+/* 墨印 — 方形紅章 */
+.jp-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid theme('colors.accent.700');
+  color: theme('colors.accent.700');
+  font-family: theme('fontFamily.jp');
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1;
+  background: theme('colors.accent.50 / 70%');
+  transform: rotate(-3deg);
+  box-shadow: inset 0 0 0 2px theme('colors.accent.50 / 60%');
+  user-select: none;
+}
+.dark .jp-seal {
+  border-color: theme('colors.accent.400');
+  color: theme('colors.accent.300');
+  background: theme('colors.accent.900 / 30%');
+  box-shadow: inset 0 0 0 2px theme('colors.accent.950 / 40%');
+}
+
+/* 縦書き大字（裝飾用） */
+.jp-vertical-kanji {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: theme('fontFamily.jp');
+  font-weight: 200;
+  line-height: 1.05;
+  letter-spacing: 0.25em;
+  color: theme('colors.stone.200 / 70%');
+  user-select: none;
+  pointer-events: none;
+}
+.dark .jp-vertical-kanji { color: theme('colors.stone.700 / 60%'); }
+
+/* 縦書き小標註（假名） */
+.jp-vertical-caption {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: theme('fontFamily.jp');
+  font-size: 0.7rem;
+  letter-spacing: 0.45em;
+  color: theme('colors.stone.400');
+  user-select: none;
+}
+.dark .jp-vertical-caption { color: theme('colors.stone.500'); }
+
+/* 明朝體引言 body */
+.jp-body {
+  font-family: theme('fontFamily.jp');
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  line-height: 2;
+  color: theme('colors.stone.700');
+}
+.dark .jp-body { color: theme('colors.stone.300'); }
+
+/* 漢数字的 tabular number 效果 */
+.jp-kansuji {
+  font-family: theme('fontFamily.jp');
+  font-feature-settings: 'tnum' on, 'palt' on;
+  letter-spacing: 0.12em;
+}
+
+/* 沿用 Tailwind 的 aspect 工具延伸：4:5 直幅 */
+.aspect-tatami { aspect-ratio: 4 / 5; }
+.aspect-kake   { aspect-ratio: 5 / 7; } /* 掛軸 */
+
+/* 墨點（代替多色圓點） */
+.jp-sumi-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: theme('colors.stone.600');
+}
+.dark .jp-sumi-dot { background: theme('colors.stone.300'); }
+
+/* 書扉邊框（單細線內縮雙框） */
+.jp-frame {
+  position: relative;
+  border: 1px solid theme('colors.stone.300 / 70%');
+}
+.dark .jp-frame { border-color: theme('colors.stone.600 / 60%'); }
+.jp-frame::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid theme('colors.stone.300 / 50%');
+  pointer-events: none;
+}
+.dark .jp-frame::after { border-color: theme('colors.stone.600 / 40%'); }
+
+/* ===== 共用 utilities（原散落於 pages/gallery/[[category]].vue） ===== */
+
+/* 文字選擇（全站） */
+::selection {
+  background: rgba(168, 162, 158, 0.25);
+  color: rgba(41, 37, 36, 0.92);
+}
+.dark ::selection {
+  background: rgba(120, 113, 108, 0.4);
+  color: rgba(245, 245, 244, 0.95);
+}
+
+/* 水平滾動條（overflow-x-auto 自動套用細緻風格） */
+.overflow-x-auto::-webkit-scrollbar { height: 2px; }
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: rgba(168, 162, 158, 0.1);
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(168, 162, 158, 0.3);
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 162, 158, 0.5);
+}
+
+/* 和紙陰影 */
+.shadow-japanese {
+  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
+}
+.shadow-japanese-hover {
+  box-shadow: 0 4px 16px rgba(168, 162, 158, 0.15), 0 2px 6px rgba(168, 162, 158, 0.08);
+}
+
+/* 毛玻璃 */
+.backdrop-blur-japanese {
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+/* 微浮按鈕（僅標記 .btn-float 生效） */
+.btn-float { transition: transform 0.3s ease; }
+.btn-float:hover { transform: translateY(-1px); }
+
+/* fadeInUp（沿用既有 reveal 節奏） */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeInUp { animation: none; opacity: 1; transform: none; }
 }
