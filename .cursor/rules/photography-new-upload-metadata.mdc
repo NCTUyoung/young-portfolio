@@ -1,0 +1,26 @@
+---
+description: After new photography uploads, read images and refine titles, captions, event copy
+alwaysApply: true
+---
+
+# Photography New Upload — Metadata From Content
+
+適用時機：使用者在 `public/images/photography/` 新增圖檔、或更新 `public/photographyList.json` 納入新作品，並請你協助整理／或你偵測到本次變更為**新上傳批次**時。
+
+## AI 應做的事
+
+- **讀取新圖**（至少抽讀該事件資料夾內數張代表圖），依畫面內容微調：
+  - 各筆的 `title`、`content`（避免長留「數位單眼相機拍攝作品」等泛用句）。
+  - 必要時微調共用 `event.description`，使與該批照片主題一致（例如神社＋街景、賽事＋應援等）。
+- **可視情況**微調 `tags`，與畫面相符即可，不必大改。
+- **`event.name` 與 `event.location`**：使用者未要求改名／改地點時維持原樣；若新圖明顯屬另一地點，應先向使用者確認再改。
+
+## 與其他規則的關係
+
+- **地圖座標**：仍依 `photography-event-locations.mdc`——為新增／變更事件補上 `event.lat`／`event.lng`，並同步 `stores/galleryConstants.ts` 的 `GALLERY_EVENT_COORDS_FALLBACK`（若專案仍使用該後備表）。
+- **Commit 前**：新事件或變更事件須確認座標已就緒，再協助 commit／push。
+
+## 不要做的事
+
+- 不要因「微調文案」而刪改使用者明確寫好的事件名稱或地點，除非使用者請你改。
+- 不要猜測敏感或無法從畫面佐證的具體地標名稱；不確定時用較保守的描述或詢問使用者。

@@ -1,5 +1,6 @@
 # Agent / 維護備忘
 
+- **美感規範**：任何 UI／版型／色彩／字型改動前，先讀 `.cursor/rules/design-aesthetic.mdc`（日式排版精神：余白・間・侘寂；stone + accent tokens、`font-jp`/`font-sans` 混植、`jp-*` utilities、dark-mode 預設、Hero 輪播與單色化等鐵律都在裡面）。
 - **部署**：GitHub Pages，`app.baseURL` = `/young-portfolio/`；靜態資源與 `useImagePath` 依此組路徑。
 - **字型**：全站 `font-sans` = **Outfit**（拉丁）→ **Noto Sans TC**（繁中）；日式豎排／引言等維持 `font-jp`（**Noto Serif JP**）。來源：`nuxt.config.ts` 的 `fonts.families` + `tailwind.config.js` 的 `fontFamily.sans`，`assets/css/main.css` 的 `@layer base`。
 - **圖片庫路由**：`pages/gallery/[[category]].vue`；分類 `all` | `digital` | `photography`。Lightbox 與 `?image=<id>` 由 `useGalleryImageRoute` 同步。列表篩選邏輯在 `stores/gallerySelectors.ts`。

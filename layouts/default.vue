@@ -6,7 +6,7 @@
         'fixed top-0 left-0 right-0 z-[1100] pt-[env(safe-area-inset-top,0px)] transition-all duration-500',
         isScrolled
           ? 'bg-white/92 dark:bg-stone-900/92 nav-scrolled border-b border-stone-200/40 dark:border-stone-700/40 shadow-sm'
-          : 'bg-transparent border-b border-transparent'
+          : 'bg-white/55 dark:bg-stone-900/50 backdrop-blur-md border-b border-stone-200/20 dark:border-stone-700/20'
       ]"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,7 +50,7 @@
               v-for="link in navLinks"
               :key="link.to"
               :to="link.to"
-              class="text-stone-600 dark:text-stone-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors duration-300 font-light tracking-wide relative group"
+              class="text-stone-700 dark:text-stone-200 hover:text-accent-600 dark:hover:text-accent-400 transition-colors duration-300 font-light tracking-wide relative group"
             >
               {{ link.label }}
               <span class="absolute -bottom-2 left-0 w-0 h-px bg-accent-400 dark:bg-accent-500 transition-all duration-300 group-hover:w-full"/>
@@ -212,8 +212,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
 
-// Dark mode
-const isDark = useDark()
+// Dark mode — 預設走 dark，尊重使用者已儲存的偏好
+const isDark = useDark({
+  initialValue: 'dark'
+})
 const toggleDark = useToggle(isDark)
 
 // 動態年份

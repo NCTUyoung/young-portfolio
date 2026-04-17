@@ -17,12 +17,17 @@ export function useScrollReveal(options?: {
   rootMargin?: string
   once?: boolean
 }) {
-  const threshold = options?.threshold ?? 0.12
-  const rootMargin = options?.rootMargin ?? '0px 0px -40px 0px'
+  const threshold = options?.threshold ?? 0.04
+  const rootMargin = options?.rootMargin ?? '0px 0px -5% 0px'
   const once = options?.once ?? true
 
   let observer: IntersectionObserver | null = null
   const revealRef = ref<HTMLElement | null>(null)
+
+  // prefers-reduced-motion：完全跳過動畫，直接顯示
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   const createObserver = () => {
     if (typeof window === 'undefined') return null
@@ -53,9 +58,15 @@ export function useScrollReveal(options?: {
   // 批量觀察容器內所有 reveal 元素
   const observeAll = (container?: HTMLElement | null) => {
     const root = container || document.body
-    if (!observer) observer = createObserver()
-
     const selectors = '.reveal, .reveal-left, .reveal-right, .reveal-scale'
+
+    // reduced-motion：直接全部顯示，不做動畫觀察
+    if (prefersReducedMotion) {
+      root.querySelectorAll(selectors).forEach((el) => el.classList.add('revealed'))
+      return
+    }
+
+    if (!observer) observer = createObserver()
     root.querySelectorAll(selectors).forEach((el) => {
       observer?.observe(el)
     })

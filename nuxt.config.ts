@@ -84,7 +84,8 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       htmlAttrs: {
-        lang: 'zh-Hant'
+        lang: 'zh-Hant',
+        class: 'dark'
       },
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',

@@ -1,0 +1,16 @@
+---
+description: Keep photography event locations clean by letting AI manage lat/lng for maps
+alwaysApply: true
+---
+
+# Photography Event Location Rule
+
+- 使用者在 `public/photographyList.json` 中新增或編輯攝影作品時，只維護 `event.name`、`event.description`、`event.location` 三個欄位，不手動填寫 `lat`、`lng`。
+- 所有地圖相關功能（例如 Gallery 的「Visited Places」）需要的經緯度，一律由 AI 依 `event.name`（必要時搭配 `location`）查詢座標：
+  - 優先寫入到對應事件的 `event.lat`、`event.lng` 欄位。
+  - 若舊資料尚未補完，才使用 `stores/gallery.ts` 中的 `EVENT_COORDS` 做暫時對照。
+- 未經使用者要求，不得改動使用者原本的 `event.name` / `description` / `location` 文本，只能補充或更新座標欄位。**例外**：使用者上傳新圖並請求整理／微調文案時，依 `photography-new-upload-metadata.mdc` 處理 `title`、`content`、必要時的 `event.description`；`event.name` 與 `location` 仍須尊重使用者或先確認再改。
+- 在 **建立 commit / push 之前**，若本次變更包含攝影事件（`public/photographyList.json` 或相關 API / store），AI 應主動檢查所有新增或變更的 `event.name` 是否已有對應座標：
+  - 若該事件已存在 `event.lat` / `event.lng`，視為已完成設定。
+  - 若尚未有座標，AI 應先補齊（透過查詢或更新 `EVENT_COORDS`），再協助進行 commit / push。
+

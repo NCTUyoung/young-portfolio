@@ -1,0 +1,143 @@
+---
+description: Young Portfolio 美感與版型準則（日式排版精神：余白・間・侘寂）
+alwaysApply: true
+---
+
+# Design Aesthetic — Young Portfolio
+
+本站視覺核心是 **日式排版精神**：「余白（よはく）」「間（ま）」「侘寂（わびさび）」「簡素」「不均整」。
+改動 UI 前先自問：是不是多了？能不能拿掉？留白夠不夠？裝飾有沒有搶戲？
+
+---
+
+## 1. 設計哲學（不可違）
+
+- **余白優先**：寧可少勿多。每個 section 要有呼吸，不要塞滿。
+- **簡素**：一條 hairline 勝過一個粗框；一枚墨點勝過一串彩色 dot。
+- **不均整**：避免左右對稱滿版；用 zig-zag、對聯雙欄（繪／影）、書扉不等寬版芯。
+- **黑白灰 + 一點赤陶**：通篇走 `stone` 暖灰，`accent`（赤陶／琥珀）是「墨印式」點綴，只在節標籤、印章、少量引導線上出現。
+- **裝飾不搶戲**：縦書き裝飾字、背景大字（`jp-kana-bg`）、washi 紋一律低透明度 + `pointer-events-none` + `user-select-none`。
+
+---
+
+## 2. 色彩 tokens
+
+主調 `stone.*`（`tailwind` 內建），點綴 `accent.*`（見 `tailwind.config.js`）。
+
+| 角色 | 日間 | 夜間 |
+| --- | --- | --- |
+| 頁面底 | `bg-stone-50` | `bg-stone-900` |
+| 主文字 | `text-stone-800/900` | `text-stone-100/50` |
+| 次文字 | `text-stone-600/500` | `text-stone-300/400` |
+| Hairline | `stone-300/60` | `stone-600/60` |
+| 點綴（印章／label） | `accent.500~700` | `accent.300~400` |
+| 卡片底 | `bg-white/70` `backdrop-blur` | `bg-stone-800/60` |
+
+**Dark mode 預設開啟**：`layouts/default.vue` 用 `useDark({ initialValue: 'dark' })`；`nuxt.config.ts` 的 `htmlAttrs.class = 'dark'` 避免 SSR FOUC。新增元件時 **一律同時寫 light/dark 兩組 class**，不可只做單邊。
+
+---
+
+## 3. 字型策略
+
+設定在 `tailwind.config.js` `fontFamily` 與 `nuxt.config.ts` `fonts.families`。
+
+- `font-sans`（預設、UI 與正文）：**Outfit**（拉丁）→ **Noto Sans TC**（繁中）
+- `font-jp`（裝飾、引言、節標題、縦書き、漢数字）：**Noto Serif JP** → 明朝體 fallback
+- **和欧混植**：`jp-eyebrow` 類別 — 中文放 `font-jp tracking-[0.45em]`，用一條 1px 細線隔開羅馬字小標。
+- 漢數字（年份、章節）用 `jp-kansuji`（啟用 `tnum`、`palt`）。
+
+常用字號慣例（Hero／節標）：
+- 主標：`font-jp font-extralight text-6xl sm:text-7xl lg:text-[6.5rem] tracking-[0.12em]`
+- 節標題：`jp-section-title`（漢字、細）+ `jp-section-ruby`（下方羅馬字小註）
+- 引言／body：`jp-body`（明朝、`line-height: 2`、`tracking: 0.05em`）
+
+---
+
+## 4. 專用 utility（`assets/css/main.css`）
+
+改版優先組合這些既有 class，不要新增相似命名：
+
+| 類別 | 用途 |
+| --- | --- |
+| `jp-eyebrow` | 和欧混植小標（中文 + 細線 + 羅馬字） |
+| `jp-section-title` / `jp-section-ruby` | 節標題（漢字 + 下方羅馬註） |
+| `jp-hairline` / `jp-hairline-v` | 極細漸淡分隔線（水平／垂直） |
+| `jp-seal` | 方形紅章（墨印），點綴用，旋轉 -3deg |
+| `jp-body` | 明朝體引言／長文 body |
+| `jp-kansuji` | 漢數字等寬 |
+| `jp-vertical-kanji` | 背景裝飾用大漢字，低透明 |
+| `jp-vertical-caption` | 縦書き小標註（假名／年號） |
+| `writing-vertical` | 通用縦書き |
+| `jp-frame` | 雙線書扉邊框（外 + 內 6px） |
+| `jp-sumi-dot` | 墨點（取代多色 dot） |
+| `washi-bg` | 和紙橫線紋底（極淡） |
+| `jp-kana-bg` | 超大 kana 背景裝飾 |
+| `aspect-tatami` (4:5) / `aspect-kake` (5:7) | 作品框比例 |
+| `deco-line-v` / `deco-line-h` / `deco-dot` | 舊版輔助，新頁面優先走 `jp-hairline` |
+
+Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale` + `reveal-delay-1..5`，皆已內建 `prefers-reduced-motion` fallback。
+
+---
+
+## 5. 動畫節奏
+
+- **緩慢、少量、可被關掉**。所有動畫必須尊重 `@media (prefers-reduced-motion: reduce)`，新增自訂動畫時加 `motion-reduce:transition-none` 或對應 media query。
+- Reveal 曲線固定 `cubic-bezier(0.16, 1, 0.3, 1)`，時長 `0.7~0.8s`，階梯延遲 0.1s。
+- Hero 輪播意象是「**風中翻書**」：5 張精選照片、9 秒一張、`transition-duration: 1500ms` 的純 opacity 淡入淡出；`@mouseenter/@focusin` 暫停，`onUnmounted` 清 interval。**不要加導覽點（dots）或箭頭**。
+- Hero 首張標 `fetchpriority="high" loading="eager"`，其餘 `loading="lazy"`。
+
+---
+
+## 6. 圖像呈現
+
+- **Hero 背景照**：必為單色化 + 降飽和 + 輕抑對比，並疊米白罩，確保主讀字區對比充足：
+  ```
+  grayscale contrast-90 brightness-105 opacity-80 dark:opacity-35
+  + bg-stone-50/45 md:bg-stone-50/25 dark:bg-stone-900/55 md:dark:bg-stone-900/50
+  + 左 72% 米白漸層托主標、右 18% 縦書き襯底、下緣 scroll 提示漸層
+  ```
+  Mobile 因樹枝／細節更多，**米白罩要壓更厚**（`/45` 而非 `/25`）。
+- **作品列表**：`GalleryPhotographySection` 走 justified rows（見 `AGENTS.md`），保留原始比例，不強裁。
+- **縮圖**：一律透過 `useImagePath.getThumbPath(path, size)`，size 建議 Hero `800`、卡片 `400~600`。
+- **非 ASCII 路徑**：`useImagePath` 已處理 `encodeURIComponent`；手寫 URL 時務必編碼中文／空白。
+
+---
+
+## 7. 版型鐵律
+
+- **色點稀有化**：禁用多色 dot 列表；要點就墨點 `jp-sumi-dot` 或不放。
+- **Hairline > 粗線**：分隔線預設 `jp-hairline`，否則 `border-stone-300/60 dark:border-stone-600/60`。
+- **導覽列恆常毛玻璃**：在 hero 背景上也要可讀 — `bg-stone-50/85 dark:bg-stone-900/75 backdrop-blur-md` + 底部 `jp-hairline`；滾動時以 `.nav-scrolled` 加強。
+- **CTA 低調**：不用亮色大按鈕；走 `text + underline on hover` 或 `jp-frame` 包細邊按鈕。
+- **節標題範式**：`jp-eyebrow` → `jp-section-title` → `jp-section-ruby` → 內容；段與段之間 `py-20 md:py-28` 起跳，保留余白。
+- **對聯／zig-zag**：Domains（繪／影）、Journey（時間軸）、Tools 三欄都採 **非對稱** 或 **中軸對稱**，避免呆版格線。
+
+---
+
+## 8. 無障礙與響應式
+
+- 所有裝飾性字（縦書き年號、背景大漢字）加 `aria-hidden="true"`。
+- 圖片若純裝飾，`alt=""` + `aria-hidden="true"`。
+- `prefers-reduced-motion` 必須 reveal 一次顯示 + 停輪播。
+- 斷點：`sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280；Hero 用 `min-h-[88dvh] md:h-[94vh] md:min-h-[640px]` 避開 mobile URL bar 跳動。
+
+---
+
+## 9. SEO／OG 一致性
+
+- `og:image` 指向 **Hero 當期首張輪播圖**（目前：`photography/WBC東京 台澳/DSC_9877-編輯-1.jpg`）。
+- 換 Hero 首張時同步更新 `pages/index.vue` 的 `useSeoMeta.ogImage`，路徑需 `encodeURIComponent`。
+- `og:locale = zh_TW`，`titleTemplate = '%s | Young Portfolio'` 不要動。
+
+---
+
+## 10. 改動 Checklist（每次 UI PR）
+
+- [ ] 余白夠嗎？有沒有硬塞？
+- [ ] 裝飾是否多餘？能否換 hairline／墨點／純字？
+- [ ] 同時寫了 light 與 dark 兩組 class？
+- [ ] 字型對嗎？漢字裝飾用 `font-jp`、UI 走 `font-sans`？
+- [ ] 動畫支援 reduced-motion？
+- [ ] 圖像走 `useImagePath`，Hero 圖做了單色化＋米白罩？
+- [ ] 新分隔線用 `jp-hairline`，不是 `border-2`？
+- [ ] 換 Hero 首張時同步更新 `ogImage`？
