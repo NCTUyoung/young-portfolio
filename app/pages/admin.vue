@@ -1,19 +1,21 @@
 <template>
   <div class="min-h-screen bg-stone-50 text-stone-900 transition-colors dark:bg-stone-950 dark:text-stone-100">
-    <!-- 頂部導航 -->
-    <header class="border-b border-stone-800 bg-stone-950 dark:border-stone-800">
+    <!-- 頂部標題列：走指示書「毛玻璃 + hairline + 單色直條」風格，與 default.vue nav 一致；
+         停用原本強黑底 (bg-stone-950) + amber 粗直條，改為 stone 灰系直條 + jp-hairline 底線。 -->
+    <header class="bg-stone-50/80 backdrop-blur-md dark:bg-stone-900/60">
       <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <div class="w-1 h-6 bg-amber-500"/>
-          <h1 class="text-lg font-light text-stone-100 tracking-wider">後台管理</h1>
+          <span class="h-[1.2em] w-[2px] shrink-0 rounded-[1px] bg-stone-900 dark:bg-stone-100" aria-hidden="true"/>
+          <h1 class="text-lg font-light text-stone-900 tracking-wider dark:text-stone-100">後台管理</h1>
         </div>
-        <NuxtLink to="/" class="text-stone-400 hover:text-stone-100 text-sm transition-colors duration-200 flex items-center space-x-1">
+        <NuxtLink to="/" class="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 text-sm transition-colors duration-200 flex items-center space-x-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           <span>返回首頁</span>
         </NuxtLink>
       </div>
+      <div class="jp-hairline w-full"/>
     </header>
 
     <!-- Tab 導航 -->

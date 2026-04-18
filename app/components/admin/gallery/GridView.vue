@@ -16,10 +16,12 @@
           decoding="async"
         >
       </div>
-      <!-- 編輯模式刪除按鈕 -->
-      <div v-if="adminStore.editMode" class="absolute top-2 right-2 z-20 opacity-80 group-hover:opacity-100 transition-opacity duration-300 flex space-x-1">
+      <!-- 編輯模式：操作鍵走 stone（編輯）+ 赤陶 accent（刪除語義）替代原本藍紅鮮色，
+           以符合 design-aesthetic「色點稀有化」「黑白灰 + 一點赤陶」「Hairline > 粗線」。
+           icon 顏色用 currentColor；hover 時才顯真實色塊底，平時維持毛玻璃低調。 -->
+      <div v-if="adminStore.editMode" class="absolute top-2 right-2 z-20 opacity-90 group-hover:opacity-100 transition-opacity duration-300 flex space-x-1">
         <button
-          class="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+          class="p-2 rounded-full border border-stone-300/70 bg-white/85 text-stone-700 shadow-sm backdrop-blur transition-colors duration-200 hover:border-stone-500 hover:text-stone-900 dark:border-stone-600/70 dark:bg-stone-900/70 dark:text-stone-200 dark:hover:border-stone-300 dark:hover:text-stone-50"
           title="編輯圖片"
           @click.stop="handleEditImage(item)"
         >
@@ -28,7 +30,7 @@
           </svg>
         </button>
         <button
-          class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 shadow-lg"
+          class="p-2 rounded-full border border-accent-400/70 bg-white/85 text-accent-700 shadow-sm backdrop-blur transition-colors duration-200 hover:border-accent-600 hover:text-accent-800 dark:border-accent-500/60 dark:bg-stone-900/70 dark:text-accent-300 dark:hover:border-accent-300 dark:hover:text-accent-200"
           title="刪除圖片"
           @click.stop="handleDeleteImage(item.filename, item.title)"
         >
