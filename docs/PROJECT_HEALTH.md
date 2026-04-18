@@ -74,31 +74,35 @@
 ### P1（維護成本）
 
 - **`stores/admin.ts`**：API 見 `adminApiClient`、型別見 `adminTypes`；管理／概覽 **computed** 見 `adminSelectors.ts`；請求經 `useApi().createApiRequest`。若仍覺肥大，可再拆「上傳／管理」子 composable 或子 store。
+  - **暫緩再拆（2026-04）**：admin.ts 還有 659 行、但被 ~180 處引用（10 個 component + `pages/admin.vue`），而 admin 頁目前**沒有 e2e 覆蓋**（Playwright smoke 只跑前台），拆完一次 regress 很難快速抓。建議先達成以下任一條件再動：(a) 幫 admin 加 smoke e2e（上傳／刪除／編輯 happy path）或 (b) admin API 型別再長大（例如加批次操作），屆時順勢切 `admin-upload` + `admin-manage` 子 store。
 - **後台 API**：新端點請先加 `adminApiClient`，再於 store 用 `createApiRequest`。
 - **`docs/MAINTENANCE.md`**：已對齊現況目錄與指令（2026-03）。
 
 ### P2（品質與長期）
 
-- **圖片格式**：若要進一步壓縮體積，可評估離線 `sharp` 一次產出 AVIF + WebP，模板搭配 `<picture>` 依序嘗試。目前策略為 WebP 縮圖 + `srcset/sizes`。
+- ~~**圖片格式**（AVIF + WebP）~~（已加，2026-04）：`scripts/generate-thumbs.mjs` 與 `server/utils/thumbFromSource.ts` 同時產 WebP (q=82) 與 AVIF (q=50, effort=4)，`<GalleryPhotographySection>`／`<GalleryMasonryLayout>` 用 `<picture>` 以 `image/avif` → `image/webp` → `<img>` 順序做 fallback（`display: contents` 保持外層 justified layout）。本機 230 張實測：AVIF 6.42 MB vs WebP 10.22 MB，縮 ~37%。`npm run thumbs -- --no-avif` 可只產 WebP；`--force` 強制覆蓋。
 - ~~**結構化資料（JSON-LD）**~~（已加，2026-04）：
   - `pages/index.vue` 插 `Person` + `WebSite` schema，`sameAs` 指向 GitHub / Facebook / Instagram / Threads，`author` 由 `SEO_CONFIG.siteUrl` 當 canonical URL。產生器集中在 `app/utils/siteSchema.ts`。
   - `pages/gallery/[[category]].vue` 依 query 吐三種 schema：無 query → `CollectionPage`（`about` 指向作者）；`?event=` → `ImageGallery` 含 `hasPart` 最多 20 張 `ImageObject`；`?image=` → 單張 `ImageObject`，帶 `creator` / `dateCreated` / `keywords`（`tags`）。實作在 `app/utils/gallerySeo.ts`。
   - **canonical URL 修正**：`useRequestURL()` 在 `nuxt generate` 時 origin 會是 `http://localhost`；schema 裡的 `url` 特別用 `SEO_CONFIG.siteUrl` 組 origin，避免 Google 把站台當 staging。`og:url` 保留原行為。
   - SSG build 驗證：`.output/public/index.html` 有 2 條 `<script type="application/ld+json">`（Person + WebSite），四個 gallery 頁各 1 條（CollectionPage）。
 - **測試**：
-  - **Vitest 單元**（`npm run test`）：覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts`、`utils/justifiedGalleryLayout.ts`、`utils/imagePaths.ts`、`utils/gallerySeo.ts`、`utils/siteSchema.ts` 與 `stores/*Selectors.test.ts`。
-  - **Playwright e2e**（`npm run test:e2e`）：`tests/e2e/` 已建骨架 — `home.spec.ts`（首頁 Hero / Gallery 連結）、`gallery.spec.ts`（`/gallery/photography` 80 works + 事件 tab 切換）、`image-viewer.spec.ts`（點圖開 lightbox + ESC + ArrowRight 切換）。baseURL 含 `/young-portfolio/`；`webServer.reuseExistingServer` 會重用本機 `npm run dev`。待補：主題切換刷新不閃爍。
+  - **Vitest 單元**（`npm run test`）：覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts`、`utils/justifiedGalleryLayout.ts`、`utils/imagePaths.ts`、`utils/gallerySeo.ts`、`utils/siteSchema.ts`、`utils/radialNavigation.ts` 與 `stores/*Selectors.test.ts`。
+  - **Playwright e2e**（`npm run test:e2e`）：`tests/e2e/` 已建骨架 — `home.spec.ts`（首頁 Hero / Gallery 連結）、`gallery.spec.ts`（`/gallery/photography` 80 works + 事件 tab 切換）、`image-viewer.spec.ts`（點圖開 lightbox + ESC + ArrowRight 切換）。baseURL 含 `/young-portfolio/`；`webServer.reuseExistingServer` 會重用本機 `npm run dev`。
+  - **CI e2e**（2026-04 加）：`deploy.yml` 於 `Build` 後跑 Playwright，透過 `actions/cache` 快取 `~/.cache/ms-playwright`，失敗會擋 deploy，reports 以 `playwright-report/` artifact 上傳保留 7 天。待補：主題切換刷新不閃爍。
 - **型別**：`types/gallery.ts` 為主；避免在元件內重複定義 props 型別，改 `import type`。
 - **ESLint**：`eslint.config.mjs` 在 `withNuxt()` 上追加 flat 區塊：`parserOptions.projectService: true`、`tsconfigRootDir` 指向 repo 根；`@typescript-eslint/consistent-type-imports` 設為 **warn**（`prefer: type-imports`）。避免 `typeof import('foo')` 型別註解，可改 `import type * as FooNS from 'foo'` + `typeof FooNS`。
 - **後台 UX**：`pages/admin.vue` 以 `pageReady` 控制首次雙分類載入完成後才顯示主內容；載入中顯示與前台類似的 loading；全域錯誤條（非 upload 分頁）可手動關閉。
 
 ### P3（長期 / 願景）
 
-- `app/stores/imageViewer` 目前承擔 lightbox 狀態、拖曳、導航、Info/Radial；未來可再切成 `viewer-core` + `viewer-interaction`，避免單檔 >400 行。
+- `app/stores/imageViewer` 目前承擔 lightbox 狀態、拖曳、導航、Info/Radial（462 行）。
+  - **Prep（2026-04 已做）**：把 radial 純演算法抽到 `app/utils/radialNavigation.ts`（`calcRadialXY` / `computeRadialVisibleWindow` / `lerp` / `easeOutQuad`）並建 12 個 unit test；`startRadialAnimation` 裡兩段 inline `getVisibleAt` 重複邏輯也收斂成單一 helper。
+  - **暫緩真正的切 store**：剩下不純的部分（`startRadialAnimation`、`selectRadialImage`、縮放／拖曳 state 與 `posMap` reactive 動畫）對 DOM 與 `requestAnimationFrame` 耦合深，Playwright smoke 目前只驗開啟／ESC／ArrowRight，不足以抓 radial 動畫 / 選區放大回歸。等 e2e 把 radial 點擊、選區縮放、info panel toggle 覆蓋到再動。
 - ~~Nuxt 4 升級~~（已完成 2026-04）。下一步關注 Nuxt 4 minor 更新與 Vue 3.6 / Nitro 5。
 - ~~dev/prerender 的 `/galleryList.json` / `/photographyList.json` 404 噪音~~（已修，2026-04；見 Nuxt 4 踩雷「SSR 讀 public JSON 不能走 HTTP」）。
 - ~~CVE gate~~（已加，2026-04；CI 現在跑 `npm audit --audit-level=high`）。
-- 加 Playwright e2e 進 CI：目前 `tests/e2e/` 只本機跑，尚未納入 `deploy.yml`。納入前要先評估穩定度（目前 smoke 6 個）與 CI 時間成本。
+- ~~加 Playwright e2e 進 CI~~（已加，2026-04；見上面 P2 的「CI e2e」）。
 
 ## 依賴與死碼策略
 

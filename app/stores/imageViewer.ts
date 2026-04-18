@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed, reactive, nextTick } from 'vue'
 import type { GalleryItem } from './gallery'
+import {
+  calcRadialXY,
+  computeRadialVisibleWindow,
+  easeOutQuad,
+  lerp
+} from '~/utils/radialNavigation'
 
 export const useImageViewerStore = defineStore('imageViewer', () => {
   // ===== 基本狀態 =====
@@ -313,89 +319,42 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
     })
   }
 
-    // ===== 放射型導航方法 =====
+  // ===== 放射型導航方法 =====
+  // 純演算法已拆到 `~/utils/radialNavigation`；這裡的 `calcXY` 只保留 store 介面，
+  // 幫 template 把「目前可見圖片數」塞進 util。`total===1` 時回傳 y=-radius 是
+  // 兼容舊值；util 回 y=-140，與 `radius` 常數相同，無行為差異。
   const calcXY = (idx: number, currentIdx: number) => {
-    const total = viewerImages.value.length
-    if (total === 1) return { x: 0, y: -radius }
-
-    const order = (idx - currentIdx + total) % total
-
-            // 根據圖片數量動態調整半徑和角度範圍
-    let dynamicRadius = radius
-    let angleRange = 180
-
-    if (total <= 3) {
-      // 3張或以下：使用較小半徑，廣角分佈
-      dynamicRadius = 80
-      angleRange = 150
-    } else if (total <= 5) {
-      // 4-5張：使用中等半徑，3/4圓分佈
-      dynamicRadius = 110
-      angleRange = 200
-    } else if (total <= 7) {
-      // 6-7張：使用標準半徑，廣角分佈
-      dynamicRadius = 140
-      angleRange = 240
-    } else {
-      // 超過7張：使用較大半徑，3/4圓分佈，只顯示部分圖片
-      dynamicRadius = 160
-      angleRange = 220
-    }
-
-    const angleStep = angleRange / Math.max(1, total - 1)
-    // 調整起始角度，讓縮圖居中對稱分佈
-    const startAngle = 270 - angleRange / 2  // 從正下方開始，左右對稱分佈
-    const angle = startAngle + order * angleStep
-    const rad = (angle * Math.PI) / 180
-
-    const x = Math.cos(rad) * dynamicRadius
-    const y = -Math.sin(rad) * dynamicRadius
-
-    return { x, y }
+    return calcRadialXY(idx, currentIdx, viewerImages.value.length)
   }
 
-    // 計算要顯示在放射型導航中的圖片
+  // 計算要顯示在放射型導航中的圖片（最多 7 張）。
   const getVisibleRadialImages = computed(() => {
     const total = viewerImages.value.length
     const current = currentImageIndex.value
+    if (total === 0) return []
 
-    // 如果圖片數量少於等於7張，顯示所有圖片
-    if (total <= 7) {
-      return viewerImages.value.map((img, index) => ({
-        ...img,
-        originalIndex: index,
-        displayIndex: index
-      }))
-    }
-
-    // 如果圖片數量超過7張，只顯示當前圖片周圍的7張圖片
-    const maxVisible = 7
-    const halfVisible = Math.floor(maxVisible / 2)
-
+    const { start, end } = computeRadialVisibleWindow(total, current, 7)
     const visibleImages = []
-    const startIndex = Math.max(0, current - halfVisible)
-    const endIndex = Math.min(total - 1, startIndex + maxVisible - 1)
-
-    // 如果接近末尾，從後往前調整
-    const actualStart = Math.max(0, endIndex - maxVisible + 1)
-
-    for (let i = actualStart; i <= endIndex; i++) {
+    for (let i = start; i <= end; i++) {
       visibleImages.push({
         ...viewerImages.value[i],
         originalIndex: i,
-        displayIndex: i - actualStart
+        displayIndex: i - start
       })
     }
-
     return visibleImages
   })
 
-  const lerp = (a: number, b: number, t: number) => {
-    return a + (b - a) * t
-  }
-
-  const easeOutQuad = (t: number) => {
-    return 1 - (1 - t) * (1 - t)
+  // 給動畫用的輕量版本（不帶 `displayIndex`，下游 `forEach((_, displayIdx) => ...)`
+  // 自然帶出來；保留最小 shape 就夠了）。
+  const getVisibleAt = (centerIdx: number) => {
+    const total = viewerImages.value.length
+    const { start, end } = computeRadialVisibleWindow(total, centerIdx, 7)
+    const out: Array<GalleryItem & { originalIndex: number }> = []
+    for (let i = start; i <= end; i++) {
+      out.push({ ...viewerImages.value[i], originalIndex: i })
+    }
+    return out
   }
 
   const startRadialAnimation = (oldIdx: number, newIdx: number) => {
@@ -405,38 +364,8 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
     animating.value = true
     animStart.value = performance.now()
 
-        // 獲取舊的和新的可見圖片列表
-    const oldVisibleImages = total <= 7 ?
-      viewerImages.value.map((img, idx) => ({ ...img, originalIndex: idx })) :
-      (() => {
-        const maxVisible = 7
-        const halfVisible = Math.floor(maxVisible / 2)
-        const startIndex = Math.max(0, oldIdx - halfVisible)
-        const endIndex = Math.min(total - 1, startIndex + maxVisible - 1)
-        const actualStart = Math.max(0, endIndex - maxVisible + 1)
-
-        const visibleImages = []
-        for (let i = actualStart; i <= endIndex; i++) {
-          visibleImages.push({ ...viewerImages.value[i], originalIndex: i })
-        }
-        return visibleImages
-      })()
-
-    const newVisibleImages = total <= 7 ?
-      viewerImages.value.map((img, idx) => ({ ...img, originalIndex: idx })) :
-      (() => {
-        const maxVisible = 7
-        const halfVisible = Math.floor(maxVisible / 2)
-        const startIndex = Math.max(0, newIdx - halfVisible)
-        const endIndex = Math.min(total - 1, startIndex + maxVisible - 1)
-        const actualStart = Math.max(0, endIndex - maxVisible + 1)
-
-        const visibleImages = []
-        for (let i = actualStart; i <= endIndex; i++) {
-          visibleImages.push({ ...viewerImages.value[i], originalIndex: i })
-        }
-        return visibleImages
-      })()
+    const oldVisibleImages = getVisibleAt(oldIdx)
+    const newVisibleImages = getVisibleAt(newIdx)
 
     const startCoords: Record<number, { x: number; y: number }> = {}
     const targetCoords: Record<number, { x: number; y: number }> = {}
