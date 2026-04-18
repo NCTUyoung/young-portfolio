@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-3">
     <div
       v-for="(item, index) in group.items"
@@ -23,7 +23,7 @@
       <div class="flex-shrink-0 flex items-center space-x-3">
         <div v-if="adminStore.manageCategory === 'photography' && (item as any).camera" class="text-right">
           <div class="text-xs text-stone-600 font-light mb-1">{{ (item as any).camera }}</div>
-          <div v-if="(item as any).tags" class="text-xs text-amber-600 font-light">
+          <div v-if="(item as any).tags" class="text-xs text-accent-600 font-light">
             {{ Array.isArray((item as any).tags) ? (item as any).tags.join(' ・ ') : (item as any).tags }}
           </div>
         </div>

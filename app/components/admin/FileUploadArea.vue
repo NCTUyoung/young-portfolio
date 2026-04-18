@@ -5,7 +5,7 @@
       :class="[
         'cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors duration-200',
         isDragging
-          ? 'border-amber-400 bg-amber-50/50 dark:border-amber-500 dark:bg-amber-950/30'
+          ? 'border-accent-400 bg-accent-50/50 dark:border-accent-500 dark:bg-accent-950/30'
           : 'border-stone-200 bg-stone-50/50 hover:border-stone-300 dark:border-stone-600 dark:bg-stone-800/40 dark:hover:border-stone-500'
       ]"
       @drop="handleDrop"
@@ -27,7 +27,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
         </svg>
         <div class="text-sm font-light text-stone-500 dark:text-stone-400">
-          <span class="cursor-pointer font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300">點擊選擇檔案</span>
+          <span class="cursor-pointer font-medium text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300">點擊選擇檔案</span>
           <span class="mx-1">或拖拽到此處</span>
         </div>
         <p class="text-xs font-light text-stone-400 dark:text-stone-500">

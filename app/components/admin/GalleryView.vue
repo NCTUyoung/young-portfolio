@@ -11,7 +11,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="搜尋圖片名稱…"
-          class="w-full rounded-lg border border-stone-200 bg-stone-50 py-1.5 pl-9 pr-3 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+          class="w-full rounded-lg border border-stone-200 bg-stone-50 py-1.5 pl-9 pr-3 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
         >
         <button v-if="searchQuery" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300" @click="searchQuery = ''">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
         :class="[
           'px-3 py-1.5 text-xs font-light rounded-lg border transition-all duration-200 flex items-center space-x-1.5',
           batchMode
-            ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950/30'
+            ? 'border-accent-200 bg-accent-50 text-accent-700 hover:bg-accent-100 dark:border-accent-800 dark:bg-accent-950/50 dark:text-accent-300 dark:hover:bg-accent-950/30'
             : 'border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700'
         ]"
         @click="toggleBatchMode"
@@ -91,7 +91,7 @@
               <div class="min-w-0">
                 <div class="flex items-center space-x-2">
                   <h4 class="text-sm font-light text-stone-800 dark:text-stone-100">{{ group.eventName }}</h4>
-                  <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-light text-amber-700 dark:bg-amber-900/50 dark:text-amber-200">
+                  <span class="inline-flex items-center rounded-full bg-accent-100 px-2 py-0.5 text-xs font-light text-accent-700 dark:bg-accent-900/50 dark:text-accent-200">
                     {{ group.items.length }} 張
                   </span>
                 </div>
@@ -107,7 +107,7 @@
               <!-- 批次：全選/取消 -->
               <button
                 v-if="batchMode"
-                class="px-2 py-1 text-xs font-light text-stone-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                class="px-2 py-1 text-xs font-light text-stone-500 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors"
                 :title="isGroupAllSelected(group) ? '取消全選' : '全選此事件'"
                 @click="toggleSelectGroup(group)"
               >
@@ -127,7 +127,7 @@
 
               <!-- 新增圖片到此事件 -->
               <button
-                class="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                class="p-1.5 text-stone-400 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors"
                 title="新增圖片到此事件"
                 @click="$emit('switchToUpload', group.eventName)"
               >
@@ -167,8 +167,8 @@
               :class="[
                 'group relative aspect-square overflow-hidden rounded-xl bg-stone-100 transition-all duration-200 dark:bg-stone-800',
                 adminStore.editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
-                selectedFiles.has(item.filename) ? 'ring-2 ring-amber-400' : 'hover:shadow-md',
-                dragOverFilename === item.filename && dragEventName === group.eventName ? 'ring-2 ring-amber-300 opacity-70' : ''
+                selectedFiles.has(item.filename) ? 'ring-2 ring-accent-400' : 'hover:shadow-md',
+                dragOverFilename === item.filename && dragEventName === group.eventName ? 'ring-2 ring-accent-300 opacity-70' : ''
               ]"
               @dragstart="handleDragStart(item.filename, group.eventName)"
               @dragover.prevent
@@ -192,8 +192,8 @@
                   :class="[
                     'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
                     selectedFiles.has(item.filename)
-                      ? 'bg-amber-500 border-amber-500'
-                      : 'bg-white/80 border-stone-300 hover:border-amber-400'
+                      ? 'bg-accent-500 border-accent-500'
+                      : 'bg-white/80 border-stone-300 hover:border-accent-400'
                   ]"
                   @click="toggleSelectFile(item.filename)"
                 >
@@ -250,8 +250,8 @@
                   :class="[
                     'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all flex-shrink-0',
                     selectedFiles.has(item.filename)
-                      ? 'bg-amber-500 border-amber-500'
-                      : 'border-stone-300 hover:border-amber-400'
+                      ? 'bg-accent-500 border-accent-500'
+                      : 'border-stone-300 hover:border-accent-400'
                   ]"
                   @click="toggleSelectFile(item.filename)"
                 >
@@ -299,7 +299,7 @@
         v-if="batchMode && selectedFiles.size > 0"
         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center space-x-4 bg-stone-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl"
       >
-        <span class="text-sm font-light">已選 <span class="text-amber-400 font-medium">{{ selectedFiles.size }}</span> 張</span>
+        <span class="text-sm font-light">已選 <span class="text-accent-400 font-medium">{{ selectedFiles.size }}</span> 張</span>
         <div class="w-px h-4 bg-stone-700"/>
         <button
           class="text-xs text-stone-400 hover:text-white transition-colors font-light"

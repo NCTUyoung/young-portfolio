@@ -94,7 +94,7 @@
 - **型別**：`types/gallery.ts` 為主；避免在元件內重複定義 props 型別，改 `import type`。
 - **ESLint**：`eslint.config.mjs` 在 `withNuxt()` 上追加 flat 區塊：`parserOptions.projectService: true`、`tsconfigRootDir` 指向 repo 根；`@typescript-eslint/consistent-type-imports` 設為 **warn**（`prefer: type-imports`）。避免 `typeof import('foo')` 型別註解，可改 `import type * as FooNS from 'foo'` + `typeof FooNS`。
 - **後台 UX**：`pages/admin.vue` 以 `pageReady` 控制首次雙分類載入完成後才顯示主內容；載入中顯示與前台類似的 loading；全域錯誤條（非 upload 分頁）可手動關閉。
-- **後台美感檢查（2026-04）**：對照 `.cursor/rules/design-aesthetic.mdc` 做了一輪截圖比對（7 張，dark/light，放 `docs/screenshots/admin-review/`），完整報告見 `docs/AESTHETIC_REVIEW_ADMIN.md`。已修兩處鐵律違反：(a) `GridView.vue` 編輯/刪除按鈕由 `bg-blue-500`／`bg-red-500` 鮮色圓鈕改成 stone 毛玻璃（編輯）＋ accent 毛玻璃（刪除語義），不再違反「色點稀有化」；(b) `admin.vue` 頁頂 header 由 `bg-stone-950` 粗色塊 + amber 粗直條改走「毛玻璃 + stone 直條 + jp-hairline 底線」，與 `default.vue` nav 同語言。**未處理的 P2**：全案 `amber-*` → `accent-*`（40+ 處），是整站色調決策，留給使用者批准再動。
+- **後台美感檢查（2026-04）**：對照 `.cursor/rules/design-aesthetic.mdc` 做了一輪截圖比對（7 張 before + 2 張 after，dark/light，放 `docs/screenshots/admin-review/`），完整報告見 `docs/AESTHETIC_REVIEW_ADMIN.md`。已修三處：(a) `GridView.vue` 編輯/刪除按鈕由 `bg-blue-500`／`bg-red-500` 鮮色圓鈕改成 stone 毛玻璃（編輯）＋ accent 毛玻璃（刪除語義），不再違反「色點稀有化」；(b) `admin.vue` 頁頂 header 由 `bg-stone-950` 粗色塊 + amber 粗直條改走「毛玻璃 + stone 直條 + jp-hairline 底線」，與 `default.vue` nav 同語言；(c) **全案 `amber-*` → `accent-*`（118 處 / 10 支 admin 檔）**，色相由「琥珀黃 `#f59e0b`」轉為指示書要求的「赤陶 `#db7b2e`」，`shared/types/gallery.ts` 的 `amber` 色票 key 屬 domain token 保留不動。前台（`default.vue` 與 `components/gallery/**`）本無 `amber-*`，故不受影響。
 
 ### P3（長期 / 願景）
 

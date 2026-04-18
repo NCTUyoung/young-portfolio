@@ -12,7 +12,7 @@
               v-model="adminStore.eventMode"
               type="radio"
               value="new"
-              class="mr-3 text-amber-500 focus:ring-amber-400"
+              class="mr-3 text-accent-500 focus:ring-accent-400"
             >
             <span class="text-sm font-light text-stone-700 dark:text-stone-200">建立新事件</span>
           </label>
@@ -21,7 +21,7 @@
               v-model="adminStore.eventMode"
               type="radio"
               value="existing"
-              class="mr-3 text-amber-500 focus:ring-amber-400"
+              class="mr-3 text-accent-500 focus:ring-accent-400"
             >
             <span class="text-sm font-light text-stone-700 dark:text-stone-200">加入現有事件</span>
           </label>
@@ -35,7 +35,7 @@
         </label>
         <select
           v-model="adminStore.selectedExistingEvent"
-          class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+          class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
         >
           <option value="">請選擇事件…</option>
           <option v-for="event in availablePhotographyEvents" :key="event" :value="event">
@@ -52,7 +52,7 @@
         <input
           v-model="adminStore.eventName"
           type="text"
-          class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+          class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
           placeholder="例如：春日街拍、2024 新北耶誕城"
         >
       </div>
@@ -64,7 +64,7 @@
           <input
             v-model="adminStore.eventDescription"
             type="text"
-            class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+            class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
             placeholder="例如：城市日常生活紀錄"
           >
         </div>
@@ -73,21 +73,21 @@
           <input
             v-model="adminStore.eventLocation"
             type="text"
-            class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+            class="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
             placeholder="例如：台北市"
           >
         </div>
       </div>
 
       <!-- 現有事件提示 -->
-      <div v-if="adminStore.eventMode === 'existing' && adminStore.selectedExistingEvent" class="rounded-lg border border-amber-100 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/40">
+      <div v-if="adminStore.eventMode === 'existing' && adminStore.selectedExistingEvent" class="rounded-lg border border-accent-100 bg-accent-50 p-4 dark:border-accent-900/50 dark:bg-accent-950/40">
         <div class="flex items-start space-x-3">
-          <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-accent-500 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <p class="mb-1 text-xs font-medium text-amber-800 dark:text-amber-200">加入現有事件</p>
-            <p class="text-xs font-light text-amber-700 dark:text-amber-300/90">
+            <p class="mb-1 text-xs font-medium text-accent-800 dark:text-accent-200">加入現有事件</p>
+            <p class="text-xs font-light text-accent-700 dark:text-accent-300/90">
               圖片將被加入「{{ adminStore.selectedExistingEvent }}」，並保留該事件的原有設定。
             </p>
           </div>

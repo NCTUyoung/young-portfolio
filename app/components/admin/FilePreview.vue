@@ -2,7 +2,7 @@
   <div v-if="adminStore.selectedFiles.length > 0">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">
-        已選擇圖片 <span class="font-medium text-amber-600 dark:text-amber-400">{{ adminStore.selectedFiles.length }}</span>
+        已選擇圖片 <span class="font-medium text-accent-600 dark:text-accent-400">{{ adminStore.selectedFiles.length }}</span>
       </h3>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -36,7 +36,7 @@
             <input
               v-model="file.title"
               type="text"
-              class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+              class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
               :placeholder="file.name.split('.')[0]"
             >
           </div>
@@ -45,7 +45,7 @@
             <textarea
               v-model="file.content"
               rows="2"
-              class="w-full resize-none rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+              class="w-full resize-none rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
               placeholder="圖片描述…"
             />
           </div>
@@ -59,7 +59,7 @@
               <input
                 v-model="file.creationDate"
                 type="date"
-                class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
               >
               <p class="mt-1 text-xs font-light text-stone-400 dark:text-stone-500">已從檔案修改時間自動推斷，可依需求調整</p>
             </div>
@@ -67,7 +67,7 @@
               <label class="block text-xs font-light text-stone-400 mb-1 tracking-wide">顏色標籤</label>
               <select
                 v-model="file.color"
-                class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
               >
                 <option value="blue">藍色</option>
                 <option value="red">紅色</option>
@@ -86,7 +86,7 @@
             <input
               v-model="file.tags"
               type="text"
-              class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
+              class="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-700 placeholder-stone-300 focus:border-transparent focus:outline-none focus:ring-1 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:placeholder-stone-500"
               placeholder="例如：人像,街拍"
             >
             <p class="mt-1 text-xs font-light text-stone-400 dark:text-stone-500">相機資訊會自動從照片讀取</p>

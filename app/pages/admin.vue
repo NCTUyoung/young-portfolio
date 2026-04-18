@@ -28,7 +28,7 @@
             :class="[
               'py-4 px-5 border-b-2 font-light text-sm transition-all duration-200 flex items-center space-x-2',
               activeTab === tab.id
-                ? 'border-amber-500 text-stone-900 dark:text-stone-50'
+                ? 'border-accent-500 text-stone-900 dark:text-stone-50'
                 : 'border-transparent text-stone-400 hover:border-stone-300 hover:text-stone-700 dark:text-stone-500 dark:hover:border-stone-600 dark:hover:text-stone-200'
             ]"
             @click="setActiveTab(tab.id)"
@@ -49,7 +49,7 @@
             <span>{{ tab.name }}</span>
             <span
 v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
-                  class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                  class="inline-flex items-center rounded-full bg-accent-100 px-2 py-0.5 text-xs font-medium text-accent-800 dark:bg-accent-900/50 dark:text-accent-200">
               {{ adminStore.selectedFiles.length }}
             </span>
           </button>
@@ -85,9 +85,9 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
         aria-live="polite"
       >
         <div class="relative w-10 h-10">
-          <div class="absolute inset-0 border border-amber-300/60 rounded-full animate-spin dark:border-amber-500/50" style="animation-duration: 2s;" />
+          <div class="absolute inset-0 border border-accent-300/60 rounded-full animate-spin dark:border-accent-500/50" style="animation-duration: 2s;" />
           <div
-            class="absolute inset-[6px] border border-amber-400/40 rounded-full animate-spin dark:border-amber-400/35"
+            class="absolute inset-[6px] border border-accent-400/40 rounded-full animate-spin dark:border-accent-400/35"
             style="animation-duration: 3s; animation-direction: reverse;"
           />
         </div>
@@ -119,7 +119,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                   :class="[
                     'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-300 ease-out',
                     adminStore.overviewCategory === cat.id
-                      ? 'w-full bg-gradient-to-r from-transparent via-amber-500 to-transparent'
+                      ? 'w-full bg-gradient-to-r from-transparent via-accent-500 to-transparent'
                       : 'w-0 bg-transparent'
                   ]"
                 />
@@ -137,7 +137,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <div class="hidden h-8 w-px self-center bg-gradient-to-b from-transparent via-stone-200 to-transparent dark:via-stone-600 sm:block" />
             <div class="flex min-w-0 items-baseline gap-3">
               <span class="shrink-0 text-xs font-light uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">本月</span>
-              <span class="font-extralight text-2xl tabular-nums text-amber-600 md:text-3xl dark:text-amber-400">{{ adminStore.overviewStats.recentUploads }}</span>
+              <span class="font-extralight text-2xl tabular-nums text-accent-600 md:text-3xl dark:text-accent-400">{{ adminStore.overviewStats.recentUploads }}</span>
             </div>
             <div class="hidden h-8 w-px self-center bg-gradient-to-b from-transparent via-stone-200 to-transparent dark:via-stone-600 sm:block" />
             <div class="flex min-w-0 items-baseline gap-3">
@@ -168,7 +168,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               >
                 <span class="text-xs font-light tabular-nums text-stone-400 dark:text-stone-500">{{ month.count }}</span>
                 <div
-                  class="min-h-[2px] w-full rounded-sm bg-gradient-to-t from-amber-400/80 to-amber-300/50 transition-all duration-500 dark:from-amber-500/70 dark:to-amber-600/40"
+                  class="min-h-[2px] w-full rounded-sm bg-gradient-to-t from-accent-400/80 to-accent-300/50 transition-all duration-500 dark:from-accent-500/70 dark:to-accent-600/40"
                   :style="{ height: month.count > 0 ? `${Math.max(6, (month.count / maxMonthCount) * 72)}px` : '2px' }"
                 />
                 <span class="text-[0.65rem] font-light tracking-wider text-stone-400 dark:text-stone-500">{{ month.label }}</span>
@@ -186,7 +186,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 class="group relative aspect-square overflow-hidden cursor-pointer"
                 :title="item.title"
               >
-                <div class="absolute inset-0 border border-stone-100 transition-colors duration-300 group-hover:border-amber-300/50 dark:border-stone-700 dark:group-hover:border-amber-500/40" />
+                <div class="absolute inset-0 border border-stone-100 transition-colors duration-300 group-hover:border-accent-300/50 dark:border-stone-700 dark:group-hover:border-accent-500/40" />
                 <img
                   :src="getThumbPath(item.filename, 400)"
                   :alt="item.title"
@@ -219,7 +219,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               <label class="text-sm font-light text-stone-500 dark:text-stone-400">分類：</label>
               <select
                 v-model="adminStore.uploadCategory"
-                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                 @change="adminStore.handleUploadCategoryChange(adminStore.uploadCategory)"
               >
                 <option value="gallery">繪圖作品</option>
@@ -243,7 +243,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               </button>
               <button
                 :disabled="!adminStore.canUpload || adminStore.uploading"
-                class="rounded-lg border border-transparent bg-stone-800 px-5 py-2 text-sm font-light text-white transition-all duration-200 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-amber-700 dark:hover:bg-amber-600 dark:focus:ring-amber-500 dark:focus:ring-offset-stone-900"
+                class="rounded-lg border border-transparent bg-stone-800 px-5 py-2 text-sm font-light text-white transition-all duration-200 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-accent-700 dark:hover:bg-accent-600 dark:focus:ring-accent-500 dark:focus:ring-offset-stone-900"
                 @click="adminStore.uploadFiles"
               >
                 <span v-if="adminStore.uploading" class="flex items-center space-x-2">
@@ -255,7 +255,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 </span>
                 <span v-else class="flex items-center space-x-2">
                   <span>上傳圖片</span>
-                  <span v-if="adminStore.selectedFiles.length > 0" class="px-1.5 py-0.5 bg-amber-500 text-xs text-white rounded-full">
+                  <span v-if="adminStore.selectedFiles.length > 0" class="px-1.5 py-0.5 bg-accent-500 text-xs text-white rounded-full">
                     {{ adminStore.selectedFiles.length }}
                   </span>
                 </span>
@@ -272,7 +272,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-200'
                 ]"
               >
-                <svg v-if="adminStore.messageType === 'success'" class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="adminStore.messageType === 'success'" class="w-5 h-5 text-accent-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <svg v-else class="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,7 +294,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <div class="flex flex-wrap items-center gap-2">
               <select
                 v-model="adminStore.manageCategory"
-                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                 @change="adminStore.handleManageCategoryChange(adminStore.manageCategory)"
               >
                 <option value="gallery">繪圖作品</option>
@@ -303,7 +303,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
 
               <select
                 v-model="adminStore.selectedEvent"
-                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
               >
                 <option value="">所有事件</option>
                 <option v-for="event in adminStore.availableEvents" :key="event" :value="event">
@@ -374,7 +374,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <span class="text-stone-200 dark:text-stone-600">•</span>
             <span><span class="font-medium text-stone-700 dark:text-stone-200">{{ adminStore.groupedManageData.length }}</span> 個事件</span>
             <span v-if="adminStore.selectedEvent" class="text-stone-200 dark:text-stone-600">•</span>
-            <span v-if="adminStore.selectedEvent" class="font-medium text-amber-600 dark:text-amber-400">
+            <span v-if="adminStore.selectedEvent" class="font-medium text-accent-600 dark:text-accent-400">
               篩選：{{ adminStore.selectedEvent }}
             </span>
           </div>
@@ -398,7 +398,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                   <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">預設分類</label>
                   <select
                     v-model="adminStore.globalSettings.defaultUploadCategory"
-                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                     @change="adminStore.updateGlobalSettings({ defaultUploadCategory: adminStore.globalSettings.defaultUploadCategory })"
                   >
                     <option value="gallery">繪圖作品</option>
@@ -413,7 +413,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                         v-model="adminStore.globalSettings.defaultViewMode"
                         type="radio"
                         value="grid"
-                        class="mr-2 text-amber-500 focus:ring-amber-400"
+                        class="mr-2 text-accent-500 focus:ring-accent-400"
                         @change="adminStore.updateGlobalSettings({ defaultViewMode: 'grid' })"
                       >
                       網格
@@ -423,7 +423,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                         v-model="adminStore.globalSettings.defaultViewMode"
                         type="radio"
                         value="list"
-                        class="mr-2 text-amber-500 focus:ring-amber-400"
+                        class="mr-2 text-accent-500 focus:ring-accent-400"
                         @change="adminStore.updateGlobalSettings({ defaultViewMode: 'list' })"
                       >
                       列表
@@ -439,7 +439,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
               <div class="space-y-5">
                 <div>
                   <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">
-                    圖片品質：<span class="text-amber-600 dark:text-amber-400">{{ adminStore.globalSettings.imageQuality }}%</span>
+                    圖片品質：<span class="text-accent-600 dark:text-accent-400">{{ adminStore.globalSettings.imageQuality }}%</span>
                   </label>
                   <input
                     v-model="adminStore.globalSettings.imageQuality"
@@ -447,7 +447,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     min="60"
                     max="100"
                     step="5"
-                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-amber-500 dark:bg-stone-700"
+                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-[#db7b2e] dark:bg-stone-700"
                     @change="adminStore.updateGlobalSettings({ imageQuality: parseInt(adminStore.globalSettings.imageQuality.toString()) })"
                   >
                   <div class="mt-1 flex justify-between text-xs text-stone-400 dark:text-stone-500">
@@ -456,7 +456,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                 </div>
                 <div>
                   <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">
-                    批次大小：<span class="text-amber-600 dark:text-amber-400">{{ adminStore.globalSettings.batchSize }}</span>
+                    批次大小：<span class="text-accent-600 dark:text-accent-400">{{ adminStore.globalSettings.batchSize }}</span>
                   </label>
                   <input
                     v-model="adminStore.globalSettings.batchSize"
@@ -464,7 +464,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     min="10"
                     max="50"
                     step="5"
-                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-amber-500 dark:bg-stone-700"
+                    class="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-[#db7b2e] dark:bg-stone-700"
                     @change="adminStore.updateGlobalSettings({ batchSize: parseInt(adminStore.globalSettings.batchSize.toString()) })"
                   >
                   <div class="mt-1 flex justify-between text-xs text-stone-400 dark:text-stone-500">
@@ -487,7 +487,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
                     <input
 v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="peer sr-only"
                       @change="adminStore.updateGlobalSettings({ autoBackup: adminStore.globalSettings.autoBackup })" >
-                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-amber-300 dark:bg-stone-600"/>
+                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-accent-300 dark:bg-stone-600"/>
                   </label>
                 </div>
                 <div class="flex items-center justify-between">
@@ -499,7 +499,7 @@ v-model="adminStore.globalSettings.autoBackup" type="checkbox" class="peer sr-on
                     <input
 v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="peer sr-only"
                       @change="adminStore.updateGlobalSettings({ showImageInfo: adminStore.globalSettings.showImageInfo })" >
-                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-amber-300 dark:bg-stone-600"/>
+                    <div class="peer h-5 w-10 rounded-full bg-stone-200 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-accent-300 dark:bg-stone-600"/>
                   </label>
                 </div>
               </div>
@@ -514,13 +514,13 @@ v-model="adminStore.globalSettings.showImageInfo" type="checkbox" class="peer sr
                   <div class="flex space-x-4">
                     <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
-v-model="adminStore.globalSettings.theme" type="radio" value="light" class="mr-2 text-amber-500 focus:ring-amber-400"
+v-model="adminStore.globalSettings.theme" type="radio" value="light" class="mr-2 text-accent-500 focus:ring-accent-400"
                         @change="adminStore.updateGlobalSettings({ theme: 'light' })" >
                       淺色
                     </label>
                     <label class="flex cursor-pointer items-center text-sm font-light text-stone-600 dark:text-stone-300">
                       <input
-v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 text-amber-500 focus:ring-amber-400"
+v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 text-accent-500 focus:ring-accent-400"
                         @change="adminStore.updateGlobalSettings({ theme: 'dark' })" >
                       深色
                     </label>
@@ -530,7 +530,7 @@ v-model="adminStore.globalSettings.theme" type="radio" value="dark" class="mr-2 
                   <label class="mb-2 block text-xs font-light uppercase tracking-wider text-stone-500 dark:text-stone-400">語言</label>
                   <select
                     v-model="adminStore.globalSettings.language"
-                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
+                    class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200"
                     @change="adminStore.updateGlobalSettings({ language: adminStore.globalSettings.language })"
                   >
                     <option value="zh-TW">繁體中文</option>

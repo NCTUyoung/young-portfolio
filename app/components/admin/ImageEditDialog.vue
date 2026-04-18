@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <Teleport to="body">
     <div v-if="isVisible" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="cancel">
       <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
@@ -37,7 +37,7 @@
                 <input
                   v-model="formData.title"
                   type="text"
-                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent"
                   placeholder="請輸入圖片標題"
                 >
               </div>
@@ -47,7 +47,7 @@
                 <textarea
                   v-model="formData.content"
                   rows="3"
-                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent resize-none"
                   placeholder="請輸入圖片描述"
                 />
               </div>
@@ -59,7 +59,7 @@
                 <input
                   v-model="formData.date"
                   type="date"
-                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent"
                 >
               </div>
 
@@ -68,7 +68,7 @@
                 <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">顏色標籤</label>
                 <select
                   v-model="formData.color"
-                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent"
                 >
                   <option value="blue">藍色</option>
                   <option value="red">紅色</option>
@@ -86,7 +86,7 @@
                 <input
                   v-model="formData.tagsString"
                   type="text"
-                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent"
                   placeholder="例如：人像,街拍"
                 >
                 <p class="text-xs text-stone-400 font-light mt-1">相機設定無法修改，會自動從照片讀取</p>

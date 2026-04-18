@@ -13,7 +13,7 @@
 
       <!-- 事件數量 -->
       <div class="group">
-        <div class="text-3xl font-extralight text-amber-600 mb-1">
+        <div class="text-3xl font-extralight text-accent-600 mb-1">
           {{ adminStore.groupedManageData.length }}
         </div>
         <div class="text-xs text-stone-500 font-light tracking-wider uppercase">

@@ -1,9 +1,12 @@
 # Admin 後台 — 美感檢查報告
 
 對照 `.cursor/rules/design-aesthetic.mdc`，逐項檢視 `/admin` 頁現況與落差。
-截圖於 `docs/screenshots/admin-review/`（dark / light 兩組共 7 張）。
+截圖分兩批：
 
-截圖檔：
+- **修改前**（`docs/screenshots/admin-review/`）：dark / light 兩組共 7 張，用作落差盤點。
+- **修改後**（`docs/screenshots/admin-review/after/`）：P2 `amber → accent` 批改後的驗證截圖。
+
+修改前（before）：
 
 - 概覽（dark）：`admin-01-overview-dark.png`
 - 管理（dark）：`admin-02-manage-dark.png`
@@ -13,6 +16,11 @@
 - 管理・編輯模式（light）：`admin-06-manage-editmode-light.png`
 - 卡片編輯/刪除 hover（light）：`admin-07-card-edit-hover-light.png`
 
+修改後（after，P2）：
+
+- 概覽（dark）：`after/admin-overview-dark.png`（柱狀/統計數字/「近 6 個月」eyebrow 改為赤陶 `#db7b2e`）
+- 管理（light）：`after/admin-01-manage-light.png`（active tab 底線、事件數量標籤改赤陶）
+
 ---
 
 ## 1. 檢查對照表
@@ -20,10 +28,10 @@
 | # | 指示書條目 | 現況 | 判定 | 行動 |
 |---|---|---|---|---|
 | 1 | dark:* 雙寫 | admin.vue + 11 支子元件皆雙寫 | ✅ 符合 | — |
-| 2 | **黑白灰 + 一點赤陶（`accent`）**；禁多色 dot | admin 頁廣泛用 tailwind 內建 **`amber-*`**（40+ 處），而指示書要求 `accent-*`（`#db7b2e` 赤陶系）。`amber-500 = #f59e0b` 偏黃、`accent-500 = #db7b2e` 偏赤，視覺差約 20% hue | ⚠️ 偏離，未處理 | **P2** 再擇期全案替換，需使用者批准 |
+| 2 | **黑白灰 + 一點赤陶（`accent`）**；禁多色 dot | admin 10 支檔（pages/admin.vue + components/admin/**）原廣泛用 tailwind 內建 `amber-*`（118 處），已**全案改為 `accent-*`**（`#db7b2e` 赤陶）。`shared/types/gallery.ts` 的 `amber: 'bg-amber-500'` 是「繪圖作品色票分類 key」屬語義 token，**保留不動** | ✅ 本輪已修（P2 完成） | — |
 | 3 | **色點稀有化**；不用亮色大按鈕 | `gallery/GridView.vue` 編輯模式浮現 `bg-blue-500` 圓鈕 + `bg-red-500` 圓鈕，兩個鮮色擺同格 | ❌ 違反 | **已修**：改 stone 邊框＋白底毛玻璃（編輯）＋ accent 邊框／accent 文字（刪除），語義保留但色點降強度 |
 | 4 | **Hairline > 粗線** | 頁頂 `<header>` 用 `bg-stone-950` 整條粗色塊，搭 `w-1 h-6 bg-amber-500` 粗直條 | ⚠️ 偏離 | **已修**：header 改毛玻璃 `bg-stone-50/80 dark:bg-stone-900/60 backdrop-blur-md`，直條改 `bg-stone-900 dark:bg-stone-100` 與 `default.vue` 品牌 Logo 對齊，底部加 `jp-hairline` |
-| 5 | CTA 低調（`text + underline on hover` 或 `jp-frame` 包細邊） | 上傳送出按鈕 light `bg-stone-800`、dark `bg-amber-700` | ✅ 可接受 | dark 可改 `dark:bg-accent-700` 連動 #2 |
+| 5 | CTA 低調（`text + underline on hover` 或 `jp-frame` 包細邊） | 上傳送出按鈕 light `bg-stone-800`、dark 已隨 #2 批改為 `dark:bg-accent-700` | ✅ 符合 | — |
 | 6 | 節標題範式：`jp-eyebrow` → `jp-section-title` → `jp-section-ruby` | Overview 有 `jp-section-label`；其他 3 個 tab 用普通 `<h2 class="text-xl font-light">` | ⚠️ 局部 | **P3** 4 個 tab 的 `<h2>` 可加上 eyebrow + ruby，待整套語系確定後再做 |
 | 7 | 余白優先、`py-20 md:py-28` 起跳 | Overview / 管理 / 上傳 / 設定 各走 `p-8 md:p-10`，密度明顯高於前台節 | ⚠️ 意圖性偏離 | 後台是工具箱型頁面、使用者只有站長，密度可容忍；**不處理** |
 | 8 | 圖片走 `useImagePath.getThumbPath` | Overview 最近上傳 / Manage / UploadArea 皆已用 | ✅ 符合 | — |
@@ -57,9 +65,20 @@
   - 底線加 `<div class="jp-hairline w-full" />`，走指示書規定的「極細漸淡分隔線」。
   - 所有 light/dark 配色成對雙寫。
 
-### 2.3 覆蓋測試
+### 2.3 `app/pages/admin.vue` + 9 支 admin 子元件 — `amber-*` → `accent-*`（P2）
+
+- 原：admin 範圍內 `amber-50/100/200/300/400/500/600/700/800/900/950` 共 **118 處**，色相偏「琥珀黃」`#f59e0b`，與指示書要求的「赤陶 accent」`#db7b2e` 有明顯落差。
+- 改：對 `app/pages/admin.vue` 與 `app/components/admin/**/*.vue`（9 支）做一對一色階替換：
+  - `text-amber-X` → `text-accent-X`、`bg-amber-X` → `bg-accent-X`
+  - `ring-amber-X` / `border-amber-X` / `from-amber-X` / `via-amber-X` / `to-amber-X` / `peer-checked:bg-amber-X` / `peer-focus:ring-amber-X` 同步
+  - `accent-amber-500`（CSS `accent-color` utility）改 `accent-[#db7b2e]`，避免 `accent-accent-500` 的 token 歧義
+- **刻意保留**：`shared/types/gallery.ts` 的 `amber: 'bg-amber-500'` 是**繪圖作品顏色分類 key**（前台 UI 用來對應「淡黃系配色的作品群」），屬 domain token、非強調色，不動。
+- 前台（`layouts/default.vue`、`app/pages/**` 非 admin 頁、`app/components/gallery/**`）**無 `amber-*` 使用**，故本輪替換不影響前台視覺。
+
+### 2.4 覆蓋測試
 
 - `tests/e2e/admin.spec.ts` 5 條 smoke 全綠（原樣未動 selector；修的是視覺而非結構）。
+- `npm run lint` 0 錯；`npm test` 79/79；`npm run test:e2e` 11/11；`npm run build` 14 routes 全 prerender 成功。
 
 ---
 
@@ -67,9 +86,8 @@
 
 | 優先 | 項目 | 規模 | 備註 |
 |---|---|---|---|
-| **P2** | 全案 `amber-*` → `accent-*` 替換 | 40+ 處跨 `admin.vue` / 11 支 admin 子元件 / `default.vue` | 色會從「偏黃琥珀」變成「偏赤陶」，是整站色調決策；建議和「要不要整站跟進（前台）」一起討論再動 |
 | **P3** | 4 個 admin tab `<h2>` 加 `jp-eyebrow` / `jp-section-ruby` | 4 處 | 錦上添花，後台功能頁可延後 |
-| **P3** | 上傳送出按鈕 dark `bg-amber-700` → `bg-accent-700` | 1 處 | 與 P2 連動一起做 |
+| **P3** | `stores/admin.ts` / `stores/imageViewer.ts` 拆子 store | 2 個 store | 已有 e2e smoke 底；等需求實際推到 store 分裂再動，避免重構風險 |
 
 ---
 
