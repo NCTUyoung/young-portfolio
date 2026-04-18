@@ -9,6 +9,19 @@ export type GalleryShareMeta = {
 }
 
 /**
+ * JSON-LD schema 內的作者資訊，插進 `ImageObject.creator` 讓 Google 圖搜
+ * 把作品連回作者本人（配合首頁的 `Person` schema 形成閉環）。
+ */
+export interface GallerySchemaAuthor {
+  name: string
+  url: string
+  alternateName?: string
+}
+
+/** 單張 Image 多大上限；超過只取 cover + 前 N 張，避免 schema JSON 變肥。 */
+const EVENT_IMAGE_CAP = 20
+
+/**
  * Absolute URL for static assets under site (path from useImagePath / getThumbPath).
  */
 export function absoluteUrlFromSitePath (siteUrl: string, path: string): string {
@@ -41,7 +54,47 @@ function truncate (s: string, max: number): string {
 }
 
 /**
- * OG / Twitter / JSON-LD for gallery deep links (?image= / ?event=).
+ * 把 GalleryItem 轉成 schema.org/ImageObject。
+ * - `creator`（若提供）：把每張作品綁回 `Person` schema，形成作者知識圖譜閉環。
+ * - `dateCreated`：用 img.time（ISO-ish）。
+ * - `keywords`：photography tags。
+ * - `thumbnailUrl`：攝影帶 800w webp 縮圖；電繪本身就是輕量 webp 省略。
+ */
+function buildImageObject (
+  img: GalleryItem,
+  absPath: (f: string) => string,
+  absThumb800: (f: string) => string,
+  creator?: GallerySchemaAuthor
+): Record<string, unknown> {
+  const schema: Record<string, unknown> = {
+    '@type': 'ImageObject',
+    name: img.title,
+    contentUrl: absPath(img.filename)
+  }
+  if (img.description) schema.description = img.description
+  if (img.time) schema.dateCreated = img.time
+  if (img.category === 'photography') {
+    schema.thumbnailUrl = absThumb800(img.filename)
+    if (img.tags && img.tags.length > 0) schema.keywords = img.tags
+  }
+  if (creator) {
+    schema.creator = {
+      '@type': 'Person',
+      name: creator.name,
+      url: creator.url,
+      ...(creator.alternateName ? { alternateName: creator.alternateName } : {})
+    }
+  }
+  return schema
+}
+
+/**
+ * OG / Twitter / JSON-LD for gallery pages。
+ *
+ * 三種情境：
+ * 1. `?image=<id>` → 單張 `ImageObject`（附 creator / keywords / dateCreated）
+ * 2. `?event=<name>` → `ImageGallery`（`hasPart` 列多張作 ImageObject，上限 EVENT_IMAGE_CAP）
+ * 3. 預設（無 query）→ `CollectionPage`，describes 整個類別；不列作品避免太重
  */
 export function resolveGalleryShareMeta (opts: {
   category: 'all' | 'digital' | 'photography'
@@ -54,6 +107,8 @@ export function resolveGalleryShareMeta (opts: {
   defaultOgImageAbs: string
   defaultTitle: string
   defaultDescription: string
+  pageUrl?: string
+  author?: GallerySchemaAuthor
 }): GalleryShareMeta {
   const {
     category,
@@ -65,7 +120,9 @@ export function resolveGalleryShareMeta (opts: {
     absThumb800,
     defaultOgImageAbs,
     defaultTitle,
-    defaultDescription
+    defaultDescription,
+    pageUrl,
+    author
   } = opts
 
   if (imageId) {
@@ -76,11 +133,7 @@ export function resolveGalleryShareMeta (opts: {
       const description = truncate(img.description || defaultDescription, 160)
       const jsonLd = {
         '@context': 'https://schema.org',
-        '@type': 'ImageObject',
-        name: img.title,
-        description: img.description || undefined,
-        contentUrl: absPath(img.filename),
-        thumbnailUrl: img.category === 'photography' ? absThumb800(img.filename) : undefined
+        ...buildImageObject(img, absPath, absThumb800, author)
       }
       return {
         title,
@@ -109,14 +162,16 @@ export function resolveGalleryShareMeta (opts: {
     const jsonLd = cover
       ? {
           '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
+          '@type': 'ImageGallery',
           name: title,
-          description: description,
-          hasPart: {
-            '@type': 'ImageObject',
-            name: cover.title,
-            contentUrl: absPath(cover.filename)
-          }
+          description,
+          ...(pageUrl ? { url: pageUrl } : {}),
+          ...(eventInfo?.location ? { contentLocation: { '@type': 'Place', name: eventInfo.location } } : {}),
+          image: absPath(cover.filename),
+          numberOfItems: inEvent.length,
+          hasPart: inEvent
+            .slice(0, EVENT_IMAGE_CAP)
+            .map(img => buildImageObject(img, absPath, absThumb800, author))
         }
       : null
     return {
@@ -128,11 +183,32 @@ export function resolveGalleryShareMeta (opts: {
     }
   }
 
+  // 預設頁：沒帶 query 的 /gallery、/gallery/photography、/gallery/digital
+  // 吐一個頁面層級的 `CollectionPage`，`about` 指向作者（Person）。
+  const defaultJsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: defaultTitle,
+    description: defaultDescription,
+    ...(pageUrl ? { url: pageUrl } : {}),
+    ...(author
+      ? {
+          about: {
+            '@type': 'Person',
+            name: author.name,
+            url: author.url,
+            ...(author.alternateName ? { alternateName: author.alternateName } : {})
+          }
+        }
+      : {}),
+    numberOfItems: allWorks.length
+  }
+
   return {
     title: defaultTitle,
     description: defaultDescription,
     ogImage: defaultOgImageAbs,
     ogImageAlt: defaultTitle,
-    jsonLd: null
+    jsonLd: defaultJsonLd
   }
 }

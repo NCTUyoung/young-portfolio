@@ -514,6 +514,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useImagePath } from '~/composables/useImagePath'
+import { SEO_CONFIG, SOCIAL_LINKS } from '~~/shared/config/constants'
+import {
+  buildPersonSchema,
+  buildWebSiteSchema,
+  toHeadScripts
+} from '~/utils/siteSchema'
 
 const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 const { observeAll } = useScrollReveal()
@@ -623,5 +629,34 @@ useSeoMeta({
   twitterDescription:
     'NCTU Young 的個人作品集：數位電繪與攝影。圖片庫依類別與事件瀏覽，攝影附地圖與拍攝資訊。',
   twitterImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/WBC%E6%9D%B1%E4%BA%AC%20%E5%8F%B0%E6%BE%B3/DSC_9877-%E7%B7%A8%E8%BC%AF-1.jpg'
+})
+
+// ===== JSON-LD 結構化資料（Person + WebSite）=====
+// Google / Bing 會把 Person 的 sameAs 連向 GitHub/IG/Threads，形成作者
+// knowledge graph；ImageGallery / ImageObject 會以 SEO_CONFIG.siteUrl 作 Person
+// 主標，所以這裡和 gallery page 的 `gallerySchemaAuthor.url` 保持一致。
+const siteIdentity = {
+  siteUrl: SEO_CONFIG.siteUrl,
+  siteName: SEO_CONFIG.siteName,
+  siteDescription: SEO_CONFIG.siteDescription,
+  personName: 'NCTU Young',
+  personAlternateName: 'jimmyyoung1995',
+  personJobTitle: 'Digital Painter · Photographer',
+  personDescription: SEO_CONFIG.siteDescription,
+  personImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/WBC%E6%9D%B1%E4%BA%AC%20%E5%8F%B0%E6%BE%B3/DSC_9877-%E7%B7%A8%E8%BC%AF-1.jpg',
+  socialLinks: [
+    SOCIAL_LINKS.github,
+    SOCIAL_LINKS.facebook,
+    SOCIAL_LINKS.instagram,
+    SOCIAL_LINKS.threads
+  ],
+  knowsAbout: ['Digital Painting', 'Photography', 'Portrait', 'Street Photography']
+}
+
+useHead({
+  script: toHeadScripts([
+    buildPersonSchema(siteIdentity),
+    buildWebSiteSchema(siteIdentity)
+  ])
 })
 </script>

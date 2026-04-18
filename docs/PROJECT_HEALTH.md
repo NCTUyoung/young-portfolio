@@ -80,9 +80,13 @@
 ### P2（品質與長期）
 
 - **圖片格式**：若要進一步壓縮體積，可評估離線 `sharp` 一次產出 AVIF + WebP，模板搭配 `<picture>` 依序嘗試。目前策略為 WebP 縮圖 + `srcset/sizes`。
-- **結構化資料**：可於 `pages/index.vue`、每場 event 頁加 JSON-LD（`Person` / `ImageGallery` / `CreativeWork`），增強 Google 圖片搜尋的可見度。
+- ~~**結構化資料（JSON-LD）**~~（已加，2026-04）：
+  - `pages/index.vue` 插 `Person` + `WebSite` schema，`sameAs` 指向 GitHub / Facebook / Instagram / Threads，`author` 由 `SEO_CONFIG.siteUrl` 當 canonical URL。產生器集中在 `app/utils/siteSchema.ts`。
+  - `pages/gallery/[[category]].vue` 依 query 吐三種 schema：無 query → `CollectionPage`（`about` 指向作者）；`?event=` → `ImageGallery` 含 `hasPart` 最多 20 張 `ImageObject`；`?image=` → 單張 `ImageObject`，帶 `creator` / `dateCreated` / `keywords`（`tags`）。實作在 `app/utils/gallerySeo.ts`。
+  - **canonical URL 修正**：`useRequestURL()` 在 `nuxt generate` 時 origin 會是 `http://localhost`；schema 裡的 `url` 特別用 `SEO_CONFIG.siteUrl` 組 origin，避免 Google 把站台當 staging。`og:url` 保留原行為。
+  - SSG build 驗證：`.output/public/index.html` 有 2 條 `<script type="application/ld+json">`（Person + WebSite），四個 gallery 頁各 1 條（CollectionPage）。
 - **測試**：
-  - **Vitest 單元**（`npm run test`）：60 tests / 8 files，覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts`、`utils/justifiedGalleryLayout.ts`、`utils/imagePaths.ts`、`utils/gallerySeo.ts` 與 `stores/*Selectors.test.ts`。
+  - **Vitest 單元**（`npm run test`）：覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts`、`utils/justifiedGalleryLayout.ts`、`utils/imagePaths.ts`、`utils/gallerySeo.ts`、`utils/siteSchema.ts` 與 `stores/*Selectors.test.ts`。
   - **Playwright e2e**（`npm run test:e2e`）：`tests/e2e/` 已建骨架 — `home.spec.ts`（首頁 Hero / Gallery 連結）、`gallery.spec.ts`（`/gallery/photography` 80 works + 事件 tab 切換）、`image-viewer.spec.ts`（點圖開 lightbox + ESC + ArrowRight 切換）。baseURL 含 `/young-portfolio/`；`webServer.reuseExistingServer` 會重用本機 `npm run dev`。待補：主題切換刷新不閃爍。
 - **型別**：`types/gallery.ts` 為主；避免在元件內重複定義 props 型別，改 `import type`。
 - **ESLint**：`eslint.config.mjs` 在 `withNuxt()` 上追加 flat 區塊：`parserOptions.projectService: true`、`tsconfigRootDir` 指向 repo 根；`@typescript-eslint/consistent-type-imports` 設為 **warn**（`prefer: type-imports`）。避免 `typeof import('foo')` 型別註解，可改 `import type * as FooNS from 'foo'` + `typeof FooNS`。

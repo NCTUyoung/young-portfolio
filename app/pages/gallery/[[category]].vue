@@ -419,6 +419,20 @@ const shareUrl = computed(() => {
   return `${requestUrl.origin}${requestUrl.pathname}${requestUrl.search}`
 })
 
+/**
+ * JSON-LD 專用的 canonical URL。
+ *
+ * `useRequestURL()` 在 `nuxt generate` 預渲染時 origin 會是 `http://localhost`，
+ * 丟進 schema 會被 Google 當 staging URL。這裡改以 `SEO_CONFIG.siteUrl` 作
+ * 基準 origin，但保留 pathname/query 讓 event / image 參數仍帶得進去。
+ * （`og:url` 保留原 behavior，避免動到既有 share flow。）
+ */
+const schemaCanonicalUrl = computed(() => {
+  if (import.meta.client) return window.location.href
+  const canonicalOrigin = new URL(SEO_CONFIG.siteUrl).origin
+  return `${canonicalOrigin}${requestUrl.pathname}${requestUrl.search}`
+})
+
 const absPathClean = (filename: string) => {
   const p = getImagePath(filename)
   return absoluteUrlFromSitePath(SEO_CONFIG.siteUrl, p.replace(/^\//, ''))
@@ -427,6 +441,13 @@ const absPathClean = (filename: string) => {
 const absThumb800Clean = (filename: string) => {
   const p = getThumbPath(filename, 800)
   return absoluteUrlFromSitePath(SEO_CONFIG.siteUrl, p.replace(/^\//, ''))
+}
+
+// creator 欄位會貼進每張 `ImageObject` 作 schema，呼應首頁 `Person` schema（同 url）。
+const gallerySchemaAuthor = {
+  name: 'NCTU Young',
+  alternateName: 'jimmyyoung1995',
+  url: SEO_CONFIG.siteUrl
 }
 
 const gallerySeoResolved = computed(() =>
@@ -440,7 +461,9 @@ const gallerySeoResolved = computed(() =>
     absThumb800: absThumb800Clean,
     defaultOgImageAbs,
     defaultTitle: seoTitles[currentCategory.value] || seoTitles.all,
-    defaultDescription: seoDefaultDescription
+    defaultDescription: seoDefaultDescription,
+    pageUrl: schemaCanonicalUrl.value,
+    author: gallerySchemaAuthor
   })
 )
 
