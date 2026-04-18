@@ -97,10 +97,12 @@ export default defineNuxtConfig({
     payloadExtraction: false
   },
 
-  // Pinia 配置：Nuxt 4 起 srcDir 搬到 app/，stores 同步
-  pinia: {
-    storesDirs: ['./app/stores/**'],
-  },
+  // Pinia：不設 storesDirs，用預設（= `<srcDir>/stores` = `app/stores/`）。
+  // 注意 @pinia/nuxt 的 storesDirs 是以 `layer.app` 為基準解析的相對路徑，
+  // 在 Nuxt 4 下 `layer.app` 已經是 `app/`，所以寫 `'./app/stores'` 會變成
+  // `app/app/stores`（不存在）→ 全部 useXxxStore auto-import silent fail，
+  // dev 端會看到 `ReferenceError: useAdminStore is not defined`。
+  // 非要寫就寫 `'./stores'` 或絕對路徑；最穩的是交給預設。
 
   // GitHub Pages 特定配置 + 全站預設 SEO 設定
   app: {

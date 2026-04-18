@@ -24,6 +24,7 @@
   - 頭一次安裝 `@nuxt/icon@2.x` 時還在 Nuxt 3，會被 disable 並炸 `_createApp is not a function`。升級順序要先升 Nuxt 本體再升 module 2.x。
   - 搬目錄後 `.nuxt/.output/.cache` 務必全清，否則殘留舊的 path 引用。
   - **Tailwind `content` 路徑**：`tailwind.config.js` 的 glob 必須跟著搬到 `app/`（`./app/components/**`、`./app/layouts/**`、`./app/pages/**`、`./app/plugins/**`、`./app/composables/**`、`./app/utils/**`、`./app/app.vue`）。舊路徑掃不到任何檔案時 dev server 會出 `No utility classes were detected in your source files` 警告，**整站 utility class 不會被編入 CSS**，視覺上像 JS/CSS 全掛（只剩 plain flow）。
+  - **Pinia `storesDirs`**：`@pinia/nuxt` 是用 `resolve(layer.app, storeDir)` 解析，而在 Nuxt 4 `layer.app` 已經是 `app/`。若寫 `storesDirs: ['./app/stores']` 會變成 `app/app/stores`（不存在）→ `useXxxStore` 全數 auto-import silent fail，dev 會看到 `ReferenceError: useAdminStore is not defined`。正解：**不設 `storesDirs`，交給預設（`<srcDir>/stores` = `app/stores`）**；真要寫就寫 `'./stores'` 或絕對路徑。
 - **Dev Server 微調（Windows + Vite 7）**：
   - **Leaflet CSS 改為元件層 import**：`nuxt.config.ts` 的 `css[]` 移除 `'leaflet/dist/leaflet.css'`，改於 `app/components/EventMap.vue` 的 `<script setup>` 頂部 `import 'leaflet/dist/leaflet.css'`。
     - 原因：Vite 7 在 Windows 透過 `@fs` 絕對路徑載入 `node_modules` 內 CSS 時，dev server 會回 `application/json` 觸發瀏覽器的 `MIME type` 錯誤與 Vue Router `No match found for location with path "/_nuxt/@fs..."` 警告。
