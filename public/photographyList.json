@@ -1,5 +1,5 @@
 {
-  "totalNumber": "72",
+  "totalNumber": "80",
   "category": "photography",
   "eventStats": {
     "春日街拍": 5,
@@ -12,7 +12,8 @@
     "峨嵋湖風鈴木": 13,
     "WBC 2026": 12,
     "WBC東京 台澳": 8,
-    "Annber 外拍": 9
+    "Annber 外拍": 9,
+    "栗子外拍": 8
   },
   "Img": [
     {
@@ -1662,6 +1663,206 @@
       "aperture": 2.5,
       "iso": 200,
       "shutterSpeed": 0.002
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_6289-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "吹散泡沫的一瞬",
+      "content": "捧起一手白沫對著鏡頭輕輕吹散，水光與氣泡在深灰鏡面前飄成星點。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 73,
+      "aperture": 3.2,
+      "iso": 1250,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_5910-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "暗紅床頭的慵懶側躺",
+      "content": "絨面暗紅床頭與銀灰抱枕之間，黑色蕾絲與長統襪構出暈黃燈下的靜謐對望。",
+      "tags": [
+        "人像",
+        "廣角",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 3.2,
+      "iso": 400,
+      "shutterSpeed": 0.008
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_5532-編輯-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "花瓣牆前的紅跟高挑",
+      "content": "白色花瓣浮雕牆與暖色光條之間，紅色尖頭高跟鞋抵著鏡頭，短髮模特斜靠回望。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 86,
+      "aperture": 2.7,
+      "iso": 1000,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_5958-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "暈燈下的大理石邊桌",
+      "content": "暖橘燈光從上方灑落，仰身倚靠大理石台面，黑色花瓶與縷空剪影在低光裡靜靜相映。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 36,
+      "aperture": 2.2,
+      "iso": 1000,
+      "shutterSpeed": 0.004
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_5636-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "鎖鏈與紅鞋之間",
+      "content": "吊椅的金屬鎖鏈垂落，一手抓鍊、一手倒提紅色高跟鞋，短髮貼額，鏡頭聚焦在唇與鞋跟。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 87,
+      "aperture": 3.5,
+      "iso": 500,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_6128-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "抱枕上的比心框景",
+      "content": "臉微微埋在灰藍絨面抱枕後，雙手在眼前圈出一顆愛心，臥房的柔光化成背景散景。",
+      "tags": [
+        "人像",
+        "廣角",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 38,
+      "aperture": 2,
+      "iso": 1000,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_5771-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "黑簾折線下的蕾絲剪影",
+      "content": "深色簾幕的直線切過畫面，白紅蕾絲在低角度俯拍中化成柔和的 S 形曲線。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "室內光",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 40,
+      "aperture": 3.5,
+      "iso": 400,
+      "shutterSpeed": 0.016666666666666666
+    },
+    {
+      "filename": "photography/栗子外拍/DSC_6037-編輯-1.jpg",
+      "time": "2025 Dec 03",
+      "title": "轉角下的蹲身一望",
+      "content": "鵝黃牆面與頂燈把空間暈成暖色，黑色蕾絲、網襪與蹲姿構成一條收束的斜線。",
+      "tags": [
+        "人像",
+        "室內光",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "栗子外拍",
+        "description": "與『栗子』於新竹湖山風景旅館主題房進行的室內人像紀錄｜花牆、暗紅床頭、紅色高跟鞋與暈黃夜燈間的質感側寫",
+        "location": "湖山風景旅館",
+        "lat": 24.76355,
+        "lng": 120.95555
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 43,
+      "aperture": 2.2,
+      "iso": 1000,
+      "shutterSpeed": 0.03333333333333333
     }
   ]
 }
