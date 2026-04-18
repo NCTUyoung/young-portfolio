@@ -1,5 +1,6 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
-import { join } from 'path'
+﻿import { mkdirSync, existsSync } from 'fs'
+import { unlink } from 'fs/promises'
+import { extname, join } from 'path'
 import { formidable } from 'formidable'
 import exifr from 'exifr'
 import {
@@ -10,8 +11,28 @@ import {
 } from '~/utils/imageUtils'
 import { formatDateFull } from '~/utils/formatters'
 import { inferEventFromTime } from '~/utils/eventUtils'
-import type { PhotographyData, GalleryData } from '~/types/gallery'
+import type { PhotographyData, GalleryData } from '~~/shared/types/gallery'
 import { generateThumbsForPublicImage } from '../utils/thumbFromSource'
+import { readGalleryData, updateGalleryData } from '../utils/galleryDataStore'
+
+/**
+ * 本機 admin 上傳的防呆白名單：只允許可被瀏覽器顯示的靜態影像格式。
+ * 擋下 .html / .svg / .js 等可能夾帶 script 的副檔名進入 public/ 。
+ */
+const ALLOWED_MIME = new Set<string>([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/gif'
+])
+const ALLOWED_EXT = new Set<string>(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif'])
+
+function isAcceptableImage (mimetype: string | null | undefined, filename: string): boolean {
+  const mimeOk = !!mimetype && ALLOWED_MIME.has(mimetype.toLowerCase())
+  const extOk = ALLOWED_EXT.has(extname(filename).toLowerCase())
+  return mimeOk && extOk
+}
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'POST') {
@@ -59,6 +80,15 @@ export default defineEventHandler(async (event) => {
       if (file) {
         const originalName = file.originalFilename || 'unnamed'
 
+        // 白名單：擋下非影像／可執行副檔名，立刻刪除暫存檔
+        if (!isAcceptableImage(file.mimetype, originalName)) {
+          console.warn(
+            `⚠️ 拒絕上傳 ${originalName}（mime=${file.mimetype}）— 僅允許 jpg/png/webp/avif/gif`
+          )
+          try { await unlink(file.filepath) } catch { /* ignore */ }
+          continue
+        }
+
         // 先確定檔案的創作/拍攝時間
         let captureTime = new Date()
 
@@ -89,15 +119,9 @@ export default defineEventHandler(async (event) => {
 
           if (addToExistingEvent && manualEventName) {
             // 添加到現有事件 - 從現有數據中查找事件信息
-            let existingData
-            try {
-              const jsonPath = './public/photographyList.json'
-              const jsonContent = readFileSync(jsonPath, 'utf-8')
-              existingData = JSON.parse(jsonContent)
-            } catch {
-              console.warn('無法讀取現有數據，將創建新事件')
-              existingData = { Img: [] }
-            }
+            const existingData = (await readGalleryData('photography')) ?? {
+              Img: [] as PhotographyData['Img']
+            } as PhotographyData
 
             // 查找現有事件的完整信息
             const existingImage = existingData.Img?.find((img: { event?: { name?: string } }) => img.event?.name === manualEventName)
@@ -236,50 +260,38 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 選擇對應的JSON檔案
-    const jsonFileName = category === 'photography' ? 'photographyList.json' : 'galleryList.json'
-    const jsonPath = `./public/${jsonFileName}`
-    let categoryData
-
-    try {
-      const jsonContent = readFileSync(jsonPath, 'utf-8')
-      categoryData = JSON.parse(jsonContent)
-    } catch {
-      // 根據分類建立初始結構
-      if (category === 'photography') {
-        categoryData = {
-          totalNumber: "0",
-          category: "photography" as const,
+    // 以 per-file mutex 執行 read → merge → atomic write，避免多 tab 並發覆蓋
+    if (category === 'photography') {
+      await updateGalleryData(
+        'photography',
+        () => ({
+          totalNumber: '0',
+          category: 'photography',
           eventStats: {},
           Img: []
-        } as PhotographyData
-      } else {
-        categoryData = {
-          totalNumber: "0",
-          Img: []
-        } as GalleryData
-      }
-    }
-
-    // 添加新上傳的圖片到JSON
-    categoryData.Img.push(...uploadedFiles)
-    categoryData.totalNumber = categoryData.Img.length.toString()
-
-    // 更新事件統計
-    if (!categoryData.eventStats) categoryData.eventStats = {}
-
-    // 統計每個事件的圖片數量
-    uploadedFiles.forEach(file => {
-      if (file.event && file.event.name) {
-        if (!categoryData.eventStats[file.event.name]) {
-          categoryData.eventStats[file.event.name] = 0
+        } as PhotographyData),
+        (data) => {
+          data.Img.push(...uploadedFiles as PhotographyData['Img'])
+          data.totalNumber = data.Img.length.toString()
+          if (!data.eventStats) data.eventStats = {}
+          for (const file of uploadedFiles) {
+            const name = file.event?.name
+            if (name) data.eventStats[name] = (data.eventStats[name] ?? 0) + 1
+          }
+          return data
         }
-        categoryData.eventStats[file.event.name] += 1
-      }
-    })
-
-    // 寫入更新後的JSON
-    writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
+      )
+    } else {
+      await updateGalleryData(
+        'gallery',
+        () => ({ totalNumber: '0', Img: [] } as GalleryData),
+        (data) => {
+          data.Img.push(...uploadedFiles as GalleryData['Img'])
+          data.totalNumber = data.Img.length.toString()
+          return data
+        }
+      )
+    }
 
     return {
       success: true,

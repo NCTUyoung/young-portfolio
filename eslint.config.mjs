@@ -14,7 +14,9 @@ export default withNuxt(
       '.nuxt/**',
       '.output/**',
       'dist/**',
-      'public/**'
+      'public/**',
+      // vitest.config.ts 不被 Nuxt 4 產出的任何 tsconfig 涵蓋，避免 projectService 抱怨
+      'vitest.config.ts'
     ],
     languageOptions: {
       parserOptions: {

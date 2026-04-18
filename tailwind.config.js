@@ -1,12 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
+  // Nuxt 4 把 app 程式碼全搬到 app/，Tailwind content 路徑必須跟著改，
+  // 否則掃不到任何 class → 整站 utility 不會被編入 CSS（No utility classes detected）。
   content: [
-    "./components/**/*.{js,vue,ts}",
-    "./layouts/**/*.vue",
-    "./pages/**/*.vue",
-    "./plugins/**/*.{js,ts}",
-    "./app.vue",
+    "./app/components/**/*.{js,vue,ts}",
+    "./app/layouts/**/*.vue",
+    "./app/pages/**/*.vue",
+    "./app/plugins/**/*.{js,ts}",
+    "./app/composables/**/*.{js,ts}",
+    "./app/utils/**/*.{js,ts}",
+    "./app/app.vue",
   ],
   theme: {
     extend: {

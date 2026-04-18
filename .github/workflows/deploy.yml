@@ -5,6 +5,15 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+# 只允許一個 pages deploy 同時跑；進行中不中斷，排隊處理後續 push。
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# 最小權限：build job 只需讀 repo；deploy job 另外宣告 pages/id-token。
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,11 +23,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 單一事實來源：本機與 CI 都吃 repo 根的 .nvmrc（目前 = 22）。
+          node-version-file: '.nvmrc'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Cache Nuxt build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nuxt
+            node_modules/.cache/nuxt
+          # 任一設定檔變動（含 tailwind/eslint/.nvmrc）就讓 cache 失效，
+          # 避免殘留的 .nuxt 吃到舊 Tailwind content / ESLint / Node 版本產物。
+          key: ${{ runner.os }}-nuxt-${{ hashFiles('package-lock.json', 'nuxt.config.ts', 'tailwind.config.js', 'eslint.config.mjs', '.nvmrc') }}
+          restore-keys: |
+            ${{ runner.os }}-nuxt-
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
 
       - name: Build
         run: npx nuxt build --preset github-pages

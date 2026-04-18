@@ -2,49 +2,57 @@
 
 ## 項目概述
 
-Nuxt 3 作品集（數位繪圖 + 攝影），部署於 **GitHub Pages**，`app.baseURL` 為 `/young-portfolio/`。
+Nuxt 4 作品集（數位繪圖 + 攝影），部署於 **GitHub Pages**，`app.baseURL` 為 `/young-portfolio/`。
 
 ### 技術棧
 
-- **框架**: Nuxt 3、Vue 3、TypeScript  
-- **狀態**: Pinia（`gallery`、`imageViewer`、`admin`）  
-- **樣式**: Tailwind CSS  
-- **工具**: VueUse、HeadlessUI、Leaflet（地圖）  
+- **框架**: Nuxt 4、Vue 3.5+、TypeScript、Node 22+
+- **狀態**: Pinia（`gallery`、`imageViewer`、`admin`；位於 `app/stores/`）
+- **樣式**: Tailwind CSS
+- **工具**: VueUse、HeadlessUI、Leaflet（地圖）、`@nuxt/icon` + lucide
 - **測試**: Vitest（`npm run test`）
 
-## 目錄結構（精簡）
+## 目錄結構（Nuxt 4 慣例）
 
 ```
 nctuyoung.github.io/
-├── pages/
-│   ├── index.vue
-│   ├── gallery/[[category]].vue   # /gallery/all|digital|photography
-│   ├── admin.vue
-│   └── article.vue
-├── components/
-│   ├── gallery/                   # GalleryPhotographySection、GalleryAllMixedSection
-│   ├── EventMap.vue
-│   ├── ImageViewer.vue
-│   └── ...
-├── composables/                   # 見 composables/README.md（勿加 index.ts barrel）
-├── stores/
-│   ├── gallery.ts
-│   ├── gallerySelectors.ts       # 篩選／分組／混合佈局／地圖點（純函式）
-│   ├── galleryLoaders.ts          # 公開 JSON 載入
-│   ├── galleryConstants.ts      # 地圖後備座標
-│   ├── imageViewer.ts
-│   ├── admin.ts
-│   ├── adminSelectors.ts        # 後台管理／概覽純計算
-│   ├── adminApiClient.ts        # 後台 API $fetch
-│   └── adminTypes.ts
-├── utils/
-│   ├── galleryUtils.ts、formatters.ts、validators.ts、imageUtils.ts
-│   └── *.test.ts                # Vitest
-├── types/gallery.ts
-├── config/constants.ts
-└── docs/
-    ├── MAINTENANCE.md            # 本檔
-    └── PROJECT_HEALTH.md         # 健檢與後續優先級
+├── app/                             # Nuxt 4 的 srcDir，對應 ~/ 與 @/
+│   ├── app.vue
+│   ├── assets/
+│   ├── components/
+│   │   ├── gallery/                 # GalleryPhotographySection、GalleryAllMixedSection
+│   │   ├── EventMap.vue
+│   │   ├── ImageViewer.vue          # 已加 focus trap + @nuxt/icon
+│   │   └── ...
+│   ├── composables/                 # 見 composables/README.md（勿加 index.ts barrel）
+│   ├── layouts/
+│   ├── pages/
+│   │   ├── index.vue
+│   │   ├── gallery/[[category]].vue # /gallery/all|digital|photography
+│   │   ├── admin.vue                # 僅本機 dev 使用，已設 ssr:false + prerender:false
+│   │   └── article.vue
+│   ├── stores/
+│   │   ├── gallery.ts、gallerySelectors.ts、galleryLoaders.ts、galleryConstants.ts
+│   │   ├── imageViewer.ts
+│   │   ├── admin.ts、adminSelectors.ts、adminApiClient.ts、adminTypes.ts
+│   └── utils/
+│       ├── galleryUtils.ts、formatters.ts、validators.ts、imageUtils.ts
+│       ├── gallerySeo.ts、justifiedGalleryLayout.ts
+│       └── *.test.ts                # Vitest
+├── shared/                          # 跨 app + server 共用，需用 ~~/shared/... 前綴
+│   ├── types/gallery.ts
+│   └── config/constants.ts
+├── server/                          # server routes / utils（Nuxt 4 仍在 root）
+│   ├── api/
+│   └── utils/galleryDataStore.ts    # atomic write + mutex
+├── public/                          # 靜態資源、sitemap.xml、robots.txt
+├── scripts/                         # generate-thumbs.mjs 等離線腳本
+├── docs/
+│   ├── MAINTENANCE.md               # 本檔
+│   └── PROJECT_HEALTH.md            # 健檢與後續優先級
+├── nuxt.config.ts
+├── vitest.config.ts                 # alias: ~ → app/、~~ → root
+└── eslint.config.mjs
 ```
 
 ## 已完成的重構（摘要）
@@ -68,11 +76,11 @@ nctuyoung.github.io/
 - [ ] 響應式與圖片庫分類切換  
 - [ ] SEO meta（圖片庫見 `pages/gallery/[[category]].vue`）
 
-### 圖片效能（縮圖與 `@nuxt/image`）
+### 圖片效能（離線 WebP 縮圖）
 
 - **網格／列表**：使用 `useImagePath()` 的 `getThumbPath`、`getGridImageSrcset`、`gridImageSizes`；實體檔由 **`scripts/generate-thumbs.mjs`** 全量掃描，或 **`server/utils/thumbFromSource.ts`** 在上傳成功時單檔產生（與腳本相同 **sharp** 參數）。  
 - **原圖**：`getImagePath` 用於 `ImageViewer`、histogram、後台編輯／lightbox 等需像素級檢視處。  
-- **`@nuxt/image`**：已安裝但未用於上述網格；GitHub Pages 為純靜態，**離線 WebP 縮圖**路徑較可預期；若未來要接 IPX／雲端 provider，需另驗 `nuxt generate` 產物。
+- **`@nuxt/image`**：**已移除**（GitHub Pages 純靜態，離線產生的 WebP `_thumbs/{400w,800w}` 搭配 `srcset`/`sizes` 已足夠）。若未來要接 IPX／雲端 provider，再重新裝回並驗 `nuxt generate` 產物。
 
 ### 發版前
 
@@ -84,9 +92,10 @@ npm run build
 
 ### 新增功能時
 
-- 型別以 `types/gallery.ts` 為主，`import type`  
-- 後台新 API：先 `adminApiClient`，再在 store 用 `createApiRequest`  
-- 純邏輯放 `utils/`，並可補 `*.test.ts`
+- 型別以 `shared/types/gallery.ts` 為主，用 `import type ... from '~~/shared/types/gallery'`（app 與 server 都同樣寫法）
+- 後台新 API：先 `app/stores/adminApiClient`，再在 store 用 `createApiRequest`
+- 純邏輯放 `app/utils/`，並可補 `*.test.ts`
+- 新 UI 圖示優先用 `<Icon name="lucide:..." />`（`@nuxt/icon` + `@iconify-json/lucide`）
 
 ## 開發指令
 
@@ -140,8 +149,8 @@ npm run test:watch    # 監聽模式
 ## 相關資源
 
 - [Nuxt](https://nuxt.com/)、[Pinia](https://pinia.vuejs.org/)、[Tailwind](https://tailwindcss.com/)  
-- 倉庫內：[composables/README.md](../composables/README.md)、[PROJECT_HEALTH.md](./PROJECT_HEALTH.md)
+- 倉庫內：[app/composables/README.md](../app/composables/README.md)、[PROJECT_HEALTH.md](./PROJECT_HEALTH.md)
 
 ---
 
-*最後更新：2026-03（與目前目錄對齊）*
+*最後更新：2026-04（Nuxt 4.4 + 新 `app/` / `shared/` 目錄結構）*

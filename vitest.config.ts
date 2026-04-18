@@ -1,8 +1,9 @@
 import { fileURLToPath } from 'node:url'
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { defineConfig } from 'vitest/config'
 
 const root = dirname(fileURLToPath(import.meta.url))
+const appDir = resolve(root, 'app')
 
 export default defineConfig({
   test: {
@@ -12,9 +13,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '~': root,
+      // Nuxt 4: `~` / `@` 指向 srcDir（app/），`~~` / `@@` 指向 rootDir
       '~~': root,
-      '@': root
+      '@@': root,
+      '~': appDir,
+      '@': appDir
     }
   }
 })

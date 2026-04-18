@@ -1,5 +1,19 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
+import { unlink } from 'fs/promises'
+import { existsSync } from 'fs'
 import { removeThumbsForPublicImageFilename } from '../utils/thumbFromSource'
+import { readGalleryData, updateGalleryData } from '../utils/galleryDataStore'
+import type { GalleryCategory } from '../utils/galleryDataStore'
+
+type ImgRecord = Record<string, unknown> & {
+  event?: { name?: string }
+  time?: string
+  filename?: string
+}
+type CategoryData = {
+  Img: ImgRecord[]
+  totalNumber: string
+  eventStats?: Record<string, unknown>
+}
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'DELETE') {
@@ -8,58 +22,63 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event)
-    const { eventName, category } = body
+    const { eventName, category } = body as {
+      eventName?: string
+      category?: GalleryCategory
+    }
 
     if (!eventName || !category) {
       throw createError({ statusCode: 400, statusMessage: '缺少必要參數 eventName 或 category' })
     }
 
-    const jsonFileName = category === 'photography' ? 'photographyList.json' : 'galleryList.json'
-    const jsonPath = `./public/${jsonFileName}`
-
-    let categoryData: { Img: Record<string, unknown>[]; totalNumber: string; eventStats?: Record<string, unknown> }
-    try {
-      const jsonContent = readFileSync(jsonPath, 'utf-8')
-      categoryData = JSON.parse(jsonContent)
-    } catch {
+    const existing = await readGalleryData(category)
+    if (!existing) {
       throw createError({ statusCode: 404, statusMessage: '找不到圖庫資料檔案' })
     }
 
-    // 找出屬於該事件的所有圖片
-    const toDelete: Record<string, unknown>[] = []
-    const remaining: Record<string, unknown>[] = []
+    let toDelete: ImgRecord[] = []
 
-    categoryData.Img.forEach((img) => {
-      const imgWithEvent = img as Record<string, unknown> & { event?: { name?: string }; time?: string; filename?: string }
-      let imgEvent = ''
-      if (imgWithEvent.event?.name) {
-        imgEvent = imgWithEvent.event.name
-      } else if (category === 'gallery') {
-        const year = new Date(imgWithEvent.time as string).getFullYear()
-        imgEvent = `${year}年電繪作品`
-      } else {
-        imgEvent = '預設事件'
+    await updateGalleryData(
+      category,
+      () => existing,
+      (data) => {
+        const typed = data as unknown as CategoryData
+        const keep: ImgRecord[] = []
+        const drop: ImgRecord[] = []
+        typed.Img.forEach((img) => {
+          let imgEvent = ''
+          if (img.event?.name) {
+            imgEvent = img.event.name
+          } else if (category === 'gallery') {
+            const year = new Date(img.time as string).getFullYear()
+            imgEvent = `${year}年電繪作品`
+          } else {
+            imgEvent = '預設事件'
+          }
+          if (imgEvent === eventName) drop.push(img)
+          else keep.push(img)
+        })
+        if (drop.length === 0) {
+          throw createError({ statusCode: 404, statusMessage: '找不到該事件的圖片記錄' })
+        }
+        toDelete = drop
+        typed.Img = keep
+        typed.totalNumber = keep.length.toString()
+        if (typed.eventStats && typed.eventStats[eventName]) {
+          Reflect.deleteProperty(typed.eventStats, eventName)
+        }
+        return data
       }
+    )
 
-      if (imgEvent === eventName) {
-        toDelete.push(img)
-      } else {
-        remaining.push(img)
-      }
-    })
-
-    if (toDelete.length === 0) {
-      throw createError({ statusCode: 404, statusMessage: '找不到該事件的圖片記錄' })
-    }
-
-    // 刪除實體檔案
+    // JSON 成功寫入後再刪實體檔案
     let deletedFiles = 0
     for (const img of toDelete) {
-      const { filename } = img as { filename?: string }
+      const filename = img.filename
       const imagePath = `./public/images/${filename}`
       if (existsSync(imagePath)) {
         try {
-          unlinkSync(imagePath)
+          await unlink(imagePath)
           deletedFiles++
         } catch (e) {
           console.warn(`Failed to delete file: ${filename}`, e)
@@ -69,17 +88,6 @@ export default defineEventHandler(async (event) => {
         removeThumbsForPublicImageFilename(filename)
       }
     }
-
-    // 更新 JSON
-    categoryData.Img = remaining
-    categoryData.totalNumber = remaining.length.toString()
-
-    // 清除 eventStats
-    if (categoryData.eventStats && categoryData.eventStats[eventName]) {
-      Reflect.deleteProperty(categoryData.eventStats, eventName)
-    }
-
-    writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
 
     return {
       success: true,

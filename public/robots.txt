@@ -1,2 +1,7 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Allow: /
+
+# 本機後台不希望被爬
+Disallow: /young-portfolio/admin
+
+Sitemap: https://nctuyoung.github.io/young-portfolio/sitemap.xml

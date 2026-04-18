@@ -1,5 +1,8 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs'
+import { unlink } from 'fs/promises'
+import { existsSync } from 'fs'
 import { removeThumbsForPublicImageFilename } from '../utils/thumbFromSource'
+import { readGalleryData, updateGalleryData } from '../utils/galleryDataStore'
+import type { GalleryCategory } from '../utils/galleryDataStore'
 
 type ImgRecord = {
   filename: string
@@ -23,7 +26,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event)
-    const { filename, category } = body
+    const { filename, category } = body as {
+      filename?: string
+      category?: GalleryCategory
+    }
 
     if (!filename || !category) {
       throw createError({
@@ -32,59 +38,48 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 選擇對應的JSON檔案
-    const jsonFileName = category === 'photography' ? 'photographyList.json' : 'galleryList.json'
-    const jsonPath = `./public/${jsonFileName}`
     const imagePath = `./public/images/${filename}`
 
-    // 讀取 JSON 數據
-    let categoryData: CategoryData
-    try {
-      const jsonContent = readFileSync(jsonPath, 'utf-8')
-      categoryData = JSON.parse(jsonContent)
-    } catch {
+    const existing = await readGalleryData(category)
+    if (!existing) {
       throw createError({
         statusCode: 404,
         statusMessage: '找不到圖庫資料檔案'
       })
     }
 
-    // 檢查圖片是否存在於資料中
-    const imageIndex = categoryData.Img.findIndex((img) => img.filename === filename)
-    if (imageIndex === -1) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: '找不到指定的圖片記錄'
-      })
-    }
+    await updateGalleryData(
+      category,
+      () => existing,
+      (data) => {
+        const typed = data as unknown as CategoryData
+        const imageIndex = typed.Img.findIndex((img) => img.filename === filename)
+        if (imageIndex === -1) {
+          throw createError({
+            statusCode: 404,
+            statusMessage: '找不到指定的圖片記錄'
+          })
+        }
+        const imageRecord = typed.Img[imageIndex]
+        typed.Img.splice(imageIndex, 1)
+        typed.totalNumber = typed.Img.length.toString()
 
-    const imageRecord = categoryData.Img[imageIndex]
+        const eventName = imageRecord.event?.name
+        if (eventName && typed.eventStats?.[eventName]) {
+          typed.eventStats[eventName] -= 1
+          if (typed.eventStats[eventName] <= 0) {
+            Reflect.deleteProperty(typed.eventStats, eventName)
+          }
+        }
+        return data
+      }
+    )
 
-    // 刪除檔案系統中的圖片與對應 WebP 縮圖
+    // JSON 成功寫入後再刪實體檔案（失敗不會造成資料不一致留孤兒記錄）
     if (existsSync(imagePath)) {
-      unlinkSync(imagePath)
+      try { await unlink(imagePath) } catch (err) { console.warn('刪除原圖失敗:', err) }
     }
     removeThumbsForPublicImageFilename(filename)
-
-    // 從 JSON 資料中移除圖片記錄
-    categoryData.Img.splice(imageIndex, 1)
-
-    // 更新總數
-    categoryData.totalNumber = categoryData.Img.length.toString()
-
-    // 更新事件統計
-    if (imageRecord.event?.name) {
-      const eventName = imageRecord.event.name
-      if (categoryData.eventStats && categoryData.eventStats[eventName]) {
-        categoryData.eventStats[eventName] -= 1
-        if (categoryData.eventStats[eventName] <= 0) {
-          Reflect.deleteProperty(categoryData.eventStats, eventName)
-        }
-      }
-    }
-
-    // 寫入更新後的 JSON
-    writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
 
     return {
       success: true,

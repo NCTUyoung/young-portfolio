@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { updateGalleryData, readGalleryData } from '../utils/galleryDataStore'
+import type { GalleryCategory } from '../utils/galleryDataStore'
 
 type ImgRecord = {
   event?: { name?: string; description?: string; location?: string }
@@ -21,7 +22,13 @@ export default defineEventHandler(async (event) => {
       newDescription,
       newLocation,
       category
-    } = body
+    } = body as {
+      originalEventName?: string
+      newEventName?: string
+      newDescription?: string
+      newLocation?: string
+      category?: GalleryCategory
+    }
 
     if (!originalEventName || !newEventName || !category) {
       throw createError({
@@ -30,34 +37,33 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 選擇對應的JSON檔案
-    const jsonFileName = category === 'photography' ? 'photographyList.json' : 'galleryList.json'
-    const jsonPath = `./public/${jsonFileName}`
-
-    // 讀取 JSON 數據
-    let categoryData: { Img: ImgRecord[] }
-    try {
-      const jsonContent = readFileSync(jsonPath, 'utf-8')
-      categoryData = JSON.parse(jsonContent)
-    } catch {
+    // 先確認檔案存在
+    const existing = await readGalleryData(category)
+    if (!existing) {
       throw createError({
         statusCode: 404,
         statusMessage: '找不到圖庫資料檔案'
       })
     }
 
-    // 找到該事件的所有圖片並更新事件資訊
     let updatedCount = 0
-    categoryData.Img.forEach((img) => {
-      if (img.event) {
-        if (img.event.name === originalEventName) {
-          img.event.name = newEventName
-          img.event.description = newDescription || ''
-          img.event.location = newLocation || ''
-          updatedCount++
-        }
+
+    await updateGalleryData(
+      category,
+      () => existing,
+      (data) => {
+        const imgs = (data as unknown as { Img: ImgRecord[] }).Img
+        imgs.forEach((img) => {
+          if (img.event?.name === originalEventName) {
+            img.event.name = newEventName
+            img.event.description = newDescription || ''
+            img.event.location = newLocation || ''
+            updatedCount++
+          }
+        })
+        return data
       }
-    })
+    )
 
     if (updatedCount === 0) {
       throw createError({
@@ -65,9 +71,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: '找不到指定事件的圖片記錄'
       })
     }
-
-    // 寫入更新後的 JSON
-    writeFileSync(jsonPath, JSON.stringify(categoryData, null, 2), 'utf-8')
 
     return {
       success: true,
