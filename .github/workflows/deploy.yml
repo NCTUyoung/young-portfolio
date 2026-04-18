@@ -42,6 +42,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuxt-
 
+      # CVE gate：上游出 high/critical 立刻紅燈，逼我們升級或 npm audit fix。
+      # 目前（2026-04）0 high；若 advisory db 中 dev-only 出現 false positive，
+      # 可改為 `--omit=dev` 只掃 production deps。
+      - name: Audit dependencies (high+)
+        run: npm audit --audit-level=high
+
       - name: Lint
         run: npm run lint
 

@@ -38,7 +38,7 @@
 ## 本次健檢批次紀錄（2026-04）
 
 - **相依與環境**：Nuxt 3.17 → 3.21；VueUse / Pinia / Vue / TS / ESLint 一併升版。`npm audit` 由 30 漏洞 → 0。`package.json` 加 `engines.node >= 22`，新增 `.nvmrc`（22）。
-- **CI**：`.github/workflows/deploy.yml` Node 20 → 22；新增 lint/test 前置步驟、build 前 `actions/cache` 快取 `.nuxt`。
+- **CI**：`.github/workflows/deploy.yml` Node 20 → 22；新增 lint/test 前置步驟、build 前 `actions/cache` 快取 `.nuxt`；加 `npm audit --audit-level=high` 作 CVE gate（上游 high/critical 漏洞會讓 build 紅燈，強制升級或 `npm audit fix`）。
 - **後端安全**：`server/api/upload.post.ts` 加 MIME + 副檔名白名單；新增 `server/utils/galleryDataStore.ts`（atomic write + per-file mutex），所有 gallery 讀寫 API 改走統一入口，避免並發覆蓋。
 - **SEO**：新增 `public/sitemap.xml`、`public/robots.txt`；`nuxt.config.ts` 補齊 `color-scheme` / `theme-color` / OG / Twitter / canonical；`pages/index.vue` `useSeoMeta` 擴充 og/twitter。
 - **主題閃爍（FOUCD）**：`nuxt.config.ts` 移除 `htmlAttrs.class = 'dark'`，改用 `tagPriority: 'critical'` 的內嵌腳本，依 `localStorage['vueuse-color-scheme']` 於首幀前套類；`layouts/default.vue` 的 `useDark` 顯式指定同一 `storageKey`。
@@ -81,7 +81,9 @@
 
 - **圖片格式**：若要進一步壓縮體積，可評估離線 `sharp` 一次產出 AVIF + WebP，模板搭配 `<picture>` 依序嘗試。目前策略為 WebP 縮圖 + `srcset/sizes`。
 - **結構化資料**：可於 `pages/index.vue`、每場 event 頁加 JSON-LD（`Person` / `ImageGallery` / `CreativeWork`），增強 Google 圖片搜尋的可見度。
-- **測試**：Vitest（`npm run test`）；已覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts` 等（見 `*.test.ts`）；store selectors 見 `*Selectors.test.ts`。可再加 Playwright e2e 涵蓋：圖片庫分類切換、lightbox 鍵盤操作、主題切換刷新不閃爍。
+- **測試**：
+  - **Vitest 單元**（`npm run test`）：60 tests / 8 files，覆蓋 `utils/galleryUtils.ts`、`utils/formatters.ts`、`utils/validators.ts`、`utils/justifiedGalleryLayout.ts`、`utils/imagePaths.ts`、`utils/gallerySeo.ts` 與 `stores/*Selectors.test.ts`。
+  - **Playwright e2e**（`npm run test:e2e`）：`tests/e2e/` 已建骨架 — `home.spec.ts`（首頁 Hero / Gallery 連結）、`gallery.spec.ts`（`/gallery/photography` 80 works + 事件 tab 切換）、`image-viewer.spec.ts`（點圖開 lightbox + ESC + ArrowRight 切換）。baseURL 含 `/young-portfolio/`；`webServer.reuseExistingServer` 會重用本機 `npm run dev`。待補：主題切換刷新不閃爍。
 - **型別**：`types/gallery.ts` 為主；避免在元件內重複定義 props 型別，改 `import type`。
 - **ESLint**：`eslint.config.mjs` 在 `withNuxt()` 上追加 flat 區塊：`parserOptions.projectService: true`、`tsconfigRootDir` 指向 repo 根；`@typescript-eslint/consistent-type-imports` 設為 **warn**（`prefer: type-imports`）。避免 `typeof import('foo')` 型別註解，可改 `import type * as FooNS from 'foo'` + `typeof FooNS`。
 - **後台 UX**：`pages/admin.vue` 以 `pageReady` 控制首次雙分類載入完成後才顯示主內容；載入中顯示與前台類似的 loading；全域錯誤條（非 upload 分頁）可手動關閉。
@@ -90,7 +92,9 @@
 
 - `app/stores/imageViewer` 目前承擔 lightbox 狀態、拖曳、導航、Info/Radial；未來可再切成 `viewer-core` + `viewer-interaction`，避免單檔 >400 行。
 - ~~Nuxt 4 升級~~（已完成 2026-04）。下一步關注 Nuxt 4 minor 更新與 Vue 3.6 / Nitro 5。
-- 修掉 dev/prerender 的 `/galleryList.json`、`/photographyList.json` 404 噪音（某處 client fetch 漏了 `baseURL` 前綴；pre-existing，不是 Nuxt 4 造成的）。
+- ~~dev/prerender 的 `/galleryList.json` / `/photographyList.json` 404 噪音~~（已修，2026-04；見 Nuxt 4 踩雷「SSR 讀 public JSON 不能走 HTTP」）。
+- ~~CVE gate~~（已加，2026-04；CI 現在跑 `npm audit --audit-level=high`）。
+- 加 Playwright e2e 進 CI：目前 `tests/e2e/` 只本機跑，尚未納入 `deploy.yml`。納入前要先評估穩定度（目前 smoke 6 個）與 CI 時間成本。
 
 ## 依賴與死碼策略
 

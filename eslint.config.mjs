@@ -15,8 +15,11 @@ export default withNuxt(
       '.output/**',
       'dist/**',
       'public/**',
-      // vitest.config.ts 不被 Nuxt 4 產出的任何 tsconfig 涵蓋，避免 projectService 抱怨
-      'vitest.config.ts'
+      // vitest.config.ts / playwright.config.ts / tests/e2e 都不在 Nuxt 4 產出的 tsconfig 內，
+      // projectService 會抱怨 "file not found by the project service"，直接排除。
+      'vitest.config.ts',
+      'playwright.config.ts',
+      'tests/e2e/**'
     ],
     languageOptions: {
       parserOptions: {
