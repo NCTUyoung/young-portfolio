@@ -49,10 +49,15 @@ export function transformPhotographyWork (img: PhotographyItem): GalleryItem {
 }
 
 /**
- * Site 根路徑（public/ 底下的靜態檔掛在這裡），不是 `/_nuxt/`。
- * `import.meta.env.BASE_URL` 在部分打包情境會變成 `.../_nuxt/`，若直接 join 會變成 `.../_nuxt/galleryList.json` → 404。
+ * Client 端 site 根路徑（public/ 底下的靜態檔掛在這裡），不是 `/_nuxt/`。
+ *
+ * 部署到 GitHub Pages 時 `app.baseURL = /young-portfolio/`，瀏覽器才需要帶前綴。
+ * SSR/prerender 不走這條路：server 端直接用 `fs` 讀檔，見下方 `fetchJsonWithFallback`。
+ *
+ * `import.meta.env.BASE_URL` 在部分打包情境會變成 `.../_nuxt/`，若直接 join 會
+ * 變成 `.../_nuxt/galleryList.json` → 404，所以 fallback 主動把它洗掉。
  */
-function getPublicSiteBase (): string {
+function getClientSiteBase (): string {
   try {
     const app = useRuntimeConfig().app as { baseURL?: string } | undefined
     const u = app?.baseURL
@@ -70,11 +75,27 @@ function getPublicSiteBase (): string {
 }
 
 /**
- * 載入 public 根目錄的 JSON（路徑 = site base + 檔名，見 `nuxt.config` 的 `app.baseURL`）。
+ * 載入 public 根目錄的 JSON。
+ *
+ * - **Server（SSR / prerender / dev server）**：直接 `fs.readFile` 讀 `public/<filename>`。
+ *   不走 Nitro HTTP，避免 request 先丟進 Vue Router catchall 產生
+ *   `[Vue Router warn] No match found for location with path "/galleryList.json"`
+ *   （即使最終 public handler 會回 200，router.resolve 已經在 log 留噪音；
+ *   Nuxt 4 下 prerender 甚至會升級成 `[unhandledRejection]`）。
+ * - **Client（瀏覽器）**：走 `$fetch` 配 baseURL，由 GitHub Pages 直接供檔。
  */
 export async function fetchJsonWithFallback (filename: string): Promise<unknown> {
-  const path = joinURL(getPublicSiteBase(), filename)
-  // 一律用根絕對路徑，避免 ofetch 把相對路徑接到錯誤的 base（例如 _nuxt）
+  if (import.meta.server) {
+    const [{ readFile }, { resolve }] = await Promise.all([
+      import('node:fs/promises'),
+      import('node:path')
+    ])
+    const absolute = resolve(process.cwd(), 'public', filename)
+    const raw = await readFile(absolute, 'utf-8')
+    return JSON.parse(raw)
+  }
+
+  const path = joinURL(getClientSiteBase(), filename)
   const absolute = path.startsWith('/') ? path : `/${path}`
   return await $fetch(absolute)
 }
