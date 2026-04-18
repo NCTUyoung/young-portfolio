@@ -1,32 +1,42 @@
 /**
- * Static WebP thumbnail paths (see scripts/generate-thumbs.mjs).
- * Used for grid / previews; full originals via getImagePath in useImagePath.
+ * Static thumbnail paths（見 scripts/generate-thumbs.mjs）。
+ * 用於 grid / previews；原圖走 useImagePath 的 getImagePath。
+ *
+ * 兩種編碼並存（AVIF 2026 已達 Safari 16+/Chrome/Firefox/Edge ≥95% 支援率）：
+ * - AVIF：同品質下比 WebP 再小 20–30%，但編碼慢 5–10 倍，排 `<picture>` 第一順位。
+ * - WebP：fallback 給老舊瀏覽器與 admin 用；也是 `<img>.src` 的最終 fallback。
  */
 
 export type ThumbWidth = 400 | 800
+export type ThumbFormat = 'webp' | 'avif'
 
 /**
- * Make paths safe for HTML `src` / `srcset` (space breaks the `url 400w` token list).
- * Only replace spaces with `%20` — do not encode whole segments: over-encoding can break
- * dev/static servers matching filesystem paths for CJK folder names.
+ * 把路徑變成 HTML `src` / `srcset` 安全字串（空格會破壞 `url 400w` token list）。
+ * 只替換空格為 `%20`；不整段 encode 以免 dev/static server 對 CJK 資料夾名 mismatch。
  */
 export function encodePublicUrlPath (path: string): string {
   if (!path) return path
   return path.replace(/ /g, '%20')
 }
 
-/** gallery/foo.jpg → gallery/foo.webp */
-export function toThumbRelativeWebp (filename: string): string {
+/** gallery/foo.jpg → gallery/foo.<ext>（用於 `_thumbs` 底下 mirror） */
+export function toThumbRelativePath (filename: string, format: ThumbFormat = 'webp'): string {
   const clean = filename.startsWith('/') ? filename.slice(1) : filename
-  return clean.replace(/\.[^.]+$/i, '') + '.webp'
+  return clean.replace(/\.[^.]+$/i, '') + `.${format}`
+}
+
+/** Deprecated：向後相容 `toThumbRelativeWebp`，新的程式碼改用 `toThumbRelativePath`. */
+export function toThumbRelativeWebp (filename: string): string {
+  return toThumbRelativePath(filename, 'webp')
 }
 
 export function buildThumbPath (
   filename: string,
   width: ThumbWidth,
-  normalizedAppBase: string
+  normalizedAppBase: string,
+  format: ThumbFormat = 'webp'
 ): string {
-  const rel = toThumbRelativeWebp(filename)
+  const rel = toThumbRelativePath(filename, format)
   const base = normalizedAppBase === '/' ? '' : normalizedAppBase
   return `${base}images/_thumbs/${width}w/${rel}`
 }

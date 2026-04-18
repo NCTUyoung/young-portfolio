@@ -27,7 +27,15 @@ export const useImagePath = () => {
    * WebP thumbnail path (400w / 800w). Run `npm run thumbs` after adding images.
    */
   const getThumbPath = (filename: string, width: ThumbWidth = 800): string => {
-    return encodePublicUrlPath(buildThumbPath(filename, width, normalizedBase))
+    return encodePublicUrlPath(buildThumbPath(filename, width, normalizedBase, 'webp'))
+  }
+
+  /**
+   * AVIF thumbnail path（同 `_thumbs` 對偶檔）；給 `<picture><source type="image/avif">` 用。
+   * 若實體 AVIF 未產出，瀏覽器 `<picture>` 會自然 fallback 到下一個 source，不會炸畫面。
+   */
+  const getAvifThumbPath = (filename: string, width: ThumbWidth = 800): string => {
+    return encodePublicUrlPath(buildThumbPath(filename, width, normalizedBase, 'avif'))
   }
 
   /**
@@ -35,6 +43,11 @@ export const useImagePath = () => {
    */
   const getGridImageSrcset = (filename: string): string => {
     return `${getThumbPath(filename, 400)} 400w, ${getThumbPath(filename, 800)} 800w`
+  }
+
+  /** AVIF 版 srcset，搭配 `<source type="image/avif">`。 */
+  const getGridAvifSrcset = (filename: string): string => {
+    return `${getAvifThumbPath(filename, 400)} 400w, ${getAvifThumbPath(filename, 800)} 800w`
   }
 
   /**
@@ -56,7 +69,9 @@ export const useImagePath = () => {
   return {
     getImagePath,
     getThumbPath,
+    getAvifThumbPath,
     getGridImageSrcset,
+    getGridAvifSrcset,
     gridImageSizes: GRID_IMAGE_SIZES,
     getFullImageUrl
   }

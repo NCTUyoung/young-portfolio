@@ -29,19 +29,31 @@
           }"
           @click="$emit('imageClick', item, sortedItems)"
         >
-          <img
-            :src="getThumbPath(item.filename, 800)"
-            :srcset="getGridImageSrcset(item.filename)"
-            :sizes="gridImageSizes"
-            :alt="item.title"
-            class="w-full h-auto block group-hover:brightness-110 transition-[filter] duration-500 ease-out"
-            :loading="rowIndex < 3 ? 'eager' : 'lazy'"
-            decoding="async"
-            :data-row-key="row.key"
-            :data-item-index="itemIndex"
-            @load="(e) => onImageLoad(e, row.key, itemIndex)"
-            @error="() => onImageError(row.key, itemIndex)"
-          >
+          <picture class="contents">
+            <source
+              :srcset="getGridAvifSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              type="image/avif"
+            >
+            <source
+              :srcset="getGridImageSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              type="image/webp"
+            >
+            <img
+              :src="getThumbPath(item.filename, 800)"
+              :srcset="getGridImageSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              :alt="item.title"
+              class="w-full h-auto block group-hover:brightness-110 transition-[filter] duration-500 ease-out"
+              :loading="rowIndex < 3 ? 'eager' : 'lazy'"
+              decoding="async"
+              :data-row-key="row.key"
+              :data-item-index="itemIndex"
+              @load="(e) => onImageLoad(e, row.key, itemIndex)"
+              @error="() => onImageError(row.key, itemIndex)"
+            >
+          </picture>
           <!-- Hover caption — 和紙低調 -->
           <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-900/85 via-stone-900/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out flex items-end p-4 motion-reduce:transition-none">
             <div class="text-stone-100 font-light">
@@ -62,15 +74,27 @@
           class="cursor-pointer active:opacity-80 transition-opacity duration-200"
           @click="$emit('imageClick', item, sortedItems)"
         >
-          <img
-            :src="getThumbPath(item.filename, 800)"
-            :srcset="getGridImageSrcset(item.filename)"
-            :sizes="gridImageSizes"
-            :alt="item.title"
-            class="w-full h-auto"
-            loading="lazy"
-            decoding="async"
-          >
+          <picture class="contents">
+            <source
+              :srcset="getGridAvifSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              type="image/avif"
+            >
+            <source
+              :srcset="getGridImageSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              type="image/webp"
+            >
+            <img
+              :src="getThumbPath(item.filename, 800)"
+              :srcset="getGridImageSrcset(item.filename)"
+              :sizes="gridImageSizes"
+              :alt="item.title"
+              class="w-full h-auto"
+              loading="lazy"
+              decoding="async"
+            >
+          </picture>
           <div class="mt-2">
             <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1 font-jp tracking-wide">{{ item.title }}</h4>
             <p class="text-xs text-stone-400 dark:text-stone-500 jp-kansuji">{{ item.time }}</p>
@@ -99,7 +123,7 @@ defineEmits<{
   imageClick: [item: GalleryItem, items: GalleryItem[]]
 }>()
 
-const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
+const { getThumbPath, getGridImageSrcset, getGridAvifSrcset, gridImageSizes } = useImagePath()
 
 const rootEl = ref<HTMLElement | null>(null)
 

@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { buildThumbPath, encodePublicUrlPath, toThumbRelativeWebp } from './imagePaths'
+import {
+  buildThumbPath,
+  encodePublicUrlPath,
+  toThumbRelativePath,
+  toThumbRelativeWebp
+} from './imagePaths'
 
-describe('toThumbRelativeWebp', () => {
-  it('strips extension and appends webp', () => {
-    expect(toThumbRelativeWebp('gallery/foo.jpg')).toBe('gallery/foo.webp')
+describe('toThumbRelativePath / toThumbRelativeWebp', () => {
+  it('strips extension and appends webp by default', () => {
+    expect(toThumbRelativePath('gallery/foo.jpg')).toBe('gallery/foo.webp')
     expect(toThumbRelativeWebp('/gallery/foo.JPEG')).toBe('gallery/foo.webp')
+  })
+
+  it('supports avif format', () => {
+    expect(toThumbRelativePath('gallery/foo.jpg', 'avif')).toBe('gallery/foo.avif')
+    expect(toThumbRelativePath('/photography/x/y.png', 'avif')).toBe('photography/x/y.avif')
   })
 })
 
@@ -26,5 +36,10 @@ describe('buildThumbPath', () => {
   })
   it('works with empty base (dev)', () => {
     expect(buildThumbPath('x.jpg', 400, '')).toBe('images/_thumbs/400w/x.webp')
+  })
+  it('emits avif path when format=avif', () => {
+    expect(buildThumbPath('a/b.png', 800, '/young-portfolio/', 'avif')).toBe(
+      '/young-portfolio/images/_thumbs/800w/a/b.avif'
+    )
   })
 })

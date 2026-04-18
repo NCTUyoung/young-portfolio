@@ -53,16 +53,32 @@
                   :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
                   @click="openImageViewer(image, item.images || [])"
                 >
-                  <img
-                    :src="getThumbPath(image.filename, 800)"
-                    :srcset="getGridImageSrcset(image.filename)"
-                    :sizes="gridImageSizes"
-                    :alt="image.title"
-                    class="h-full w-full object-cover align-top"
-                    loading="lazy"
-                    decoding="async"
-                    @load="onImgLoad(image.filename, $event)"
-                  >
+                  <!--
+                    `<picture class="contents">` 讓 layout 透明化，flex/grid 仍以 `<img>` 當 direct child。
+                    AVIF 未產出時瀏覽器自動 fallback 到 WebP `<source>`，再到 `<img>.src`，不會影響畫面。
+                  -->
+                  <picture class="contents">
+                    <source
+                      :srcset="getGridAvifSrcset(image.filename)"
+                      :sizes="gridImageSizes"
+                      type="image/avif"
+                    >
+                    <source
+                      :srcset="getGridImageSrcset(image.filename)"
+                      :sizes="gridImageSizes"
+                      type="image/webp"
+                    >
+                    <img
+                      :src="getThumbPath(image.filename, 800)"
+                      :srcset="getGridImageSrcset(image.filename)"
+                      :sizes="gridImageSizes"
+                      :alt="image.title"
+                      class="h-full w-full object-cover align-top"
+                      loading="lazy"
+                      decoding="async"
+                      @load="onImgLoad(image.filename, $event)"
+                    >
+                  </picture>
                   <!-- Hover overlay — 墨色和紙、jp-eyebrow 風 -->
                   <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/85 via-stone-900/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3 motion-reduce:transition-none">
                     <h4 class="text-stone-100 text-sm font-jp font-light tracking-wider mb-1.5 truncate">{{ image.title || '未命名' }}</h4>
@@ -126,16 +142,28 @@
                 :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
                 @click="openImageViewer(image, item.images || [])"
               >
-                <img
-                  :src="getThumbPath(image.filename, 800)"
-                  :srcset="getGridImageSrcset(image.filename)"
-                  :sizes="gridImageSizes"
-                  :alt="image.title"
-                  class="h-full w-full object-cover align-top"
-                  loading="lazy"
-                  decoding="async"
-                  @load="onImgLoad(image.filename, $event)"
-                >
+                <picture class="contents">
+                  <source
+                    :srcset="getGridAvifSrcset(image.filename)"
+                    :sizes="gridImageSizes"
+                    type="image/avif"
+                  >
+                  <source
+                    :srcset="getGridImageSrcset(image.filename)"
+                    :sizes="gridImageSizes"
+                    type="image/webp"
+                  >
+                  <img
+                    :src="getThumbPath(image.filename, 800)"
+                    :srcset="getGridImageSrcset(image.filename)"
+                    :sizes="gridImageSizes"
+                    :alt="image.title"
+                    class="h-full w-full object-cover align-top"
+                    loading="lazy"
+                    decoding="async"
+                    @load="onImgLoad(image.filename, $event)"
+                  >
+                </picture>
               </div>
             </div>
           </div>
@@ -167,7 +195,7 @@ const IDEAL_ROW_MOBILE = 180
 const FALLBACK_WIDTH_DESKTOP = 1200
 const FALLBACK_WIDTH_MOBILE = 360
 
-const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
+const { getThumbPath, getGridImageSrcset, getGridAvifSrcset, gridImageSizes } = useImagePath()
 const imageViewerStore = useImageViewerStore()
 
 /** Measured width of the actual gallery column (inside timeline content slot) */
