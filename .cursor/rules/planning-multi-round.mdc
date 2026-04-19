@@ -1,0 +1,108 @@
+---
+description: Multi-round planning flow for major features — parallel explore × N subagents → v1 draft → critic subagent → decisions → v2. Use when planning architecture, optimizing core features, large refactors, or any ambiguous task with trade-offs where single-pass plans risk blind spots.
+alwaysApply: false
+---
+
+# 多輪規劃流程（Multi-Round Planning）
+
+當使用者要求「提出優化計畫 / 重大重構 / 核心功能改造 / 架構決策」時，**不要**一次性丟出線性步驟列表（單輪規劃常有事實錯誤、假設盲點、低估成本）。改走本流程。
+
+## 何時啟用
+
+- 任務跨 3+ 檔案 **且** 有非瑣碎取捨（效能 vs. 可維護、簡單 vs. 正確）
+- 使用者用「優化、重構、重新設計、核心、計畫、phasing」等字
+- 使用者明說「啟動 subagent」「多輪討論」「檢討」
+
+## 何時跳過
+
+- 單檔 bug fix、格式化、改名、文案微調
+- 任務範圍明確且只有一種解（直接做，別開會）
+
+---
+
+## 流程（5 個 Round）
+
+### Round 1 — 原則錨定（主 agent 自己做，1~2 個檔案讀取）
+
+讀該專案的關鍵規則檔：`AGENTS.md`、相關的 `.cursor/rules/*.mdc`、領域規則（如 `design-aesthetic.mdc`）。
+目的：後續所有建議都必須符合既有美感／架構／部署原則。
+
+### Round 2 — 平行探索（`Task` × 3~5 個 `explore` subagent）
+
+**同一個 tool_use block 內**並行派出 explore subagents，每個負責**不同面向**，互不重疊：
+
+| 面向 | 典型問題 |
+|---|---|
+| 結構 / 路由 / 狀態 | 元件 ↔ store ↔ route 依賴、composable 競態、SEO SSR |
+| 效能 / 資產 | bundle、lazy load、圖片策略、CLS/LCP、資料大小 |
+| UX / A11y / 響應式 | happy path vs. current、空態／錯態、觸控鍵盤、對比度 |
+| 資料 / metadata | schema、完成度統計、孤兒欄位、後台可維護性 |
+| 測試 / CI（視需要） | 覆蓋、護欄、lint 策略 |
+
+**每個 explore prompt 都要指定明確回傳格式**（中文 markdown，含「痛點清單 🔴🟡🟢 + 檔案:行號」+「尚待釐清事項」）。這讓 subagent 回傳可直接合併、不發散。
+
+### Round 3 — v1 草案（主 agent）
+
+基於四份探索報告，綜合成 v1 計畫：
+
+1. **診斷摘要表**（嚴重度 × 類別 × 一句話）
+2. **分 Phase**（0 止血 → 1 核心 → 2 效能 → 3 深化 → 4 彈性）
+   - 每項帶：改動、檔案、估時、風險、**rollback 訊號**（失敗判定）
+3. **測試策略**（既有不破 + 新增護欄）
+4. **原則提醒**（呼應 Round 1 讀到的規則）
+
+### Round 4 — 批判（`Task` 單發 `generalPurpose` + `readonly: true`）
+
+派一個 **critic subagent**，prompt 要明確說「像 devil's advocate、資深 tech lead 審稿、不要讚美」。交給它 v1 全文 + 專案背景，要求：
+
+- 對每個 Phase 每條改動，回答：**新問題／前置假設對不對／成本低估嗎／違反準則嗎／更好替代**
+- 特別質疑**主 agent 可能盲點**（通常藏在「把行為當 bug」「事實錯誤」「技術陷阱」）
+- 指出**主 agent 未提到**的結構性遺漏（SSG、cache、CI、記憶體、部署邊界）
+- 給「只做 3 件事」的優先序
+- **列 3~5 題必問使用者的 Open Questions**（UX 意圖、品牌取捨等 agent 無權替使用者決定的事）
+
+### Round 5 — 決策 + v2 定案（主 agent）
+
+1. 列出**被 critic 推翻／修正**的項目（不要遮掩錯誤，明列 v1→v2 差異）
+2. 列出**critic 補入的新項目**並分配 Phase
+3. 用 `AskQuestion` 把 critic 提出的 3~5 題**一次性**問使用者（多選一 options，含「智慧混合」「維持現況」等中庸選項）
+4. 把回答**注入計畫**，把 v2 鎖成可執行
+5. 等使用者授權才動手
+
+---
+
+## 產出品質檢查
+
+每一輪結束前自檢：
+
+- Round 2：每個 subagent 有回「檔案:行號」證據，不只推論
+- Round 3：每個改動都能答「失敗怎麼判斷」（rollback 訊號）
+- Round 4：critic 至少找出 3 個事實錯誤或假設盲點；若找不到，表示主 agent 太保守或 critic prompt 不夠挑釁
+- Round 5：v2 不再含「未決策」項；所有 UX 判斷都有使用者背書
+
+## 反面教材
+
+- ❌ 直接用 Todo 寫 10 個線性步驟就開幹
+- ❌ explore subagent 沒分面向，互相重疊或都在找同一個痛點
+- ❌ critic prompt 寫「請協助審視」——太客氣，會得到附和
+- ❌ 把所有決策硬塞給使用者（列 20 題 AskQuestion）——只問 3~5 個**真正只有使用者能答**的
+- ❌ 一輪就把 v2 當定案、直接開工——一定會漏掉 SSG、cache、部署邊界
+
+## 範例 prompt 骨架
+
+**Explore（其中一面向）**
+> 你是 readonly 探索 agent。從「[面向]」角度徹底分析 [功能]。
+> 目的：為後續優化提供此層的地圖與痛點。
+> 待回答：[5~8 個具體問題]
+> 回傳格式：A. 架構地圖 / B. 現狀摘要（附檔案:行號）/ C. 痛點 🔴🟡🟢 / D. 尚待釐清
+> 以 very thorough 層級，不改檔。
+
+**Critic**
+> 你是嚴格的 tech lead。不要讚美，找漏洞。
+> 背景：[專案 stack + 規則檔路徑]
+> 待審：<plan>[v1 全文]</plan>
+> 1. 每 Phase 每條：新問題／假設對嗎／成本真實嗎／違反準則嗎／更好替代
+> 2. 特別質疑：[2~3 個主 agent 可能的盲點]
+> 3. 找出主 agent 遺漏的結構議題（SSG、cache、CI、記憶體、部署）
+> 4. 「只做 3 件事」排序
+> 5. 列 3~5 題必問使用者的 Open Questions

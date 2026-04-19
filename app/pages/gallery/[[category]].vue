@@ -35,6 +35,9 @@
         <div class="mb-6">
           <EventFilter />
         </div>
+
+        <!-- 搜尋 + 年份：輕量行內工具列 -->
+        <GalleryFilterToolbar />
       </div>
     </div>
 
@@ -53,9 +56,32 @@
         </div>
       </div>
 
+      <!-- 錯誤態：useAsyncData 失敗或兩邊作品都空時，提供就地重試（避免只靠右上角 toast） -->
+      <div
+        v-else-if="galleryLoadFailed"
+        class="max-w-md mx-auto my-24 text-center px-6"
+        role="alert"
+      >
+        <p class="jp-section-label mb-3">Error</p>
+        <h2 class="text-xl font-extralight text-stone-700 dark:text-stone-200 tracking-wider mb-2">
+          無法載入作品清單
+        </h2>
+        <p class="text-sm text-stone-500 dark:text-stone-400 font-light leading-relaxed mb-6">
+          網路或資料檔可能暫時無法取得，請稍後再試。
+        </p>
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 px-5 py-2 text-xs tracking-[0.25em] text-stone-600 dark:text-stone-300 border border-stone-300 dark:border-stone-600 hover:text-accent-600 dark:hover:text-accent-400 hover:border-accent-400/60 transition-colors"
+          :disabled="isGalleryRetrying"
+          @click="retryGalleryLoad"
+        >
+          {{ isGalleryRetrying ? 'Retrying…' : 'Retry' }}
+        </button>
+      </div>
+
       <!-- 地點地圖：僅在攝影作品分類顯示 -->
       <section
-        v-if="eventLocations && eventLocations.length && currentCategory === 'photography'"
+        v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
         ref="mapSectionRef"
         class="mb-16 max-w-7xl mx-auto scroll-mt-24"
       >
@@ -69,9 +95,30 @@
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
-      <div v-if="!isGalleryLoading" :key="currentCategory">
+      <div v-if="!isGalleryLoading && !galleryLoadFailed" :key="currentCategory">
+        <!-- 搜尋／年份篩選後無結果：就地提示並提供清除 -->
+        <div
+          v-if="hasActiveSecondaryFilter && noFilteredResults"
+          class="max-w-md mx-auto my-20 text-center px-6"
+        >
+          <p class="jp-section-label mb-3">Empty</p>
+          <h2 class="text-lg font-extralight text-stone-700 dark:text-stone-200 tracking-wider mb-2">
+            沒有符合條件的作品
+          </h2>
+          <p class="text-sm text-stone-500 dark:text-stone-400 font-light leading-relaxed mb-5">
+            試著調整搜尋詞或年份篩選，或直接清除現有篩選再瀏覽。
+          </p>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 px-4 py-1.5 text-xs tracking-[0.25em] text-stone-600 dark:text-stone-300 border border-stone-300 dark:border-stone-600 hover:text-accent-600 dark:hover:text-accent-400 hover:border-accent-400/60 transition-colors"
+            @click="clearSecondaryFilters"
+          >
+            Reset filters
+          </button>
+        </div>
+
         <!-- 數位繪圖 - Pinterest 風格瀑布流佈局 -->
-        <div v-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
+        <div v-else-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
           <GalleryMasonryLayout
             :items="digitalArtItems"
             :columns="4"
@@ -129,6 +176,8 @@
       v-if="showBackToMap && currentCategory === 'photography'"
       class="hidden md:flex fixed right-[10%] top-1/2 z-[1005] -translate-y-1/2 px-3 py-1.5 text-[0.7rem] tracking-[0.3em] rounded-full bg-white/90 border border-stone-200 text-stone-500 hover:text-accent-600 hover:border-accent-300 shadow-japanese transition-all"
       type="button"
+      aria-label="回到地圖"
+      title="回到地圖"
       @click="scrollToMap"
     >
       MAP
@@ -139,6 +188,8 @@
       v-if="showBackToMap && currentCategory === 'photography'"
       class="md:hidden fixed z-[1005] flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-stone-200 bg-white/95 text-[0.65rem] tracking-[0.2em] text-stone-500 shadow-japanese transition-all active:scale-95 right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(5rem+env(safe-area-inset-bottom))]"
       type="button"
+      aria-label="回到地圖"
+      title="回到地圖"
       @click="scrollToMap"
     >
       MAP
@@ -165,6 +216,7 @@ import { useGlobalToast } from '~/composables/useToast'
 // ===== 組件引入 =====
 import GalleryTabBar from '~/components/GalleryTabBar.vue'
 import EventFilter from '~/components/EventFilter.vue'
+import GalleryFilterToolbar from '~/components/GalleryFilterToolbar.vue'
 import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryAllMixedSection from '~/components/gallery/GalleryAllMixedSection.vue'
@@ -183,18 +235,20 @@ const {
   filterState,
   digitalWorks,
   photographyWorks,
-  currentWorks,
+  filteredItems,
 } = storeToRefs(galleryStore)
 
 const {
   loadAllWorks,
   hydrateFromPayload,
   setSelectedEvent,
+  setSearchQuery,
+  setYearFilter,
 } = galleryStore
 
 const { getImagePath, getThumbPath } = useImagePath()
 
-const { data: galleryPayload, pending: galleryPending } = await useAsyncData('gallery-works', async () => {
+const { data: galleryPayload, pending: galleryPending, error: galleryPayloadError, refresh: refreshGalleryPayload } = await useAsyncData('gallery-works', async () => {
   const [digital, photo] = await Promise.all([fetchDigitalWorks(), fetchPhotographyWorks()])
   return { digital, photo }
 })
@@ -204,6 +258,29 @@ watch(galleryPayload, (v) => {
 }, { immediate: true })
 
 const isGalleryLoading = computed(() => galleryPending.value || isLoading.value)
+
+const galleryLoadFailed = computed(() => {
+  if (isGalleryLoading.value) return false
+  const hasError = Boolean(galleryPayloadError.value || digitalError.value || photographyError.value)
+  const hasNoWorks = digitalWorks.value.length === 0 && photographyWorks.value.length === 0
+  return hasError && hasNoWorks
+})
+
+const isGalleryRetrying = ref(false)
+const retryGalleryLoad = async () => {
+  if (isGalleryRetrying.value) return
+  isGalleryRetrying.value = true
+  try {
+    await refreshGalleryPayload()
+    if (galleryPayload.value) {
+      hydrateFromPayload(galleryPayload.value)
+    } else {
+      await loadAllWorks()
+    }
+  } finally {
+    isGalleryRetrying.value = false
+  }
+}
 
 const imageViewerStore = useImageViewerStore()
 const toast = useGlobalToast()
@@ -242,13 +319,31 @@ const footerQuotes: Record<string, { quote: string; sub: string }> = {
 const footerQuote = computed(() => footerQuotes[currentCategory.value]?.quote || footerQuotes.all.quote)
 const footerSub = computed(() => footerQuotes[currentCategory.value]?.sub || footerQuotes.all.sub)
 
-// 數位作品列表 - 使用經過篩選的 currentWorks
+// 數位作品列表 - 使用經過篩選的 currentWorks（含搜尋／年份）
 const digitalArtItems = computed(() => {
   if (filterState.value.selectedCategory === 'digital') {
-    return currentWorks.value
+    // filteredItems = currentWorks 套用 search/year；category=digital 時 currentWorks 已是 digitalWorks
+    return filteredItems.value
   }
   return digitalWorks.value
 })
+
+const hasActiveSecondaryFilter = computed(() =>
+  Boolean(filterState.value.searchQuery || filterState.value.yearFilter)
+)
+
+const noFilteredResults = computed(() => {
+  if (currentCategory.value === 'digital') return digitalArtItems.value.length === 0
+  if (currentCategory.value === 'photography') {
+    return photographyEventItems.value.reduce((s, g) => s + (g.images?.length || 0), 0) === 0
+  }
+  return mixedPhotoItems.value.reduce((s, g) => s + (g.images?.length || 0), 0) === 0
+})
+
+const clearSecondaryFilters = () => {
+  setSearchQuery('')
+  setYearFilter(null)
+}
 
 
 
@@ -329,7 +424,9 @@ const isMapComfortablyVisible = () => {
 }
 
 const scrollToMap = () => {
-  mapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // block: 'nearest' 避免使用者已在地圖下方瀏覽時被強拉回頂端；
+  // 只有完全看不到地圖時瀏覽器才會自動對齊，符合「柔性引導」原則。
+  mapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 }
 
 // ===== 圖片檢視器方法 =====
@@ -339,11 +436,21 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
 
 
 // ===== 監聽器 =====
-/** 篩選某一事件時：地圖 flyTo（EventMap）；僅在需要時捲到「整塊地圖區」對齊視窗上方，避免半張地圖＋半張作品 */
+/**
+ * 篩選某一事件時：
+ * - 地圖 flyTo 由 EventMap 處理
+ * - 僅當「首次選取事件」且「使用者目前看不到地圖」才 scrollToMap，
+ *   避免在地圖下方繼續切換事件時每次都被捲回頂端
+ */
+const hasScrolledOnEventSelection = ref(false)
 watch(
   () => filterState.value.selectedEvent,
-  async (name) => {
-    if (currentCategory.value !== 'photography' || !name) return
+  async (name, prev) => {
+    if (currentCategory.value !== 'photography') return
+    if (!name) {
+      hasScrolledOnEventSelection.value = false
+      return
+    }
     await nextTick()
     await nextTick()
 
@@ -357,8 +464,10 @@ watch(
       focusTimer = null
     }, 1200)
 
-    if (!isMapComfortablyVisible()) {
+    const isFirstSelection = prev === null || prev === undefined
+    if (isFirstSelection && !isMapComfortablyVisible()) {
       scrollToMap()
+      hasScrolledOnEventSelection.value = true
     }
   }
 )
@@ -495,6 +604,17 @@ useHead({
 .gallery-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
 .gallery-fade-enter-from { opacity: 0; transform: translateY(12px); }
 .gallery-fade-leave-to   { opacity: 0; transform: translateY(-8px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-fade-enter-active,
+  .gallery-fade-leave-active {
+    transition: opacity 0.15s linear;
+  }
+  .gallery-fade-enter-from,
+  .gallery-fade-leave-to {
+    transform: none;
+  }
+}
 
 @media (max-width: 768px) {
   h1 {

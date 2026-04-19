@@ -181,6 +181,23 @@ import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { computeJustifiedRows, DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
 
+/**
+ * ResizeObserver debounce：視窗拖拉時每毫秒都會觸發 RO，
+ * 一次 resize 可能連續觸發上百次 justified layout 重算 → 主執行緒抖動。
+ * 用 rAF 合併到下一幀只算一次。
+ */
+function rafDebounce (fn: () => void): () => void {
+  let scheduled = false
+  return () => {
+    if (scheduled) return
+    scheduled = true
+    requestAnimationFrame(() => {
+      scheduled = false
+      fn()
+    })
+  }
+}
+
 const props = defineProps<{
   items: MixedPhotoItem[]
   focusedEventName: string | null
@@ -241,7 +258,7 @@ function bindStripRef (
     }
   }
 
-  const ro = new ResizeObserver(apply)
+  const ro = new ResizeObserver(rafDebounce(apply))
   ro.observe(html)
   resizeObservers.set(mapKey, ro)
   apply()

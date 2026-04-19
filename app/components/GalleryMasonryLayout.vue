@@ -25,6 +25,7 @@
           :style="{
             flex: row.items.length === 1 ? '0 0 auto' : `${item.flex} 1 0`,
             maxWidth: row.items.length === 1 ? getSingleItemMaxWidth(item.aspectRatio) : undefined,
+            aspectRatio: String(item.aspectRatio),
             transitionDelay: `${(rowIndex * row.items.length + itemIndex) * 50}ms`
           }"
           @click="$emit('imageClick', item, sortedItems)"
@@ -45,7 +46,7 @@
               :srcset="getGridImageSrcset(item.filename)"
               :sizes="gridImageSizes"
               :alt="item.title"
-              class="w-full h-auto block group-hover:brightness-110 transition-[filter] duration-500 ease-out"
+              class="w-full h-full object-cover block group-hover:brightness-110 transition-[filter] duration-500 ease-out"
               :loading="rowIndex < 3 ? 'eager' : 'lazy'"
               decoding="async"
               :data-row-key="row.key"
@@ -74,6 +75,10 @@
           class="cursor-pointer active:opacity-80 transition-opacity duration-200"
           @click="$emit('imageClick', item, sortedItems)"
         >
+          <div
+            class="w-full overflow-hidden bg-stone-100 dark:bg-stone-800"
+            :style="{ aspectRatio: String(getAspectRatio(item)) }"
+          >
           <picture class="contents">
             <source
               :srcset="getGridAvifSrcset(item.filename)"
@@ -90,11 +95,12 @@
               :srcset="getGridImageSrcset(item.filename)"
               :sizes="gridImageSizes"
               :alt="item.title"
-              class="w-full h-auto"
+              class="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
             >
           </picture>
+          </div>
           <div class="mt-2">
             <h4 class="text-sm font-light text-stone-700 dark:text-stone-300 line-clamp-1 font-jp tracking-wide">{{ item.title }}</h4>
             <p class="text-xs text-stone-400 dark:text-stone-500 jp-kansuji">{{ item.time }}</p>
@@ -397,6 +403,8 @@ onMounted(() => {
 .gallery-item img {
   display: block;
   width: 100%;
-  height: auto;
+  /* 以容器 aspect-ratio 撐出高度、object-cover 填滿，避免圖片載入時 layout shift */
+  height: 100%;
+  object-fit: cover;
 }
 </style>

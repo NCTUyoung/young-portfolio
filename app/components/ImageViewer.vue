@@ -7,7 +7,7 @@
     aria-modal="true"
     aria-label="圖片檢視器"
     tabindex="-1"
-    class="fixed inset-0 z-[9999] bg-stone-950/97 backdrop-blur-sm"
+    class="fixed inset-0 z-[9999] bg-stone-950/95 backdrop-blur-md"
   >
     <!-- 背景點擊關閉 -->
     <div class="absolute inset-0" @click="closeImageViewer"/>
@@ -22,82 +22,87 @@ class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 tran
            }"
            @wheel.prevent="handleWheel">
 
-        <!-- 頂部工具列（手機改為兩列，避免按鈕與標題擠成一行） -->
+        <!-- 頂部漸層（讓標題／圖示不必框就可讀） -->
+        <div class="viewer-top-veil pointer-events-none absolute inset-x-0 top-0 z-0 h-24 bg-gradient-to-b from-stone-950/75 via-stone-950/25 to-transparent sm:h-32"/>
+
+        <!-- 頂部：標題（左）+ 工具列（右）— 無框浮空，遵循「余白・細線」原則 -->
         <div
-class="absolute top-2 left-2 z-10 flex flex-col gap-2 sm:top-4 sm:left-4 sm:flex-row sm:items-start sm:justify-between"
+class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 flex items-start justify-between gap-3 sm:top-5 sm:left-5 sm:right-5"
              :style="toolbarInsetStyle">
 
-          <!-- 圖片資訊 — 和紙卡片 -->
-          <div class="min-w-0 flex max-w-full items-center space-x-4 bg-stone-900/75 px-3 py-2 backdrop-blur-md border border-stone-700/50 sm:px-4">
-            <div class="min-w-0 text-stone-100">
-              <h3 class="truncate font-jp font-light tracking-wider">{{ currentViewerImage?.title || '未命名' }}</h3>
-              <p class="text-xs text-stone-400 font-light tracking-[0.2em] jp-kansuji">{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>
-            </div>
+          <!-- 標題區：純文字 + 細線收束，無背景、無邊框 -->
+          <div class="min-w-0 flex-1 pt-1 text-stone-100">
+            <p class="text-[0.65rem] sm:text-xs text-stone-400 font-light tracking-[0.3em] jp-kansuji tabular-nums">
+              <span class="text-stone-100">{{ currentImageIndex + 1 }}</span>
+              <span class="mx-1.5 text-stone-600">／</span>
+              <span>{{ viewerImages.length }}</span>
+            </p>
+            <h3 class="mt-1 truncate font-jp font-light tracking-wider text-[0.95rem] sm:text-base">
+              {{ currentViewerImage?.title || '未命名' }}
+            </h3>
+            <span aria-hidden="true" class="mt-2 block h-px w-10 bg-stone-300/30"/>
           </div>
 
-          <!-- 操作按鈕 -->
-          <div class="flex flex-shrink-0 flex-wrap items-center justify-end gap-1 bg-stone-900/75 px-1 py-1 backdrop-blur-md border border-stone-700/50 sm:gap-2 sm:px-2 sm:py-2">
-            <!-- 縮放控制 -->
+          <!-- 操作列：一排簡素圖示，無外框；「關閉」前以細線分隔收束 -->
+          <div class="flex flex-shrink-0 items-center gap-0 -mr-1 sm:-mr-2">
             <button
-:disabled="!canZoomOut" class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+:disabled="!canZoomOut" class="viewer-btn"
                     title="縮小 (Ctrl + -)"
                     aria-label="縮小"
                     @click="zoomOut">
-              <Icon name="lucide:zoom-out" class="w-5 h-5" aria-hidden="true"/>
+              <Icon name="lucide:zoom-out" class="viewer-ico" aria-hidden="true"/>
             </button>
 
-            <span class="text-stone-200 text-sm min-w-[60px] text-center font-light jp-kansuji">{{ Math.round(viewerScale * 100) }}%</span>
+            <span class="hidden sm:inline-block text-stone-300 text-xs min-w-[52px] text-center font-light jp-kansuji tabular-nums">{{ Math.round(viewerScale * 100) }}%</span>
 
             <button
-:disabled="!canZoomIn" class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+:disabled="!canZoomIn" class="viewer-btn"
                     title="放大 (Ctrl + +)"
                     aria-label="放大"
                     @click="zoomIn">
-              <Icon name="lucide:zoom-in" class="w-5 h-5" aria-hidden="true"/>
+              <Icon name="lucide:zoom-in" class="viewer-ico" aria-hidden="true"/>
             </button>
 
-            <!-- 適應螢幕/原始大小切換 -->
+            <!-- 適應螢幕／原始大小切換（手機隱藏） -->
             <button
-class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
+class="viewer-btn hidden sm:inline-flex"
                     :title="fitToScreen ? '顯示原始大小' : '適應螢幕'"
                     :aria-label="fitToScreen ? '顯示原始大小' : '適應螢幕'"
                     @click="toggleFitToScreen">
               <Icon
                 :name="fitToScreen ? 'lucide:maximize' : 'lucide:minimize'"
-                class="w-5 h-5"
+                class="viewer-ico"
                 aria-hidden="true"
               />
             </button>
 
-            <!-- 重置縮放 -->
             <button
-class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
+class="viewer-btn"
                     title="重置縮放 (0)"
                     aria-label="重置縮放"
                     @click="resetTransform">
-              <Icon name="lucide:rotate-ccw" class="w-5 h-5" aria-hidden="true"/>
+              <Icon name="lucide:rotate-ccw" class="viewer-ico" aria-hidden="true"/>
             </button>
 
-
-
-            <!-- 資訊面板切換 -->
             <button
-class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
-                    :class="{ 'bg-stone-700/60 text-stone-50': showInfoPanel }"
+class="viewer-btn"
+                    :class="{ 'viewer-btn--active': showInfoPanel }"
                     title="圖片資訊 (I)"
                     aria-label="切換圖片資訊面板"
                     :aria-pressed="showInfoPanel"
                     @click="toggleInfoPanel">
-              <Icon name="lucide:info" class="w-5 h-5" aria-hidden="true"/>
+              <Icon name="lucide:info" class="viewer-ico" aria-hidden="true"/>
             </button>
 
-            <!-- 關閉按鈕 -->
+            <!-- 細線分隔，讓「關閉」成為一個獨立收束點 -->
+            <span aria-hidden="true" class="mx-1 h-5 w-px bg-stone-500/30"/>
+
             <button
-class="p-2 text-stone-200 hover:text-stone-50 hover:bg-stone-700/50 transition-colors"
+class="viewer-btn"
                     title="關閉 (Esc)"
                     aria-label="關閉圖片檢視器"
                     @click="closeImageViewer">
-              <Icon name="lucide:x" class="w-5 h-5" aria-hidden="true"/>
+              <Icon name="lucide:x" class="viewer-ico-lg" aria-hidden="true"/>
             </button>
           </div>
         </div>
@@ -116,7 +121,8 @@ v-if="currentViewerImage"
                ]"
                :style="imageStyle"
                draggable="false"
-               loading="lazy"
+               loading="eager"
+               fetchpriority="high"
                decoding="async"
                @click.stop
                @mousedown="handleMouseDown"
@@ -136,7 +142,7 @@ v-if="currentViewerImage"
         <!-- 導航按鈕 -->
         <button
 v-if="viewerImages.length > 1 && hasPrevious"
-                class="absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2 p-2.5 sm:p-3 bg-stone-900/70 backdrop-blur-md border border-stone-700/50 text-stone-200 rounded-full hover:bg-stone-800/85 hover:text-stone-50 transition-colors"
+                class="viewer-nav-btn absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2"
                 title="上一張 (←)"
                 aria-label="上一張"
                 @click="goToPreviousImage">
@@ -145,7 +151,7 @@ v-if="viewerImages.length > 1 && hasPrevious"
 
         <button
 v-if="viewerImages.length > 1 && hasNext"
-                class="absolute top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3 bg-stone-900/70 backdrop-blur-md border border-stone-700/50 text-stone-200 rounded-full hover:bg-stone-800/85 hover:text-stone-50 transition-colors"
+                class="viewer-nav-btn absolute top-1/2 transform -translate-y-1/2"
                 :style="nextNavButtonStyle"
                 title="下一張 (→)"
                 aria-label="下一張"
@@ -167,13 +173,16 @@ v-if="viewerImages.length > 1 && hasNext"
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
-import ImageInfoPanel from './ImageInfoPanel.vue'
-import ImageNavigator from './ImageNavigator.vue'
-import RadialNavigation from './RadialNavigation.vue'
+
+// 非關鍵子元件採 lazy 載入：使用者打開 lightbox 當下不一定會開資訊面板／縮圖盤，
+// 拆出去可以省首屏 JS 體積，首次點開圖片時再按需載入。
+const ImageInfoPanel = defineAsyncComponent(() => import('./ImageInfoPanel.vue'))
+const ImageNavigator = defineAsyncComponent(() => import('./ImageNavigator.vue'))
+const RadialNavigation = defineAsyncComponent(() => import('./RadialNavigation.vue'))
 
 const imageViewerStore = useImageViewerStore()
 const { getImagePath } = useImagePath()
@@ -234,9 +243,13 @@ const lightboxRoot = ref<HTMLElement>()
 
 /**
  * Lightbox focus trap：
- * - 開啟時：記住原焦點、鎖 body 捲動、把焦點移入 dialog
+ * - 開啟時：記住原焦點、把焦點移入 dialog
  * - Tab / Shift+Tab 循環 dialog 內的可聚焦元素
- * - 關閉時：還原捲動與焦點
+ * - 關閉時：還原焦點
+ *
+ * 註：body 捲動鎖定由 `stores/imageViewer.ts` 的 open/closeImageViewer 統一管理，
+ * 此處不可重複操作 body.style.overflow，否則關閉時會把先前由 store 設定的
+ * 'hidden' 寫回，導致整頁滾輪事件失靈。
  */
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -248,7 +261,6 @@ const FOCUSABLE_SELECTOR = [
 ].join(',')
 
 let previouslyFocused: HTMLElement | null = null
-let previousBodyOverflow = ''
 
 const getFocusable = (): HTMLElement[] => {
   const root = lightboxRoot.value
@@ -259,16 +271,12 @@ const getFocusable = (): HTMLElement[] => {
 
 const activateTrap = async () => {
   previouslyFocused = (document.activeElement as HTMLElement) ?? null
-  previousBodyOverflow = document.body.style.overflow
-  document.body.style.overflow = 'hidden'
   await nextTick()
   const [first] = getFocusable()
   ;(first ?? lightboxRoot.value)?.focus()
 }
 
 const releaseTrap = () => {
-  document.body.style.overflow = previousBodyOverflow
-  previousBodyOverflow = ''
   if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
     previouslyFocused.focus()
   }
@@ -481,6 +489,79 @@ watch(isOpen, (open) => {
 </script>
 
 <style scoped>
+/* ===== 檢視器按鈕（無框、簡素；手機 44px 最小觸控目標） ===== */
+.viewer-btn {
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.625rem;
+  color: rgb(214 211 209 / 0.9);
+  background-color: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.viewer-btn:not(.hidden) {
+  display: inline-flex;
+}
+.viewer-btn:hover:not(:disabled) {
+  background-color: rgb(41 37 36 / 0.5);
+  color: rgb(250 250 249);
+}
+.viewer-btn:active:not(:disabled) {
+  background-color: rgb(41 37 36 / 0.75);
+}
+.viewer-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.viewer-btn--active {
+  color: rgb(237 184 125); /* accent-300，細微墨印色提示 */
+}
+@media (min-width: 640px) {
+  .viewer-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0.5rem;
+  }
+}
+
+/* 圖示尺寸 — 手機略小更簡素 */
+.viewer-ico {
+  width: 18px;
+  height: 18px;
+}
+.viewer-ico-lg {
+  width: 20px;
+  height: 20px;
+}
+@media (min-width: 640px) {
+  .viewer-ico { width: 20px; height: 20px; }
+}
+
+/* 上／下一張 — 圓形浮空鈕，淡墨底 + 細邊 */
+.viewer-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background-color: rgb(12 10 9 / 0.55);
+  border: 1px solid rgb(168 162 158 / 0.2);
+  color: rgb(231 229 228 / 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.viewer-nav-btn:hover {
+  background-color: rgb(12 10 9 / 0.82);
+  color: rgb(250 250 249);
+  border-color: rgb(231 229 228 / 0.35);
+}
+@media (min-width: 640px) {
+  .viewer-nav-btn { width: 48px; height: 48px; }
+}
+
 /* ===== 拖拽優化 ===== */
 .user-select-none {
   user-select: none;

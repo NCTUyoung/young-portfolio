@@ -78,6 +78,11 @@ export default defineNuxtConfig({
         '/gallery/digital',
         '/gallery/photography',
       ]
+      // 註：事件專頁以 `?event=<name>` 傳遞，query string 在靜態輸出下
+      // 無法產生不同 HTML 檔（Nitro 對 query 不做路徑扁平化，只會蓋同一份）。
+      // 分享時的 OG／JSON-LD 仍會在使用者實際造訪時由 client-side hydration 動態寫入
+      // `<head>`，社群爬蟲需要獨立 HTML 才能看到的情境屬已知限制，暫不處理；
+      // 若未來要完整靜態化，請把路由從 `?event=` 改為 `/gallery/photography/<event-slug>`。
     }
   },
 
@@ -89,12 +94,13 @@ export default defineNuxtConfig({
   // 靜態站點生成 (SSG) 配置
   ssr: true, // 啟用 SSR 為了預渲染
 
-  // 關掉 payload extraction：
-  // - Nuxt 4 在 Windows 寫 .nuxt/cache/nuxt/payload/<route> 時沒先 mkdir 父目錄，
-  //   dev 刷某些子頁會 500（ENOENT）。
-  // - 本站資料流走 Pinia 客戶端 fetch `public/*.json`，_payload.json 預抽取沒加速效益。
+  // payload extraction：
+  // - dev（Windows）：Nuxt 4 在 Windows 寫 .nuxt/cache/nuxt/payload/<route>
+  //   時沒先 mkdir 父目錄，dev 刷某些子頁會 500（ENOENT），所以 dev 強制關掉。
+  // - production / nuxt generate：打開可讓 useAsyncData 的結果打包成 _payload.json，
+  //   使用者二次造訪事件頁時不必重新 fetch 與轉換作品清單，TTI 更快。
   experimental: {
-    payloadExtraction: false
+    payloadExtraction: process.env.NODE_ENV === 'production'
   },
 
   // Pinia：不設 storesDirs，用預設（= `<srcDir>/stores` = `app/stores/`）。

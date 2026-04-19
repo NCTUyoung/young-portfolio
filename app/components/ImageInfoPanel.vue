@@ -1,7 +1,7 @@
 <template>
   <div
 v-if="showInfoPanel && currentViewerImage && imageInfo"
-       class="info-panel fixed top-0 right-0 z-50 h-full overflow-y-auto border-l border-stone-700/60 bg-stone-950/97 backdrop-blur-md transition-all duration-300 max-md:left-0 max-md:w-full max-md:border-l-0"
+       class="info-panel fixed top-0 right-0 z-50 h-full overflow-y-auto border-l border-stone-700/60 bg-stone-950/95 backdrop-blur-md transition-all duration-300 max-md:left-0 max-md:w-full max-md:border-l-0"
        :style="panelWidthStyle"
        @wheel.stop>
 
@@ -134,12 +134,12 @@ v-for="tag in imageInfo.tags"
         </div>
       </section>
 
-      <!-- 描述 -->
-      <section v-if="imageInfo.description" class="space-y-3">
+      <!-- 描述（模板樣板句會被 isBoilerplateContent 過濾掉，避免整排「數位單眼相機拍攝作品」） -->
+      <section v-if="meaningfulDescription" class="space-y-3">
         <h4 class="text-stone-200 font-jp font-light tracking-[0.3em] text-xs pb-2 border-b border-stone-700/50">描述</h4>
 
         <p class="jp-body !text-sm !leading-[1.9] !text-stone-300">
-          {{ imageInfo.description }}
+          {{ meaningfulDescription }}
         </p>
       </section>
     </div>
@@ -147,11 +147,14 @@ v-for="tag in imageInfo.tags"
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, ref, onUnmounted, defineAsyncComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
-import ImageHistogram from './ImageHistogram.vue'
+import { nonBoilerplateOrEmpty } from '~/utils/descriptionFilters'
+
+// Histogram 會跑 canvas 取色 + 排序，單獨切出來避免在只看描述時也背一份
+const ImageHistogram = defineAsyncComponent(() => import('./ImageHistogram.vue'))
 
 const imageViewerStore = useImageViewerStore()
 const { getThumbPath } = useImagePath()
@@ -307,6 +310,10 @@ const imageInfo = computed(() => {
     focalLength: image.focalLength
   }
 })
+
+const meaningfulDescription = computed(() =>
+  nonBoilerplateOrEmpty(imageInfo.value?.description)
+)
 
 const formattedFileSize = computed(() => {
   if (!imageInfo.value?.fileSize) return '未知'

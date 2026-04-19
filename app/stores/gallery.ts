@@ -30,9 +30,24 @@ export const useGalleryStore = defineStore('gallery', () => {
 
   // 計算屬性（?. 防 corrupted / 部分 hydrate 導致整包 undefined）
   const digitalWorks = computed(() => digitalData.value?.works ?? [])
-  const digitalEventStats = computed(() => digitalData.value?.eventStats ?? {})
   const photographyWorks = computed(() => photographyData.value?.works ?? [])
-  const eventStats = computed(() => photographyData.value?.eventStats ?? {})
+
+  /**
+   * `eventStats`：由實際 works 即時重算，而非信任 JSON 內預先嵌入的統計。
+   * 原本的 JSON `eventStats` 會出現「桃猿 vs 桃園」之類 typo 導致的幽靈鍵，
+   * 或是事件改名後統計未同步；改 runtime 後永遠與可見作品一致。
+   */
+  function computeEventStats (works: GalleryItem[]): Record<string, number> {
+    const out: Record<string, number> = {}
+    for (const w of works) {
+      const name = w.event?.name
+      if (!name) continue
+      out[name] = (out[name] || 0) + 1
+    }
+    return out
+  }
+  const eventStats = computed(() => computeEventStats(photographyWorks.value))
+  const digitalEventStats = computed(() => computeEventStats(digitalWorks.value))
 
   const isLoading = computed(() => isLoadingDigital.value || isLoadingPhotography.value)
 
@@ -77,17 +92,40 @@ export const useGalleryStore = defineStore('gallery', () => {
   /** 至少完成一次 hydrate 或 loadAllWorks，供 ?event= 路由邏輯避免在資料未到前誤清網址 */
   const galleryDataReady = ref(false)
 
-  const cache = ref(new Map())
+  /**
+   * Memo 快取採簡易 LRU 防長時間瀏覽時無限成長。
+   * 實測同一 session 內可能經過多次分類切換 + 搜尋，key 可能累積到數百，
+   * 每項又持有整排作品陣列；超過 `MAX_CACHE_ENTRIES` 時丟最舊項。
+   */
+  const MAX_CACHE_ENTRIES = 64
+  const cache = ref(new Map<string, unknown>())
+
+  function cacheGet<T> (key: string): T | undefined {
+    if (!cache.value.has(key)) return undefined
+    // LRU touch：取出再放回以刷新插入順序
+    const v = cache.value.get(key) as T
+    cache.value.delete(key)
+    cache.value.set(key, v)
+    return v
+  }
+
+  function cacheSet<T> (key: string, value: T): void {
+    if (cache.value.has(key)) cache.value.delete(key)
+    cache.value.set(key, value)
+    while (cache.value.size > MAX_CACHE_ENTRIES) {
+      const oldestKey = cache.value.keys().next().value
+      if (oldestKey === undefined) break
+      cache.value.delete(oldestKey)
+    }
+  }
 
   const allWorks = computed(() => {
     const cacheKey = `allWorks-${digitalWorks.value.length}-${photographyWorks.value.length}`
-
-    if (cache.value.has(cacheKey)) {
-      return cache.value.get(cacheKey)
-    }
+    const hit = cacheGet<GalleryItem[]>(cacheKey)
+    if (hit) return hit
 
     const sorted = combineAndSortAllWorks(digitalWorks.value, photographyWorks.value)
-    cache.value.set(cacheKey, sorted)
+    cacheSet(cacheKey, sorted)
     return sorted
   })
 
@@ -110,15 +148,17 @@ export const useGalleryStore = defineStore('gallery', () => {
 
   const groupedWorks = computed(() => buildGroupedWorks(currentWorks.value))
 
+  /**
+   * mixedPhotoItems 以 filteredItems（已套用搜尋 + 年份）為輸入，
+   * 讓 UI 上新增的搜尋／年份濾器能直接影響畫面，而不是只改 store 的 `filteredItems` 無人使用。
+   */
   const mixedPhotoItems = computed(() => {
-    const cacheKey = `mixedItems-${currentWorks.value.length}-${JSON.stringify(filterState.value)}`
+    const cacheKey = `mixedItems-${filteredItems.value.length}-${JSON.stringify(filterState.value)}`
+    const hit = cacheGet<ReturnType<typeof buildMixedPhotoItems>>(cacheKey)
+    if (hit) return hit
 
-    if (cache.value.has(cacheKey)) {
-      return cache.value.get(cacheKey)
-    }
-
-    const sorted = buildMixedPhotoItems(currentWorks.value)
-    cache.value.set(cacheKey, sorted)
+    const sorted = buildMixedPhotoItems(filteredItems.value)
+    cacheSet(cacheKey, sorted)
     return sorted
   })
 
