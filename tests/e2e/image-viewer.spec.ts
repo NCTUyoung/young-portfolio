@@ -43,15 +43,17 @@ test.describe('ImageViewer 鍵盤操作', () => {
     const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
     await expect(dialog).toBeVisible()
 
-    // 主索引是頂部工具列的 `<p>{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>`。
-    // dialog 內同時有 radial menu 也會出現 `1 / N`，只取 `<p>` 避免 strict mode 炸。
-    const indexP = dialog.locator('p').filter({ hasText: /^\s*\d+\s*\/\s*\d+\s*$/ })
+    // 主索引是頂部工具列的 `<p><span>N</span><span>／</span><span>M</span></p>`。
+    // 分隔符為全形「／」（jp-kansuji 風格，刻意），regex 接受 ASCII `/` 或全形 `／`
+    // 兩者擇一，以免日後若改回 ASCII 又要改 test。
+    // dialog 內同時有 radial menu 也會出現類似 `1 / N`，只取 `<p>` 避免 strict mode 炸。
+    const indexP = dialog.locator('p').filter({ hasText: /^\s*\d+\s*[／/]\s*\d+\s*$/ })
 
-    await expect(indexP).toHaveText(/^\s*1\s*\/\s*\d+\s*$/)
+    await expect(indexP).toHaveText(/^\s*1\s*[／/]\s*\d+\s*$/)
 
     await page.keyboard.press('ArrowRight')
 
-    await expect(indexP).toHaveText(/^\s*2\s*\/\s*\d+\s*$/, { timeout: 5_000 })
+    await expect(indexP).toHaveText(/^\s*2\s*[／/]\s*\d+\s*$/, { timeout: 5_000 })
 
     await page.keyboard.press('Escape')
   })
