@@ -10,123 +10,126 @@
                      高度 88dvh → 60vh 讓 strip 上緣在首屏內露臉。
          ===================================================================== -->
     <section
-      class="relative min-h-[480px] h-[60vh] md:h-[64vh] md:min-h-[560px] overflow-hidden"
+      class="relative min-h-[560px] h-[78vh] md:h-[82vh] md:min-h-[640px] overflow-hidden flex flex-col lg:flex-row-reverse"
       role="region"
       aria-roledescription="封面主視覺"
-      aria-label="Young Portfolio 表紙 — 靜照扉頁"
+      aria-label="Young Portfolio 表紙 — amble 封面式分塊"
     >
-      <!-- 背景：單張靜照（hero series 第一張）+ 分區和紙米白罩 -->
-      <div class="absolute inset-0">
+      <!-- 右半（desktop）／上半（mobile）：Hero 拼貼區（§11 策略 C 清爽拼貼）
+           desktop：3 張縦照片並排、錯位偏移，彰顯電繪 + 攝影雙主線
+           mobile：僅主攝影出血，避免 3 圖在小螢幕擠壓
+           overlay caption：左/右兩側標 Digital / Photo（中圖不貼，保 SEO 中性與余白） -->
+      <div class="relative h-[42%] lg:h-full lg:w-[58%] overflow-hidden bg-stone-50 dark:bg-stone-900">
+        <!-- Mobile / Tablet：單張主攝影 -->
         <img
-          v-if="heroImage"
-          :src="heroImage"
+          v-if="heroCollage.main"
+          :src="heroCollage.main"
           alt=""
-          class="absolute inset-0 w-full h-full object-cover grayscale contrast-90 brightness-105 opacity-80 dark:opacity-35 motion-reduce:transition-none"
+          class="lg:hidden absolute inset-0 w-full h-full object-cover dark:brightness-[0.82]"
           fetchpriority="high"
           loading="eager"
           decoding="async"
           aria-hidden="true"
         >
-        <!-- 全局輕薄米白罩：mobile 壓更多以確保對比，desktop 輕壓 -->
-        <div class="absolute inset-0 bg-stone-50/45 md:bg-stone-50/25 dark:bg-stone-900/55 md:dark:bg-stone-900/50"/>
-        <!-- 左側主讀字區：不透明米白漸至透明，托起「余白」主標 -->
-        <div class="absolute inset-y-0 left-0 w-[72%] bg-gradient-to-r from-stone-50 via-stone-50/92 to-transparent dark:from-stone-900 dark:via-stone-900/92"/>
-        <!-- 右側縦書き襯底：細柱米白漸層 -->
-        <div class="absolute inset-y-0 right-0 w-[18%] bg-gradient-to-l from-stone-50/80 to-transparent dark:from-stone-900/80 hidden lg:block"/>
-        <!-- 下緣輕抹一層，讓 Scroll 提示清楚 -->
-        <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-stone-50/70 to-transparent dark:from-stone-900/70"/>
-      </div>
 
-      <!-- 內容格 — 書籍扉頁式版芯 -->
-      <div class="relative z-10 h-full flex items-center">
-        <div class="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full">
-          <div class="grid grid-cols-12 items-center gap-6">
-            <!-- 左欄：縦書き年號（裝飾，大寫氣勢） -->
-            <aside class="hidden lg:flex col-span-1 justify-end">
-              <div class="flex flex-col items-center gap-3">
-                <div class="w-px h-10 bg-stone-400/60 dark:bg-stone-500/60"/>
-                <span class="jp-vertical-caption">令和七年・春</span>
-                <div class="w-px h-16 bg-stone-400/40 dark:bg-stone-500/40"/>
-              </div>
-            </aside>
+        <!-- Desktop：3 張縦拼貼 -->
+        <div class="hidden lg:flex absolute inset-0 items-stretch gap-3 px-3 py-6">
+          <!-- 左：電繪代表（上偏） -->
+          <figure class="relative flex-1 translate-y-4 overflow-hidden bg-stone-100 dark:bg-stone-800">
+            <img
+              v-if="heroCollage.art"
+              :src="heroCollage.art"
+              :alt="`電繪作品代表 — ${heroCollage.artTitle}`"
+              class="w-full h-full object-cover dark:brightness-[0.85]"
+              fetchpriority="high"
+              loading="eager"
+              decoding="async"
+            >
+            <figcaption class="absolute bottom-3 left-3 font-jp text-[0.62rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none">
+              Digital
+            </figcaption>
+          </figure>
 
-            <!-- 中央主欄 -->
-            <div class="col-span-12 lg:col-span-8">
-              <!-- 和欧混植 eyebrow -->
-              <p class="reveal jp-eyebrow text-stone-700 dark:text-stone-200 mb-8">
-                <span class="font-jp tracking-[0.45em]">作品集</span>
-                <span aria-hidden="true" class="w-px h-3 bg-stone-400/60"/>
-                <span>Young Portfolio</span>
-              </p>
+          <!-- 中：攝影主（與 SEO / og:image 同源，最大、定軸） -->
+          <figure class="relative flex-[1.3] -translate-y-2 overflow-hidden bg-stone-100 dark:bg-stone-800">
+            <img
+              v-if="heroCollage.main"
+              :src="heroCollage.main"
+              alt=""
+              class="w-full h-full object-cover dark:brightness-[0.82]"
+              fetchpriority="high"
+              loading="eager"
+              decoding="async"
+              aria-hidden="true"
+            >
+          </figure>
 
-              <!-- 主標：漢字 + 英文副題，和欧對照 -->
-              <h1 class="reveal reveal-delay-1">
-                <span class="block font-jp font-extralight text-6xl sm:text-7xl lg:text-[6.5rem] tracking-[0.12em] text-stone-900 dark:text-stone-50 leading-[1.05]">
-                  余<span class="inline-block mx-3"/>白
-                </span>
-                <span class="mt-5 flex items-baseline gap-4">
-                  <span class="h-px w-10 bg-stone-400/70 dark:bg-stone-500"/>
-                  <span class="text-sm sm:text-base tracking-[0.32em] uppercase text-stone-600 dark:text-stone-300 font-light">
-                    Digital Art &amp; Photography
-                  </span>
-                </span>
-              </h1>
-
-              <!-- 引言（明朝體、兩行） -->
-              <p class="reveal reveal-delay-2 jp-body mt-10 max-w-md text-[0.98rem]">
-                餘白之中，留下電繪與攝影的斷章——<br>
-                <span class="text-stone-500 dark:text-stone-400">拾取日常的節奏，緩緩書寫。</span>
-              </p>
-
-              <!-- 入口：低調文字 + 箭頭，非橘色鈕 -->
-              <div class="reveal reveal-delay-3 mt-12 flex flex-wrap items-center gap-x-8 gap-y-4">
-                <NuxtLink
-                  to="/gallery"
-                  class="group inline-flex items-center gap-3 text-stone-800 dark:text-stone-100 border-b border-stone-400/70 dark:border-stone-500/70 pb-2 pr-2 hover:border-accent-500 dark:hover:border-accent-400 transition-colors duration-500"
-                >
-                  <span class="font-jp tracking-[0.25em] text-lg">作品を見る</span>
-                  <span class="text-xs tracking-[0.3em] text-stone-500 dark:text-stone-400 uppercase">Gallery</span>
-                  <svg class="w-4 h-4 text-stone-500 dark:text-stone-400 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </NuxtLink>
-                <NuxtLink
-                  to="/article"
-                  class="group inline-flex items-center gap-2 text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors duration-500"
-                >
-                  <span class="font-jp tracking-[0.25em] text-base">文章を読む</span>
-                  <svg class="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </NuxtLink>
-              </div>
-            </div>
-
-            <!-- 右欄：縦書き主題字 -->
-            <aside class="hidden lg:flex col-span-3 justify-end pr-6">
-              <div class="flex items-start gap-6">
-                <div class="jp-hairline-v h-48"/>
-                <div class="flex flex-col items-center gap-4 select-none">
-                  <div class="w-px h-6 bg-stone-500/60 dark:bg-stone-400/60"/>
-                  <span class="writing-vertical font-jp text-[2.1rem] font-light tracking-[0.35em] text-stone-900 dark:text-stone-50 leading-none drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                    繪<span class="block h-3"/>と<span class="block h-3"/>影
-                  </span>
-                  <div class="w-px h-6 bg-stone-500/60 dark:bg-stone-400/60"/>
-                  <span class="writing-vertical font-jp text-xs tracking-[0.6em] text-stone-600 dark:text-stone-300">
-                    二〇二六
-                  </span>
-                </div>
-              </div>
-            </aside>
-          </div>
+          <!-- 右：攝影副（下偏） -->
+          <figure class="relative flex-1 translate-y-8 overflow-hidden bg-stone-100 dark:bg-stone-800">
+            <img
+              v-if="heroCollage.sub"
+              :src="heroCollage.sub"
+              :alt="`攝影作品代表 — ${heroCollage.subTitle}`"
+              class="w-full h-full object-cover dark:brightness-[0.82]"
+              loading="eager"
+              decoding="async"
+            >
+            <figcaption class="absolute bottom-3 right-3 font-jp text-[0.62rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none">
+              Photo
+            </figcaption>
+          </figure>
         </div>
       </div>
 
-      <!-- 底部：SCROLL 提示（和英）— 只在桌機顯示，避免與手機 CTA 撞位 -->
-      <div class="hidden md:flex absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-stone-500 dark:text-stone-400">
-        <span class="font-jp text-[0.7rem] tracking-[0.5em]">下へ</span>
-        <div class="w-px h-10 bg-gradient-to-b from-stone-400/70 to-transparent dark:from-stone-500/70 animate-pulse"/>
-        <span class="text-[0.6rem] tracking-[0.35em] uppercase">Scroll</span>
+      <!-- 左半（desktop）／下半（mobile）：純米白底文字區，無疊加 -->
+      <div class="relative bg-stone-50 dark:bg-stone-900 flex items-center h-[58%] lg:h-full lg:w-[42%] px-6 sm:px-10 lg:pl-16 lg:pr-6 py-10 lg:py-0">
+        <!-- 縦書き「繪と影」：貼文字區右緣（= 照片區左緣），留在白底側不押圖 -->
+        <aside class="hidden lg:flex absolute inset-y-0 right-0 items-center pr-4" aria-hidden="false">
+          <span
+            class="writing-vertical font-jp text-[1.5rem] font-light tracking-[0.5em] text-stone-700 dark:text-stone-300 leading-none select-none"
+            aria-label="繪と影 — Digital Art and Photography"
+          >
+            <span aria-hidden="true">繪<span class="block h-3"/>と<span class="block h-3"/>影</span>
+          </span>
+        </aside>
+
+        <div class="relative w-full max-w-xl lg:pr-12">
+          <!-- 主標：余白 + 副題 -->
+          <h1 class="reveal">
+            <span class="block font-jp font-extralight text-6xl sm:text-7xl lg:text-[7.5rem] tracking-[0.14em] text-stone-900 dark:text-stone-50 leading-[1]">
+              余<span class="inline-block mx-4"/>白
+            </span>
+            <span class="mt-6 flex items-baseline gap-4">
+              <span class="h-px w-12 bg-stone-400/70 dark:bg-stone-500" aria-hidden="true"/>
+              <span class="text-sm sm:text-base tracking-[0.32em] uppercase text-stone-600 dark:text-stone-300 font-light">
+                Digital Art &amp; Photography
+              </span>
+            </span>
+          </h1>
+
+          <!-- 入口：低調文字 + 箭頭 -->
+          <div class="reveal reveal-delay-1 mt-10 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <NuxtLink
+              to="/gallery"
+              class="group inline-flex items-center gap-3 text-stone-800 dark:text-stone-100 border-b border-stone-400/70 dark:border-stone-500/70 pb-2 pr-2 hover:border-accent-500 dark:hover:border-accent-400 transition-colors duration-500"
+            >
+              <span class="font-jp tracking-[0.25em] text-lg">作品を見る</span>
+              <span class="text-xs tracking-[0.3em] text-stone-500 dark:text-stone-400 uppercase">Gallery</span>
+              <svg class="w-4 h-4 text-stone-500 dark:text-stone-400 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </NuxtLink>
+            <NuxtLink
+              to="/article"
+              class="group inline-flex items-center gap-2 text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors duration-500"
+            >
+              <span class="font-jp tracking-[0.25em] text-base">文章を読む</span>
+              <svg class="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </NuxtLink>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -249,27 +252,62 @@
     </section>
 
     <!-- =====================================================================
-         道具 — 三欄、hairline 分隔
+         道具 — 不等寬 + 左側縦向 spine（2026-04-20 v2）
+         來源：wiki/concepts/japanese-editorial-cover.md 案例 B（amble #1 Tokyo）
+               左側極粗直排「Tokyo」地名軸 + 右側目錄欄位
+         改動：原 md:grid-cols-3 + md:divide-x（三等分對稱，像規格表）
+               → 打斷為左 spine + 三不等寬欄，移除 divide-x 留白氣
+         鐵律守門：spine 用 extralight 克制，非 Extra Bold；三欄依內容長度分配；
+                   §1 不均整加分；§7 Hairline > 粗線（僅保留一道豎 hairline 嵌在 spine 右側）
          ===================================================================== -->
     <section class="relative py-24 lg:py-32">
       <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-        <header class="reveal mb-14 text-center">
+        <header class="reveal mb-14 flex items-baseline justify-between flex-wrap gap-4">
           <h2 class="jp-section-title text-3xl sm:text-4xl">道具
             <span class="jp-section-ruby">Tools</span>
           </h2>
+          <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 uppercase hidden md:inline-block">Instruments &middot; 三種の神器</span>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-stone-200/70 dark:divide-stone-700/50">
+        <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_1.1fr_1fr] gap-0 md:gap-x-8 lg:gap-x-12">
+          <!-- 左側縦向 spine：借 amble 左軸字機制
+               2026-04-20 修正：原 spine 寫「道具」與 h2 主標重複（double-signaling）
+               改為「筆鏡技」三字合璧——對應右側三欄 kanji（筆/鏡/技），
+               spine 作為「三字隆重直排」的 editorial 副線，非 h2 複寫
+               注意：writing-mode: vertical-rl + flex flex-col 會讓 children 變右→左排
+                     這裡用單 span + block spacer，與 hero「繪と影」同構，保證上→下 -->
+          <aside class="hidden md:flex flex-col items-center justify-start pr-6 relative">
+            <span
+              class="writing-vertical font-jp text-xl lg:text-2xl font-extralight tracking-[0.9em] text-stone-700 dark:text-stone-200 leading-none select-none"
+              aria-hidden="true"
+            >
+              筆鏡技
+            </span>
+            <div class="jp-hairline-v h-16 mt-6" aria-hidden="true" />
+            <span
+              class="writing-vertical mt-4 text-[0.6rem] tracking-[0.45em] uppercase text-stone-400 dark:text-stone-500"
+              aria-hidden="true"
+            >
+              Instruments
+            </span>
+          </aside>
+
           <article
             v-for="(tool, index) in tools"
             :key="tool.category"
-            class="reveal px-6 md:px-8 py-10 flex flex-col items-center text-center"
+            class="reveal px-4 md:px-0 py-10 md:py-2 flex flex-col text-center md:text-left border-t md:border-t-0 first:border-t-0 border-stone-200/70 dark:border-stone-700/50"
             :class="[`reveal-delay-${index + 1}`]"
           >
-            <span class="writing-vertical font-jp text-2xl font-extralight tracking-[0.4em] text-stone-700 dark:text-stone-200 mb-6">
+            <span class="writing-vertical font-jp text-2xl font-extralight tracking-[0.4em] text-stone-700 dark:text-stone-200 mb-6 md:hidden">
               {{ tool.kanji }}
             </span>
-            <p class="text-[0.65rem] tracking-[0.45em] uppercase text-stone-500 dark:text-stone-400 mb-6">{{ tool.category }}</p>
+            <p class="text-[0.65rem] tracking-[0.45em] uppercase text-stone-500 dark:text-stone-400 mb-3">
+              <span class="md:inline-flex md:items-baseline md:gap-2">
+                <span class="hidden md:inline font-jp text-base tracking-[0.3em] text-stone-700 dark:text-stone-200 font-extralight not-italic">{{ tool.kanji }}</span>
+                <span class="hidden md:inline w-px h-3 bg-stone-300/70 dark:bg-stone-600/70"></span>
+                <span>{{ tool.category }}</span>
+              </span>
+            </p>
             <ul class="space-y-2.5">
               <li
                 v-for="item in tool.items"
@@ -339,7 +377,7 @@
 
           <ol class="space-y-12 md:space-y-20">
             <li
-              v-for="(m, index) in milestones"
+              v-for="(m, index) in milestonesWithPlace"
               :key="index"
               class="reveal relative md:grid md:grid-cols-2 md:gap-12"
               :class="[`reveal-delay-${Math.min(index + 1, 5)}`]"
@@ -352,7 +390,11 @@
 
               <!-- 行動版：單欄 -->
               <div class="md:hidden pl-10">
-                <p class="jp-kansuji text-sm text-accent-600 dark:text-accent-400 tracking-wider mb-1">{{ m.kansuji }} / {{ m.year }}</p>
+                <p class="jp-kansuji text-sm text-accent-600 dark:text-accent-400 tracking-wider mb-1">
+                  {{ m.kansuji }} / {{ m.year }}
+                  <span v-if="m.place" class="mx-2 text-stone-400">·</span>
+                  <span v-if="m.place" class="text-stone-500 dark:text-stone-400 font-jp tracking-[0.2em]">{{ m.place }}</span>
+                </p>
                 <h3 class="font-jp text-lg font-light tracking-[0.2em] text-stone-800 dark:text-stone-100">{{ m.title }}</h3>
                 <p class="jp-body text-sm mt-2">{{ m.description }}</p>
               </div>
@@ -368,6 +410,25 @@
                 </h3>
                 <p class="jp-body text-[0.95rem]">{{ m.description }}</p>
               </div>
+
+              <!--
+                直排地名軸字（Phase 2；2026-04-20）
+                - 來源：japanese-editorial-cover.md 候補機制 3（amble 左軸字）
+                - 只有當 m.place 存在（photography 資料聚合成功）才渲染
+                - 自動流入對向空欄：idx 偶時 content 在 col-1，aside 流到 col-2；反之亦然
+                - 字級 text-[0.8rem] extralight 極克制，避免與中央 kansuji 搶戲
+                - 守門：若縦書き通膨明顯（同視窗 >1 高辨識度直排），此處為第一個降級候選
+              -->
+              <aside
+                v-if="m.place"
+                class="hidden md:flex items-start pt-1"
+                :class="index % 2 === 0 ? 'md:pl-12' : 'md:pr-12 md:justify-end md:row-start-1 md:col-start-1'"
+                aria-hidden="true"
+              >
+                <span class="writing-vertical font-jp text-[0.8rem] tracking-[0.55em] text-stone-500 dark:text-stone-400 font-extralight leading-none">
+                  {{ m.place }}
+                </span>
+              </aside>
             </li>
           </ol>
         </div>
@@ -528,7 +589,7 @@ import {
   toHeadScripts
 } from '~/utils/siteSchema'
 import { useGalleryStore } from '~/stores/gallery'
-import { fetchPhotographyWorks } from '~/stores/galleryLoaders'
+import { fetchPhotographyWorks, fetchDigitalWorks } from '~/stores/galleryLoaders'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
 
 const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
@@ -544,10 +605,20 @@ const pageRef = ref<HTMLElement | null>(null)
  */
 const galleryStore = useGalleryStore()
 const { data: photoPayload } = await useAsyncData('home-photography', fetchPhotographyWorks)
+// 2026-04-20：Hero 改 amble 清爽拼貼（§11 策略 C）— 需混合攝影 + 電繪兩線作品
+// 同屏彰顯雙主線。此處載入 digital 供 heroCollage computed 取代表作。
+const { data: digitalPayload } = await useAsyncData('home-digital', fetchDigitalWorks)
 watch(
   photoPayload,
   (v) => {
     if (v) galleryStore.hydrateFromPayload({ photography: v })
+  },
+  { immediate: true }
+)
+watch(
+  digitalPayload,
+  (v) => {
+    if (v) galleryStore.hydrateFromPayload({ digital: v })
   },
   { immediate: true }
 )
@@ -570,6 +641,46 @@ const heroImage = computed(() => getThumbPath(heroSource.value, 800))
 const heroImageAbsolute = computed(() =>
   `${SEO_CONFIG.siteUrl}images/${heroSource.value.split('/').map(encodeURIComponent).join('/')}`
 )
+
+// ===== Hero 拼貼（§11 策略 C）=====
+// 2026-04-20：amble 清爽拼貼讓電繪 + 攝影同屏可見，彰顯雙主線。
+// - art：電繪代表作（series=hero 優先，否則最新一張，fallback 硬編）
+// - main：攝影主圖（= heroSource，SEO / og:image 同源，不動）
+// - sub：攝影副圖（series=hero-2 優先，否則 featured 排除主 hero，fallback 硬編）
+// 若後續改 admin UI 讓 user 勾選 Hero tag，這段就全數據驅動。
+const HERO_DIGITAL_FALLBACK = 'gallery/2026年電繪作品/21-編輯-編輯-編輯-1.jpg'
+const HERO_PHOTO_SUB_FALLBACK = 'photography/Annber 外拍/DSC_2702-編輯-1.jpg'
+
+const heroCollage = computed(() => {
+  const digitalWorks = digitalPayload.value?.works ?? []
+  const photoWorks = photoPayload.value?.works ?? []
+
+  const digitalPick =
+    digitalWorks.find((w) => Array.isArray(w.series) && w.series.includes('hero')) ||
+    digitalWorks[0]
+  const digitalSource = digitalPick?.filename || HERO_DIGITAL_FALLBACK
+  const digitalTitle = digitalPick?.title || 'Digital artwork'
+
+  const photoSubPick =
+    photoWorks.find((w) => Array.isArray(w.series) && w.series.includes('hero-2')) ||
+    photoWorks.find(
+      (w) =>
+        Array.isArray(w.series) &&
+        w.series.includes('featured') &&
+        w.filename !== heroSource.value
+    ) ||
+    photoWorks.find((w) => w.filename !== heroSource.value)
+  const photoSubSource = photoSubPick?.filename || HERO_PHOTO_SUB_FALLBACK
+  const photoSubTitle = photoSubPick?.title || 'Photography'
+
+  return {
+    art: getThumbPath(digitalSource, 800),
+    artTitle: digitalTitle,
+    main: heroImage.value,
+    sub: getThumbPath(photoSubSource, 800),
+    subTitle: photoSubTitle
+  }
+})
 
 // ===== 領域 =====
 const digitalTags = ['電繪插畫', '角色設計', '風景繪製', '概念藝術', '幾何風格']
@@ -595,13 +706,69 @@ const tools = [
 ]
 
 // ===== 步履 Journey：章題 + 漢数字 =====
-const milestones = [
+// usePhotoLocation（可選）：true 時才對應 photography event.location 聚合為縦向地名軸
+// 2026-04-20 修正：原本按 year 聚合會讓同年電繪 milestone 也拿到攝影地名（2024「熟」錯配）
+// 改為顯式旗標；電繪 milestone 不開，攝影相關才開
+const milestones: Array<{
+  year: string
+  kansuji: string
+  chapter: string
+  title: string
+  description: string
+  usePhotoLocation?: boolean
+}> = [
   { year: '2018', kansuji: '二〇一八', chapter: '初', title: '開始數位繪畫', description: '嘗試幾何風格動物插畫與經典畫作再創作。' },
   { year: '2020', kansuji: '二〇二〇', chapter: '進', title: '深入角色創作', description: '進行人物角色設計，探索多元的創作風格。' },
   { year: '2024', kansuji: '二〇二四', chapter: '熟', title: '電繪技法精進', description: '累積大量作品，風格更加成熟與多樣。' },
-  { year: '2024', kansuji: '二〇二四', chapter: '撮', title: '踏入攝影領域', description: '入手 Nikon Z f，開始記錄城市街拍與活動紀實。' },
-  { year: '2025', kansuji: '二〇二五', chapter: '築', title: '建立作品集', description: '以 Nuxt 3 打造個人作品集，整合電繪與攝影。' }
+  { year: '2024', kansuji: '二〇二四', chapter: '撮', title: '踏入攝影領域', description: '入手 Nikon Z f，開始記錄城市街拍與活動紀實。', usePhotoLocation: true },
+  { year: '2025', kansuji: '二〇二五', chapter: '築', title: '建立作品集', description: '以 Nuxt 3 打造個人作品集，整合電繪與攝影。', usePhotoLocation: true }
 ]
+
+/**
+ * Journey 地名聚合（2026-04-20 v2 Phase 2 + 2026-04-20 修正）
+ *
+ * 來源：wiki/concepts/japanese-editorial-cover.md 候補機制 3（直排事件軸字）
+ *       案例 B（amble #1 Tokyo）左緣縦向地名軸
+ *
+ * 資料層真相（critic-agent 2026-04-20 指正）：
+ *   - milestones 常數本身無 location；event.location 僅存於 photographyList.json
+ *   - 對應邏輯：按 `time: "YYYY Mon DD"` 抽年份 → 統計該年 event.location 最高頻 → 回灌 milestone
+ *   - 2018 / 2020 = 電繪年，無 photography → place 為 undefined → UI 自動隱藏縦軸
+ *   - 2024（撮）/ 2025（築）明確標 usePhotoLocation=true → 取最高頻地名
+ *   - 2024（熟）雖同年有攝影資料，但本身是電繪 milestone → 未標旗標 → 不顯示
+ *
+ * 守門：
+ *   - 地名來源為真實資料，非手填，維持 §6 精神「資料不為版式讓路」
+ *   - 縦軸為 optional（`v-if="m.place"`）；無旗標的 milestone 不渲染，避免錯配
+ *   - 顯式旗標（usePhotoLocation）取代隱式年份匹配，避免「同年電繪共享攝影地名」bug
+ */
+const milestonesWithPlace = computed(() => {
+  const works = photoPayload.value?.works ?? []
+  const yearLocCount = new Map<string, Map<string, number>>()
+  for (const w of works) {
+    const year = typeof w.time === 'string' ? w.time.slice(0, 4) : undefined
+    const loc = w.event?.location
+    if (!year || !loc) continue
+    let locMap = yearLocCount.get(year)
+    if (!locMap) {
+      locMap = new Map<string, number>()
+      yearLocCount.set(year, locMap)
+    }
+    locMap.set(loc, (locMap.get(loc) ?? 0) + 1)
+  }
+  const yearTopLoc = new Map<string, string>()
+  for (const [year, locMap] of yearLocCount) {
+    let top: [string, number] | null = null
+    for (const entry of locMap) {
+      if (!top || entry[1] > top[1]) top = entry
+    }
+    if (top) yearTopLoc.set(year, top[0])
+  }
+  return milestones.map(m => ({
+    ...m,
+    place: m.usePhotoLocation ? yearTopLoc.get(m.year) : undefined
+  }))
+})
 
 // ===== 精選作品 =====
 const featuredWorks = [

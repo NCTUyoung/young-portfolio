@@ -15,7 +15,7 @@ alwaysApply: true
 - **余白優先**：寧可少勿多。每個 section 要有呼吸，不要塞滿。
 - **簡素**：一條 hairline 勝過一個粗框；一枚墨點勝過一串彩色 dot。
 - **不均整**：避免左右對稱滿版；用 zig-zag、對聯雙欄（繪／影）、書扉不等寬版芯。
-- **黑白灰 + 一點赤陶**：通篇走 `stone` 暖灰，`accent`（赤陶／琥珀）是「墨印式」點綴，只在節標籤、印章、少量引導線上出現。
+- **UI 走 stone 暖灰 + 赤陶點綴；作品圖可保原色**：文字／分隔線／底色全部 `stone`，`accent`（赤陶／琥珀）是「墨印式」點綴，只在節標籤、印章、少量引導線上出現。**Hero 多圖拼貼或左右分塊中的作品照片不強制去色**（2026-04-20 放寬），可保留原色以彰顯「雙主線」作品力；單張全幅背景 Hero 仍建議單色化以托字（見 §6 / §11）。
 - **裝飾不搶戲**：縦書き裝飾字、背景大字（`jp-kana-bg`）、washi 紋一律低透明度 + `pointer-events-none` + `user-select-none`。
 
 ---
@@ -83,23 +83,45 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 
 - **緩慢、少量、可被關掉**。所有動畫必須尊重 `@media (prefers-reduced-motion: reduce)`，新增自訂動畫時加 `motion-reduce:transition-none` 或對應 media query。
 - Reveal 曲線固定 `cubic-bezier(0.16, 1, 0.3, 1)`，時長 `0.7~0.8s`，階梯延遲 0.1s。
-- **Hero 採「靜照扉頁」**（Phase 3A，2026-04-19）：單張靜照為背景、純文字扉頁為主角；**禁用自動輪播、翻頁、淡入淡出切換**。原「風中翻書」5 張輪播機制已廢除，不要重新加回（改動動機：資料與 SEO 單一來源、降 LCP 推遲、減少 interval / reduce-motion 分支維護成本）。
-- Hero 靜照 `<img>` 標 `fetchpriority="high" loading="eager" decoding="async"`；背景處理沿用 §6「單色化 + 降飽和 + 米白罩」配方。
-- **如需換 Hero 圖**：改 `public/photographyList.json` 裡目標項目的 `series: [..., 'hero']`（同步移除原來那張的 `hero` tag，保持 1 張 hero）；`index.vue` 會透過 `series=hero` 取第一張；`og:image` / `twitterImage` / `personImage` 皆同源自動跟進。
+- **Hero 採靜態展示，禁用自動輪播／翻頁／淡入淡出切換**（Phase 3A，2026-04-19 鐵律保留）。原「風中翻書」5 張輪播機制已廢除，不要重新加回（動機：資料與 SEO 單一來源、降 LCP 推遲、減少 interval / reduce-motion 分支維護成本）。
+- **Hero 布局策略有三（2026-04-20 放寬）**：A 單張全幅靜照扉頁（文字疊前景、米白罩托字）／ B amble 左右分塊（左文右圖，文字不押圖、照片保原色）／ C 清爽破格拼貼（2-4 張電繪＋攝影混排、同屏表現雙主線）。三者皆靜態、皆禁輪播；選擇準則見 §11。
+- Hero 圖 `<img>` 一律標 `fetchpriority="high" loading="eager" decoding="async"`；策略 A 沿用 §6「單色化 + 米白罩」配方，策略 B / C 照片保原色、無 overlay（文字有自己的底色區塊托住）。
+- **如需換 Hero 圖**：改 `public/photographyList.json` 裡目標項目的 `series`，加 `'hero'`（策略 A / B：僅 1 張；策略 C：可多張 `'hero', 'hero-2', 'hero-3'` 或定義拼貼 slot tag）。`og:image` / `twitterImage` / `personImage` 取 `series=hero` 第一張即可（拼貼下的其他圖只作視覺不影響 SEO 單源）。
 
 ---
 
 ## 6. 圖像呈現
 
-- **Hero 背景照**：必為單色化 + 降飽和 + 輕抑對比，並疊米白罩，確保主讀字區對比充足：
-  ```
-  grayscale contrast-90 brightness-105 opacity-80 dark:opacity-35
-  + bg-stone-50/45 md:bg-stone-50/25 dark:bg-stone-900/55 md:dark:bg-stone-900/50
-  + 左 72% 米白漸層托主標、右 18% 縦書き襯底、下緣 scroll 提示漸層
-  ```
-  Mobile 因樹枝／細節更多，**米白罩要壓更厚**（`/45` 而非 `/25`）。
+**Hero 圖處理 — 按 §5 策略 A / B / C 分流**（2026-04-20 放寬，不再強制所有 Hero 都走單色化配方）：
+
+### 策略 A：單張全幅背景（文字疊前景）
+
+必為單色化 + 降飽和 + 輕抑對比，並疊米白罩確保主讀字區對比充足：
+
+```
+grayscale contrast-90 brightness-105 opacity-80 dark:opacity-35
++ bg-stone-50/45 md:bg-stone-50/25 dark:bg-stone-900/55 md:dark:bg-stone-900/50
++ 左 55~72% 米白漸層托主標、下緣 scroll 提示漸層
+```
+
+Mobile 因細節更多，米白罩要壓更厚（`/45` 而非 `/25`）。
+
+### 策略 B：amble 左右分塊（文字不押圖）
+
+**不用 overlay**。文字區純色底 `bg-stone-50 dark:bg-stone-900` 自托文字；照片區 `object-cover` 保原色即可。Dark mode 可加輕微 `dark:brightness-[0.82]` 降亮，但不加飽和度壓制。
+
+### 策略 C：清爽破格拼貼（2-4 張同屏）
+
+**不用 overlay**，各圖保原色。清爽感靠三要素維持：
+- **間距勝於濾鏡**：圖與圖之間給 `gap-4 lg:gap-6` 白底露出，替代統一色罩
+- **尺寸對比**：1 主 2 副（中大兩側小 / 主 1200w + 副 600w）或 2+2 對比格
+- **錯位節奏**：副圖輕微上下 offset（`translate-y-4` / `-translate-y-4`），避免呆板方格
+- **混媒材**：至少 1 張電繪 + 1 張攝影，彰顯「雙主線」；不要全部同媒材
+
+### 共通
+
 - **作品列表**：`GalleryPhotographySection` 走 justified rows（見 `AGENTS.md`），保留原始比例，不強裁。
-- **縮圖**：一律透過 `useImagePath.getThumbPath(path, size)`，size 建議 Hero `800`、卡片 `400~600`。
+- **縮圖**：一律透過 `useImagePath.getThumbPath(path, size)`，size 建議 Hero 主圖 `800`、拼貼副圖 `600`、卡片 `400~600`。
 - **非 ASCII 路徑**：`useImagePath` 已處理 `encodeURIComponent`；手寫 URL 時務必編碼中文／空白。
 
 ---
@@ -111,7 +133,7 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 - **導覽列恆常毛玻璃**：在 hero 背景上也要可讀 — `bg-stone-50/85 dark:bg-stone-900/75 backdrop-blur-md` + 底部 `jp-hairline`；滾動時以 `.nav-scrolled` 加強。
 - **CTA 低調**：不用亮色大按鈕；走 `text + underline on hover` 或 `jp-frame` 包細邊按鈕。
 - **節標題範式**：`jp-eyebrow` → `jp-section-title` → `jp-section-ruby` → 內容；段與段之間 `py-20 md:py-28` 起跳，保留余白。
-- **對聯／zig-zag**：Domains（繪／影）、Journey（時間軸）、Tools 三欄都採 **非對稱** 或 **中軸對稱**，避免呆版格線。
+- **非對稱核心，對聯非強制**（2026-04-20 放寬）：Domains（繪／影）、Journey（時間軸）、Tools 仍採 **非對稱** 或 **中軸對稱**，避免呆版格線；但「對聯形式」（成對 caption 或 hairline 疊層）不再是強制守則——**訊息減法優先於形式對聯**。若一段文字能砍，就砍，不要為了湊對聯硬留。
 
 ---
 
@@ -120,14 +142,18 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 - 所有裝飾性字（縦書き年號、背景大漢字）加 `aria-hidden="true"`。
 - 圖片若純裝飾，`alt=""` + `aria-hidden="true"`。
 - `prefers-reduced-motion` 必須 reveal 一次顯示 + 停輪播。
-- 斷點：`sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280；Hero 用 `min-h-[88dvh] md:h-[94vh] md:min-h-[640px]` 避開 mobile URL bar 跳動。
+- 斷點：`sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280；Hero 高度 `min-h-[560px] h-[78vh] md:h-[82vh] md:min-h-[640px]`（扉頁佔領感優先於完全避開 mobile URL bar 跳動；`min-h` 兜底保留以防縮頁）。
+- **Hero 策略 B / C 的 mobile 順序**：flex `flex-col` 時 **圖在上、文字在下**（符合日式雜誌封面 mobile 版式；不要 flex-col-reverse）；比例建議 42% 圖 / 58% 文字，可視主標字級調整。
+- 裝飾性 `aside`（整塊為 decorative hairline / 縦書き年號組合）可整塊 `aria-hidden="true"`；若 aside 混有品牌字（如「繪と影」），則逐元素加註，品牌字用 `aria-label` 保留語意。
+- 所有 `animate-*` 作裝飾節奏者必須搭配 `motion-reduce:animate-none`。
 
 ---
 
 ## 9. SEO／OG 一致性
 
-- **單一來源**：`og:image` 指向 `public/photographyList.json` 中標 `series: ['hero']` 的那張圖（目前：`photography/WBC東京 台澳/DSC_9877-編輯-1.jpg`）。首頁扉頁 `<img>`、`useSeoMeta.ogImage` / `twitterImage`、JSON-LD `Person.image` 皆從此 tag 動態取，不再多處硬編。
-- **換 Hero 圖只改一個地方**：編輯 JSON 的 `series: ['hero']` 目標項（後台 ImageEditDialog 有對應勾選 UI），其餘全部自動跟進。路徑需 `encodeURIComponent`（已封裝於 `index.vue` 的 `heroImageAbsolute` computed）。
+- **單一來源**：`og:image` 指向 `series` 含 `'hero'` 的第一張（策略 A/B 只有 1 張；策略 C 拼貼可有多張 hero-tagged，取第一張為 SEO 來源）。首頁 Hero `<img>`、`useSeoMeta.ogImage` / `twitterImage`、JSON-LD `Person.image` 皆從此 tag 動態取，不再多處硬編。
+- **換 Hero 圖只改一個地方**：編輯 JSON 的 `series: [..., 'hero']`（後台 ImageEditDialog 有對應勾選 UI），其餘全部自動跟進。路徑需 `encodeURIComponent`（已封裝於 `index.vue` 的 `heroImageAbsolute` computed）。
+- **拼貼（策略 C）多源**：若需跨資料集（攝影 + 電繪）混合拼貼，可在 `digitalArtList.json` 與 `photographyList.json` 各自 tag `series: ['hero']`，`index.vue` 從兩個 loader 合併取出；SEO 出處仍只取攝影主張（品牌基調不變）。
 - **`nuxt.config.ts` 的 `app.head.meta` 預設 og:image** 為**全站 fallback**（非首頁也有分享縮圖）；首頁 `useSeoMeta` 為 page-level 後註冊會覆寫；兩處建議手動保持同一張。
 - `og:locale = zh_TW`，`titleTemplate = '%s | Young Portfolio'` 不要動。
 
@@ -135,11 +161,36 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 
 ## 10. 改動 Checklist（每次 UI PR）
 
-- [ ] 余白夠嗎？有沒有硬塞？
+- [ ] 余白夠嗎？有沒有硬塞？訊息可不可以再砍？
 - [ ] 裝飾是否多餘？能否換 hairline／墨點／純字？
+- [ ] 縦書き裝飾是否 ≤ 1 組（避免 vertical writing inflation）？
 - [ ] 同時寫了 light 與 dark 兩組 class？
 - [ ] 字型對嗎？漢字裝飾用 `font-jp`、UI 走 `font-sans`？
-- [ ] 動畫支援 reduced-motion？
-- [ ] 圖像走 `useImagePath`，Hero 圖做了單色化＋米白罩？
+- [ ] 動畫支援 reduced-motion？所有 `animate-*` 加 `motion-reduce:animate-none`？
+- [ ] 圖像走 `useImagePath`？Hero 策略與圖像處理匹配（A→米白罩、B/C→保原色）？
+- [ ] 若動 Hero，**雙主線（電繪＋攝影）是否同屏可見**？（策略 C 必檢）
 - [ ] 新分隔線用 `jp-hairline`，不是 `border-2`？
-- [ ] 換 Hero 圖時只改 JSON 的 `series: ['hero']`（一處即同步）？
+- [ ] 換 Hero 圖時只改 JSON 的 `series: [..., 'hero']`（SEO 一處即同步）？
+
+---
+
+## 11. Hero 布局策略表（2026-04-20 新增）
+
+| 策略 | 視覺特徵 | 適用情境 | 圖像處理 | 範例 |
+| --- | --- | --- | --- | --- |
+| **A 單張全幅** | 出血背景照片 + 文字疊前景 + 米白罩托字 | 作品集要求「單一強烈主視覺」或「書籍扉頁感」；主標語氣濃厚 | grayscale + 米白多層漸層（見 §6） | Phase 3A.1（2026-04-19） |
+| **B amble 分塊** | 左文右圖（desktop）／上圖下文（mobile）；文字不押圖 | 要同時給文字呼吸與照片色彩；單主線 or 輕雙主線 | 照片保原色、無 overlay；文字區純色底 | Phase 3A.2（2026-04-20，參考 `wiki/concepts/japanese-editorial-cover.md` amble Tokyo） |
+| **C 破格拼貼** | 2-4 張錯位拼貼（中大兩側小 or 2+2）；同屏多媒材 | 要同屏彰顯「雙主線」（電繪＋攝影）；portfolio 綜合展示 | 各圖保原色，間距＋尺寸對比＋輕錯位維持清爽 | 參考 `wiki/sources/assets/...` user 提供的 MEMORIES / Happy Monday / Capture the Moment |
+
+### 選擇準則
+
+- **主角是文字（書名型封面）** → A
+- **主角是文字＋一張照片（雜誌封面型）** → B
+- **主角是作品力（portfolio 型），要一眼看到雙主線** → C
+
+### 共通禁忌（無論 A/B/C）
+
+- 禁用自動輪播／翻頁／淡入淡出切換（§5）
+- 禁用亮色大 CTA 按鈕（§7）
+- 禁用縦書き 2 組以上堆疊（1 組為上限）
+- 禁用彩色 dot 列表；要點用墨點或不放（§7）
