@@ -34,3 +34,6 @@ gallery-review*.png
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Wiki：由 wiki/.git 獨立追蹤（local-only），主 repo 不管
+wiki/
