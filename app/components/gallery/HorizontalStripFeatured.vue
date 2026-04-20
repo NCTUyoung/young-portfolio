@@ -131,7 +131,22 @@
       理由：左側 side caption 已經承擔「這是橫卷」的語義標記；
             保留底部條 = double-signaling，觸 design-aesthetic §1 簡素「能不能拿掉？」
       來源：inspirations/strip-side-caption.md
+
+      [2026-04-20 v2] 改接入「日本編輯式封面」之底部資訊帶（editorial caption band）
+      - 取代被撤的 hairline 裝飾條：承擔「出版式落點」而非「再一條墨印」
+      - 嚴守「側欄強 + 底帶弱」分級（critic-agent 守門條件）
+      - text-[0.6rem] tracking-[0.5em] stone-500 + pointer-events-none
+      - 動態張數（featured count）讓資訊帶有實質承載，避免成為裝飾字串
+      - showCaptionBand 預設 true；gallery/photography 與首頁皆顯示（user 選項 both）
+      - 來源：concepts/japanese-editorial-cover.md 候補機制 2；案例 A 底部 credits 帶
     -->
+    <p
+      v-if="showCaptionBand"
+      class="pointer-events-none select-none mt-5 lg:mt-6 text-center text-[0.6rem] tracking-[0.5em] uppercase text-stone-500 dark:text-stone-500 font-light"
+      aria-hidden="true"
+    >
+      Featured · {{ captionCount }} Frames · 二〇二六
+    </p>
   </section>
 </template>
 
@@ -172,8 +187,20 @@ import { HORIZONTAL_STRIP_SIZES } from '~/utils/imagePaths'
  */
 interface Props {
   linkMode?: 'viewer' | 'navigate'
+  /**
+   * 是否顯示底部編輯式資訊帶（`Featured · NN Frames · 二〇二六`）
+   *
+   * 來源：concepts/japanese-editorial-cover.md 候補機制 2（底部超細字資訊帶）
+   * 決策：2026-04-20 v2 首頁改造 user 選 "both"——首頁與 gallery/photography 皆顯示
+   * 守門：與左側書腰形成「強側欄 + 弱底帶」分級；若日後發現「上下夾 strip」感，
+   *       可在單一頁面設 false 關閉，不需動本元件結構
+   */
+  showCaptionBand?: boolean
 }
-const props = withDefaults(defineProps<Props>(), { linkMode: 'viewer' })
+const props = withDefaults(defineProps<Props>(), {
+  linkMode: 'viewer',
+  showCaptionBand: true
+})
 
 const TARGET_SERIES = 'featured' as const
 
@@ -189,6 +216,12 @@ const stripItems = computed<GalleryItem[]>(() => {
   if (!photographyWorks.value.length) return []
   return photographyWorks.value.filter(w => Array.isArray(w.series) && w.series.includes(TARGET_SERIES))
 })
+
+/**
+ * 底部資訊帶用的張數（zero-padded 至少 2 位；99 張以下呈現自然）
+ * 動態承載：避免變純裝飾字串，呼應 concept 頁「資訊帶 ≠ 第二條裝飾線」要求
+ */
+const captionCount = computed(() => stripItems.value.length.toString().padStart(2, '0'))
 
 /** 固定高度：
  *  - 不用 dvh：iOS Safari URL bar 出現/消失會讓圖片「跳一下」，水平軸上特別明顯
