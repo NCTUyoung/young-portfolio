@@ -43,3 +43,12 @@ export function buildThumbPath (
 
 /** Default sizes for responsive grid + 400/800 srcset */
 export const GRID_IMAGE_SIZES = '(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 1200px'
+
+/**
+ * Sizes hint for the horizontal featured strip (桌機獨享，寬 ~ 62vh ratio scale)。
+ * 與 GRID_IMAGE_SIZES 獨立——strip 每張寬度約略是視口高度的 1~1.8 倍（依比例），
+ * 但瀏覽器選 srcset 時用的是**顯示寬度**；strip 圖片實際渲染寬度約 500~1000 CSS px，
+ * 因此 `800px` hint 讓高密度螢幕選 800w 資產，避開 sizes 為 100vw 導致選過大 source。
+ * 若未來 strip 要上 1200w 資產，再改這個常數即可，不影響其他 grid。
+ */
+export const HORIZONTAL_STRIP_SIZES = '(max-width: 768px) 90vw, 800px'

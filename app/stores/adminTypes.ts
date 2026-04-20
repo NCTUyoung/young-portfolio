@@ -1,4 +1,4 @@
-﻿import type { GalleryItem, PhotographyItem, CategoryType } from '~~/shared/types/gallery'
+import type { GalleryItem, PhotographyItem, CategoryType } from '~~/shared/types/gallery'
 
 export type UnifiedGalleryItem = GalleryItem | PhotographyItem
 
@@ -57,6 +57,8 @@ export type UpdateImageBody = {
     date: string
     color?: string
     tags?: string[]
+    /** 策展系列（見 shared/config/constants.ts SERIES_TAGS） */
+    series?: string[]
   }
 }
 

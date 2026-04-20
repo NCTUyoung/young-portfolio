@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Gallery 公開資料載入：JSON 路徑（依 app.baseURL）、轉成 GalleryItem
  */
 import { joinURL } from 'ufo'
@@ -23,7 +23,11 @@ export function transformDigitalWork (img: DigitalArtItem): GalleryItem {
     color: img.color,
     event: img.event || null,
     category: 'digital' as const,
-    visible: true
+    visible: true,
+    // series 為 optional 策展 tag；若原資料未帶欄位則留 undefined 不佔空間
+    ...(Array.isArray((img as { series?: unknown }).series)
+      ? { series: [...(img as { series: string[] }).series] }
+      : {})
   }
 }
 
@@ -44,7 +48,9 @@ export function transformPhotographyWork (img: PhotographyItem): GalleryItem {
     iso: img.iso,
     shutterSpeed: img.shutterSpeed,
     category: 'photography' as const,
-    visible: true
+    visible: true,
+    // series 為 optional 策展 tag；未設定時留 undefined，下游用 `series?.includes(x)` 就安全
+    ...(Array.isArray(img.series) ? { series: [...img.series] } : {})
   }
 }
 

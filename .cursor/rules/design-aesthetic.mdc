@@ -33,7 +33,7 @@ alwaysApply: true
 | 點綴（印章／label） | `accent.500~700` | `accent.300~400` |
 | 卡片底 | `bg-white/70` `backdrop-blur` | `bg-stone-800/60` |
 
-**Dark mode 預設開啟**：`layouts/default.vue` 用 `useDark({ initialValue: 'dark' })`；`nuxt.config.ts` 的 `htmlAttrs.class = 'dark'` 避免 SSR FOUC。新增元件時 **一律同時寫 light/dark 兩組 class**，不可只做單邊。
+**Light mode 預設**（2026-04-19 調整，原為 dark）：`layouts/default.vue` 用 `useDark({ initialValue: 'light' })`；`nuxt.config.ts` 的 theme-boot inline script 於 localStorage 空值時套 light，不在 `htmlAttrs.class` 寫死主題以避開 FOUC。**dark mode 仍保留為可選**（header 有 toggle、`dark:*` class 不得移除），只是不再是開箱預設。新增元件時 **一律同時寫 light/dark 兩組 class**，不可只做單邊——即使 light 為預設，使用者 toggle 後仍要看得出設計有做過。
 
 ---
 
@@ -83,8 +83,9 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 
 - **緩慢、少量、可被關掉**。所有動畫必須尊重 `@media (prefers-reduced-motion: reduce)`，新增自訂動畫時加 `motion-reduce:transition-none` 或對應 media query。
 - Reveal 曲線固定 `cubic-bezier(0.16, 1, 0.3, 1)`，時長 `0.7~0.8s`，階梯延遲 0.1s。
-- Hero 輪播意象是「**風中翻書**」：5 張精選照片、9 秒一張、`transition-duration: 1500ms` 的純 opacity 淡入淡出；`@mouseenter/@focusin` 暫停，`onUnmounted` 清 interval。**不要加導覽點（dots）或箭頭**。
-- Hero 首張標 `fetchpriority="high" loading="eager"`，其餘 `loading="lazy"`。
+- **Hero 採「靜照扉頁」**（Phase 3A，2026-04-19）：單張靜照為背景、純文字扉頁為主角；**禁用自動輪播、翻頁、淡入淡出切換**。原「風中翻書」5 張輪播機制已廢除，不要重新加回（改動動機：資料與 SEO 單一來源、降 LCP 推遲、減少 interval / reduce-motion 分支維護成本）。
+- Hero 靜照 `<img>` 標 `fetchpriority="high" loading="eager" decoding="async"`；背景處理沿用 §6「單色化 + 降飽和 + 米白罩」配方。
+- **如需換 Hero 圖**：改 `public/photographyList.json` 裡目標項目的 `series: [..., 'hero']`（同步移除原來那張的 `hero` tag，保持 1 張 hero）；`index.vue` 會透過 `series=hero` 取第一張；`og:image` / `twitterImage` / `personImage` 皆同源自動跟進。
 
 ---
 
@@ -125,8 +126,9 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 
 ## 9. SEO／OG 一致性
 
-- `og:image` 指向 **Hero 當期首張輪播圖**（目前：`photography/WBC東京 台澳/DSC_9877-編輯-1.jpg`）。
-- 換 Hero 首張時同步更新 `pages/index.vue` 的 `useSeoMeta.ogImage`，路徑需 `encodeURIComponent`。
+- **單一來源**：`og:image` 指向 `public/photographyList.json` 中標 `series: ['hero']` 的那張圖（目前：`photography/WBC東京 台澳/DSC_9877-編輯-1.jpg`）。首頁扉頁 `<img>`、`useSeoMeta.ogImage` / `twitterImage`、JSON-LD `Person.image` 皆從此 tag 動態取，不再多處硬編。
+- **換 Hero 圖只改一個地方**：編輯 JSON 的 `series: ['hero']` 目標項（後台 ImageEditDialog 有對應勾選 UI），其餘全部自動跟進。路徑需 `encodeURIComponent`（已封裝於 `index.vue` 的 `heroImageAbsolute` computed）。
+- **`nuxt.config.ts` 的 `app.head.meta` 預設 og:image** 為**全站 fallback**（非首頁也有分享縮圖）；首頁 `useSeoMeta` 為 page-level 後註冊會覆寫；兩處建議手動保持同一張。
 - `og:locale = zh_TW`，`titleTemplate = '%s | Young Portfolio'` 不要動。
 
 ---
@@ -140,4 +142,4 @@ Reveal 動畫類別：`reveal` / `reveal-left` / `reveal-right` / `reveal-scale`
 - [ ] 動畫支援 reduced-motion？
 - [ ] 圖像走 `useImagePath`，Hero 圖做了單色化＋米白罩？
 - [ ] 新分隔線用 `jp-hairline`，不是 `border-2`？
-- [ ] 換 Hero 首張時同步更新 `ogImage`？
+- [ ] 換 Hero 圖時只改 JSON 的 `series: ['hero']`（一處即同步）？

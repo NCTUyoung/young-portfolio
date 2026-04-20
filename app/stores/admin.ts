@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { FileWithMeta, GalleryItem, PhotographyItem, CategoryType } from '~~/shared/types/gallery'
 import type { GalleryListApiResponse, UnifiedGalleryItem } from '~/stores/adminTypes'
@@ -484,6 +484,7 @@ export const useAdminStore = defineStore('admin', () => {
     date: string
     color?: string
     tags?: string[]
+    series?: string[]
   }) => {
     if (!editingImageData.value) return
 
@@ -532,8 +533,14 @@ export const useAdminStore = defineStore('admin', () => {
         // 分類特定更新
         if (manageCategory.value === 'gallery' && updateData.color) {
           (updatedImage as GalleryItem & { color?: string }).color = updateData.color
-        } else if (manageCategory.value === 'photography' && updateData.tags) {
-          (updatedImage as GalleryItem).tags = updateData.tags
+        } else if (manageCategory.value === 'photography') {
+          if (updateData.tags) {
+            (updatedImage as GalleryItem).tags = updateData.tags
+          }
+          // series 即使為空陣列也要覆蓋（代表使用者清空了所有系列）
+          if (updateData.series !== undefined) {
+            (updatedImage as GalleryItem).series = updateData.series
+          }
         }
 
         console.log('更新後的圖片:', updatedImage)

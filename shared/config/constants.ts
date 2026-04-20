@@ -111,6 +111,31 @@ export const TAG_PRIORITY = [
   '室內', '室外', '高速快門', '慢速快門', '深景深'
 ] as const
 
+/**
+ * 策展用系列標籤白名單（GalleryItem.series / PhotographyItem.series 欄位的合法值）。
+ *
+ * 新增一個 series 前請同步：
+ *   1. 這裡加入 slug（小寫英數 + 連字號）
+ *   2. `SERIES_TAG_LABELS` 加入中英文顯示名
+ *   3. 消費端（目前僅 HorizontalStripFeatured）加入對應 UI 切換
+ *   4. `scripts/lint-gallery-data.mjs` 會自動檢查資料端是否用了未登記的名
+ */
+export const SERIES_TAGS = ['featured', 'hero'] as const
+export type SeriesTag = typeof SERIES_TAGS[number]
+
+export const SERIES_TAG_LABELS: Record<SeriesTag, { label: string; zh: string; description: string }> = {
+  featured: {
+    label: 'Featured',
+    zh: '精選水平軸',
+    description: '顯示在 /gallery/photography 頁 Hero 之後的水平軸精選系列；建議維持 6–12 張'
+  },
+  hero: {
+    label: 'Hero',
+    zh: '首頁扉頁',
+    description: '首頁 index.vue 扉頁靜照 + og:image / twitterImage / personImage JSON-LD 圖。建議只標 1 張；若標多張取第一張'
+  }
+} as const
+
 // 快門速度顯示格式
 export const SHUTTER_SPEED_FORMATS = {
   threshold: 1, // 大於等於1秒顯示為秒數，小於1秒顯示為分數

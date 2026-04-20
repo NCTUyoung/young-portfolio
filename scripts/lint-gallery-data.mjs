@@ -21,6 +21,10 @@ const __dirname = path.dirname(__filename)
 const ROOT = path.resolve(__dirname, '..')
 const PUB = path.join(ROOT, 'public')
 
+// 與 shared/config/constants.ts SERIES_TAGS 同步；lint 時若發現資料使用白名單外
+// 的 series 名，視為 error（避免 typo 或廢棄 tag 殘留在 JSON）。
+const KNOWN_SERIES_TAGS = new Set(['featured', 'hero'])
+
 function readJson (p) {
   return JSON.parse(fs.readFileSync(p, 'utf-8'))
 }
@@ -70,6 +74,42 @@ function findMissingFiles (works) {
     if (!fs.existsSync(abs)) missing.push(w.filename)
   }
   return missing
+}
+
+/**
+ * 檢查 series 欄位合法性：
+ *   - 必須是 string[]（不能是 string、number、object）
+ *   - 每個值必須屬於 `KNOWN_SERIES_TAGS`
+ *   - 陣列內不可有重複（顯示端會誤算數量）
+ *
+ * 回傳 { errors: string[], summary: Record<tag, count> }
+ */
+function checkSeriesTags (works) {
+  const errors = []
+  const summary = {}
+  for (const w of works) {
+    if (!('series' in w) || w.series === undefined || w.series === null) continue
+    if (!Array.isArray(w.series)) {
+      errors.push(`${w.filename}: series 必須是陣列，實際為 ${typeof w.series}`)
+      continue
+    }
+    const seen = new Set()
+    for (const tag of w.series) {
+      if (typeof tag !== 'string') {
+        errors.push(`${w.filename}: series 元素必須為字串，發現 ${typeof tag}`)
+        continue
+      }
+      if (seen.has(tag)) {
+        errors.push(`${w.filename}: series 有重複值 "${tag}"`)
+      }
+      seen.add(tag)
+      if (!KNOWN_SERIES_TAGS.has(tag)) {
+        errors.push(`${w.filename}: series "${tag}" 不在白名單（合法值：${[...KNOWN_SERIES_TAGS].join(', ')}）`)
+      }
+      summary[tag] = (summary[tag] || 0) + 1
+    }
+  }
+  return { errors, summary }
 }
 
 function checkEventCoords (works, category) {
@@ -139,6 +179,23 @@ function main () {
     if (missingCoords.length > 0) {
       warnCount++
       report.push(flagLine('warn', `${missingCoords.length} 筆攝影作品缺 event.lat/lng，會退回 fallback 座標`))
+    }
+
+    const seriesResult = checkSeriesTags(works)
+    if (seriesResult.errors.length > 0) {
+      errorCount++
+      report.push(flagLine('error', `series 欄位異常：`))
+      for (const msg of seriesResult.errors.slice(0, 10)) {
+        report.push(`         - ${msg}`)
+      }
+      if (seriesResult.errors.length > 10) {
+        report.push(`         ...還有 ${seriesResult.errors.length - 10} 筆`)
+      }
+    }
+    const seriesKeys = Object.keys(seriesResult.summary)
+    if (seriesKeys.length > 0) {
+      const breakdown = seriesKeys.map(k => `${k}=${seriesResult.summary[k]}`).join(', ')
+      report.push(flagLine('info', `series 分布：${breakdown}`))
     }
 
     const boiler = countBoilerplate(works)

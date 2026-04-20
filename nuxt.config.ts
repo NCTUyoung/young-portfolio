@@ -129,7 +129,7 @@ export default defineNuxtConfig({
         {
           key: 'theme-boot-vueuse',
           tagPriority: 'critical',
-          innerHTML: `(function(){try{var k='vueuse-color-scheme';var raw=localStorage.getItem(k);var m=raw;if(m==null||m==='')m='dark';if(m==='auto')m=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var el=document.documentElement;if(m==='dark')el.classList.add('dark');else el.classList.remove('dark')}catch(e){}})()`,
+          innerHTML: `(function(){try{var k='vueuse-color-scheme';var raw=localStorage.getItem(k);var m=raw;if(m==null||m==='')m='light';if(m==='auto')m=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var el=document.documentElement;if(m==='dark')el.classList.add('dark');else el.classList.remove('dark')}catch(e){}})()`,
           type: 'text/javascript'
         }
       ],
@@ -155,6 +155,10 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'zh_TW' },
         { property: 'og:url', content: 'https://nctuyoung.github.io/young-portfolio/' },
+        // og:image 全站預設（非首頁也能分享）；首頁的 useSeoMeta 會以 hero series
+        // 圖覆寫（page-level 後註冊 > global meta）。若要換 hero 圖，改
+        // photographyList.json 的 `series: ['hero']` 目標；此預設同步更新。
+        // 2026-04-19 Phase 3A：DSC_9877 = 首屏靜照，與 hero tag 同源。
         {
           property: 'og:image',
           content:

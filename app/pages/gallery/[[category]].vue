@@ -79,16 +79,28 @@
         </button>
       </div>
 
-      <!-- 地點地圖：僅在攝影作品分類顯示 -->
+      <!--
+        地點地圖：僅在攝影作品分類顯示（2026-04-19 起改 compact 版）
+        理由：原本 420px 地圖把後面的 Featured Strip 擠出首屏；
+        壓成 160px（桌機）/ 120px（手機）帶狀後，首屏即可看到
+        「地圖 → 精選 strip → 時間軸」三個橫向 band，敘事連貫。
+        互動不減：marker click 仍觸發 handleFocusEvent，hover card 改縮小右上角。
+      -->
       <section
         v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
         ref="mapSectionRef"
-        class="mb-16 max-w-7xl mx-auto scroll-mt-24"
+        class="mb-8 max-w-7xl mx-auto scroll-mt-24"
       >
-        <p class="jp-section-label mb-3">Visited Places</p>
+        <div class="flex items-baseline justify-between mb-2">
+          <p class="jp-section-label">Visited Places · 訪れた場所</p>
+          <p class="text-[0.65rem] tracking-[0.3em] text-stone-400 dark:text-stone-500 uppercase">
+            {{ eventLocations.length }} locations
+          </p>
+        </div>
         <EventMap
           :events="eventLocations"
           :selected-event-name="filterState.selectedEvent"
+          variant="compact"
           @focus-event="handleFocusEvent"
         />
       </section>
@@ -129,6 +141,28 @@
 
         <!-- 攝影作品 - 保持原有的日式佈局 -->
         <div v-else-if="currentCategory === 'photography'">
+          <!--
+            Artist Statement — 一句人格短句（wiki/inspirations/hero-artist-statement.md 選項 A 候選 3）
+            位置：map 之後、strip 之前，作為策展內容的序幕句；photography 獨享。
+            與 hero 詩性引言（作品立場）互補：此句為 personal statement（攝影師本人的聲音）。
+          -->
+          <div class="max-w-7xl mx-auto px-6 mt-2 mb-10 md:mb-14">
+            <p
+              lang="ja"
+              class="jp-body text-center text-stone-500 dark:text-stone-400 tracking-[0.35em] text-sm md:text-base"
+              aria-label="Artist statement: まだ、撮っている。（仍在拍著）"
+            >
+              まだ、撮っている。
+            </p>
+          </div>
+
+          <!--
+            POC：Horizontal Featured Strip（Jack Kuo 水平軸概念移植，桌機獨享）
+            放在地圖之後、時間軸之前：工具性（地圖） → 策展焦點（strip） → 全量（時間軸）
+            手機 `md:hidden` 不渲染（Q3(a) 決策）。詳見 wiki/inspirations/horizontal-strip-poc.md
+          -->
+          <HorizontalStripFeatured />
+
           <GalleryPhotographySection
             :items="photographyEventItems"
             :focused-event-name="focusedEventName"
@@ -220,6 +254,7 @@ import GalleryFilterToolbar from '~/components/GalleryFilterToolbar.vue'
 import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryAllMixedSection from '~/components/gallery/GalleryAllMixedSection.vue'
+import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 

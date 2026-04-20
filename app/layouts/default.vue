@@ -212,10 +212,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
 
-// Dark mode — 預設走 dark，尊重使用者已儲存的偏好（storageKey 須與 nuxt.config theme-boot 腳本一致）
+// Dark mode — 預設走 light，尊重使用者已儲存的偏好（storageKey 須與 nuxt.config theme-boot 腳本一致）
 const isDark = useDark({
   storageKey: 'vueuse-color-scheme',
-  initialValue: 'dark'
+  initialValue: 'light'
 })
 const toggleDark = useToggle(isDark)
 

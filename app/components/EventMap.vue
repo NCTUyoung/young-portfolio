@@ -1,11 +1,55 @@
 <template>
-  <div class="event-map-wrapper">
+  <div
+    class="event-map-wrapper"
+    :class="{
+      'event-map-wrapper--compact': variant === 'compact',
+      'event-map-wrapper--expanded': isExpanded
+    }"
+    @mouseenter="onWrapperEnter"
+    @mouseleave="onWrapperLeave"
+  >
     <div ref="mapContainer" class="event-map-container" />
+
+    <!--
+      compact 未展開時顯示「停留展開」hint：
+      - 位於地圖中下緣，小、半透明，不搶視覺
+      - `@media (hover: hover)` 才有作用；touch-only 裝置 hint 也會顯示但點了沒反應，
+        不過「停留」對 touch 裝置本來就不成立，使用者不會期待
+      - `pointer-events: none` 不擋 Leaflet 互動
+    -->
+    <div
+      v-if="variant === 'compact' && !isExpanded"
+      class="event-map-expand-hint"
+      aria-hidden="true"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" class="event-map-expand-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 13L3 17m0 0h3.5M3 17v-3.5M13 7l4-4m0 0h-3.5M17 3v3.5" />
+      </svg>
+      <span>停留放大</span>
+    </div>
+
+    <!--
+      compact 模式左右兩側加極輕漸層遮罩：
+      1. 視覺上呼應 HorizontalStripFeatured 的漸層邊，讓全頁「橫向 band」語彙一致
+      2. 地圖 tile 在窄高容器中容易「硬切邊」，軟化邊緣減輕突兀
+      仍 `pointer-events: none`，不影響 leaflet 互動
+    -->
+    <template v-if="variant === 'compact'">
+      <div
+        class="pointer-events-none absolute top-0 bottom-0 left-0 w-12 z-[400] bg-gradient-to-r from-stone-50/70 dark:from-stone-900/70 to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        class="pointer-events-none absolute top-0 bottom-0 right-0 w-12 z-[400] bg-gradient-to-l from-stone-50/70 dark:from-stone-900/70 to-transparent"
+        aria-hidden="true"
+      />
+    </template>
 
     <transition name="event-map-hover">
       <div
         v-if="hoveredEvent"
         class="event-map-hover-card"
+        :class="{ 'event-map-hover-card--compact': variant === 'compact' }"
       >
         <img
           :src="getThumbPath(hoveredEvent.coverFilename, 400)"
@@ -65,8 +109,15 @@ const props = withDefaults(
     events: EventLocation[]
     /** 與 Event 篩選同步：選中時地圖飛到該點並強調標記；null 時縮放至全部範圍 */
     selectedEventName?: string | null
+    /**
+     * 版型變體：
+     *   - `default`：420px 高（手機 260px），wheel zoom、鍵盤導覽開啟——適合專頁或詳細模式
+     *   - `compact`：160px 高（手機 120px），停用 wheel zoom 與鍵盤（避免與頁面捲動、strip 的鍵盤導覽打架），
+     *     hover card 彈在地圖下方外而非內部右下，marker 縮小；用於常駐 summary bar
+     */
+    variant?: 'default' | 'compact'
   }>(),
-  { selectedEventName: null }
+  { selectedEventName: null, variant: 'default' }
 )
 
 const emit = defineEmits<{
@@ -76,6 +127,49 @@ const emit = defineEmits<{
 const mapContainer = ref<HTMLDivElement | null>(null)
 const hoveredEvent = ref<EventLocation | null>(null)
 const isDark = useDark()
+
+/**
+ * compact 變體的 hover 展開狀態：
+ * 滑鼠停在地圖帶 ≥280ms 後 `isExpanded = true` → container 從 160px 長到 480px；
+ * 離開後 350ms 收回。延遲的目的是避免使用者「從 hero 快速滾到 strip」途中被誤觸。
+ * expand/collapse 動畫結束（~360ms）後呼叫 `runInvalidateWhenIdle()` 讓 Leaflet 重繪，
+ * 否則 tile 會停留在舊尺寸導致邊緣空白。
+ */
+const isExpanded = ref(false)
+let expandTimer: ReturnType<typeof setTimeout> | null = null
+let collapseTimer: ReturnType<typeof setTimeout> | null = null
+
+const HOVER_EXPAND_DELAY = 280
+const HOVER_COLLAPSE_DELAY = 350
+/** CSS height transition（0.32s）後保險再多 40ms 確保動畫完成 */
+const MAP_RESIZE_AFTER_ANIM = 360
+
+function clearHoverTimers () {
+  if (expandTimer) { clearTimeout(expandTimer); expandTimer = null }
+  if (collapseTimer) { clearTimeout(collapseTimer); collapseTimer = null }
+}
+
+function onWrapperEnter () {
+  if (props.variant !== 'compact') return
+  if (collapseTimer) { clearTimeout(collapseTimer); collapseTimer = null }
+  if (isExpanded.value) return
+  expandTimer = setTimeout(() => {
+    isExpanded.value = true
+    expandTimer = null
+    setTimeout(() => runInvalidateWhenIdle(), MAP_RESIZE_AFTER_ANIM)
+  }, HOVER_EXPAND_DELAY)
+}
+
+function onWrapperLeave () {
+  if (props.variant !== 'compact') return
+  if (expandTimer) { clearTimeout(expandTimer); expandTimer = null }
+  if (!isExpanded.value) return
+  collapseTimer = setTimeout(() => {
+    isExpanded.value = false
+    collapseTimer = null
+    setTimeout(() => runInvalidateWhenIdle(), MAP_RESIZE_AFTER_ANIM)
+  }, HOVER_COLLAPSE_DELAY)
+}
 
 const { getThumbPath } = useImagePath()
 
@@ -160,10 +254,20 @@ const initMap = async () => {
     const L = await import('leaflet')
     if (map || !mapContainer.value) return
 
+    // compact 版調整：
+    //   - scrollWheelZoom: 'center' → 以地圖中心縮放（而非游標位置），避免 160px 窄帶中
+    //     游標貼邊時 zoom 跳位；Leaflet 僅在 hover 於 map container 時攔截 wheel，
+    //     離開就還給頁面，所以快速滾過不會卡住頁面捲動。
+    //   - keyboard: false → tiny map 的 `+/-` 鍵讓給 strip / timeline 鍵盤導覽。
+    //   - 仍保留 dragging / touchZoom / doubleClickZoom 讓使用者可探索。
+    const isCompact = props.variant === 'compact'
     map = L.map(mapContainer.value, {
       center: [23.7, 121],
-      zoom: 7,
-      zoomControl: false
+      zoom: isCompact ? 6 : 7,
+      zoomControl: false,
+      scrollWheelZoom: isCompact ? 'center' : true,
+      keyboard: !isCompact,
+      attributionControl: !isCompact
     })
 
     await setTileLayer(isDark.value)
@@ -248,17 +352,25 @@ const applyMapViewForSelection = (L: LeafletModule) => {
   if (name) {
     const ev = props.events.find(e => e.name === name)
     if (ev) {
-      runFly(() => mapInstance.flyTo([ev.lat, ev.lng], 12, { duration: flyDuration }))
+      // compact 版中飛到單一 event 不要 zoom 到 12（太近看不出地理脈絡），停 9
+      const focusZoom = props.variant === 'compact' ? 9 : 12
+      runFly(() => mapInstance.flyTo([ev.lat, ev.lng], focusZoom, { duration: flyDuration }))
       return
     }
   }
 
   const bounds = props.events.map(e => [e.lat, e.lng] as LatLngTuple)
+  // compact 版 padding 拉大（避免 marker 貼邊切掉），maxZoom 限得更小
+  // 讓「台灣全島 + 日本」等跨區域資料能同框展示而不被強制 zoom-in。
+  const isCompact = props.variant === 'compact'
+  const fitPadding: [number, number] = isCompact ? [32, 48] : [36, 36]
+  const fitMaxZoom = isCompact ? 6 : 12
+  const singleZoom = isCompact ? 7 : 10
   if (bounds.length === 1) {
-    runFly(() => mapInstance.flyTo(bounds[0], 10, { duration: flyDuration }))
+    runFly(() => mapInstance.flyTo(bounds[0], singleZoom, { duration: flyDuration }))
   } else if (bounds.length > 1) {
     const b = L.latLngBounds(bounds)
-    runFly(() => mapInstance.flyToBounds(b, { padding: [36, 36], duration: flyDuration, maxZoom: 12 }))
+    runFly(() => mapInstance.flyToBounds(b, { padding: fitPadding, duration: flyDuration, maxZoom: fitMaxZoom }))
   }
 }
 
@@ -359,6 +471,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  clearHoverTimers()
   if (resizeObserver) {
     if (mapContainer.value) {
       resizeObserver.unobserve(mapContainer.value)
@@ -382,16 +495,106 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
 }
 
+/**
+ * compact 版的外框改得更「帶狀」：
+ * 圓角縮小、shadow 取消（band 式不需要卡片感）、邊框淡化。
+ * 目的是讓它在 header 與 strip 之間「低調分隔」而非「醒目卡片」。
+ */
+.event-map-wrapper--compact {
+  @apply rounded-xl border-stone-200/60 dark:border-stone-700/40;
+  box-shadow: none;
+}
+
 .event-map-container {
   width: 100%;
   min-width: 0;
   height: 420px;
 }
 
+/*
+ * compact：160px（桌機）/ 120px（手機）。
+ * 加 transition 讓 hover 展開順暢；timing 與 JS 的 `MAP_RESIZE_AFTER_ANIM` (360ms)
+ * 對齊——CSS 動畫 0.32s + 40ms buffer = JS invalidateSize 時 tile 已落位。
+ */
+.event-map-wrapper--compact .event-map-container {
+  height: 160px;
+  transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* hover 展開：桌機長到 480px（舒適瀏覽高度，比 default 的 420 大一點表示「專注」） */
+.event-map-wrapper--compact.event-map-wrapper--expanded .event-map-container {
+  height: 480px;
+}
+
 @media (max-width: 768px) {
   .event-map-container {
     height: 260px;
   }
+  .event-map-wrapper--compact .event-map-container {
+    height: 120px;
+  }
+  /* 手機 hover 展開不太可能被觸發，但保險給個縮小版尺寸 */
+  .event-map-wrapper--compact.event-map-wrapper--expanded .event-map-container {
+    height: 340px;
+  }
+}
+
+/* 無障礙：不喜歡動畫的使用者直接切換尺寸 */
+@media (prefers-reduced-motion: reduce) {
+  .event-map-wrapper--compact .event-map-container {
+    transition: none;
+  }
+}
+
+/*
+ * 展開狀態下左右漸層遮罩要淡化——遮罩是為了 160px 窄帶的硬邊軟化，
+ * 480px 時再蓋會無端遮蔽內容。
+ */
+.event-map-wrapper--compact.event-map-wrapper--expanded > [class*="bg-gradient-to"] {
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+/*
+ * 「停留放大」hint：
+ * 中下緣 pill，icon + 文字組合；半透明、低對比，只在 compact 未展開時顯示，
+ * 主動提示可 hover 探索。mouseenter 後 280ms 才展開，hint 這段時間仍可見，
+ * 展開瞬間 v-if=false 消失（無需 fade）。
+ */
+.event-map-expand-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(253, 248, 240, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(196, 96, 35, 0.18);
+  font-size: 0.58rem;
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.22em;
+  color: rgb(120 113 108);
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0.78;
+}
+.event-map-expand-icon {
+  width: 0.7rem;
+  height: 0.7rem;
+  color: rgb(196 96 35);
+  opacity: 0.8;
+}
+.dark .event-map-expand-hint {
+  background: rgba(28, 25, 23, 0.82);
+  border-color: rgba(228, 150, 74, 0.2);
+  color: rgb(168 162 158);
+}
+.dark .event-map-expand-icon {
+  color: rgb(228 150 74);
 }
 
 /* 淺色模式：微灰階與對比；深色模式：地圖已是深色，僅微調 */
@@ -431,6 +634,37 @@ onBeforeUnmount(() => {
   z-index: 1000;
   pointer-events: none;
   max-width: 260px;
+}
+/**
+ * compact 版 hover card：
+ * 容器本身僅 160px 高，放原尺寸（60px 圖 + 3 行文）會佔滿全高；
+ * 改貼右上角、縮小圖至 40px、限 max-width 220px，
+ * 並移除 attribution（compact 時 attributionControl:false）不必留空間，
+ * bottom/left 都留 0.4rem padding 呈現輕盈浮貼感。
+ */
+.event-map-hover-card--compact {
+  right: 0.55rem;
+  bottom: auto;
+  top: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  gap: 0.55rem;
+  border-radius: 0.65rem;
+  max-width: 220px;
+}
+.event-map-hover-card--compact .event-map-hover-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+}
+.event-map-hover-card--compact .event-map-hover-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 0;
+}
+.event-map-hover-card--compact .event-map-hover-sub,
+.event-map-hover-card--compact .event-map-hover-meta {
+  font-size: 0.6rem;
+  line-height: 1.35;
 }
 .dark .event-map-hover-card {
   background: rgba(28, 25, 23, 0.94);

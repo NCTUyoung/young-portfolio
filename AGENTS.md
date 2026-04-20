@@ -14,3 +14,4 @@
 - **ESLint**：`consistent-type-imports` 為 warn；動態模組型別勿用 `typeof import('pkg')`，改用 `import type * as Pkg from 'pkg'` + `typeof Pkg`。
 - **測試**：`npm run test`（Vitest）；`utils/*.test.ts`（`galleryUtils`、`formatters`、`validators`）。新增或變更使用者可見功能時，另依 `.cursor/rules/feature-testing-mcp-devtools.mdc` 以 **MCP `user-chrome-devtools`** 對本機 `npm run dev` 做路由／快照（或 trace）驗證；勿只用內建瀏覽器測 `localhost`。
 - **回應語言**：使用者偏好中文說明；程式與註解可用英文。
+- **攝影網站研究 Wiki**：`wiki/` 是獨立的 LLM-maintained 知識庫（Karpathy `llm-wiki` pattern），專收攝影作品集網站並提煉給 young-portfolio 用的靈感。有自己的 `wiki/AGENTS.md` 規範頁面格式、ingest/query/lint 三種操作、`index.md` 與 `log.md` 維護方式。使用者說「ingest」「lint wiki」「開一張 inspiration」等指令時，全部按 `wiki/AGENTS.md` 走，不要在全站 src 裡亂寫。

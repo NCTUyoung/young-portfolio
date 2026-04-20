@@ -27,6 +27,13 @@ export interface GalleryItem {
   time: string
   tags?: string[]
   visible?: boolean
+  /**
+   * 策展用系列標籤（可為多個）。用於 HorizontalStripFeatured 等獨立展示區
+   * 從 `photographyList.json` / `galleryList.json` 擷取特定子集。
+   * 合法值見 `shared/config/constants.ts` SERIES_TAGS；lint 由
+   * `scripts/lint-gallery-data.mjs` 檢查名稱一致性。
+   */
+  series?: string[]
   // 數位作品相關
   color?: string
   // 攝影作品相關
@@ -48,6 +55,8 @@ export interface DigitalArtItem extends BaseImageItem {
 // 攝影作品接口
 export interface PhotographyItem extends BaseImageItem {
   tags: string[]
+  /** 策展用系列標籤（與 GalleryItem.series 同語意；見該欄位 doc） */
+  series?: string[]
   event: PhotoEvent
   camera: string
   model: string

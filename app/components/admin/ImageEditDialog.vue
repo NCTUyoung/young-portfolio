@@ -92,6 +92,39 @@
                 <p class="text-xs text-stone-400 font-light mt-1">相機設定無法修改，會自動從照片讀取</p>
               </div>
 
+              <!--
+                策展系列（series）：跨 event 的策展分組。目前有：
+                  - `featured` → 前台 /gallery/photography & 首頁 Horizontal Strip 精選軸（建議 6–12 張）
+                  - `hero`     → 首頁扉頁靜照 + og:image / twitterImage / personImage（建議 1 張；多張取第一張）
+                需新增值時請改 `shared/config/constants.ts` SERIES_TAGS；UI 自動跟進。
+              -->
+              <div v-if="category === 'photography'" class="border-t border-stone-100 pt-4">
+                <label class="block text-xs font-light text-stone-500 mb-2 tracking-wider uppercase">策展系列</label>
+                <div class="space-y-2">
+                  <label
+                    v-for="tag in SERIES_TAGS"
+                    :key="tag"
+                    class="flex items-start gap-3 p-3 rounded-lg border border-stone-200 bg-stone-50 hover:bg-stone-100 cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="formData.series.includes(tag)"
+                      class="mt-0.5 w-4 h-4 rounded border-stone-300 text-accent-500 focus:ring-accent-400"
+                      @change="toggleSeries(tag, ($event.target as HTMLInputElement).checked)"
+                    >
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-light text-stone-800">
+                        {{ SERIES_TAG_LABELS[tag].zh }}
+                        <span class="text-xs text-stone-400 ml-2">{{ SERIES_TAG_LABELS[tag].label }}</span>
+                      </p>
+                      <p class="text-xs text-stone-500 font-light mt-0.5 leading-relaxed">
+                        {{ SERIES_TAG_LABELS[tag].description }}
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <!-- 事件資訊 -->
               <div v-if="imageData.event" class="border-t border-stone-100 pt-4">
                 <h5 class="text-xs font-light text-stone-500 mb-3 tracking-wider uppercase">事件資訊</h5>
@@ -139,6 +172,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { GalleryItem, PhotographyItem } from '~~/shared/types/gallery'
+import { SERIES_TAGS, SERIES_TAG_LABELS, type SeriesTag } from '~~/shared/config/constants'
 
 interface Props {
   isVisible: boolean
@@ -148,15 +182,33 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  confirm: [data: { title: string; content: string; date: string; color?: string; tags?: string[] }]
+  confirm: [data: { title: string; content: string; date: string; color?: string; tags?: string[]; series?: string[] }]
   cancel: []
 }>()
 
 const { getImagePath } = useImagePath()
 
-const formData = ref({ title: '', content: '', date: '', color: 'blue', tagsString: '' })
+const formData = ref({
+  title: '',
+  content: '',
+  date: '',
+  color: 'blue',
+  tagsString: '',
+  series: [] as string[]
+})
 
 const isFormValid = computed(() => formData.value.title.trim() !== '' && formData.value.date !== '')
+
+/**
+ * 切換單一 series tag。保留使用 `string[]` 而非 `SeriesTag[]` 是因為現有資料可能
+ * 已帶入舊字串，UI 不強制清洗（清洗交由 lint 腳本提示）。
+ */
+function toggleSeries (tag: SeriesTag, checked: boolean) {
+  const set = new Set(formData.value.series)
+  if (checked) set.add(tag)
+  else set.delete(tag)
+  formData.value.series = Array.from(set)
+}
 
 watch(() => props.imageData, (newData) => {
   if (newData) {
@@ -180,7 +232,10 @@ watch(() => props.imageData, (newData) => {
         ? Array.isArray((newData as PhotographyItem).tags)
           ? (newData as PhotographyItem).tags.join(', ')
           : String((newData as PhotographyItem).tags || '')
-        : ''
+        : '',
+      series: Array.isArray((newData as PhotographyItem).series)
+        ? [...(newData as PhotographyItem).series as string[]]
+        : []
     }
   }
 }, { immediate: true })
@@ -196,6 +251,8 @@ const confirm = () => {
     updateData.color = formData.value.color
   } else if (props.category === 'photography') {
     updateData.tags = formData.value.tagsString.split(',').map(t => t.trim()).filter(t => t)
+    // Series 總是送出（包含空陣列）讓後端明確覆蓋，避免 sticky-old-value bug
+    updateData.series = [...formData.value.series]
   }
   emit('confirm', updateData)
 }

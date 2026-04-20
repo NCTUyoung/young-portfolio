@@ -1,34 +1,29 @@
 <template>
   <div ref="pageRef">
     <!-- =====================================================================
-         Hero — 表紙（扉頁）
-         構成：左縦書き年號／中主標（和欧混植）／右作品集縦書き／底部 CTA
+         Hero — 表紙（靜照扉頁，Phase 3A）
+         構成：左縦書き年號／中主標（和欧混植）／右作品集縦書き／單張靜照背景
+         2026-04-19：廢除「風中翻書」5 張輪播鐵律（見 design-aesthetic.mdc §5）。
+                     保留扉頁氣質（余白主標、引言、令和年號、繪と影對聯）；
+                     單張靜照改從 photographyList.json 標 `series: ['hero']` 取，
+                     與 useSeoMeta.ogImage / nuxt.config.ts 同源，修資料債。
+                     高度 88dvh → 60vh 讓 strip 上緣在首屏內露臉。
          ===================================================================== -->
     <section
-      class="relative min-h-[88dvh] md:h-[94vh] md:min-h-[640px] overflow-hidden"
+      class="relative min-h-[480px] h-[60vh] md:h-[64vh] md:min-h-[560px] overflow-hidden"
       role="region"
       aria-roledescription="封面主視覺"
-      aria-label="Young Portfolio 表紙 — 精選攝影輪播"
-      @mouseenter="pauseHeroCycle"
-      @mouseleave="resumeHeroCycle"
-      @focusin="pauseHeroCycle"
-      @focusout="resumeHeroCycle"
+      aria-label="Young Portfolio 表紙 — 靜照扉頁"
     >
-      <!-- 背景：作品照片輪播（極慢淡入淡出） + 分區和紙米白罩 -->
+      <!-- 背景：單張靜照（hero series 第一張）+ 分區和紙米白罩 -->
       <div class="absolute inset-0">
-        <!-- 多張疊加、僅 opacity 控制可見性；單色化 + 輕抑飽和／亮度 -->
         <img
-          v-for="(src, i) in heroImages"
-          :key="src"
-          :src="src"
+          v-if="heroImage"
+          :src="heroImage"
           alt=""
-          class="absolute inset-0 w-full h-full object-cover grayscale contrast-90 brightness-105 transition-opacity ease-in-out motion-reduce:transition-none"
-          :class="[
-            i === activeHero ? 'opacity-80 dark:opacity-35' : 'opacity-0'
-          ]"
-          style="transition-duration: 1500ms"
-          :fetchpriority="i === 0 ? 'high' : 'auto'"
-          :loading="i === 0 ? 'eager' : 'lazy'"
+          class="absolute inset-0 w-full h-full object-cover grayscale contrast-90 brightness-105 opacity-80 dark:opacity-35 motion-reduce:transition-none"
+          fetchpriority="high"
+          loading="eager"
           decoding="async"
           aria-hidden="true"
         >
@@ -127,8 +122,8 @@
         </div>
       </div>
 
-      <!-- 底部：SCROLL 提示（和英） -->
-      <div class="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-500 dark:text-stone-400">
+      <!-- 底部：SCROLL 提示（和英）— 只在桌機顯示，避免與手機 CTA 撞位 -->
+      <div class="hidden md:flex absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-stone-500 dark:text-stone-400">
         <span class="font-jp text-[0.7rem] tracking-[0.5em]">下へ</span>
         <div class="w-px h-10 bg-gradient-to-b from-stone-400/70 to-transparent dark:from-stone-500/70 animate-pulse"/>
         <span class="text-[0.6rem] tracking-[0.35em] uppercase">Scroll</span>
@@ -400,6 +395,18 @@
           </NuxtLink>
         </header>
 
+        <!--
+          Phase 3B（2026-04-19）：在精選 grid 之前加 horizontal strip
+          - linkMode="navigate" 讓點擊跳到 /gallery/photography?image=<filename>；
+            首頁不掛 ImageViewer，由 gallery 頁的 useGalleryImageRoute 接手
+          - 手機 `md:hidden`（元件內部控制），行動裝置仍看下方 3x2 grid
+          - 若未來 Phase 3A 想廢 grid，只需刪下面 `<ul>` 區塊
+          - 詳見 wiki/inspirations/horizontal-strip-poc.md（Phase 3 章節）
+        -->
+        <div class="reveal mb-12 lg:mb-16 -mx-6 sm:-mx-10 lg:-mx-16">
+          <HorizontalStripFeatured link-mode="navigate" />
+        </div>
+
         <!-- 整齊 3 欄 4:5 grid -->
         <ul class="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
           <li
@@ -511,7 +518,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useImagePath } from '~/composables/useImagePath'
 import { SEO_CONFIG, SOCIAL_LINKS } from '~~/shared/config/constants'
@@ -520,46 +527,49 @@ import {
   buildWebSiteSchema,
   toHeadScripts
 } from '~/utils/siteSchema'
+import { useGalleryStore } from '~/stores/gallery'
+import { fetchPhotographyWorks } from '~/stores/galleryLoaders'
+import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
 
 const { getThumbPath, getGridImageSrcset, gridImageSizes } = useImagePath()
 const { observeAll } = useScrollReveal()
 const pageRef = ref<HTMLElement | null>(null)
 
+/**
+ * Phase 3B/3A：首頁需 photography 作品以渲染 HorizontalStripFeatured。
+ * 用同一個 useAsyncData key 讓 SSR 能 prefetch；key 與 gallery 頁不同
+ * （gallery 頁是 'gallery-works' 含 digital + photo），避免 Nuxt 錯誤覆蓋。
+ * strip 篩 series=featured（~8 張）；Hero 靜照篩 series=hero（建議 1 張）。
+ * 共用同一筆 JSON 載入，載入成本小（photographyList.json ~80 筆）。
+ */
+const galleryStore = useGalleryStore()
+const { data: photoPayload } = await useAsyncData('home-photography', fetchPhotographyWorks)
+watch(
+  photoPayload,
+  (v) => {
+    if (v) galleryStore.hydrateFromPayload({ photography: v })
+  },
+  { immediate: true }
+)
+
 // ===== 圖片路徑 =====
 const avatarPath = getThumbPath('gallery/2024年電繪作品/55.jpg', 400)
 
-// ===== Hero 輪播：精選 5 張，極慢淡入淡出（風中翻書） =====
-// 順序即顯示序；首張即預設開頁、SEO 主圖
-const heroImages = [
-  getThumbPath('photography/WBC東京 台澳/DSC_9877-編輯-1.jpg', 800),
-  getThumbPath('photography/峨嵋湖風鈴木/DSC_1437-編輯-1.jpg', 800),
-  getThumbPath('photography/Annber 外拍/DSC_2187-編輯-1.jpg', 800),
-  getThumbPath('photography/峨嵋湖風鈴木/DSC_2030-編輯-1.jpg', 800),
-  getThumbPath('photography/Annber 外拍/DSC_2702-編輯-1.jpg', 800)
-]
-const HERO_INTERVAL_MS = 9000
-const activeHero = ref(0)
-let heroTimer: ReturnType<typeof setInterval> | null = null
-const prefersReduceMotion = () =>
-  typeof window !== 'undefined'
-  && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-
-const advanceHero = () => {
-  activeHero.value = (activeHero.value + 1) % heroImages.length
-}
-const startHeroCycle = () => {
-  if (prefersReduceMotion()) return
-  stopHeroCycle()
-  heroTimer = setInterval(advanceHero, HERO_INTERVAL_MS)
-}
-const stopHeroCycle = () => {
-  if (heroTimer !== null) {
-    clearInterval(heroTimer)
-    heroTimer = null
-  }
-}
-const pauseHeroCycle = () => stopHeroCycle()
-const resumeHeroCycle = () => startHeroCycle()
+// ===== Hero 靜照（Phase 3A） =====
+// 2026-04-19：從 series=hero 的 JSON 資料取第一張；與 og:image / twitterImage /
+// personImage 同源，避免過去 heroImages 硬編 5 張 × 3 份 OG URL 的資料債。
+// 若 JSON 暫未標 hero tag（本地測試 / 極端情況），fallback 回固定路徑。
+const HERO_FALLBACK = 'photography/WBC東京 台澳/DSC_9877-編輯-1.jpg'
+const heroSource = computed(() => {
+  const first = photoPayload.value?.works?.find(
+    (img) => Array.isArray(img.series) && img.series.includes('hero')
+  )
+  return first?.filename || HERO_FALLBACK
+})
+const heroImage = computed(() => getThumbPath(heroSource.value, 800))
+const heroImageAbsolute = computed(() =>
+  `${SEO_CONFIG.siteUrl}images/${heroSource.value.split('/').map(encodeURIComponent).join('/')}`
+)
 
 // ===== 領域 =====
 const digitalTags = ['電繪插畫', '角色設計', '風景繪製', '概念藝術', '幾何風格']
@@ -605,14 +615,12 @@ const featuredWorks = [
 
 onMounted(() => {
   observeAll(pageRef.value)
-  startHeroCycle()
 })
 
-onUnmounted(() => {
-  stopHeroCycle()
-})
-
-// SEO
+// SEO — og:image / twitterImage / personImage 皆指向 heroImageAbsolute，
+// 與扉頁視覺本體同源；換 hero 張數只需改 photographyList.json 的 series=hero。
+// 注意：nuxt.config.ts 的 app.head.meta 也寫了一份 og:image（全站預設），
+// useSeoMeta 為 page-level 後註冊，會 **覆寫** 同 property；兩處建議保持一致。
 useSeoMeta({
   title: 'NCTU Young - 數位藝術與攝影作品集',
   description:
@@ -621,21 +629,22 @@ useSeoMeta({
   ogDescription:
     'NCTU Young 的個人作品集：數位電繪與攝影。圖片庫依類別與事件瀏覽，攝影附地圖與拍攝資訊。',
   ogType: 'website',
-  ogUrl: 'https://nctuyoung.github.io/young-portfolio/',
-  ogImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/WBC%E6%9D%B1%E4%BA%AC%20%E5%8F%B0%E6%BE%B3/DSC_9877-%E7%B7%A8%E8%BC%AF-1.jpg',
-  ogImageAlt: 'Young Portfolio — 日式靜素作品集 hero 攝影',
+  ogUrl: SEO_CONFIG.siteUrl,
+  ogImage: () => heroImageAbsolute.value,
+  ogImageAlt: 'Young Portfolio — 日式靜照扉頁 hero 攝影',
   twitterCard: 'summary_large_image',
   twitterTitle: 'Young Portfolio - 數位藝術與攝影',
   twitterDescription:
     'NCTU Young 的個人作品集：數位電繪與攝影。圖片庫依類別與事件瀏覽，攝影附地圖與拍攝資訊。',
-  twitterImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/WBC%E6%9D%B1%E4%BA%AC%20%E5%8F%B0%E6%BE%B3/DSC_9877-%E7%B7%A8%E8%BC%AF-1.jpg'
+  twitterImage: () => heroImageAbsolute.value
 })
 
 // ===== JSON-LD 結構化資料（Person + WebSite）=====
 // Google / Bing 會把 Person 的 sameAs 連向 GitHub/IG/Threads，形成作者
 // knowledge graph；ImageGallery / ImageObject 會以 SEO_CONFIG.siteUrl 作 Person
 // 主標，所以這裡和 gallery page 的 `gallerySchemaAuthor.url` 保持一致。
-const siteIdentity = {
+// personImage 使用 heroImageAbsolute.value（伺服器端渲染時會 snapshot 一次）。
+const siteIdentity = computed(() => ({
   siteUrl: SEO_CONFIG.siteUrl,
   siteName: SEO_CONFIG.siteName,
   siteDescription: SEO_CONFIG.siteDescription,
@@ -643,7 +652,7 @@ const siteIdentity = {
   personAlternateName: 'jimmyyoung1995',
   personJobTitle: 'Digital Painter · Photographer',
   personDescription: SEO_CONFIG.siteDescription,
-  personImage: 'https://nctuyoung.github.io/young-portfolio/images/photography/WBC%E6%9D%B1%E4%BA%AC%20%E5%8F%B0%E6%BE%B3/DSC_9877-%E7%B7%A8%E8%BC%AF-1.jpg',
+  personImage: heroImageAbsolute.value,
   socialLinks: [
     SOCIAL_LINKS.github,
     SOCIAL_LINKS.facebook,
@@ -651,12 +660,12 @@ const siteIdentity = {
     SOCIAL_LINKS.threads
   ],
   knowsAbout: ['Digital Painting', 'Photography', 'Portrait', 'Street Photography']
-}
+}))
 
 useHead({
   script: toHeadScripts([
-    buildPersonSchema(siteIdentity),
-    buildWebSiteSchema(siteIdentity)
+    buildPersonSchema(siteIdentity.value),
+    buildWebSiteSchema(siteIdentity.value)
   ])
 })
 </script>
