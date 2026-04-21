@@ -1,7 +1,7 @@
 <template>
   <div ref="pageRef" class="min-h-screen transition-colors duration-300">
     <!-- Header — 個性化設計 -->
-    <div class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative">
+    <div ref="controlsSectionRef" class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative">
       <!-- 右側縦書き裝飾字（配 hairline 收尾，不再孤立色點） -->
       <div class="absolute top-10 right-[6%] hidden lg:flex flex-col items-center gap-4 select-none pointer-events-none">
         <span class="jp-hairline-v h-16"/>
@@ -26,20 +26,41 @@
           <span>{{ categoryCount }} works</span>
         </p>
 
-        <!-- Category Tabs -->
-        <div class="mb-4">
-          <GalleryTabBar />
-        </div>
+        <div id="gallery-filter-controls">
+          <!-- Category Tabs -->
+          <div class="mb-4">
+            <GalleryTabBar />
+          </div>
 
-        <!-- Event Filter -->
-        <div class="mb-6">
-          <EventFilter />
-        </div>
+          <!-- Event Filter -->
+          <div class="mb-6">
+            <EventFilter />
+          </div>
 
-        <!-- 搜尋 + 年份：輕量行內工具列 -->
-        <GalleryFilterToolbar />
+          <!-- 搜尋 + 年份：輕量行內工具列 -->
+          <GalleryFilterToolbar />
+        </div>
       </div>
     </div>
+
+    <!-- Sticky mini bar：控制區離開可視區後，收束為一行摘要 -->
+    <transition name="mini-bar-fade">
+      <div
+        v-if="showControlMiniBar"
+        class="pointer-events-none fixed inset-x-0 z-[1090] top-[calc(env(safe-area-inset-top,0px)+4rem)]"
+        data-testid="gallery-filter-mini-bar"
+      >
+        <GalleryControlMiniBar
+          controls-id="gallery-filter-controls"
+          :category-label="miniCategoryLabel"
+          :event-label="miniEventLabel"
+          :year-label="miniYearLabel"
+          :search-label="miniSearchLabel"
+          :expanded="false"
+          @expand="scrollToControls"
+        />
+      </div>
+    </transition>
 
     <!-- Gallery Content -->
     <div class="container mx-auto px-4 sm:px-6 relative">
@@ -255,6 +276,7 @@ import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryAllMixedSection from '~/components/gallery/GalleryAllMixedSection.vue'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
+import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
@@ -325,8 +347,10 @@ useGalleryImageRoute()
 useGalleryCategoryRoute()
 useGalleryEventRoute()
 const pageRef = ref<HTMLElement | null>(null)
+const controlsSectionRef = ref<HTMLElement | null>(null)
 const mapSectionRef = ref<HTMLElement | null>(null)
 const showBackToMap = ref(false)
+const showControlMiniBar = ref(false)
 
 // ===== 計算屬性 =====
 // 當前選擇的類別
@@ -343,6 +367,19 @@ const categoryCount = computed(() => {
     return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
   }
   return mixedPhotoItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
+})
+
+const miniCategoryLabel = computed(() => {
+  const labels: Record<string, string> = { digital: 'Digital', photography: 'Photography', all: 'All' }
+  return labels[currentCategory.value] || 'All'
+})
+
+const miniEventLabel = computed(() => filterState.value.selectedEvent || '全部事件')
+const miniYearLabel = computed(() => filterState.value.yearFilter || '全年份')
+const miniSearchLabel = computed(() => {
+  const value = filterState.value.searchQuery.trim()
+  if (!value) return '無'
+  return value.length > 18 ? `${value.slice(0, 18)}…` : value
 })
 
 // Footer quotes by category
@@ -436,10 +473,27 @@ const handleFocusEvent = async (eventName: string) => {
 }
 
 const handleScroll = () => {
-  if (!mapSectionRef.value) return
-  const mapBottom = mapSectionRef.value.getBoundingClientRect().bottom
-  const threshold = 80
-  showBackToMap.value = mapBottom < threshold
+  if (mapSectionRef.value) {
+    const mapBottom = mapSectionRef.value.getBoundingClientRect().bottom
+    const threshold = 80
+    showBackToMap.value = mapBottom < threshold
+  } else {
+    showBackToMap.value = false
+  }
+
+  // 控制區 sticky mini bar（hysteresis：避免臨界點閃爍）
+  if (!controlsSectionRef.value || isGalleryLoading.value || galleryLoadFailed.value) {
+    showControlMiniBar.value = false
+    return
+  }
+  const controlsBottom = controlsSectionRef.value.getBoundingClientRect().bottom
+  const collapseThreshold = 100
+  const expandThreshold = 160
+  if (!showControlMiniBar.value && controlsBottom < collapseThreshold) {
+    showControlMiniBar.value = true
+  } else if (showControlMiniBar.value && controlsBottom > expandThreshold) {
+    showControlMiniBar.value = false
+  }
 }
 
 /** 地圖區是否已貼在導覽列下方；區塊高於視窗時只檢查頂緣對齊（避免矮螢幕誤判） */
@@ -462,6 +516,16 @@ const scrollToMap = () => {
   // block: 'nearest' 避免使用者已在地圖下方瀏覽時被強拉回頂端；
   // 只有完全看不到地圖時瀏覽器才會自動對齊，符合「柔性引導」原則。
   mapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+}
+
+const scrollToControls = () => {
+  if (!controlsSectionRef.value) return
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  controlsSectionRef.value.scrollIntoView({
+    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    block: 'start'
+  })
 }
 
 // ===== 圖片檢視器方法 =====
@@ -640,13 +704,27 @@ useHead({
 .gallery-fade-enter-from { opacity: 0; transform: translateY(12px); }
 .gallery-fade-leave-to   { opacity: 0; transform: translateY(-8px); }
 
+.mini-bar-fade-enter-active,
+.mini-bar-fade-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.mini-bar-fade-enter-from,
+.mini-bar-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gallery-fade-enter-active,
-  .gallery-fade-leave-active {
+  .gallery-fade-leave-active,
+  .mini-bar-fade-enter-active,
+  .mini-bar-fade-leave-active {
     transition: opacity 0.15s linear;
   }
   .gallery-fade-enter-from,
-  .gallery-fade-leave-to {
+  .gallery-fade-leave-to,
+  .mini-bar-fade-enter-from,
+  .mini-bar-fade-leave-to {
     transform: none;
   }
 }

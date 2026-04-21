@@ -62,6 +62,16 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        '@headlessui/vue',
+        'leaflet'
+      ]
+    }
+  },
 
   // GitHub Pages 靜態輸出配置
   nitro: {

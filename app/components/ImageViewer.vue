@@ -44,7 +44,7 @@ class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 flex items-start
           </div>
 
           <!-- 操作列：一排簡素圖示，無外框；「關閉」前以細線分隔收束 -->
-          <div class="flex flex-shrink-0 items-center gap-0 -mr-1 sm:-mr-2">
+          <div class="flex flex-shrink-0 items-center gap-0 mr-0 sm:-mr-2">
             <button
 :disabled="!canZoomOut" class="viewer-btn"
                     title="縮小 (Ctrl + -)"
@@ -98,7 +98,7 @@ class="viewer-btn"
             <span aria-hidden="true" class="mx-1 h-5 w-px bg-stone-500/30"/>
 
             <button
-class="viewer-btn"
+class="viewer-btn viewer-btn-close"
                     title="關閉 (Esc)"
                     aria-label="關閉圖片檢視器"
                     @click="closeImageViewer">
@@ -229,7 +229,7 @@ const panelLayoutOffsetPx = computed(() => {
 const toolbarInsetStyle = computed(() => {
   const pad = 16
   const offset = showInfoPanel.value && isDesktopViewerLayout.value ? infoPanelWidth.value + pad : pad
-  return { right: `${offset}px` }
+  return { right: `calc(${offset}px + env(safe-area-inset-right, 0px))` }
 })
 
 const nextNavButtonStyle = computed(() => {
@@ -517,11 +517,37 @@ watch(isOpen, (open) => {
 .viewer-btn--active {
   color: rgb(237 184 125); /* accent-300，細微墨印色提示 */
 }
+
+/* 關閉鍵提升辨識度與觸控命中率（手機優先） */
+.viewer-btn-close {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.75rem;
+  color: rgb(250 250 249);
+  background-color: rgb(28 25 23 / 0.55);
+  border: 1px solid rgb(214 211 209 / 0.2);
+  border-radius: 9999px;
+  touch-action: manipulation;
+}
+.viewer-btn-close:hover:not(:disabled) {
+  background-color: rgb(28 25 23 / 0.8);
+  color: rgb(255 255 255);
+  border-color: rgb(231 229 228 / 0.35);
+}
+.viewer-btn-close:active:not(:disabled) {
+  background-color: rgb(28 25 23 / 0.9);
+}
 @media (min-width: 640px) {
   .viewer-btn {
     min-width: 40px;
     min-height: 40px;
     padding: 0.5rem;
+  }
+
+  .viewer-btn-close {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.625rem;
   }
 }
 
