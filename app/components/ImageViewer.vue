@@ -102,7 +102,10 @@ class="viewer-btn viewer-btn-close"
                     title="關閉 (Esc)"
                     aria-label="關閉圖片檢視器"
                     @click="closeImageViewer">
-              <Icon name="lucide:x" class="viewer-ico-lg" aria-hidden="true"/>
+              <svg class="viewer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6L18 18" />
+                <path d="M18 6L6 18" />
+              </svg>
             </button>
           </div>
         </div>
@@ -537,6 +540,14 @@ watch(isOpen, (open) => {
 .viewer-btn-close:active:not(:disabled) {
   background-color: rgb(28 25 23 / 0.9);
 }
+.viewer-close-icon {
+  width: 22px;
+  height: 22px;
+  stroke: rgb(255 255 255);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  fill: none;
+}
 @media (min-width: 640px) {
   .viewer-btn {
     min-width: 40px;
@@ -548,6 +559,11 @@ watch(isOpen, (open) => {
     min-width: 44px;
     min-height: 44px;
     padding: 0.625rem;
+  }
+
+  .viewer-close-icon {
+    width: 20px;
+    height: 20px;
   }
 }
 
