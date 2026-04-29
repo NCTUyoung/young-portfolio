@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>CTAs</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:28px; background:var(--bg); font-family:var(--font-sans); display:flex; flex-direction:column; gap:18px; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); }
+  .cta { display:inline-flex; align-items:center; gap:12px; color:var(--fg-2); border-bottom:1px solid var(--border-soft); padding-bottom:8px; padding-right:8px; width:max-content; }
+  .cta .jp { font-family:var(--font-jp); font-size:1.05rem; letter-spacing:.25em; }
+  .cta .lat { font-size:.7rem; letter-spacing:.32em; text-transform:uppercase; color:var(--fg-muted); }
+  .cta svg { width:16px; height:16px; color:var(--fg-muted); }
+  .cta-mute .jp { color:var(--fg-muted); }
+  .arr-btn { background:var(--accent-500); color:#fff; padding:14px 28px; display:inline-flex; align-items:center; gap:12px; border-radius:6px; font-size:14px; letter-spacing:.15em; width:max-content; }
+  .row { display:flex; gap:32px; align-items:center; flex-wrap:wrap; }
+</style></head>
+<body>
+  <div><div class="meta">primary CTA · hairline underline</div>
+  <a class="cta"><span class="jp">作品を見る</span><span class="lat">Gallery</span><svg fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a></div>
+
+  <div><div class="meta">secondary CTA · muted</div>
+  <a class="cta cta-mute" style="border:0;padding:0"><span class="jp">文章を読む</span><svg fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a></div>
+
+  <div><div class="meta">accent button · use sparingly (article page only)</div>
+  <a class="arr-btn">瀏覽作品集 →</a></div>
+</body></html>

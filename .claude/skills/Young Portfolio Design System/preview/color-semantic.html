@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Semantic colors</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:24px; background:var(--bg); font-family:var(--font-sans); }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td { padding:8px 10px; border-bottom:1px solid var(--border-soft); }
+  td:first-child { font-family: ui-monospace, monospace; color: var(--fg-3); width:160px; }
+  .sw { display:inline-block; width:36px; height:18px; vertical-align:middle; margin-right:8px; border:1px solid var(--border); }
+  .grp { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); padding-top:14px; }
+</style></head>
+<body>
+  <table>
+    <tr><td class="grp" colspan="3">Surface</td></tr>
+    <tr><td>--bg</td><td><span class="sw" style="background:var(--bg)"></span>page background</td><td>stone-50 / 900</td></tr>
+    <tr><td>--bg-sub</td><td><span class="sw" style="background:var(--bg-sub)"></span>section alternate</td><td>stone-100/40</td></tr>
+    <tr><td>--surface</td><td><span class="sw" style="background:var(--surface)"></span>card surface</td><td>stone-100 / 800</td></tr>
+
+    <tr><td class="grp" colspan="3">Foreground</td></tr>
+    <tr><td>--fg-1</td><td><span class="sw" style="background:var(--fg-1)"></span>headings</td><td>stone-900</td></tr>
+    <tr><td>--fg-2</td><td><span class="sw" style="background:var(--fg-2)"></span>body strong</td><td>stone-800</td></tr>
+    <tr><td>--fg-3</td><td><span class="sw" style="background:var(--fg-3)"></span>body</td><td>stone-700</td></tr>
+    <tr><td>--fg-muted</td><td><span class="sw" style="background:var(--fg-muted)"></span>captions</td><td>stone-500</td></tr>
+    <tr><td>--fg-faint</td><td><span class="sw" style="background:var(--fg-faint)"></span>hairlines, ruby</td><td>stone-400</td></tr>
+
+    <tr><td class="grp" colspan="3">Accent</td></tr>
+    <tr><td>--accent</td><td><span class="sw" style="background:var(--accent)"></span>eyebrow / kansuji</td><td>accent-500</td></tr>
+    <tr><td>--accent-ink</td><td><span class="sw" style="background:var(--accent-ink)"></span>seal ink</td><td>accent-700</td></tr>
+  </table>
+</body></html>

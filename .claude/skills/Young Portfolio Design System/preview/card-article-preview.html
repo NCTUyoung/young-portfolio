@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Article preview card</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:24px; background:var(--bg); font-family:var(--font-sans); display:flex; gap:14px; }
+  .pc { background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:18px; width:160px; }
+  .ic { width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:var(--fg-3); margin-bottom:14px; }
+  .pc h3 { margin:0; font-family:var(--font-jp); font-size:16px; font-weight:300; letter-spacing:.18em; color:var(--fg-2); }
+  .pc p { margin:6px 0 0; font-size:11px; line-height:1.7; color:var(--fg-muted); }
+</style></head>
+<body>
+  <div class="pc">
+    <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></div>
+    <h3>設計心得</h3>
+    <p>分享數位繪圖與攝影構圖的思考過程。</p>
+  </div>
+  <div class="pc">
+    <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+    <h3>技術筆記</h3>
+    <p>記錄 Vue、Nuxt、Tailwind CSS 等前端技術的學習心得。</p>
+  </div>
+  <div class="pc">
+    <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 21h6M12 17v4M5 8a7 7 0 1114 0c0 3-2 4-3 6H8c-1-2-3-3-3-6z"/></svg></div>
+    <h3>創作故事</h3>
+    <p>每個作品背後的靈感與創作過程。</p>
+  </div>
+</body></html>

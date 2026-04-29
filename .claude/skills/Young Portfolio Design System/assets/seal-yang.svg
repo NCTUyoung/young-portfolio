@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g transform="rotate(-3 32 32)">
+    <rect x="6" y="6" width="52" height="52" fill="#fdf8f0" stroke="#a3491f" stroke-width="2.4"></rect>
+    <rect x="11" y="11" width="42" height="42" fill="none" stroke="#fdf8f0" stroke-width="2"></rect>
+    <text x="32" y="42" text-anchor="middle" font-family="&#39;Noto Serif JP&#39;, serif" font-weight="500" font-size="28" fill="#a3491f">楊</text>
+  </g>
+</svg>

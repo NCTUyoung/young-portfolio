@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Logo</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:32px; background:var(--bg); font-family:var(--font-sans); display:flex; flex-direction:column; gap:18px; }
+  .lockup { display:flex; align-items:baseline; gap:10px; }
+  .lockup .b { border-left:1.4px solid var(--fg-1); padding-left:10px; font-weight:700; font-size:28px; letter-spacing:.06em; color:var(--fg-1); }
+  .lockup .l { font-weight:300; font-size:18px; letter-spacing:.36em; color:var(--fg-muted); }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); }
+  .seal { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border:2px solid var(--accent-700); color:var(--accent-700); font-family:var(--font-jp); font-size:1.1rem; font-weight:500; background:#fdf8f0b3; transform:rotate(-3deg); box-shadow: inset 0 0 0 2px #fdf8f099; user-select:none; }
+</style></head>
+<body>
+  <div><div class="meta">primary lockup</div>
+    <div class="lockup"><span class="b">NCTU</span><span class="l">YOUNG</span></div>
+  </div>
+  <div><div class="meta">marks</div>
+    <div style="display:flex; gap:14px; align-items:center;">
+      <span class="seal">楊</span>
+      <span class="seal" style="font-size:.85rem; width:28px; height:28px;">集</span>
+      <span class="seal" style="font-size:.85rem; width:28px; height:28px;">文</span>
+    </div>
+  </div>
+</body></html>

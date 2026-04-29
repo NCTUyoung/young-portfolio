@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Seal + frame</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:28px; background:var(--bg); font-family:var(--font-sans); display:flex; gap:32px; align-items:center; }
+  .frame { position:relative; width:160px; height:200px; border:1px solid #d6d3d1b3; background:var(--surface); }
+  .frame::after { content:''; position:absolute; inset:6px; border:1px solid #d6d3d180; pointer-events:none; }
+  .seal { display:inline-flex; align-items:center; justify-content:center; width:54px; height:54px; border:2px solid var(--accent-700); color:var(--accent-700); font-family:var(--font-jp); font-size:1.4rem; font-weight:500; background:#fdf8f0b3; transform:rotate(-3deg); box-shadow: inset 0 0 0 3px #fdf8f099; user-select:none; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); margin-top:8px; text-align:center; }
+  .col { display:flex; flex-direction:column; align-items:center; gap:6px; }
+</style></head>
+<body>
+  <div class="col"><div class="frame"></div><div class="meta">.jp-frame · 雙細線書扉</div></div>
+  <div class="col"><span class="seal">楊</span><div class="meta">.jp-seal · 印章</div></div>
+  <div class="col"><span class="seal" style="font-size:.9rem; width:36px; height:36px;">集</span><div class="meta">small seal</div></div>
+  <div class="col"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent-400);opacity:.5"></span><div class="meta">.deco-dot</div></div>
+  <div class="col"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg-3)"></span><div class="meta">.jp-sumi-dot</div></div>
+</body></html>

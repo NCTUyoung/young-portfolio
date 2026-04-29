@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 36" width="200" height="36">
+  <line x1="6" y1="4" x2="6" y2="32" stroke="#292524" stroke-width="1.4"></line>
+  <text x="16" y="26" font-family="Outfit, sans-serif" font-weight="700" font-size="20" letter-spacing="1.2" fill="#292524">NCTU</text>
+  <text x="78" y="26" font-family="Outfit, sans-serif" font-weight="300" font-size="16" letter-spacing="3.5" fill="#78716c">YOUNG</text>
+</svg>

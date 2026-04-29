@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Header</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:0; background:var(--bg); font-family:var(--font-sans); }
+  .nav { display:flex; align-items:center; padding:18px 32px; gap:32px; }
+  .logo { display:flex; align-items:baseline; gap:8px; }
+  .logo .b { border-left:1.4px solid var(--fg-1); padding-left:8px; font-weight:700; font-size:20px; letter-spacing:.06em; color:var(--fg-1); }
+  .logo .l { font-weight:300; font-size:14px; letter-spacing:.32em; color:var(--fg-muted); }
+  ul { list-style:none; margin:0; padding:0; display:flex; gap:32px; margin-left:auto; }
+  ul a { font-size:14px; color:var(--fg-3); text-decoration:none; }
+  .dot { width:14px; height:14px; border:1px solid var(--border); border-radius:50%; }
+  .meta { padding:0 32px 20px; font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); }
+</style></head>
+<body>
+  <div class="nav">
+    <div class="logo"><span class="b">NCTU</span><span class="l">YOUNG</span></div>
+    <ul>
+      <li><a>首頁</a></li>
+      <li><a>圖片庫</a></li>
+      <li><a>文章</a></li>
+      <li><a>後台管理</a></li>
+    </ul>
+    <div class="dot"></div>
+  </div>
+  <div class="meta">Sticky header · light/dark mode toggle (●) · scrolled state adds backdrop-blur 16px + saturate 140%</div>
+</body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Radii + shadows</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:24px; background:var(--bg); font-family:var(--font-sans); display:flex; gap:24px; align-items:center; }
+  .card { width:130px; height:90px; background:var(--surface); display:flex; align-items:flex-end; padding:10px; font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--fg-muted); }
+  .b { border:1px solid var(--border-soft); }
+  .sh { box-shadow: var(--shadow-japanese); border:1px solid var(--border-soft); }
+  .shh { box-shadow: var(--shadow-japanese-hover); border:1px solid var(--border-soft); }
+  .pill { border-radius:9999px; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); margin-top:6px; text-align:center; }
+</style></head>
+<body>
+  <div><div class="card b">none · square</div><div class="meta">radius 0</div></div>
+  <div><div class="card b" style="border-radius:2px">sm</div><div class="meta">2px</div></div>
+  <div><div class="card sh">shadow-japanese</div><div class="meta">微影</div></div>
+  <div><div class="card shh">shadow-japanese-hover</div><div class="meta">hover</div></div>
+  <div><div class="card pill" style="background:var(--surface-2); justify-content:center; align-items:center; padding:0">pill · social only</div><div class="meta">9999px</div></div>
+</body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Hairlines</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:28px; background:var(--bg); font-family:var(--font-sans); display:flex; flex-direction:column; gap:18px; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); }
+  .hl-h { height:1px; background: linear-gradient(to right, transparent, #d6d3d1cc 20%, #d6d3d1cc 80%, transparent); }
+  .hl-v { width:1px; height:90px; background: linear-gradient(to bottom, transparent, #d6d3d1b3 15%, #d6d3d1b3 85%, transparent); }
+  .row { display:flex; gap:24px; align-items:center; }
+  .side { border-left:1.5px solid var(--accent-soft); padding-left:1rem; opacity:.75; }
+</style></head>
+<body>
+  <div><div class="meta">.jp-hairline — horizontal, fades at ends</div><div class="hl-h"></div></div>
+  <div class="row">
+    <div><div class="meta">.jp-hairline-v</div><div class="hl-v"></div></div>
+    <div class="side" style="font-family:var(--font-jp); font-weight:300; line-height:1.7; color:var(--fg-3)">不完美之中<br>藏著最真實的美。</div>
+    <div class="meta" style="margin-left:auto">.jp-side-line — accent border 1.5px</div>
+  </div>
+</body></html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Young Portfolio · UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  :root { --bg-sub: #f5f5f4; --surface: #fafaf9; --surface-2: #e7e5e4; }
+  body { margin: 0; background: var(--bg); color: var(--fg-1); font-family: var(--font-sans); }
+  a { text-decoration: none; }
+  button { font-family: inherit; }
+  ul, ol { padding: 0; margin: 0; list-style: none; }
+  .my-8 { margin: 32px 0; }
+  .t-vertical-caption {
+    writing-mode: vertical-rl; font-family: var(--font-jp);
+    font-size: 12px; letter-spacing: .45em; color: var(--fg-muted);
+  }
+  .t-body-jp {
+    font-family: var(--font-jp); font-weight: 300; letter-spacing: .05em;
+    line-height: 2; color: var(--fg-3); font-size: 14px; margin: 0;
+  }
+  .jp-eyebrow {
+    display: inline-flex; align-items: baseline; gap: 12px;
+    font-size: 11px; letter-spacing: .35em; text-transform: uppercase;
+    font-weight: 300; color: var(--fg-muted); margin: 0;
+  }
+  .jp-eyebrow::before {
+    content: ''; display: inline-block; width: 28px; height: 1px;
+    background: currentColor; opacity: .5; transform: translateY(-3px);
+  }
+  .jp-eyebrow-accent { color: var(--accent-500); }
+  .jp-section-title {
+    font-family: var(--font-jp); font-weight: 300; letter-spacing: .18em;
+    color: var(--fg-1); line-height: 1.15; margin: 0;
+  }
+  .jp-section-ruby {
+    display: block; font-family: var(--font-sans); font-weight: 300;
+    font-size: 11px; letter-spacing: .5em; text-transform: uppercase;
+    color: var(--fg-muted); margin-top: 8px;
+  }
+  .jp-hairline {
+    height: 1px; background: linear-gradient(to right,
+      transparent, #d6d3d1cc 20%, #d6d3d1cc 80%, transparent);
+  }
+  .jp-hairline-v {
+    width: 1px; background: linear-gradient(to bottom,
+      transparent, #d6d3d1b3 15%, #d6d3d1b3 85%, transparent);
+  }
+  .jp-frame { position: relative; border: 1px solid #d6d3d1b3; }
+  .jp-frame::after {
+    content: ''; position: absolute; inset: 6px;
+    border: 1px solid #d6d3d180; pointer-events: none;
+  }
+  .jp-seal {
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--accent-700); color: var(--accent-700);
+    font-family: var(--font-jp); font-weight: 500; background: #fdf8f0b3;
+    transform: rotate(-3deg); box-shadow: inset 0 0 0 2px #fdf8f099;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="Header.jsx"></script>
+<script type="text/babel" src="Footer.jsx"></script>
+<script type="text/babel" src="HomeHero.jsx"></script>
+<script type="text/babel" src="HomeAbout.jsx"></script>
+<script type="text/babel" src="HomeDomains.jsx"></script>
+<script type="text/babel" src="HomeFeatured.jsx"></script>
+<script type="text/babel" src="GalleryControls.jsx"></script>
+<script type="text/babel" src="GalleryEventMap.jsx"></script>
+<script type="text/babel" src="GalleryFeaturedStrip.jsx"></script>
+<script type="text/babel" src="GalleryGrid.jsx"></script>
+<script type="text/babel" src="ArticleHero.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+function App() {
+  const [route, setRoute] = useState("home");
+  const [scrolled, setScrolled] = useState(false);
+  const [category, setCategory] = useState("photography");
+  const [event, setEvent] = useState("all");
+  const [year, setYear] = useState("全部年份");
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const nav = (r) => { setRoute(r); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  return (
+    <div data-screen-label={route === "home" ? "01 Home" : route === "gallery" ? "02 Gallery" : route === "article" ? "03 Article" : "04 Admin"}>
+      <Header route={route} onNavigate={nav} scrolled={scrolled}/>
+
+      {route === "home" && (
+        <main>
+          <HomeHero onNavigate={nav}/>
+          <HomeAbout/>
+          <HomeDomains/>
+          <HomeFeatured onNavigate={nav}/>
+        </main>
+      )}
+
+      {route === "gallery" && (
+        <main>
+          <GalleryControls
+            category={category} setCategory={setCategory}
+            event={event} setEvent={setEvent}
+            year={year} setYear={setYear}/>
+          {category === "photography" && <GalleryEventMap/>}
+          {category === "photography" && <GalleryFeaturedStrip/>}
+          <GalleryGrid category={category}/>
+        </main>
+      )}
+
+      {route === "article" && (
+        <main><ArticleHero onNavigate={nav}/></main>
+      )}
+
+      {route === "admin" && (
+        <main style={{ padding: "120px 32px", textAlign: "center" }}>
+          <p className="jp-eyebrow jp-eyebrow-accent" style={{ justifyContent: "center" }}>Admin</p>
+          <h1 style={{ margin: "16px 0", fontFamily: "var(--font-jp)", fontWeight: 200, fontSize: 56, letterSpacing: ".25em" }}>後台管理</h1>
+          <p style={{ color: "var(--fg-muted)", fontSize: 14 }}>登入後可上傳作品、編輯事件分類、調整排序。（Internal）</p>
+        </main>
+      )}
+
+      <Footer/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

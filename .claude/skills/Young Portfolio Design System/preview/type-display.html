@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Display kanji</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:32px 28px; background:var(--bg); font-family:var(--font-sans); display:flex; align-items:center; gap:32px; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); line-height:1.8; }
+  .yo, .ku { font-family: var(--font-jp); font-weight: 200; font-size: 9rem; letter-spacing: 0.14em; color: var(--fg-1); line-height: 1; }
+  .ruby { display:flex; align-items:center; gap:14px; margin-top:14px; }
+  .ruby span:first-child { display:inline-block; width:48px; height:1px; background:var(--fg-faint); }
+  .ruby span:last-child { font-size:13px; letter-spacing:.32em; text-transform:uppercase; color:var(--fg-3); font-weight:300; }
+</style></head>
+<body>
+  <div>
+    <div><span class="yo">余</span><span style="display:inline-block;width:32px"></span><span class="ku">白</span></div>
+    <div class="ruby"><span></span><span>Digital Art &amp; Photography</span></div>
+  </div>
+  <div class="meta" style="margin-left:auto">
+    Display JP<br>
+    Noto Serif JP · 200<br>
+    9rem / 0.14em<br>
+    line-height 1
+  </div>
+</body></html>

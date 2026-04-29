@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Eyebrow + ruby</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:28px; background:var(--bg); font-family:var(--font-sans); display:flex; flex-direction:column; gap:20px; }
+  .ey { display:inline-flex; align-items:baseline; gap:.75rem; font-size:.7rem; letter-spacing:.35em; text-transform:uppercase; font-weight:300; color:var(--fg-muted); }
+  .ey::before { content:''; width:1.75rem; height:1px; background:currentColor; opacity:.5; transform:translateY(-.22em); display:inline-block; }
+  .ey-a { color: var(--accent); }
+  .lat { font-family:var(--font-sans); font-weight:300; font-size:0.85rem; letter-spacing:0.32em; text-transform:uppercase; color:var(--fg-3); }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); margin-top:6px; }
+</style></head>
+<body>
+  <div><span class="ey">Gallery</span> <div class="meta">jp-eyebrow · stone-500</div></div>
+  <div><span class="ey ey-a">Photography</span> <div class="meta">jp-eyebrow accent</div></div>
+  <div><span class="lat">Digital Art &amp; Photography</span> <div class="meta">latin label · 0.32em</div></div>
+  <div><span style="font-family:var(--font-sans); font-size:0.65rem; letter-spacing:0.5em; text-transform:uppercase; color:var(--fg-faint); font-weight:300;">— Featured Series</span> <div class="meta">section ruby · 0.5em</div></div>
+</body></html>

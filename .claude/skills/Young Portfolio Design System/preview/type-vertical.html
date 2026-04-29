@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Vertical type</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:28px; background:var(--bg); font-family:var(--font-sans); display:flex; gap:48px; align-items:flex-start; }
+  .col { display:flex; flex-direction:column; gap:8px; }
+  .meta { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--fg-muted); }
+  .vert-big { writing-mode:vertical-rl; text-orientation:upright; font-family:var(--font-jp); font-weight:200; font-size:5rem; letter-spacing:.25em; line-height:1.05; color:var(--fg-faint); }
+  .vert-cap { writing-mode:vertical-rl; text-orientation:mixed; font-family:var(--font-jp); font-size:.7rem; letter-spacing:.45em; color:var(--fg-muted); }
+  .vert-quote { writing-mode:vertical-rl; font-family:var(--font-jp); font-weight:200; font-size:2.25rem; letter-spacing:.4em; line-height:2.2; color:var(--fg-1); }
+</style></head>
+<body>
+  <div class="col"><div class="meta">.t-vertical-kanji</div><span class="vert-big">繪</span></div>
+  <div class="col"><div class="meta">.t-vertical-kanji</div><span class="vert-big">影</span></div>
+  <div class="col"><div class="meta">vertical caption</div><span class="vert-cap">記録と附作</span></div>
+  <div class="col"><div class="meta">vertical blockquote</div><span class="vert-quote">不完美之中</span></div>
+</body></html>
