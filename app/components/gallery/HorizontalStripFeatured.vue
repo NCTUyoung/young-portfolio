@@ -1,9 +1,11 @@
 <template>
   <section
     v-if="stripItems.length > 0"
-    class="hidden md:block relative mt-6 mb-12 lg:mt-8 lg:mb-16"
-    aria-labelledby="featured-strip-heading"
+    class="relative mt-6 mb-12 lg:mt-8 lg:mb-16"
+    :aria-labelledby="`featured-strip-heading-${category}`"
   >
+    <!-- Desktop strip：橫卷 + 書腰側欄（hidden md:block 包在內層，讓 v-if 仍適用 mobile fallback） -->
+    <div class="hidden md:block">
     <!-- Strip 容器（相對定位，承載側欄標題 + 漸層遮罩） -->
     <div class="relative">
       <!--
@@ -12,27 +14,29 @@
         - z-20 高於左漸層遮罩（z-10），避免被遮住
         - 不透明 bg 讓水平滾動的圖片自然從側欄背後滑過（書頁掠過書腰效果）
       -->
+      <!--
+        側欄四段堆疊（對齊 ui_kits/portfolio_site/GalleryFeaturedStrip.jsx）：
+        FEATURED / SERIES（accent eyebrow）→ 精選（豎排大字）→ HORIZONTAL CUT（豎排說明）→ SCROLL →
+        4 子節點 + justify-between，與 ui_kit 同步均分。原本 hairline 內間隔已撤；
+        若要重新編輯式裝飾，請維持 1 條 hairline 不疊兩條。
+      -->
       <div
-        class="pointer-events-none absolute left-0 top-0 bottom-0 z-20 hidden md:flex flex-col items-center justify-between py-3 w-[120px] lg:w-[140px] bg-stone-50/70 dark:bg-stone-900/70 backdrop-blur-md"
+        class="pointer-events-none absolute left-0 top-0 bottom-0 z-20 hidden md:flex flex-col items-center justify-between py-4 w-[120px] lg:w-[140px] bg-stone-50/70 dark:bg-stone-900/70 backdrop-blur-md"
         :style="{ height: stripHeight }"
         aria-hidden="true"
       >
-        <p class="jp-section-label pl-4 self-start" style="writing-mode: horizontal-tb;">
-          Featured Series
+        <p class="jp-section-label pl-4 self-start leading-[1.6] whitespace-pre-line" style="writing-mode: horizontal-tb;">{{ sidePanel.eyebrow }}</p>
+        <h2
+          :id="`featured-strip-heading-${category}`"
+          class="writing-vertical font-jp font-extralight tracking-[0.4em] text-stone-700 dark:text-stone-200"
+          :class="sidePanel.kanji.length > 1 ? 'text-xl lg:text-2xl' : 'text-3xl lg:text-4xl'"
+        >
+          {{ sidePanel.kanji }}
+        </h2>
+        <p class="writing-vertical font-jp text-[0.6rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500">
+          {{ sidePanel.desc }}
         </p>
-        <div class="flex-1 flex flex-col items-center justify-center gap-4 min-h-0">
-          <h2
-            id="featured-strip-heading"
-            class="writing-vertical font-jp text-xl lg:text-2xl font-extralight tracking-[0.5em] text-stone-800 dark:text-stone-100"
-          >
-            精選
-          </h2>
-          <div class="jp-hairline-v h-16 lg:h-20" />
-          <p class="writing-vertical font-jp text-[0.6rem] tracking-[0.4em] uppercase text-stone-400 dark:text-stone-500">
-            Horizontal Cut
-          </p>
-        </div>
-        <p class="text-[0.6rem] tracking-[0.35em] text-stone-400 dark:text-stone-500 uppercase flex flex-col items-center gap-1">
+        <p class="text-[0.6rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 uppercase flex items-center gap-1.5">
           <span>scroll</span>
           <span aria-hidden="true">→</span>
         </p>
@@ -126,6 +130,44 @@
         </div>
       </div>
     </div>
+    </div>
+
+    <!--
+      Mobile fallback（< md）：2-col grid，呈現相同的 stripItems
+      理由：原本 hidden md:block 讓手機完全看不到精選；首頁雙 strip 必須在手機上也呈現，
+      改 grid 是行動裝置最穩的策展呈現（不冒水平滑動 vs 返回手勢衝突）。
+      只取前 6 張，避免精選感稀釋。
+    -->
+    <div class="md:hidden">
+      <p class="jp-section-label mb-3 leading-[1.6] flex items-baseline gap-2">
+        <span class="font-jp text-[0.7rem] tracking-[0.45em] text-stone-700 dark:text-stone-200 normal-case">{{ sidePanel.kanji }}</span>
+        <span class="opacity-70">{{ sidePanel.eyebrow.replace(/\n/g, ' · ') }}</span>
+      </p>
+      <ul class="grid grid-cols-2 gap-2">
+        <li v-for="(img, idx) in stripItems.slice(0, 6)" :key="img.filename">
+          <button
+            type="button"
+            class="block w-full aspect-[4/5] overflow-hidden bg-stone-100 dark:bg-stone-800 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/70"
+            :aria-label="buildAriaLabel(img, idx)"
+            @click="handleClick(img)"
+          >
+            <picture class="contents">
+              <source :srcset="getGridAvifSrcset(img.filename)" type="image/avif">
+              <source :srcset="getGridImageSrcset(img.filename)" type="image/webp">
+              <img
+                :src="getThumbPath(img.filename, 400)"
+                :alt="img.title || img.event?.name || 'Featured work'"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03] group-active:scale-[1.02]"
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+              >
+            </picture>
+          </button>
+        </li>
+      </ul>
+    </div>
+
     <!--
       [2026-04-20] 撤除原本底部「橫卷」hairline 裝飾條
       理由：左側 side caption 已經承擔「這是橫卷」的語義標記；
@@ -196,26 +238,46 @@ interface Props {
    *       可在單一頁面設 false 關閉，不需動本元件結構
    */
   showCaptionBand?: boolean
+  /**
+   * 篩 featured 的資料來源類別。
+   * - `photography`（預設）：從 photographyWorks 過濾，編輯感對齊 wide 風景比例
+   * - `digital`：從 digitalWorks 過濾，給首頁「電繪精選」副軸用
+   * 兩者共用同元件結構，只切資料源 + 側欄文字，避免雙份 strip 邏輯歧異。
+   */
+  category?: 'photography' | 'digital'
 }
 const props = withDefaults(defineProps<Props>(), {
   linkMode: 'viewer',
-  showCaptionBand: true
+  showCaptionBand: true,
+  category: 'photography'
 })
 
 const TARGET_SERIES = 'featured' as const
 
 const galleryStore = useGalleryStore()
-const { photographyWorks } = storeToRefs(galleryStore)
+const { photographyWorks, digitalWorks } = storeToRefs(galleryStore)
 const imageViewerStore = useImageViewerStore()
 const { getThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()
 const { registerImage } = useHorizontalStripRestore()
 const router = useRouter()
 
+/** 依 category 切資料源：photography → photographyWorks；digital → digitalWorks */
+const sourceWorks = computed<GalleryItem[]>(() =>
+  props.category === 'digital' ? digitalWorks.value : photographyWorks.value
+)
+
 /** 從 store 過濾出掛了 `featured` series 的作品，順序依 JSON 自然序 */
 const stripItems = computed<GalleryItem[]>(() => {
-  if (!photographyWorks.value.length) return []
-  return photographyWorks.value.filter(w => Array.isArray(w.series) && w.series.includes(TARGET_SERIES))
+  if (!sourceWorks.value.length) return []
+  return sourceWorks.value.filter(w => Array.isArray(w.series) && w.series.includes(TARGET_SERIES))
 })
+
+/** 側欄文字依 medium 切，兩條 strip 同放時不會「兩段一樣的書腰」 */
+const sidePanel = computed(() =>
+  props.category === 'digital'
+    ? { eyebrow: 'Digital\nFeatured', kanji: '繪', desc: 'Stroke Selection', heading: '電繪精選橫卷' }
+    : { eyebrow: 'Featured\nSeries',  kanji: '精選', desc: 'Horizontal Cut', heading: '攝影精選橫卷' }
+)
 
 /**
  * 底部資訊帶用的張數（zero-padded 至少 2 位；99 張以下呈現自然）

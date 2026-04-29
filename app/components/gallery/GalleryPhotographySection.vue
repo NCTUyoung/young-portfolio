@@ -84,7 +84,7 @@
                     <h4 class="text-stone-100 text-sm font-jp font-light tracking-wider mb-1.5 truncate">{{ image.title || '未命名' }}</h4>
                     <div class="text-stone-300 text-xs space-y-1 font-light">
                       <div v-if="image.camera || image.model" class="flex items-center gap-2 tracking-[0.15em]">
-                        <span aria-hidden="true" class="text-[0.7rem]">📷</span>
+                        <span aria-hidden="true" class="font-jp text-[0.7rem] tracking-[0.4em] text-stone-400">CAM</span>
                         <span class="truncate">{{ image.camera }} {{ image.model }}</span>
                       </div>
                       <div class="flex items-center gap-3 text-stone-400 jp-kansuji">

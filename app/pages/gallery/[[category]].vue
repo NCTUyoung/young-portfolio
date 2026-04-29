@@ -9,13 +9,17 @@
       </div>
 
       <div class="max-w-7xl mx-auto">
-        <!-- 小標 + 主標 -->
+        <!--
+          頁眉 — 對齊 ui_kits/portfolio_site/GalleryControls.jsx：
+          「— Gallery」accent eyebrow 帶 em-dash → 大 sans「Works」+ 中性 hairline → category · count 行
+          em-dash hairline 由 .jp-eyebrow::before 自動產生（取代右側漸層裝飾線，回歸對稱）
+        -->
         <div class="mb-2">
-          <p class="jp-section-label mb-2">Gallery</p>
+          <p class="jp-eyebrow text-accent-500 dark:text-accent-400 mb-2"><span>Gallery</span></p>
           <div class="flex items-end gap-6">
             <h1 class="text-3xl md:text-4xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">Works</h1>
-            <!-- 裝飾細線 -->
-            <div class="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-400/50 to-transparent mb-2"/>
+            <!-- 中性 hairline（對齊 ui_kit Works ___ 的橫線），不再用 accent 漸層搶焦 -->
+            <span class="hidden sm:block h-px flex-1 max-w-[120px] bg-stone-300/70 dark:bg-stone-600/50 mb-2"/>
           </div>
         </div>
 
@@ -101,29 +105,35 @@
       </div>
 
       <!--
-        地點地圖：僅在攝影作品分類顯示（2026-04-19 起改 compact 版）
-        理由：原本 420px 地圖把後面的 Featured Strip 擠出首屏；
-        壓成 160px（桌機）/ 120px（手機）帶狀後，首屏即可看到
-        「地圖 → 精選 strip → 時間軸」三個橫向 band，敘事連貫。
-        互動不減：marker click 仍觸發 handleFocusEvent，hover card 改縮小右上角。
+        地點地圖：僅在攝影作品分類顯示（2026-04-19 起改 compact 版；2026-04-28 priority 2 重構）
+        敘事章節結構：
+          一 · 踏跡 Footsteps（map） → 二 · 句 Statement → 三 · 精選 Selected → 四 · 時間軸 Timeline
+        每段冠以 editorial section header（章碼 + 漢字 + Ruby + hairline）取代孤立的 eyebrow 行，
+        讓策展節奏取代功能感。
       -->
       <section
         v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
         ref="mapSectionRef"
-        class="mb-8 max-w-7xl mx-auto scroll-mt-24"
+        class="mb-12 max-w-7xl mx-auto scroll-mt-24"
+        aria-labelledby="photo-map-heading"
       >
-        <div class="flex items-baseline justify-between mb-2">
-          <p class="jp-section-label">Visited Places · 訪れた場所</p>
-          <p class="text-[0.65rem] tracking-[0.3em] text-stone-400 dark:text-stone-500 uppercase">
-            {{ eventLocations.length }} locations
-          </p>
-        </div>
+        <header class="mb-5 flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p class="jp-section-label mb-2">其の一 · Footsteps</p>
+            <h2
+              id="photo-map-heading"
+              class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100"
+            >踏跡 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Visited Places</span></h2>
+          </div>
+          <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">{{ eventLocations.length }} locations · {{ totalPhotographyCount }} 葉</p>
+        </header>
         <EventMap
           :events="eventLocations"
           :selected-event-name="filterState.selectedEvent"
           variant="compact"
           @focus-event="handleFocusEvent"
         />
+        <div class="jp-hairline w-full mt-6"/>
       </section>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
@@ -150,39 +160,83 @@
           </button>
         </div>
 
-        <!-- 數位繪圖 - Pinterest 風格瀑布流佈局 -->
-        <div v-else-if="currentCategory === 'digital'" class="max-w-7xl mx-auto">
-          <GalleryMasonryLayout
-            :items="digitalArtItems"
-            :columns="4"
-            :gap="16"
-            @image-click="openImageViewer"
-          />
+        <!-- 數位繪圖 - 策展開場 + Pinterest 風格瀑布流佈局 -->
+        <div v-else-if="currentCategory === 'digital'">
+          <!--
+            策展開場：縦書き「繪」+ Statement +年度索引
+            設計依據：design brief priority 4 — 補上電繪頁的「入口質感」，
+                      避免從 controls 直接掉入大量瀑布流圖片。
+          -->
+          <GalleryDigitalIntro />
+          <div class="max-w-7xl mx-auto">
+            <GalleryMasonryLayout
+              :items="digitalArtItems"
+              :columns="4"
+              :gap="16"
+              @image-click="openImageViewer"
+            />
+          </div>
         </div>
 
         <!-- 攝影作品 - 保持原有的日式佈局 -->
         <div v-else-if="currentCategory === 'photography'">
           <!--
-            Artist Statement — 一句人格短句（wiki/inspirations/hero-artist-statement.md 選項 A 候選 3）
-            位置：map 之後、strip 之前，作為策展內容的序幕句；photography 獨享。
-            與 hero 詩性引言（作品立場）互補：此句為 personal statement（攝影師本人的聲音）。
+            其の二 · 句 Statement
+            原 一行斜插的「まだ、撮っている。」太孤立（design brief priority 2）。
+            這版改為「章節節點」結構：左側縦書き章碼 + 中央句子 + ruby/譯註 + 兩端 hairline，
+            讓 statement 成為地圖與精選之間的過場頁，而非散落 caption。
           -->
-          <div class="max-w-7xl mx-auto px-6 mt-2 mb-10 md:mb-14">
-            <p
-              lang="ja"
-              class="jp-body text-center text-stone-500 dark:text-stone-400 tracking-[0.35em] text-sm md:text-base"
-              aria-label="Artist statement: まだ、撮っている。（仍在拍著）"
-            >
-              まだ、撮っている。
-            </p>
-          </div>
+          <section
+            class="max-w-3xl mx-auto px-6 mt-4 mb-12 md:mb-16 scroll-mt-24"
+            aria-labelledby="photo-statement-heading"
+          >
+            <p class="jp-section-label text-center mb-5">其の二 · Artist Statement</p>
+            <div class="relative flex items-center justify-center gap-6 md:gap-10">
+              <!-- 左側 hairline -->
+              <span class="hidden sm:block flex-1 max-w-[80px] h-px bg-gradient-to-r from-transparent to-stone-300/70 dark:to-stone-600/60" aria-hidden="true"/>
+              <blockquote
+                id="photo-statement-heading"
+                lang="ja"
+                class="font-jp text-xl sm:text-2xl md:text-[1.6rem] font-extralight tracking-[0.4em] text-stone-800 dark:text-stone-100 leading-[1.9] text-center"
+              >
+                まだ、<span class="inline-block mx-1"/>撮っている。
+              </blockquote>
+              <!-- 右側 hairline -->
+              <span class="hidden sm:block flex-1 max-w-[80px] h-px bg-gradient-to-l from-transparent to-stone-300/70 dark:to-stone-600/60" aria-hidden="true"/>
+            </div>
+            <p class="text-center text-[0.7rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500 mt-4">— Still, photographing.</p>
+          </section>
 
           <!--
-            POC：Horizontal Featured Strip（Jack Kuo 水平軸概念移植，桌機獨享）
+            其の三 · 精選 Selected — Horizontal Featured Strip
             放在地圖之後、時間軸之前：工具性（地圖） → 策展焦點（strip） → 全量（時間軸）
-            手機 `md:hidden` 不渲染（Q3(a) 決策）。詳見 wiki/inspirations/horizontal-strip-poc.md
+            桌機獨享（元件內 md:hidden）。
+            上方加 editorial section header，承接 statement 的氣口、避免和 strip 內側欄重複信號。
           -->
+          <header class="hidden md:flex max-w-7xl mx-auto px-6 mb-3 items-end justify-between gap-4 flex-wrap">
+            <div>
+              <p class="jp-section-label mb-2">其の三 · Selected</p>
+              <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">精選 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Featured Series</span></h2>
+            </div>
+            <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">Horizontal Cut</p>
+          </header>
           <HorizontalStripFeatured />
+
+          <!--
+            其の四 · 時間軸 Timeline — 全量作品依事件分組
+            設定 hairline + section header 區分上方策展焦點與下方完整時間軸；
+            mt-12 給 strip 結束後的呼吸（design brief priority 2「避免從 featured 直接掉入大量照片」）
+          -->
+          <header class="max-w-7xl mx-auto px-6 mt-12 md:mt-16 mb-8 md:mb-10">
+            <div class="jp-hairline w-full mb-6"/>
+            <div class="flex items-end justify-between gap-4 flex-wrap">
+              <div>
+                <p class="jp-section-label mb-2">其の四 · Timeline</p>
+                <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">時間軸 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Chronicle</span></h2>
+              </div>
+              <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">All by event</p>
+            </div>
+          </header>
 
           <GalleryPhotographySection
             :items="photographyEventItems"
@@ -276,6 +330,7 @@ import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryAllMixedSection from '~/components/gallery/GalleryAllMixedSection.vue'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
+import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
@@ -368,6 +423,9 @@ const categoryCount = computed(() => {
   }
   return mixedPhotoItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
 })
+
+// 攝影段落 Header 標示總葉數（與 categoryCount 一致；獨立 computed 以便其他段落引用）
+const totalPhotographyCount = computed(() => photographyWorks.value.length)
 
 const miniCategoryLabel = computed(() => {
   const labels: Record<string, string> = { digital: 'Digital', photography: 'Photography', all: 'All' }

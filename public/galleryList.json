@@ -35,7 +35,10 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2018年電繪作品/vectorpath.png",
@@ -179,7 +182,10 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2022年電繪作品/自創08-13.jpg",
@@ -275,7 +281,10 @@
         "name": "2023年電繪作品",
         "description": "2023年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2024年電繪作品/55.jpg",
@@ -371,7 +380,10 @@
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2025年電繪作品/17-編輯.jpg",
@@ -383,7 +395,10 @@
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2025年電繪作品/test3-1.jpg",
@@ -395,7 +410,10 @@
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2026年電繪作品/7-編輯-2-1.jpg",
@@ -407,7 +425,10 @@
         "name": "2026年電繪作品",
         "description": "2026 年電繪創作，含載具習作與角色／同人稿等",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     },
     {
       "filename": "gallery/2026年電繪作品/21-編輯-編輯-編輯-1.jpg",
@@ -419,7 +440,10 @@
         "name": "2026年電繪作品",
         "description": "2026 年電繪創作，含載具習作與角色／同人稿等",
         "location": ""
-      }
+      },
+      "series": [
+        "featured"
+      ]
     }
   ]
 }

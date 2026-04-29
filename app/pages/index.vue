@@ -17,9 +17,11 @@
     >
       <!-- 右半（desktop）／上半（mobile）：Hero 拼貼區（§11 策略 C 清爽拼貼）
            desktop：3 張縦照片並排、錯位偏移，彰顯電繪 + 攝影雙主線
-           mobile：僅主攝影出血，避免 3 圖在小螢幕擠壓
-           overlay caption：左/右兩側標 Digital / Photo（中圖不貼，保 SEO 中性與余白） -->
-      <div class="relative h-[42%] lg:h-full lg:w-[58%] overflow-hidden bg-stone-50 dark:bg-stone-900">
+           mobile：單張主攝影出血 + 上下封面式收束（避免「圖+文」兩 block 感）
+           overlay caption：左/右兩側標 Digital / Photo（中圖不貼，保 SEO 中性與余白）
+           2026-04-28：依 design brief priority 3，調 desktop offset 防右側裁切；
+                       mobile 加底部漸層 + 縦書き「影」與下方文字區搭橋。 -->
+      <div class="relative h-[46%] lg:h-full lg:w-[58%] overflow-hidden bg-stone-50 dark:bg-stone-900">
         <!-- Mobile / Tablet：單張主攝影 -->
         <img
           v-if="heroCollage.main"
@@ -32,10 +34,30 @@
           aria-hidden="true"
         >
 
-        <!-- Desktop：3 張縦拼貼 -->
-        <div class="hidden lg:flex absolute inset-0 items-stretch gap-3 px-3 py-6">
+        <!--
+          Mobile 封面收束：底部漸層 + 縦書き「影」/「繪」對聯
+          - 漸層讓圖片下緣自然融入下方文字區的 stone-50（書封 → 內頁的轉場）
+          - 縦書き「繪」「影」貼右下角，承擔 desktop 上「繪と影」對聯的角色
+          - lg:hidden 確保只在手機/平板出現，桌機不干擾 3 圖拼貼
+        -->
+        <div class="lg:hidden absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent via-stone-50/40 to-stone-50 dark:via-stone-900/40 dark:to-stone-900 pointer-events-none" aria-hidden="true"/>
+        <div class="lg:hidden absolute bottom-3 right-4 flex flex-col items-center gap-1.5 pointer-events-none select-none" aria-hidden="true">
+          <span class="font-jp text-[0.92rem] tracking-[0.4em] text-stone-700 dark:text-stone-200 font-extralight leading-none [writing-mode:vertical-rl]">繪と影</span>
+          <span class="block w-px h-6 bg-stone-400/60 dark:bg-stone-500/60"/>
+        </div>
+        <div class="lg:hidden absolute top-4 left-4 font-jp text-[0.6rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none pointer-events-none select-none" aria-hidden="true">
+          Photo
+        </div>
+
+        <!--
+          Desktop：3 張縦拼貼
+          - py-6 → py-8：替最大 translate-y 預留呼吸，避免最後一張底邊被裁
+          - translate-y-8 → translate-y-5：縮小最右張下移幅度（依 brief priority 3）
+          - flex-[1.3] → flex-[1.25]：中心圖略收，讓兩側更平衡
+        -->
+        <div class="hidden lg:flex absolute inset-0 items-stretch gap-3 px-4 pt-6 pb-10">
           <!-- 左：電繪代表（上偏） -->
-          <figure class="relative flex-1 translate-y-4 overflow-hidden bg-stone-100 dark:bg-stone-800">
+          <figure class="relative flex-1 -translate-y-1 overflow-hidden bg-stone-100 dark:bg-stone-800">
             <img
               v-if="heroCollage.art"
               :src="heroCollage.art"
@@ -51,7 +73,7 @@
           </figure>
 
           <!-- 中：攝影主（與 SEO / og:image 同源，最大、定軸） -->
-          <figure class="relative flex-[1.3] -translate-y-2 overflow-hidden bg-stone-100 dark:bg-stone-800">
+          <figure class="relative flex-[1.25] translate-y-2 overflow-hidden bg-stone-100 dark:bg-stone-800">
             <img
               v-if="heroCollage.main"
               :src="heroCollage.main"
@@ -64,8 +86,8 @@
             >
           </figure>
 
-          <!-- 右：攝影副（下偏） -->
-          <figure class="relative flex-1 translate-y-8 overflow-hidden bg-stone-100 dark:bg-stone-800">
+          <!-- 右：攝影副（下偏，但收斂以免裁邊） -->
+          <figure class="relative flex-1 translate-y-5 overflow-hidden bg-stone-100 dark:bg-stone-800">
             <img
               v-if="heroCollage.sub"
               :src="heroCollage.sub"
@@ -81,8 +103,13 @@
         </div>
       </div>
 
-      <!-- 左半（desktop）／下半（mobile）：純米白底文字區，無疊加 -->
-      <div class="relative bg-stone-50 dark:bg-stone-900 flex items-center h-[58%] lg:h-full lg:w-[42%] px-6 sm:px-10 lg:pl-16 lg:pr-6 py-10 lg:py-0">
+      <!--
+        左半（desktop）／下半（mobile）：純米白底文字區，無疊加
+        2026-04-28 priority 3：mobile 高度 58% → 54%，與 image 區的 46% 互補；
+                                文字向上 -mt-8（負外距）讓 hero collage 漸層與標題交疊一格，
+                                配合 image 區底部 stone-50 漸層形成「同一封面」感。
+      -->
+      <div class="relative bg-stone-50 dark:bg-stone-900 flex items-center h-[54%] lg:h-full lg:w-[42%] px-6 sm:px-10 lg:pl-16 lg:pr-6 py-10 lg:py-0 -mt-8 lg:mt-0 z-[1]">
         <!-- 縦書き「繪と影」：貼文字區右緣（= 照片區左緣），留在白底側不押圖 -->
         <aside class="hidden lg:flex absolute inset-y-0 right-0 items-center pr-4" aria-hidden="false">
           <span
@@ -436,7 +463,10 @@
     </section>
 
     <!-- =====================================================================
-         精選 — 整齊方格 (4:5)
+         精選 — 雙橫卷（攝影 + 電繪），data-driven 自 series:['featured']
+         2026-04-29：撤掉 hardcoded featuredWorks 陣列 + 3x2 grid，
+                     兩個 medium 各自有書腰 + 橫卷，呼應「雙主線並行」首頁敘事；
+                     手機由 HorizontalStripFeatured 內部 fallback 為 2-col grid。
          ===================================================================== -->
     <section class="relative py-24 lg:py-32 bg-stone-100/40 dark:bg-stone-800/25">
       <div class="jp-hairline absolute top-0 left-0 right-0"/>
@@ -456,51 +486,15 @@
           </NuxtLink>
         </header>
 
-        <!--
-          Phase 3B（2026-04-19）：在精選 grid 之前加 horizontal strip
-          - linkMode="navigate" 讓點擊跳到 /gallery/photography?image=<filename>；
-            首頁不掛 ImageViewer，由 gallery 頁的 useGalleryImageRoute 接手
-          - 手機 `md:hidden`（元件內部控制），行動裝置仍看下方 3x2 grid
-          - 若未來 Phase 3A 想廢 grid，只需刪下面 `<ul>` 區塊
-          - 詳見 wiki/inspirations/horizontal-strip-poc.md（Phase 3 章節）
-        -->
-        <div class="reveal mb-12 lg:mb-16 -mx-6 sm:-mx-10 lg:-mx-16">
-          <HorizontalStripFeatured link-mode="navigate" />
+        <!-- 第一條：攝影精選 -->
+        <div class="reveal mb-10 lg:mb-14 -mx-6 sm:-mx-10 lg:-mx-16">
+          <HorizontalStripFeatured category="photography" link-mode="navigate" :show-caption-band="false" />
         </div>
 
-        <!-- 整齊 3 欄 4:5 grid -->
-        <ul class="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
-          <li
-            v-for="(work, index) in featuredWorks"
-            :key="work.src"
-            class="reveal"
-            :class="[`reveal-delay-${Math.min(index + 1, 5)}`]"
-          >
-            <NuxtLink
-              to="/gallery"
-              class="block group relative overflow-hidden aspect-tatami bg-stone-200/60 dark:bg-stone-800/60"
-            >
-              <img
-                :src="getThumbPath(work.src, 800)"
-                :srcset="getGridImageSrcset(work.src)"
-                :sizes="gridImageSizes"
-                :alt="work.title"
-                class="w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
-                loading="lazy"
-                decoding="async"
-              >
-              <!-- 日式 caption：直書短標 + 橫書副標 -->
-              <div class="absolute inset-0 bg-gradient-to-t from-stone-900/75 via-stone-900/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"/>
-              <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-5 flex items-end justify-between gap-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                <div>
-                  <p class="text-white font-jp text-base tracking-[0.15em] font-light leading-tight">{{ work.title }}</p>
-                  <p class="text-white/70 text-[0.65rem] tracking-[0.35em] uppercase mt-1.5">{{ work.category }}</p>
-                </div>
-                <span class="writing-vertical font-jp text-[0.65rem] tracking-[0.4em] text-white/70">{{ work.kanji }}</span>
-              </div>
-            </NuxtLink>
-          </li>
-        </ul>
+        <!-- 第二條：電繪精選（不再顯示底部 Featured Frames band，避免雙 strip 各掛一條） -->
+        <div class="reveal -mx-6 sm:-mx-10 lg:-mx-16">
+          <HorizontalStripFeatured category="digital" link-mode="navigate" :show-caption-band="false" />
+        </div>
       </div>
     </section>
 
@@ -769,16 +763,6 @@ const milestonesWithPlace = computed(() => {
     place: m.usePhotoLocation ? yearTopLoc.get(m.year) : undefined
   }))
 })
-
-// ===== 精選作品 =====
-const featuredWorks = [
-  { src: 'gallery/2025年電繪作品/36-編輯-1.jpg', title: '2025 電繪新作', category: 'Digital Art', kanji: '繪' },
-  { src: 'photography/春日街拍/DSC_7556-編輯-1.jpg', title: '春日街拍', category: 'Photography', kanji: '春' },
-  { src: 'photography/攝影社 米倉團拍/DSC_4810-編輯-1.jpg', title: '米倉團拍', category: 'Photography', kanji: '影' },
-  { src: 'gallery/2024年電繪作品/52-1.jpg', title: '2024 角色設計', category: 'Digital Art', kanji: '人' },
-  { src: 'photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg', title: '新北耶誕城', category: 'Photography', kanji: '夜' },
-  { src: 'gallery/2023年電繪作品/51.jpg', title: '2023 插畫作品', category: 'Digital Art', kanji: '畫' }
-]
 
 onMounted(() => {
   observeAll(pageRef.value)

@@ -86,8 +86,9 @@ const iconClass = computed(() =>
   bare.value ? 'w-4 h-4' : 'w-5 h-5'
 )
 
+// 設計鐵律：social-link pills 用 rounded-full（README §Cards / §Corner Radii 唯一允許的圓角例外）
 const pillClass =
-  'p-3 rounded-xl border border-stone-200/60 dark:border-stone-700/60 hover:border-accent-300/80 dark:hover:border-accent-600/80 hover:bg-accent-50/50 dark:hover:bg-accent-900/20 transition-all duration-300 group text-stone-500 dark:text-stone-400 hover:text-accent-600 dark:hover:text-accent-400'
+  'p-3 rounded-full border border-stone-200/60 dark:border-stone-700/60 hover:border-accent-300/80 dark:hover:border-accent-600/80 hover:bg-accent-50/50 dark:hover:bg-accent-900/20 transition-all duration-300 group text-stone-500 dark:text-stone-400 hover:text-accent-600 dark:hover:text-accent-400'
 
 const bareClass =
   'text-stone-400 dark:text-stone-500 hover:text-accent-500 dark:hover:text-accent-400 transition-colors duration-300'
