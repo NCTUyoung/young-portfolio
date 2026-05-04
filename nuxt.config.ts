@@ -14,9 +14,21 @@ export default defineNuxtConfig({
   ],
 
   // @nuxt/icon：離線優先（從 @iconify-json/lucide bundle 圖示到輸出），避免 GitHub Pages 打到 CDN
+  //
+  // serverBundle 只覆蓋 SSR 時直接渲染進 HTML 的 <Icon>。lightbox（ImageViewer）以
+  // v-if="isOpen" 包住，預設關閉、SSR 沒渲染，因此一旦使用者打開、client 才掛載這批
+  // <Icon name="lucide:..."> 時會走 fallback：fetch https://api.iconify.design/。
+  // 行動網路慢／隱私阻擋（uBlock、Brave、Edge tracker prevention 等）會擋掉這個 CDN，
+  // 結果是手機上看到的 lightbox 按鈕全部空白（只剩唯一已改 inline SVG 的關閉鍵 X）。
+  // clientBundle.scan：build 時掃 .vue 找出實際用到的 lucide:* 名稱並打進前端 JS，
+  // 完全不再打 CDN。sizeLimitKb 為防呆上限，目前用量遠低於此值。
   icon: {
     serverBundle: {
       collections: ['lucide']
+    },
+    clientBundle: {
+      scan: true,
+      sizeLimitKb: 256
     }
   },
 
