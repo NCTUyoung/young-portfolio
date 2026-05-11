@@ -42,8 +42,10 @@ describe('gallerySelectors', () => {
     }
     expect(getCurrentWorks(fs, digital, photo, all)).toHaveLength(1)
 
-    const fs2 = { ...fs, selectedCategory: 'all' as const, selectedEvent: null }
-    expect(getCurrentWorks(fs2, digital, photo, all).length).toBe(2)
+    // 2026-05-09：'all' 已移除，改測「切到 photography 看到 photo 那張」
+    const fs2 = { ...fs, selectedCategory: 'photography' as const, selectedEvent: null }
+    expect(getCurrentWorks(fs2, digital, photo, all).length).toBe(1)
+    expect(getCurrentWorks(fs2, digital, photo, all)[0]?.filename).toBe('2.jpg')
   })
 
   it('applySearchAndYearFilter', () => {

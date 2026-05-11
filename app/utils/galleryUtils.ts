@@ -93,8 +93,7 @@ export const filterImagesByYear = (images: GalleryItem[], year: string | null): 
 /**
  * 按類別篩選圖片
  */
-export const filterImagesByCategory = (images: GalleryItem[], category: 'all' | 'digital' | 'photography'): GalleryItem[] => {
-  if (category === 'all') return images
+export const filterImagesByCategory = (images: GalleryItem[], category: 'digital' | 'photography'): GalleryItem[] => {
   return images.filter(image => image.category === category)
 }
 

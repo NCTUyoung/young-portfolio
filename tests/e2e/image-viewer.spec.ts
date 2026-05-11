@@ -11,6 +11,8 @@ import { test, expect } from '@playwright/test'
 test.describe('ImageViewer 鍵盤操作', () => {
   test('點圖開啟 → ESC 關閉', async ({ page }) => {
     await page.goto('/gallery/photography')
+    // 等 hydration 完成再 click，否則 button @click handler 可能尚未綁定
+    await page.waitForLoadState('networkidle')
 
     // 先等第一個事件 heading 出現，確保 photo grid 已掛上（避免 img[alt] 搶到 nav icon）
     await page
@@ -31,6 +33,7 @@ test.describe('ImageViewer 鍵盤操作', () => {
 
   test('方向鍵切換下一張（index 1/N → 2/N）', async ({ page }) => {
     await page.goto('/gallery/photography')
+    await page.waitForLoadState('networkidle')
 
     await page
       .getByRole('heading', { level: 3, name: /Annber 外拍/ })

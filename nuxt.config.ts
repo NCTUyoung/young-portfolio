@@ -1,5 +1,45 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+/**
+ * 讀作品 JSON、依 category 分組所有 event 名，組出
+ * `/gallery/<category>/<event>` 路徑供 Nitro 預渲染。
+ *
+ * 為什麼 build 時讀靜態 JSON：每個事件需要一份獨立 HTML 才能讓社群爬蟲（OG / Twitter）
+ * 抓得到對應的 hero 圖；單純靠 Nuxt crawlLinks 看不到 EventFilter 的 button click，
+ * 不會自動發現這些事件路徑，必須在這裡明列。
+ *
+ * URL 編碼策略：用原始 unicode（Wikipedia 風格），瀏覽器顯示乾淨、Nitro 輸出資料夾
+ * 與 GitHub Pages 服務都直接走 utf-8 路徑。
+ */
+function buildEventPrerenderRoutes (): string[] {
+  type Work = { event?: { name?: string } }
+  type Bag = { Img?: Record<string, Work> }
+  const here = fileURLToPath(new URL('.', import.meta.url))
+  const read = (rel: string): Bag => {
+    try {
+      return JSON.parse(readFileSync(`${here}/public/${rel}`, 'utf8')) as Bag
+    } catch {
+      return { Img: {} }
+    }
+  }
+  const photo = read('photographyList.json')
+  const digi = read('galleryList.json')
+  const collect = (bag: Bag, cat: 'photography' | 'digital'): string[] => {
+    const set = new Set<string>()
+    for (const w of Object.values(bag.Img || {})) {
+      const n = w?.event?.name
+      if (typeof n === 'string' && n.length > 0) set.add(n)
+    }
+    return [...set].map(name => `/gallery/${cat}/${name}`)
+  }
+  return [
+    ...collect(photo, 'photography'),
+    ...collect(digi, 'digital')
+  ]
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
@@ -89,22 +129,23 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'github-pages',
     prerender: {
-      // Nuxt 4 預設 crawlLinks=true 會從首頁爬連結；admin 為本機後台頁，不進 SSG
+      // Nuxt 4 預設 crawlLinks=true 會從首頁爬連結；admin 為本機後台頁，不進 SSG。
       crawlLinks: true,
-      failOnError: false,
+      // failOnError=true：若有事件路由 SSR 死掉直接讓 build 紅，避免悄悄漏掉。
+      failOnError: true,
       ignore: ['/admin', '/young-portfolio/admin'],
       routes: [
         '/',
         '/gallery',
-        '/gallery/all',
+        // 2026-05-09：移除 /gallery/all 預渲染（雙主線敘事不容 mixed feed）；
+        // 舊 path 由 useGalleryCategoryRoute 在 client-side replace 到 /gallery/photography
         '/gallery/digital',
         '/gallery/photography',
+        // 每個事件一份 HTML：分享連結（Slack/Discord/X/Threads）爬蟲現在能讀到該事件的 hero 圖與 JSON-LD。
+        // 不對 slug 做 encodeURIComponent；Nitro 對 prerender 路由內部會 decodeURI 後再 encodeURI（見
+        // nitropack/dist/core/index.mjs 的 generateRoute），原始 unicode 字串能直接落到輸出資料夾名。
+        ...buildEventPrerenderRoutes()
       ]
-      // 註：事件專頁以 `?event=<name>` 傳遞，query string 在靜態輸出下
-      // 無法產生不同 HTML 檔（Nitro 對 query 不做路徑扁平化，只會蓋同一份）。
-      // 分享時的 OG／JSON-LD 仍會在使用者實際造訪時由 client-side hydration 動態寫入
-      // `<head>`，社群爬蟲需要獨立 HTML 才能看到的情境屬已知限制，暫不處理；
-      // 若未來要完整靜態化，請把路由從 `?event=` 改為 `/gallery/photography/<event-slug>`。
     }
   },
 
@@ -122,7 +163,22 @@ export default defineNuxtConfig({
   // - production / nuxt generate：打開可讓 useAsyncData 的結果打包成 _payload.json，
   //   使用者二次造訪事件頁時不必重新 fetch 與轉換作品清單，TTI 更快。
   experimental: {
-    payloadExtraction: process.env.NODE_ENV === 'production'
+    // 必須留 false。
+    //
+    // 原因：路徑含非 ASCII（例：`/gallery/photography/2024新北耶誕城`）時，Nitro 預渲染會擲：
+    //   TypeError: Cannot convert argument to a ByteString because the character at index 21 has a value of 26032 which is greater than 255.
+    // (26032 = '新' 的 Unicode codepoint)
+    //
+    // payloadExtraction=true 時 Nuxt 會在 SSR 渲染同時對 `<route>/_payload.json` 發 fetch，
+    // 該 fetch 會把原路徑塞進 HTTP header（Link 或自訂 prerender header），但**未 URL-encode**；
+    // fetch 規範要求 header value 是 ByteString（ASCII），CJK codepoint 直接超出 255 而炸。
+    // 確認：以 `'prerender:route'` hook 印 res.body 抓到 TypeError；nitropack 2.13.3 + Nuxt 4.4.2 復現。
+    //
+    // 影響：本站只有一個全域 `useAsyncData('gallery-works')`，payload 抽取的 perf 收益微乎其微，
+    // 關掉的代價接近零（仍是 SSG，HTML 已含 SSR 內容）；換得 19 個事件路由能正確 prerender。
+    //
+    // 重啟條件：等上游修好（Nitro / Nuxt 對 header 寫入做 encodeURI），再開回 production-only。
+    payloadExtraction: false
   },
 
   // Pinia：不設 storesDirs，用預設（= `<srcDir>/stores` = `app/stores/`）。

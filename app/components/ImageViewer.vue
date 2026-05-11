@@ -110,28 +110,61 @@ class="viewer-btn viewer-btn-close"
           </div>
         </div>
 
+        <!--
+          Hit-zone overlays（McGinley 風格）：左/右兩側透明 click 區→ 上/下一張
+          chevron 按鈕保留作 a11y fallback；縮放中（scale > 1）以 pointer-events:none
+          讓出，避免覆蓋 image drag-to-pan
+        -->
+        <button
+v-if="viewerImages.length > 1 && hasPrevious"
+                type="button"
+                tabindex="-1"
+                aria-hidden="true"
+                class="viewer-hit-zone viewer-hit-zone--left"
+                :class="{ 'viewer-hit-zone--inactive': viewerScale > 1 }"
+                @click="goToPreviousImage"/>
+        <button
+v-if="viewerImages.length > 1 && hasNext"
+                type="button"
+                tabindex="-1"
+                aria-hidden="true"
+                class="viewer-hit-zone viewer-hit-zone--right"
+                :class="{ 'viewer-hit-zone--inactive': viewerScale > 1 }"
+                :style="hitZoneRightStyle"
+                @click="goToNextImage"/>
+
                 <!-- 主要圖片區域 -->
         <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
-          <img
-v-if="currentViewerImage"
-               ref="imageElement"
-               :src="getImagePath(currentViewerImage.filename)"
-               :alt="currentViewerImage.title"
-               :class="[
-                 'select-none user-select-none',
-                 isDragging ? 'cursor-grabbing' : (viewerScale > 1 ? 'cursor-grab' : 'cursor-default'),
-                 isDragging ? '' : 'transition-transform duration-200 ease-out'
-               ]"
-               :style="imageStyle"
-               draggable="false"
-               loading="eager"
-               fetchpriority="high"
-               decoding="async"
-               @click.stop
-               @mousedown="handleMouseDown"
-               @touchstart="handleTouchStart"
-               @contextmenu.stop
-          >
+          <!--
+            Lightbox 圖片來源優先序（`<picture>` 由瀏覽器選第一個能用的 source）：
+              1) AVIF 1600w（2026 主流瀏覽器全支援，最小）
+              2) WebP 1600w（fallback）
+              3) 原圖（僅古早瀏覽器或 thumb 缺檔時兜底）
+            放大到 >1x 仍是同一張 1600w，視覺上夠用；要原解析度可走 ImageInfoPanel 的「下載原圖」（後續再加）。
+          -->
+          <picture v-if="currentViewerImage">
+            <source type="image/avif" :srcset="getAvifThumbPath(currentViewerImage.filename, 1600)">
+            <source type="image/webp" :srcset="getThumbPath(currentViewerImage.filename, 1600)">
+            <img
+              ref="imageElement"
+              :src="getImagePath(currentViewerImage.filename)"
+              :alt="currentViewerImage.title"
+              :class="[
+                'select-none user-select-none',
+                isDragging ? 'cursor-grabbing' : (viewerScale > 1 ? 'cursor-grab' : 'cursor-default'),
+                isDragging ? '' : 'transition-transform duration-200 ease-out'
+              ]"
+              :style="imageStyle"
+              draggable="false"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              @click.stop
+              @mousedown="handleMouseDown"
+              @touchstart="handleTouchStart"
+              @contextmenu.stop
+            >
+          </picture>
 
           <!-- 載入中 -->
           <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">
@@ -142,10 +175,10 @@ v-if="currentViewerImage"
           </div>
         </div>
 
-        <!-- 導航按鈕 -->
+        <!-- 導航按鈕（保留為 a11y fallback；z-10 蓋過 hit-zone z-5） -->
         <button
 v-if="viewerImages.length > 1 && hasPrevious"
-                class="viewer-nav-btn absolute left-2 top-1/2 sm:left-4 transform -translate-y-1/2"
+                class="viewer-nav-btn absolute left-2 top-1/2 sm:left-4 z-10 transform -translate-y-1/2"
                 title="上一張 (←)"
                 aria-label="上一張"
                 @click="goToPreviousImage">
@@ -154,7 +187,7 @@ v-if="viewerImages.length > 1 && hasPrevious"
 
         <button
 v-if="viewerImages.length > 1 && hasNext"
-                class="viewer-nav-btn absolute top-1/2 transform -translate-y-1/2"
+                class="viewer-nav-btn absolute top-1/2 z-10 transform -translate-y-1/2"
                 :style="nextNavButtonStyle"
                 title="下一張 (→)"
                 aria-label="下一張"
@@ -188,7 +221,7 @@ const ImageNavigator = defineAsyncComponent(() => import('./ImageNavigator.vue')
 const RadialNavigation = defineAsyncComponent(() => import('./RadialNavigation.vue'))
 
 const imageViewerStore = useImageViewerStore()
-const { getImagePath } = useImagePath()
+const { getImagePath, getThumbPath, getAvifThumbPath } = useImagePath()
 const {
   isOpen,
   viewerImages,
@@ -240,6 +273,14 @@ const nextNavButtonStyle = computed(() => {
   const offset = showInfoPanel.value && isDesktopViewerLayout.value ? infoPanelWidth.value + pad : pad
   return { right: `${offset}px` }
 })
+
+/**
+ * Hit-zone 右側 right 偏移：避免 hit-zone 跑到 InfoPanel 底下而失效。
+ * Panel 開啟時（僅桌面），right = panel 寬；否則 right: 0。
+ */
+const hitZoneRightStyle = computed(() => ({
+  right: panelLayoutOffsetPx.value
+}))
 
 const imageElement = ref<HTMLImageElement>()
 const lightboxRoot = ref<HTMLElement>()
@@ -578,6 +619,33 @@ watch(isOpen, (open) => {
 }
 @media (min-width: 640px) {
   .viewer-ico { width: 20px; height: 20px; }
+}
+
+/* Hit-zone：左/右半 viewport invisible click 翻頁；保留 chevron 按鈕作 a11y fallback。
+   啟發自 sites/ryan-mcginley.md（200 張全 DOM 預載翻頁式）；本站 lazy 仍走 thumb，
+   但 click-zone 本身可獨立採納。30% 寬度為「足以涵蓋 image 邊界但留中央 40% 給 image」之折衷 */
+.viewer-hit-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 5;
+}
+.viewer-hit-zone--left {
+  left: 0;
+}
+.viewer-hit-zone--right {
+  /* right via inline style (跟著 panelLayoutOffsetPx) */
+}
+/* 縮放中讓出：避免覆蓋 image drag-to-pan 與雙指捏合（行動版） */
+.viewer-hit-zone--inactive {
+  pointer-events: none;
+  cursor: default;
 }
 
 /* 上／下一張 — 圓形浮空鈕，淡墨底 + 細邊 */

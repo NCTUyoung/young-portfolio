@@ -91,8 +91,11 @@ export interface MixedPhotoItem {
 }
 
 // 篩選狀態接口
+// 2026-05-09：移除 'all'。雙主線敘事（繪 / 影）為策展核心，mixed feed 與兩條獨立
+// 敘事弧不同質，反而稀釋每條主線。預設落點改為 'photography'。
+// 舊 /gallery/all 路徑由 useGalleryCategoryRoute 負責 redirect → /gallery/photography。
 export interface FilterState {
-  selectedCategory: 'all' | 'digital' | 'photography'
+  selectedCategory: 'digital' | 'photography'
   selectedEvent: string | null
   searchQuery: string
   yearFilter: string | null

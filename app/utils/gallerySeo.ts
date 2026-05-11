@@ -37,14 +37,20 @@ export function parseGalleryImageIdFromRoute (query: Record<string, unknown>): s
   return id
 }
 
-export function parseGalleryEventFromRoute (query: Record<string, unknown>): string | null {
-  const raw = query.event
-  const q = Array.isArray(raw) ? raw[0] : raw
-  if (!q || typeof q !== 'string') return null
+/**
+ * 從 vue-router params 取出 event 名（已 decode）。
+ * 對應 `/gallery/<category>/<event>` 路由；若沒帶 event 段回傳 null。
+ *
+ * 不再從 query 讀取——`?event=` 已遷移為路徑參數，獨立預渲染為各自的 HTML。
+ */
+export function parseGalleryEventFromParams (params: Record<string, unknown>): string | null {
+  const raw = params.event
+  const v = Array.isArray(raw) ? raw[0] : raw
+  if (!v || typeof v !== 'string') return null
   try {
-    return decodeURIComponent(q)
+    return decodeURIComponent(v)
   } catch {
-    return q
+    return v
   }
 }
 
@@ -93,11 +99,11 @@ function buildImageObject (
  *
  * 三種情境：
  * 1. `?image=<id>` → 單張 `ImageObject`（附 creator / keywords / dateCreated）
- * 2. `?event=<name>` → `ImageGallery`（`hasPart` 列多張作 ImageObject，上限 EVENT_IMAGE_CAP）
- * 3. 預設（無 query）→ `CollectionPage`，describes 整個類別；不列作品避免太重
+ * 2. 路徑 `/gallery/<cat>/<event>` → `ImageGallery`（`hasPart` 列多張作 ImageObject，上限 EVENT_IMAGE_CAP）
+ * 3. 預設（無 image / event）→ `CollectionPage`，describes 整個類別；不列作品避免太重
  */
 export function resolveGalleryShareMeta (opts: {
-  category: 'all' | 'digital' | 'photography'
+  category: 'digital' | 'photography'
   categoryTitle: string
   imageId: string | null
   eventName: string | null
@@ -145,7 +151,7 @@ export function resolveGalleryShareMeta (opts: {
     }
   }
 
-  if (eventName && (category === 'photography' || category === 'digital' || category === 'all')) {
+  if (eventName && (category === 'photography' || category === 'digital')) {
     const inEvent = allWorks.filter(w => w.event?.name === eventName)
     const firstPhoto = inEvent.find(w => w.category === 'photography')
     const firstAny = inEvent[0]

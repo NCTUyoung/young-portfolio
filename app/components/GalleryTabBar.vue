@@ -78,10 +78,11 @@ const route = useRoute()
 const galleryStore = useGalleryStore()
 const { categoryStats, filterState } = storeToRefs(galleryStore)
 
+// 2026-05-09：移除「全部作品」tab。雙主線敘事（繪 / 影）為策展核心；
+// mixed feed 與兩條獨立敘事弧不同質，反而稀釋每條主線。
 const tabs = [
   { key: 'digital', label: '數位繪圖' },
   { key: 'photography', label: '攝影作品' },
-  { key: 'all', label: '全部作品' },
 ] as const
 
 function isActive (key: string) {

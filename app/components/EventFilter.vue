@@ -177,11 +177,10 @@ const onSelectEvent = (name: string | null) => {
   mobileExpanded.value = false
 }
 
-// 切換到不支援事件的類別時，自動清除事件選擇與展開狀態
-watch(() => filterState.value.selectedCategory, (newCategory) => {
-  if (newCategory === 'all' && filterState.value.selectedEvent) {
-    setSelectedEvent(null)
-  }
+// 切換分類時收起 mobile 展開狀態
+// 2026-05-09：移除 'all' 後 digital / photography 兩類都支援 event filter，
+// 不再需要「切到 all 時清 event」邏輯。
+watch(() => filterState.value.selectedCategory, () => {
   mobileExpanded.value = false
 })
 </script>

@@ -81,15 +81,21 @@ export const useGalleryStore = defineStore('gallery', () => {
   }
 
   const filterState = useLocalStorage<FilterState>('gallery-filters', {
-    selectedCategory: 'all',
+    selectedCategory: 'photography',
     selectedEvent: null,
     searchQuery: '',
     yearFilter: null
   })
 
+  // 2026-05-09 migration：舊版 localStorage 可能緩存 selectedCategory='all'。
+  // 型別已收斂為 'digital' | 'photography'；任何非合法值一律 coerce 到 photography 預設。
+  if (filterState.value.selectedCategory !== 'digital' && filterState.value.selectedCategory !== 'photography') {
+    filterState.value.selectedCategory = 'photography'
+  }
+
   const expandedGroups = ref<Record<string, boolean>>({})
 
-  /** 至少完成一次 hydrate 或 loadAllWorks，供 ?event= 路由邏輯避免在資料未到前誤清網址 */
+  /** 至少完成一次 hydrate 或 loadAllWorks，供事件路由邏輯避免在資料未到前誤把合法路徑導走 */
   const galleryDataReady = ref(false)
 
   /**
@@ -215,7 +221,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     clearCache(['mixedItems', 'filteredItems'])
   }, 300)
 
-  const setSelectedCategory = (category: 'all' | 'digital' | 'photography') => {
+  const setSelectedCategory = (category: 'digital' | 'photography') => {
     filterState.value.selectedCategory = category
     clearCache(['mixedItems'])
   }
@@ -235,7 +241,7 @@ export const useGalleryStore = defineStore('gallery', () => {
   }
 
   const clearFilters = () => {
-    filterState.value.selectedCategory = 'all'
+    filterState.value.selectedCategory = 'photography'
     filterState.value.selectedEvent = null
     filterState.value.searchQuery = ''
     filterState.value.yearFilter = null

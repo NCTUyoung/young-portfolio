@@ -78,8 +78,9 @@ describe('galleryUtils', () => {
       mockItem({ filename: 'a.jpg', category: 'digital' }),
       mockItem({ filename: 'b.jpg', category: 'photography' })
     ]
-    expect(filterImagesByCategory(items, 'all')).toHaveLength(2)
+    // 2026-05-09：移除 'all'；驗證雙主線各自只取自家類別
     expect(filterImagesByCategory(items, 'digital')).toHaveLength(1)
+    expect(filterImagesByCategory(items, 'photography')).toHaveLength(1)
   })
 
   it('filterImagesByEvent', () => {

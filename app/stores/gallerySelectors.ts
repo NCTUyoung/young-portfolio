@@ -32,31 +32,24 @@ export function combineAndSortAllWorks (
   return combined.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 }
 
+/**
+ * 2026-05-09：移除 'all' 後 selectedCategory 僅為 'digital' | 'photography'。
+ * `allWorksSorted` 參數仍保留（其他 selector 依賴），於本函式內未使用。
+ */
 export function getCurrentWorks (
   filterState: FilterState,
   digitalWorks: GalleryItem[],
   photographyWorks: GalleryItem[],
-  allWorksSorted: GalleryItem[]
+  _allWorksSorted: GalleryItem[]
 ): GalleryItem[] {
   const { selectedCategory, selectedEvent } = filterState
 
-  let works: GalleryItem[] = []
+  const works = selectedCategory === 'digital' ? digitalWorks : photographyWorks
+  const filtered = selectedEvent
+    ? works.filter(work => work.event && work.event.name === selectedEvent)
+    : works
 
-  if (selectedCategory === 'digital') {
-    works = digitalWorks
-    if (selectedEvent) {
-      works = works.filter(work => work.event && work.event.name === selectedEvent)
-    }
-  } else if (selectedCategory === 'photography') {
-    works = photographyWorks
-    if (selectedEvent) {
-      works = works.filter(work => work.event && work.event.name === selectedEvent)
-    }
-  } else {
-    works = allWorksSorted
-  }
-
-  return works.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+  return [...filtered].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 }
 
 export function applySearchAndYearFilter (
@@ -249,11 +242,10 @@ export function buildAvailableEvents (
     }
   }
 
-  if (category === 'all' || category === 'digital') {
+  // 2026-05-09：移除 'all' 後僅雙主線
+  if (category === 'digital') {
     digitalWorks.forEach(recordEvent)
-  }
-
-  if (category === 'all' || category === 'photography') {
+  } else {
     photographyWorks.forEach(recordEvent)
   }
 

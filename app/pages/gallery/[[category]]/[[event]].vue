@@ -111,8 +111,12 @@
         每段冠以 editorial section header（章碼 + 漢字 + Ruby + hairline）取代孤立的 eyebrow 行，
         讓策展節奏取代功能感。
       -->
+      <!--
+        其の一 Footsteps Map — 僅在 photography overview（未進 event）顯示。
+        進 event 時改走扉頁（GalleryEventCover），跳過 map / statement / strip 三章節。
+      -->
       <section
-        v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
+        v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography' && !filterState.selectedEvent"
         ref="mapSectionRef"
         class="mb-12 max-w-7xl mx-auto scroll-mt-24"
         aria-labelledby="photo-map-heading"
@@ -181,12 +185,29 @@
         <!-- 攝影作品 - 保持原有的日式佈局 -->
         <div v-else-if="currentCategory === 'photography'">
           <!--
-            其の二 · 句 Statement
+            進入特定 event 時：扉頁式入口（GalleryEventCover）
+            啟發自 sites/ryan-mcginley.md + sites/rinko-kawauchi.md（沉浸型訪客優先）。
+            跳過 overview 的 Map/Statement/Strip 三章節，直接呈現該 event 之代表照 + metadata + 展開鈕。
+            升級路徑：未來加 SERIES_TAG = 'event-cover' 後，cover 來源由 D1（第一張）改為 D2（admin 指定）。
+
+            注意：不能用 <template v-if/v-else> 包多元素群組——本層在 <transition>
+            內，多根 fragment 會觸發 Vue 內部 _leaveCb null reference（v3.4-3.6
+            transition + multi-root fragment 已知互動）。改用個別 v-if 維持單根。
+          -->
+          <GalleryEventCover
+            v-if="filterState.selectedEvent && currentEventGroup"
+            :group="currentEventGroup"
+            @expand="scrollToEventTimeline"
+          />
+
+          <!--
+            其の二 · 句 Statement（僅 overview 模式）
             原 一行斜插的「まだ、撮っている。」太孤立（design brief priority 2）。
             這版改為「章節節點」結構：左側縦書き章碼 + 中央句子 + ruby/譯註 + 兩端 hairline，
             讓 statement 成為地圖與精選之間的過場頁，而非散落 caption。
           -->
           <section
+            v-if="!filterState.selectedEvent"
             class="max-w-3xl mx-auto px-6 mt-4 mb-12 md:mb-16 scroll-mt-24"
             aria-labelledby="photo-statement-heading"
           >
@@ -208,26 +229,25 @@
           </section>
 
           <!--
-            其の三 · 精選 Selected — Horizontal Featured Strip
+            其の三 · 精選 Selected — Horizontal Featured Strip（僅 overview 模式）
             放在地圖之後、時間軸之前：工具性（地圖） → 策展焦點（strip） → 全量（時間軸）
             桌機獨享（元件內 md:hidden）。
             上方加 editorial section header，承接 statement 的氣口、避免和 strip 內側欄重複信號。
           -->
-          <header class="hidden md:flex max-w-7xl mx-auto px-6 mb-3 items-end justify-between gap-4 flex-wrap">
+          <header v-if="!filterState.selectedEvent" class="hidden md:flex max-w-7xl mx-auto px-6 mb-3 items-end justify-between gap-4 flex-wrap">
             <div>
               <p class="jp-section-label mb-2">其の三 · Selected</p>
               <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">精選 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Featured Series</span></h2>
             </div>
             <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">Horizontal Cut</p>
           </header>
-          <HorizontalStripFeatured />
+          <HorizontalStripFeatured v-if="!filterState.selectedEvent" />
 
           <!--
-            其の四 · 時間軸 Timeline — 全量作品依事件分組
-            設定 hairline + section header 區分上方策展焦點與下方完整時間軸；
-            mt-12 給 strip 結束後的呼吸（design brief priority 2「避免從 featured 直接掉入大量照片」）
+            其の四 · 時間軸 Timeline header — 僅 overview 模式顯示章節 header；
+            event 模式下章節標題感由扉頁取代，timeline 直接展開以保留沉浸氣口。
           -->
-          <header class="max-w-7xl mx-auto px-6 mt-12 md:mt-16 mb-8 md:mb-10">
+          <header v-if="!filterState.selectedEvent" class="max-w-7xl mx-auto px-6 mt-12 md:mt-16 mb-8 md:mb-10">
             <div class="jp-hairline w-full mb-6"/>
             <div class="flex items-end justify-between gap-4 flex-wrap">
               <div>
@@ -238,17 +258,21 @@
             </div>
           </header>
 
-          <GalleryPhotographySection
-            :items="photographyEventItems"
-            :focused-event-name="focusedEventName"
-            :register-event-ref="setEventRef"
-          />
+          <!-- Timeline：兩種模式皆渲染；event 模式下扉頁的「展開全部」會 scroll 到此 -->
+          <div ref="eventTimelineRef" :class="{ 'scroll-mt-24': filterState.selectedEvent }">
+            <GalleryPhotographySection
+              :items="photographyEventItems"
+              :focused-event-name="focusedEventName"
+              :register-event-ref="setEventRef"
+            />
+          </div>
         </div>
 
-        <!-- 全部作品 - 混合佈局 -->
-        <div v-else>
-          <GalleryAllMixedSection :items="mixedPhotoItems" />
-        </div>
+        <!--
+          2026-05-09：移除「全部作品 - 混合佈局」分支（原 GalleryAllMixedSection）。
+          雙主線敘事（繪 / 影）為策展核心；mixed feed 與兩條獨立敘事弧不同質。
+          舊 /gallery/all 由 useGalleryCategoryRoute 在 client-side replace 到 /gallery/photography。
+        -->
       </div>
       </transition>
     </div>
@@ -315,7 +339,7 @@ import { SEO_CONFIG } from '~~/shared/config/constants'
 import {
   resolveGalleryShareMeta,
   parseGalleryImageIdFromRoute,
-  parseGalleryEventFromRoute,
+  parseGalleryEventFromParams,
   absoluteUrlFromSitePath
 } from '~/utils/gallerySeo'
 import type { GalleryItem, FilterState } from '~~/shared/types/gallery'
@@ -328,7 +352,7 @@ import EventFilter from '~/components/EventFilter.vue'
 import GalleryFilterToolbar from '~/components/GalleryFilterToolbar.vue'
 import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
-import GalleryAllMixedSection from '~/components/gallery/GalleryAllMixedSection.vue'
+import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
@@ -361,8 +385,12 @@ const {
 const { getImagePath, getThumbPath } = useImagePath()
 
 const { data: galleryPayload, pending: galleryPending, error: galleryPayloadError, refresh: refreshGalleryPayload } = await useAsyncData('gallery-works', async () => {
-  const [digital, photo] = await Promise.all([fetchDigitalWorks(), fetchPhotographyWorks()])
-  return { digital, photo }
+  // Key 必須叫 `photography` 才能對上 `hydrateFromPayload` 的 destructure；
+  // 早期版本誤命名為 `photo`，導致 SSR 只灌到 digital，攝影仍為空，要靠 onMounted 補抓
+  // (見下方 `if (digitalWorks.length === 0 || photographyWorks.length === 0) loadAllWorks()`)。
+  // 修正 key 名後 SSR 就能完整填滿 store，事件頁的 `ImageGallery` JSON-LD 也才會帶 hasPart。
+  const [digital, photography] = await Promise.all([fetchDigitalWorks(), fetchPhotographyWorks()])
+  return { digital, photography }
 })
 
 watch(galleryPayload, (v) => {
@@ -412,24 +440,22 @@ const showControlMiniBar = ref(false)
 const currentCategory = computed(() => filterState.value.selectedCategory)
 
 // Gallery header dynamic info
+// 2026-05-09：移除 'all'，labels 收斂為雙主線
 const categoryLabel = computed(() => {
-  const labels: Record<string, string> = { digital: 'Digital Art', photography: 'Photography', all: 'All Works' }
-  return labels[currentCategory.value] || 'All Works'
+  const labels: Record<FilterState['selectedCategory'], string> = { digital: 'Digital Art', photography: 'Photography' }
+  return labels[currentCategory.value]
 })
 const categoryCount = computed(() => {
   if (currentCategory.value === 'digital') return digitalArtItems.value.length
-  if (currentCategory.value === 'photography') {
-    return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
-  }
-  return mixedPhotoItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
+  return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
 })
 
 // 攝影段落 Header 標示總葉數（與 categoryCount 一致；獨立 computed 以便其他段落引用）
 const totalPhotographyCount = computed(() => photographyWorks.value.length)
 
 const miniCategoryLabel = computed(() => {
-  const labels: Record<string, string> = { digital: 'Digital', photography: 'Photography', all: 'All' }
-  return labels[currentCategory.value] || 'All'
+  const labels: Record<FilterState['selectedCategory'], string> = { digital: 'Digital', photography: 'Photography' }
+  return labels[currentCategory.value]
 })
 
 const miniEventLabel = computed(() => filterState.value.selectedEvent || '全部事件')
@@ -440,14 +466,13 @@ const miniSearchLabel = computed(() => {
   return value.length > 18 ? `${value.slice(0, 18)}…` : value
 })
 
-// Footer quotes by category
-const footerQuotes: Record<string, { quote: string; sub: string }> = {
+// Footer quotes by category（2026-05-09：移除 'all' quote）
+const footerQuotes: Record<FilterState['selectedCategory'], { quote: string; sub: string }> = {
   digital:     { quote: '每一筆都是故事', sub: 'every stroke tells a story' },
   photography: { quote: '光影之間，皆是詩', sub: 'poetry between light and shadow' },
-  all:         { quote: '創作不止，記錄不息', sub: 'create, capture, repeat' },
 }
-const footerQuote = computed(() => footerQuotes[currentCategory.value]?.quote || footerQuotes.all.quote)
-const footerSub = computed(() => footerQuotes[currentCategory.value]?.sub || footerQuotes.all.sub)
+const footerQuote = computed(() => footerQuotes[currentCategory.value].quote)
+const footerSub = computed(() => footerQuotes[currentCategory.value].sub)
 
 // 數位作品列表 - 使用經過篩選的 currentWorks（含搜尋／年份）
 const digitalArtItems = computed(() => {
@@ -464,10 +489,7 @@ const hasActiveSecondaryFilter = computed(() =>
 
 const noFilteredResults = computed(() => {
   if (currentCategory.value === 'digital') return digitalArtItems.value.length === 0
-  if (currentCategory.value === 'photography') {
-    return photographyEventItems.value.reduce((s, g) => s + (g.images?.length || 0), 0) === 0
-  }
-  return mixedPhotoItems.value.reduce((s, g) => s + (g.images?.length || 0), 0) === 0
+  return photographyEventItems.value.reduce((s, g) => s + (g.images?.length || 0), 0) === 0
 })
 
 const clearSecondaryFilters = () => {
@@ -483,6 +505,29 @@ const photographyEventItems = computed(() => {
     item.images && item.images.some(img => img.category === 'photography')
   )
 })
+
+/**
+ * 進入 event path 時的扉頁來源 group。
+ * `mixedPhotoItems` 已套 selectedEvent filter，所以選 event 時通常只剩一個 group；
+ * 仍 explicit 用 eventName 比對以防其他 filter 介入。
+ */
+const currentEventGroup = computed(() => {
+  if (!filterState.value.selectedEvent) return null
+  return photographyEventItems.value.find(g => g.eventName === filterState.value.selectedEvent) ?? null
+})
+
+const eventTimelineRef = ref<HTMLDivElement | null>(null)
+
+/** 扉頁「展開全部」→ 平滑捲到 timeline；prefers-reduced-motion 改為瞬移 */
+const scrollToEventTimeline = () => {
+  if (!eventTimelineRef.value) return
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  eventTimelineRef.value.scrollIntoView({
+    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    block: 'start'
+  })
+}
 
 // 地圖點擊 → 導覽到下方事件區塊
 const eventRefs = ref<Record<string, HTMLElement | null>>({})
@@ -640,7 +685,8 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 
 // ===== 生命週期 =====
 onMounted(async () => {
-  // 僅在「兩邊都空」才補抓會漏掉「只灌到數位、攝影仍為 []」的狀況（需手動重整才正常）
+  // 防禦性 fallback：useAsyncData 走完 hydrate 後若仍有任一邊為空（過去因 payload key
+  // 不對齊導致 SSR 只灌數位的 bug 觸發過；現已修正），補抓一次保 UX 正常。
   try {
     if (!digitalError.value && !photographyError.value) {
       if (digitalWorks.value.length === 0 || photographyWorks.value.length === 0) {
@@ -663,9 +709,9 @@ onBeforeUnmount(() => {
   }
 })
 
-// ===== SEO（SSR：useAsyncData 先灌入作品，才能依 ?image= / ?event= 產生 OG／Twitter／JSON-LD）=====
+// ===== SEO（SSR：useAsyncData 先灌入作品，才能依 ?image= / 路徑 event 段產生 OG／Twitter／JSON-LD）=====
+// 2026-05-09：移除 'all' 類別後 seoTitles 收斂為雙主線
 const seoTitles: Record<FilterState['selectedCategory'], string> = {
-  all: 'Works - 作品集',
   digital: 'Works - 數位繪圖',
   photography: 'Works - 攝影作品',
 }
@@ -719,14 +765,14 @@ const gallerySchemaAuthor = {
 const gallerySeoResolved = computed(() =>
   resolveGalleryShareMeta({
     category: currentCategory.value,
-    categoryTitle: seoTitles[currentCategory.value] || seoTitles.all,
+    categoryTitle: seoTitles[currentCategory.value],
     imageId: parseGalleryImageIdFromRoute(route.query as Record<string, unknown>),
-    eventName: parseGalleryEventFromRoute(route.query as Record<string, unknown>),
+    eventName: parseGalleryEventFromParams(route.params as Record<string, unknown>),
     allWorks: allWorks.value,
     absPath: absPathClean,
     absThumb800: absThumb800Clean,
     defaultOgImageAbs,
-    defaultTitle: seoTitles[currentCategory.value] || seoTitles.all,
+    defaultTitle: seoTitles[currentCategory.value],
     defaultDescription: seoDefaultDescription,
     pageUrl: schemaCanonicalUrl.value,
     author: gallerySchemaAuthor

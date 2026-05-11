@@ -22,6 +22,8 @@ test.describe('Gallery /gallery/photography', () => {
 
   test('切換到特定事件 tab 只剩該事件的作品', async ({ page }) => {
     await page.goto('/gallery/photography')
+    // 等 hydration 完成再 click，否則 click handler 可能尚未綁定（Vue3 hydration 是 async）
+    await page.waitForLoadState('networkidle')
 
     // 事件 filter 的按鈕 accessible name 是 `Annber 外拍·9` 形式（N 為該事件作品數）。
     // 明確指定 `^...·\d+$` 能把 tab 按鈕和地圖點 toggle 按鈕（名稱是「顯示 ...」）分開。
@@ -41,5 +43,30 @@ test.describe('Gallery /gallery/photography', () => {
     await expect(
       page.locator('p').filter({ hasText: new RegExp(`\\b${count} works\\b`) })
     ).toBeVisible({ timeout: 5_000 })
+  })
+
+  test('進入 event 顯示扉頁、Map/Statement/Strip 隱藏', async ({ page }) => {
+    // 直接走 event path（與點 tab 後 router.replace 的目的地等價，但對 SSR 更乾淨）
+    await page.goto('/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D')
+    await page.waitForLoadState('networkidle')
+
+    // 扉頁渲染：「扉頁 · Cover」eyebrow + 大字 event 名
+    await expect(
+      page.getByRole('heading', { level: 2, name: /Annber 外拍/ })
+    ).toBeVisible({ timeout: 10_000 })
+    await expect(
+      page.locator('p').filter({ hasText: /^扉頁\s*·\s*Cover\s*$/ })
+    ).toBeVisible()
+
+    // Overview 三章節隱藏（Map / Statement / Strip header）
+    await expect(page.locator('#photo-map-heading')).toHaveCount(0)
+    await expect(page.locator('#photo-statement-heading')).toHaveCount(0)
+    // Strip header 用其の三 標籤判斷（其の二/其の三/其の四 都該不在 event mode）
+    await expect(page.locator('p').filter({ hasText: /其の三/ })).toHaveCount(0)
+
+    // 「展開全部」按鈕存在（hit zone CTA）
+    await expect(
+      page.getByRole('button', { name: /展開全部/ })
+    ).toBeVisible()
   })
 })
