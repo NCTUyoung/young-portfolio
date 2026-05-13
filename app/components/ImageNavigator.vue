@@ -23,7 +23,7 @@ class="bg-stone-900/85 backdrop-blur-md border border-stone-700/60 p-2"
         <img
 v-if="currentViewerImage"
              ref="navigatorImageElement"
-             :src="getImagePath(currentViewerImage.filename)"
+             :src="getThumbPath(currentViewerImage.filename, 400)"
              decoding="async"
              :alt="currentViewerImage.title"
              class="w-full h-full object-contain cursor-pointer"
@@ -64,7 +64,7 @@ import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath } = useImagePath()
 const {
   showNavigator,
   navigatorDragging,

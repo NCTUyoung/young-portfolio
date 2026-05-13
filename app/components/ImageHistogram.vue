@@ -35,7 +35,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
-const { getImagePath } = useImagePath()
+const { getThumbPath } = useImagePath()
 const { currentViewerImage, showInfoPanel, infoPanelWidth } = storeToRefs(imageViewerStore)
 const isDesktopHistogramLayout = useMediaQuery('(min-width: 768px)')
 
@@ -67,7 +67,8 @@ const generateHistogram = async () => {
     await new Promise((resolve, reject) => {
       img.onload = resolve
       img.onerror = reject
-      img.src = getImagePath(currentViewerImage.value!.filename)
+      // 直方圖 sample 後縮成 200×200 canvas，1600w WebP 已綽綽有餘；複用 lightbox 已快取的同一來源避免重撈原圖。
+      img.src = getThumbPath(currentViewerImage.value!.filename, 1600)
     })
 
     // 創建 canvas 來分析圖片

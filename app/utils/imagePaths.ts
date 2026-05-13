@@ -7,7 +7,7 @@
  * - WebP：fallback 給老舊瀏覽器與 admin 用；也是 `<img>.src` 的最終 fallback。
  */
 
-export type ThumbWidth = 400 | 800
+export type ThumbWidth = 400 | 800 | 1600
 export type ThumbFormat = 'webp' | 'avif'
 
 /**

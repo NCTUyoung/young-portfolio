@@ -20,7 +20,9 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, '..', 'public', 'images')
-const WIDTHS = [400, 800]
+// 400 / 800 給 grid；1600 給 lightbox（取代原圖 5–10 MB 的 JPEG）。
+// 1600w AVIF q50 在實測下平均 200–400 KB，接近原圖畫質但行動端載入速度差一個量級。
+const WIDTHS = [400, 800, 1600]
 const IMAGE_EXT = /\.(jpe?g|png|gif|webp)$/i
 
 const args = new Set(process.argv.slice(2))
