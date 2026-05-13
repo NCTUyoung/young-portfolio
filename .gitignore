@@ -31,6 +31,16 @@ logs
 hero-*.png
 home-*.png
 gallery-review*.png
+live-*.png
+ykit-*.png
+
+# Author-download skill 產出與輸入清單（本機用，含他人作品）
+downloads/
+ig-urls.json
+
+# Python bytecode（claude skills 內 helper scripts 跑過會產生）
+__pycache__/
+*.pyc
 
 # Playwright e2e runner 產物
 /test-results/

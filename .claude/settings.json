@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vue-tsc *)",
+      "Bash(npx --no-install playwright-cli * screenshot *)",
+      "Bash(npx --no-install playwright-cli * snapshot *)",
+      "Bash(npx --no-install playwright-cli * --version)"
+    ]
+  }
+}
