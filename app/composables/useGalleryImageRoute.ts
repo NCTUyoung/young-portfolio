@@ -8,9 +8,8 @@ import type { GalleryItem } from '~~/shared/types/gallery'
  * 圖片庫頁面：檢視器與網址 `?image=<id>` 雙向同步。
  * - 開啟／切換圖片時更新 query，便於分享與重新整理還原。
  * - 帶 `?image=` 進入時，待作品載入後開啟檢視器。
- * - **智慧導覽範圍**：若網址同時帶 `?event=<事件>`，viewer 左右切換僅限該事件作品；
- *   否則退回 `allWorks`（跨類別瀏覽）。此設計讓「從事件分享連結進入」的使用者
- *   不會一路左右切換到其他事件，符合分享情境。
+ * - **智慧導覽範圍**：若網址路徑為 `/gallery/<category>/<event>`，viewer 左右切換僅限該事件作品；
+ *   否則退回 `allWorks`（跨類別瀏覽）。讓「從事件分享連結進入」的使用者不會一路切到其他事件。
  */
 export function useGalleryImageRoute () {
   const route = useRoute()
@@ -21,15 +20,15 @@ export function useGalleryImageRoute () {
   const { allWorks, photographyWorks, digitalWorks, isLoading, galleryDataReady, filterState } = storeToRefs(galleryStore)
   const { isOpen: viewerOpen, currentViewerImage } = storeToRefs(imageViewerStore)
 
-  /** 根據網址 `?event=` 決定 viewer 導覽清單（智慧 scope） */
+  /** 根據路徑 `/gallery/<cat>/<event>` 決定 viewer 導覽清單（智慧 scope） */
   const viewerScopeList = computed<GalleryItem[]>(() => {
-    const raw = route.query.event
-    const q = Array.isArray(raw) ? raw[0] : raw
-    if (!q || typeof q !== 'string') return allWorks.value
+    const raw = route.params.event
+    const v = Array.isArray(raw) ? raw[0] : raw
+    if (!v || typeof v !== 'string') return allWorks.value
 
-    const decoded = decodeURIComponent(q)
+    let decoded: string
+    try { decoded = decodeURIComponent(v) } catch { decoded = v }
     const cat = filterState.value.selectedCategory
-    // 事件 scope：只取目前分類下屬於該事件的作品；如果分類是 all，兩邊都看
     const pool = cat === 'digital'
       ? digitalWorks.value
       : cat === 'photography'

@@ -84,7 +84,7 @@
 - ~~**圖片格式**（AVIF + WebP）~~（已加，2026-04）：`scripts/generate-thumbs.mjs` 與 `server/utils/thumbFromSource.ts` 同時產 WebP (q=82) 與 AVIF (q=50, effort=4)，`<GalleryPhotographySection>`／`<GalleryMasonryLayout>` 用 `<picture>` 以 `image/avif` → `image/webp` → `<img>` 順序做 fallback（`display: contents` 保持外層 justified layout）。本機 230 張實測：AVIF 6.42 MB vs WebP 10.22 MB，縮 ~37%。`npm run thumbs -- --no-avif` 可只產 WebP；`--force` 強制覆蓋。
 - ~~**結構化資料（JSON-LD）**~~（已加，2026-04）：
   - `pages/index.vue` 插 `Person` + `WebSite` schema，`sameAs` 指向 GitHub / Facebook / Instagram / Threads，`author` 由 `SEO_CONFIG.siteUrl` 當 canonical URL。產生器集中在 `app/utils/siteSchema.ts`。
-  - `pages/gallery/[[category]].vue` 依 query 吐三種 schema：無 query → `CollectionPage`（`about` 指向作者）；`?event=` → `ImageGallery` 含 `hasPart` 最多 20 張 `ImageObject`；`?image=` → 單張 `ImageObject`，帶 `creator` / `dateCreated` / `keywords`（`tags`）。實作在 `app/utils/gallerySeo.ts`。
+  - `pages/gallery/[[category]]/[[event]].vue` 吐三種 schema：無 event 段且無 `?image=` → `CollectionPage`（`about` 指向作者）；路徑 `/gallery/<cat>/<event>` → `ImageGallery` 含 `hasPart` 最多 20 張 `ImageObject`；`?image=` → 單張 `ImageObject`，帶 `creator` / `dateCreated` / `keywords`（`tags`）。實作在 `app/utils/gallerySeo.ts`。
   - **canonical URL 修正**：`useRequestURL()` 在 `nuxt generate` 時 origin 會是 `http://localhost`；schema 裡的 `url` 特別用 `SEO_CONFIG.siteUrl` 組 origin，避免 Google 把站台當 staging。`og:url` 保留原行為。
   - SSG build 驗證：`.output/public/index.html` 有 2 條 `<script type="application/ld+json">`（Person + WebSite），四個 gallery 頁各 1 條（CollectionPage）。
 - **測試**：

@@ -11,7 +11,7 @@ Nuxt 會自動匯入 `composables/*.ts` 內的 `use*` 函式，頁面與元件�
 | `useScrollReveal.ts` | IntersectionObserver，`.reveal` 等進場動畫 |
 | `useGalleryImageRoute.ts` | 圖片庫頁：`?image=<id>` 與 lightbox 狀態同步 |
 | `useGalleryCategoryRoute.ts` | 圖片庫：`/gallery/:category` 與 Pinia `selectedCategory` 同步 |
-| `useGalleryEventRoute.ts` | 圖片庫：`?event=<event.name>` 與事件篩選同步（攝影／數位）；可與 `?image=` 並用 |
+| `useGalleryEventRoute.ts` | 圖片庫：`/gallery/<category>/<event>` 路徑與事件篩選同步（攝影／數位）；可與 `?image=` query 並用 |
 | （攝影 justified） | 見 `utils/justifiedGalleryLayout.ts` + `GalleryPhotographySection.vue`：量測容器寬、`ResizeObserver`、圖片載入後比例，組 **justified rows**（每列張數隨寬度變） |
 
 ## 工具／預留
