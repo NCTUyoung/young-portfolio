@@ -42,6 +42,52 @@ module.exports = {
           900: '#6c321d',
           950: '#3a180e',
         },
+        // Semantic tokens — CSS var 驅動，.dark class 自動切換，無需寫 dark: variant
+        bg:           'var(--bg)',
+        'bg-sub':     'var(--bg-sub)',
+        surface:      'var(--surface)',
+        'surface-2':  'var(--surface-2)',
+        'fg-1':       'var(--fg-1)',
+        'fg-2':       'var(--fg-2)',
+        'fg-3':       'var(--fg-3)',
+        'fg-muted':   'var(--fg-muted)',
+        'fg-faint':   'var(--fg-faint)',
+        'border-ds':  'var(--border)',
+        'border-soft':'var(--border-soft)',
+        'accent-ds':  'var(--accent)',
+        'accent-ink': 'var(--accent-ink)',
+        'accent-soft-ds': 'var(--accent-soft)',
+      },
+      // 日式字距 — Tailwind 預設沒有的 JP 細分值
+      letterSpacing: {
+        'jp-body':    '0.05em',
+        'jp-title':   '0.18em',
+        'jp-display': '0.30em',
+        eyebrow:      '0.35em',
+        ruby:         '0.50em',
+      },
+      // 日式行高 — ds- prefix 避免蓋掉 Tailwind 預設值
+      lineHeight: {
+        'ds-tight':  '1.10',
+        'ds-snug':   '1.30',
+        'ds-normal': '1.55',
+        'jp-body':   '2.00',
+      },
+      // 余白間距 — 對應 DS spacing tokens
+      spacing: {
+        section:     '6rem',
+        'section-lg':'9rem',
+        gutter:      '1.5rem',
+        'gutter-md': '2.5rem',
+        'gutter-lg': '4rem',
+      },
+      maxWidth: {
+        content:    '72rem',
+        'prose-ds': '64rem',
+      },
+      boxShadow: {
+        japanese:         'var(--shadow-japanese)',
+        'japanese-hover': 'var(--shadow-japanese-hover)',
       },
       // 自訂動畫
       keyframes: {

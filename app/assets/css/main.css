@@ -2,11 +2,129 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Design System — CSS Tokens (Young Portfolio)
+   Stone (暖調中性) が軸，Accent (テラコッタ) は要所のみ
+   ============================================================ */
+:root {
+  /* ---- Stone scale ---- */
+  --stone-50:  #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-300: #d6d3d1;
+  --stone-400: #a8a29e;
+  --stone-500: #78716c;
+  --stone-600: #57534e;
+  --stone-700: #44403c;
+  --stone-800: #292524;
+  --stone-900: #1c1917;
+  --stone-950: #0c0a09;
+
+  /* ---- Accent scale ---- */
+  --accent-50:  #fdf8f0;
+  --accent-100: #faecd9;
+  --accent-200: #f4d5b0;
+  --accent-300: #edb87d;
+  --accent-400: #e4964a;
+  --accent-500: #db7b2e;
+  --accent-600: #c46023;
+  --accent-700: #a3491f;
+  --accent-800: #843b20;
+  --accent-900: #6c321d;
+  --accent-950: #3a180e;
+
+  /* ---- Semantic — light mode ---- */
+  --bg:          var(--stone-50);
+  --bg-sub:      #f5f5f466;
+  --surface:     var(--stone-100);
+  --surface-2:   var(--stone-200);
+
+  --fg-1:        var(--stone-900);
+  --fg-2:        var(--stone-800);
+  --fg-3:        var(--stone-700);
+  --fg-muted:    var(--stone-500);
+  --fg-faint:    var(--stone-400);
+
+  --border:      var(--stone-300);
+  --border-soft: #d6d3d1b3;
+  --hairline:    linear-gradient(to right, transparent, #d6d3d1cc 20%, #d6d3d1cc 80%, transparent);
+
+  --accent:      var(--accent-500);
+  --accent-ink:  var(--accent-700);
+  --accent-soft: var(--accent-300);
+
+  --shadow-japanese:       0 2px 8px rgba(168, 162, 158, 0.10), 0 1px 3px rgba(168, 162, 158, 0.05);
+  --shadow-japanese-hover: 0 4px 16px rgba(168, 162, 158, 0.15), 0 2px 6px rgba(168, 162, 158, 0.08);
+
+  --selection-bg: rgba(168, 162, 158, 0.25);
+  --selection-fg: rgba(41, 37, 36, 0.92);
+
+  /* ---- Type ---- */
+  --font-sans: 'Outfit', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', ui-sans-serif, system-ui, sans-serif;
+  --font-jp:   'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+
+  --w-extralight: 200;
+  --w-light:      300;
+  --w-regular:    400;
+  --w-medium:     500;
+  --w-semibold:   600;
+
+  --track-tight:       -0.01em;
+  --track-normal:       0em;
+  --track-wide:         0.05em;
+  --track-jp-body:      0.05em;
+  --track-jp-title:     0.18em;
+  --track-jp-display:   0.30em;
+  --track-eyebrow:      0.35em;
+  --track-ruby:         0.50em;
+
+  --lh-tight:   1.10;
+  --lh-snug:    1.30;
+  --lh-normal:  1.55;
+  --lh-jp-body: 2.00;
+
+  /* ---- Spacing ---- */
+  --pad-section-y:    6rem;
+  --pad-section-y-lg: 9rem;
+  --gutter-x:         1.5rem;
+  --gutter-x-md:      2.5rem;
+  --gutter-x-lg:      4rem;
+  --max-content:      72rem;
+  --max-prose:        64rem;
+}
+
+/* ---- Dark mode (.dark on <html>) ---- */
+.dark {
+  --bg:          var(--stone-900);
+  --bg-sub:      #29252440;
+  --surface:     var(--stone-800);
+  --surface-2:   var(--stone-700);
+
+  --fg-1:        var(--stone-50);
+  --fg-2:        var(--stone-100);
+  --fg-3:        var(--stone-300);
+  --fg-muted:    var(--stone-400);
+  --fg-faint:    var(--stone-500);
+
+  --border:      var(--stone-600);
+  --border-soft: #57534e99;
+  --hairline:    linear-gradient(to right, transparent, #57534eb3 20%, #57534eb3 80%, transparent);
+
+  --accent:      var(--accent-400);
+  --accent-ink:  var(--accent-300);
+  --accent-soft: var(--accent-600);
+
+  --selection-bg: rgba(120, 113, 108, 0.4);
+  --selection-fg: rgba(245, 245, 244, 0.95);
+}
+
 /* 全站字型： Outfit + Noto Sans TC（見 tailwind fontFamily.sans） */
 @layer base {
   html {
     @apply font-sans antialiased;
     font-feature-settings: 'kern' 1, 'liga' 1;
+    color: var(--fg-2);
+    background-color: var(--bg);
   }
 }
 
@@ -89,39 +207,13 @@
 .deco-line-v {
   position: absolute;
   width: 1px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    theme('colors.stone.300'),
-    transparent
-  );
-}
-.dark .deco-line-v {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    theme('colors.stone.600'),
-    transparent
-  );
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
 }
 /* 預設為文件流，避免僅 w-full 時無定位父層導致線條相對視窗寬度溢出；需貼邊時請加 Tailwind `absolute` */
 .deco-line-h {
   display: block;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    theme('colors.stone.300'),
-    transparent
-  );
-}
-.dark .deco-line-h {
-  background: linear-gradient(
-    to right,
-    transparent,
-    theme('colors.stone.600'),
-    transparent
-  );
+  background: linear-gradient(to right, transparent, var(--border), transparent);
 }
 .deco-dot {
   position: absolute;
@@ -164,10 +256,7 @@
   letter-spacing: 0.35em;
   text-transform: uppercase;
   font-weight: 300;
-  color: theme('colors.accent.500');
-}
-.dark .jp-section-label {
-  color: theme('colors.accent.400');
+  color: var(--accent);
 }
 
 /* ===== 大型漢字背景裝飾 ===== */
@@ -175,13 +264,12 @@
   font-size: clamp(6rem, 18vw, 18rem);
   font-weight: 100;
   line-height: 1;
-  color: theme('colors.stone.100');
+  color: var(--surface);
   pointer-events: none;
   user-select: none;
   letter-spacing: 0.05em;
 }
 .dark .jp-kana-bg {
-  color: theme('colors.stone.800');
   opacity: 0.5;
 }
 
@@ -207,12 +295,9 @@
 
 /* ===== 日式側線（引言、事件資訊框） ===== */
 .jp-side-line {
-  border-left: 1.5px solid theme('colors.accent.300');
+  border-left: 1.5px solid var(--accent-soft);
   padding-left: 1rem;
   opacity: 0.7;
-}
-.dark .jp-side-line {
-  border-left-color: theme('colors.accent.600');
 }
 
 /* ===== 紙紋底色（極淡） ===== */
@@ -250,9 +335,8 @@
   letter-spacing: 0.35em;
   text-transform: uppercase;
   font-weight: 300;
-  color: theme('colors.stone.500');
+  color: var(--fg-muted);
 }
-.dark .jp-eyebrow { color: theme('colors.stone.400'); }
 .jp-eyebrow::before {
   content: '';
   display: inline-block;
@@ -268,10 +352,9 @@
   font-family: theme('fontFamily.jp');
   font-weight: 300;
   letter-spacing: 0.18em;
-  color: theme('colors.stone.800');
+  color: var(--fg-2);
   line-height: 1.15;
 }
-.dark .jp-section-title { color: theme('colors.stone.100'); }
 
 .jp-section-ruby {
   display: block;
@@ -280,47 +363,22 @@
   font-size: 0.65rem;
   letter-spacing: 0.5em;
   text-transform: uppercase;
-  color: theme('colors.stone.400');
+  color: var(--fg-faint);
   margin-top: 0.4em;
 }
-.dark .jp-section-ruby { color: theme('colors.stone.500'); }
 
 /* Hairline 分隔線 — 極細 + 兩端漸淡 */
 .jp-hairline {
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    theme('colors.stone.300 / 80%') 20%,
-    theme('colors.stone.300 / 80%') 80%,
-    transparent
-  );
-}
-.dark .jp-hairline {
-  background: linear-gradient(
-    to right,
-    transparent,
-    theme('colors.stone.600 / 70%') 20%,
-    theme('colors.stone.600 / 70%') 80%,
-    transparent
-  );
+  background: var(--hairline);
 }
 .jp-hairline-v {
   width: 1px;
   background: linear-gradient(
     to bottom,
     transparent,
-    theme('colors.stone.300 / 70%') 15%,
-    theme('colors.stone.300 / 70%') 85%,
-    transparent
-  );
-}
-.dark .jp-hairline-v {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    theme('colors.stone.600 / 60%') 15%,
-    theme('colors.stone.600 / 60%') 85%,
+    var(--border-soft) 15%,
+    var(--border-soft) 85%,
     transparent
   );
 }
@@ -332,8 +390,8 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border: 1.5px solid theme('colors.accent.700');
-  color: theme('colors.accent.700');
+  border: 1.5px solid var(--accent-ink);
+  color: var(--accent-ink);
   font-family: theme('fontFamily.jp');
   font-size: 0.9rem;
   font-weight: 500;
@@ -345,8 +403,6 @@
   user-select: none;
 }
 .dark .jp-seal {
-  border-color: theme('colors.accent.400');
-  color: theme('colors.accent.300');
   background: theme('colors.accent.900 / 30%');
   box-shadow: inset 0 0 0 2px theme('colors.accent.950 / 40%');
 }
@@ -372,10 +428,9 @@
   font-family: theme('fontFamily.jp');
   font-size: 0.7rem;
   letter-spacing: 0.45em;
-  color: theme('colors.stone.400');
+  color: var(--fg-faint);
   user-select: none;
 }
-.dark .jp-vertical-caption { color: theme('colors.stone.500'); }
 
 /* 明朝體引言 body */
 .jp-body {
@@ -383,9 +438,8 @@
   font-weight: 300;
   letter-spacing: 0.05em;
   line-height: 2;
-  color: theme('colors.stone.700');
+  color: var(--fg-3);
 }
-.dark .jp-body { color: theme('colors.stone.300'); }
 
 /* 漢数字的 tabular number 效果 */
 .jp-kansuji {
@@ -403,16 +457,14 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: theme('colors.stone.600');
+  background: var(--fg-3);
 }
-.dark .jp-sumi-dot { background: theme('colors.stone.300'); }
 
 /* 書扉邊框（單細線內縮雙框） */
 .jp-frame {
   position: relative;
-  border: 1px solid theme('colors.stone.300 / 70%');
+  border: 1px solid var(--border-soft);
 }
-.dark .jp-frame { border-color: theme('colors.stone.600 / 60%'); }
 .jp-frame::after {
   content: '';
   position: absolute;
@@ -426,12 +478,8 @@
 
 /* 文字選擇（全站） */
 ::selection {
-  background: rgba(168, 162, 158, 0.25);
-  color: rgba(41, 37, 36, 0.92);
-}
-.dark ::selection {
-  background: rgba(120, 113, 108, 0.4);
-  color: rgba(245, 245, 244, 0.95);
+  background: var(--selection-bg);
+  color: var(--selection-fg);
 }
 
 /* 水平滾動條（overflow-x-auto 自動套用細緻風格） */
@@ -448,10 +496,10 @@
 
 /* 和紙陰影 */
 .shadow-japanese {
-  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
+  box-shadow: var(--shadow-japanese);
 }
 .shadow-japanese-hover {
-  box-shadow: 0 4px 16px rgba(168, 162, 158, 0.15), 0 2px 6px rgba(168, 162, 158, 0.08);
+  box-shadow: var(--shadow-japanese-hover);
 }
 
 /* 毛玻璃 */
