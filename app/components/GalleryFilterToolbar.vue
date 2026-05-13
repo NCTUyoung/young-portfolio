@@ -1,6 +1,14 @@
 <template>
-  <!-- 搜尋 + 年份篩選：低調一行，與全站「細線／簡素」呼應；手機上由左排列 -->
-  <div v-if="showToolbar" class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <!--
+    搜尋 + 年份篩選：低調一行，與全站「細線／簡素」呼應；手機上由左排列。
+    rail variant：lg+ 在左 rail 內固定垂直堆疊（不會跑回 row）。
+  -->
+  <div
+    v-if="showToolbar"
+    :class="variant === 'rail'
+      ? 'mb-2 flex flex-col gap-4 items-stretch'
+      : 'mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'"
+  >
     <!-- 搜尋欄：hairline 下底線、無框 -->
     <label class="relative flex min-w-0 flex-1 items-center gap-2 border-b border-stone-200 dark:border-stone-700 focus-within:border-accent-400 dark:focus-within:border-accent-500 transition-colors">
       <Icon name="lucide:search" class="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" aria-hidden="true"/>
@@ -24,11 +32,14 @@
     </label>
 
     <!-- 年份：純文字底線選單，展開時顯示年度與數量 -->
-    <div v-if="availableYears.length > 1" class="flex items-center gap-2 whitespace-nowrap">
+    <div v-if="availableYears.length > 1" :class="variant === 'rail' ? 'flex items-center justify-between gap-3' : 'flex items-center gap-2 whitespace-nowrap'">
       <span class="jp-section-label !text-[0.6rem]">Year</span>
       <select
         :value="filterState.yearFilter ?? ''"
-        class="min-w-[6rem] border-b border-stone-200 dark:border-stone-700 bg-transparent pb-1 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 focus:border-accent-400 focus:outline-none"
+        :class="[
+          'border-b border-stone-200 dark:border-stone-700 bg-transparent pb-1 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 focus:border-accent-400 focus:outline-none',
+          variant === 'rail' ? 'flex-1 min-w-0' : 'min-w-[6rem]'
+        ]"
         aria-label="依年份篩選"
         @change="onYearChange"
       >
@@ -43,6 +54,14 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
+
+withDefaults(defineProps<{
+  /**
+   * default: 桌機 sm+ 一行 / 手機垂直
+   * rail: 永遠垂直堆疊（rail 內專用）
+   */
+  variant?: 'default' | 'rail'
+}>(), { variant: 'default' })
 
 const galleryStore = useGalleryStore()
 const { filterState, availableYears } = storeToRefs(galleryStore)

@@ -1,10 +1,13 @@
 <template>
   <div
     v-if="(filterState.selectedCategory === 'photography' || filterState.selectedCategory === 'digital') && availableEvents.length > 0"
-    class="mb-8"
+    :class="variant === 'rail' ? 'mb-6' : 'mb-8'"
   >
-    <!-- 小標 + 計數（一行壓住），手機上同時放展開／收束按鈕 -->
-    <div class="mb-3 flex items-end justify-between gap-3">
+    <!--
+      Rail variant：垂直列，無摘要鈕（rail 僅 lg+ 顯示，無需手機 collapse 邏輯）
+      Horizontal variant：原本的小標 + 手機 collapse 結構
+    -->
+    <div v-if="variant !== 'rail'" class="mb-3 flex items-end justify-between gap-3">
       <p class="jp-section-label">Event</p>
       <!-- 手機（< sm）：摘要 + 展開鈕；展開後改成「收起」 -->
       <button
@@ -27,13 +30,17 @@
       </button>
     </div>
 
+    <!-- Rail variant：小標單獨一行（無 collapse 鈕） -->
+    <p v-else class="jp-section-label mb-3">Event</p>
+
     <!--
       手機（< sm）收束視圖：當前選擇 + 全部數量。點摘要列也展開。
       設計理由（design brief priority 1）：mobile 上 event chips 水平溢出讓人不確定能不能滑，
       改為「目前選了什麼 / 點開抽屜」的收束結構，把策展焦點還給作品。
+      Rail variant 跳過（rail 僅 lg+ 顯示）。
     -->
     <button
-      v-if="hasMultipleEvents && !mobileExpanded"
+      v-if="variant !== 'rail' && hasMultipleEvents && !mobileExpanded"
       type="button"
       class="sm:hidden w-full flex items-baseline justify-between gap-3 border-b border-stone-200 dark:border-stone-700 pb-2.5 text-left hover:border-accent-400/60 transition-colors"
       :aria-label="`目前篩選：${currentMobileLabel}，按下展開所有事件`"
@@ -47,25 +54,36 @@
       </span>
     </button>
 
-    <!-- 桌機：wrap 排列 / 手機展開：wrap 排列（不再橫向溢出） -->
+    <!--
+      Rail variant：固定垂直列，max-h + overflow 防溢出（11 個 chips 垂直堆 ~ 300px+）
+      Horizontal：原本桌機 wrap / 手機展開排列
+    -->
     <div
       id="event-filter-mobile-list"
-      class="-mx-1 gap-x-1 gap-y-1 px-1 sm:flex-wrap sm:overflow-visible sm:pb-0"
-      :class="[
-        mobileExpanded ? 'flex flex-wrap pb-1' : 'hidden sm:flex',
-      ]"
+      :class="variant === 'rail'
+        ? 'flex flex-col max-h-[44vh] overflow-y-auto -mx-2 px-2 hide-scrollbar'
+        : ['-mx-1 gap-x-1 gap-y-1 px-1 sm:flex-wrap sm:overflow-visible sm:pb-0', mobileExpanded ? 'flex flex-wrap pb-1' : 'hidden sm:flex']"
     >
       <!-- 全部事件 -->
       <button
         type="button"
-        class="relative touch-manipulation px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
-        :class="filterState.selectedEvent === null
-          ? 'text-stone-800 dark:text-stone-100'
-          : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"
+        :class="[
+          'relative touch-manipulation font-light tracking-wide transition-all duration-300 group rounded-none',
+          variant === 'rail'
+            ? 'flex items-baseline justify-between gap-3 px-2 py-1.5 text-left'
+            : 'px-4 py-2.5',
+          filterState.selectedEvent === null
+            ? 'text-stone-800 dark:text-stone-100'
+            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+        ]"
         @click="onSelectEvent(null)"
       >
-        <!-- 選中底線（漸層暈染） -->
+        <!--
+          選中底線（漸層暈染）— horizontal 版置於 button 底；
+          rail 版改為左側 hairline 直條，配合垂直列邏輯。
+        -->
         <span
+          v-if="variant !== 'rail'"
           :class="[
             'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out',
             filterState.selectedEvent === null
@@ -73,32 +91,50 @@
               : 'w-0 bg-transparent'
           ]"
         />
-        <!-- 計數格式 name · n -->
-        <span class="text-xs">全部事件</span>
-        <span class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
         <span
-          class="text-xs tabular-nums transition-colors duration-300"
-          :class="filterState.selectedEvent === null
-            ? 'text-accent-500 dark:text-accent-400'
-            : 'text-stone-400 dark:text-stone-600'"
+          v-else
+          :class="[
+            'absolute left-0 top-1/2 -translate-y-1/2 w-px transition-all duration-300 ease-out',
+            filterState.selectedEvent === null
+              ? 'h-4/5 bg-accent-500 dark:bg-accent-400'
+              : 'h-0 bg-transparent'
+          ]"
+        />
+        <!-- 計數格式 name · n（rail 改為 name 與 count 兩端對齊） -->
+        <span class="text-xs truncate">全部事件</span>
+        <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
+        <span
+          class="text-xs tabular-nums transition-colors duration-300 shrink-0"
+          :class="[
+            variant === 'rail' ? '' : '',
+            filterState.selectedEvent === null
+              ? 'text-accent-500 dark:text-accent-400'
+              : 'text-stone-400 dark:text-stone-600'
+          ]"
         >{{ totalWorksInCategory }}</span>
       </button>
 
-      <!-- 垂直分隔線（桌機才出現） -->
-      <span class="hidden self-center sm:block w-px h-4 bg-stone-200/60 dark:bg-stone-700/50 mx-1"/>
+      <!-- 垂直分隔線（桌機 horizontal 才出現） -->
+      <span v-if="variant !== 'rail'" class="hidden self-center sm:block w-px h-4 bg-stone-200/60 dark:bg-stone-700/50 mx-1"/>
 
       <!-- 各事件 -->
       <template v-for="(event, index) in availableEvents" :key="event.name">
         <button
           type="button"
-          class="relative touch-manipulation px-4 py-2.5 font-light tracking-wide transition-all duration-300 group rounded-none"
-          :class="filterState.selectedEvent === event.name
-            ? 'text-stone-800 dark:text-stone-100'
-            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'"
+          :class="[
+            'relative touch-manipulation font-light tracking-wide transition-all duration-300 group rounded-none',
+            variant === 'rail'
+              ? 'flex items-baseline justify-between gap-3 px-2 py-1.5 text-left'
+              : 'px-4 py-2.5',
+            filterState.selectedEvent === event.name
+              ? 'text-stone-800 dark:text-stone-100'
+              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+          ]"
           @click="onSelectEvent(event.name)"
         >
-          <!-- 選中底線（漸層暈染） -->
+          <!-- 選中底線 / 側線 -->
           <span
+            v-if="variant !== 'rail'"
             :class="[
               'absolute bottom-0 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out',
               filterState.selectedEvent === event.name
@@ -106,27 +142,36 @@
                 : 'w-0 bg-transparent'
             ]"
           />
-          <!-- 計數格式 name · n -->
-          <span class="text-xs">{{ event.name }}</span>
-          <span class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
           <span
-            class="text-xs tabular-nums transition-colors duration-300"
+            v-else
+            :class="[
+              'absolute left-0 top-1/2 -translate-y-1/2 w-px transition-all duration-300 ease-out',
+              filterState.selectedEvent === event.name
+                ? 'h-4/5 bg-accent-500 dark:bg-accent-400'
+                : 'h-0 bg-transparent'
+            ]"
+          />
+          <!-- 計數格式 name · n -->
+          <span class="text-xs truncate">{{ event.name }}</span>
+          <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
+          <span
+            class="text-xs tabular-nums transition-colors duration-300 shrink-0"
             :class="filterState.selectedEvent === event.name
               ? 'text-accent-500 dark:text-accent-400'
               : 'text-stone-400 dark:text-stone-600'"
           >{{ event.count }}</span>
         </button>
 
-        <!-- 事件間的細分隔線（桌機才顯示，避免手機 wrap 排列出現多餘豎線） -->
+        <!-- 事件間的細分隔線（horizontal 桌機才顯示） -->
         <span
-          v-if="index < availableEvents.length - 1"
+          v-if="variant !== 'rail' && index < availableEvents.length - 1"
           class="hidden sm:inline-block self-center w-px h-3 bg-stone-200/50 dark:bg-stone-700/40 mx-0.5"
         />
       </template>
     </div>
 
-    <!-- 底部 hairline（兩端漸淡） -->
-    <div class="jp-hairline w-full mt-4"/>
+    <!-- 底部 hairline（兩端漸淡）— rail 版間距更緊湊 -->
+    <div :class="['jp-hairline w-full', variant === 'rail' ? 'mt-3' : 'mt-4']"/>
   </div>
 </template>
 
@@ -134,6 +179,14 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
+
+withDefaults(defineProps<{
+  /**
+   * default: 桌機橫向 chips / 手機 collapse 摘要
+   * rail: 桌機左側 rail 內垂直列（lg+ 專用，不渲染 mobile collapse）
+   */
+  variant?: 'default' | 'rail'
+}>(), { variant: 'default' })
 
 const galleryStore = useGalleryStore()
 const {

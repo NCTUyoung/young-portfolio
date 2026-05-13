@@ -1,7 +1,19 @@
 <template>
   <div ref="pageRef" class="min-h-screen transition-colors duration-300">
-    <!-- Header — 個性化設計 -->
-    <div ref="controlsSectionRef" class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative">
+    <!--
+      桌機 lg+：左 rail（filters 常駐）+ 主欄（內容從 viewport 頂端開始）
+      mobile/tablet（<lg）：rail 隱藏，沿用原本 top-stack 結構 + sticky mini bar
+      詳見 wiki/inspirations/gallery-left-rail.md（survives chrome-budget rule：加 rail = 砍頂部 chrome）
+    -->
+    <div class="lg:flex lg:gap-8 lg:items-start">
+      <GalleryLeftRail
+        :category-label="categoryLabel"
+        :category-count="categoryCount"
+        class="hidden lg:block"
+      />
+      <div class="lg:flex-1 lg:min-w-0">
+    <!-- Header — 個性化設計（lg+ 改由左 rail 承擔，隱藏避免重複） -->
+    <div ref="controlsSectionRef" class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative lg:hidden">
       <!-- 右側縦書き裝飾字（配 hairline 收尾，不再孤立色點） -->
       <div class="absolute top-10 right-[6%] hidden lg:flex flex-col items-center gap-4 select-none pointer-events-none">
         <span class="jp-hairline-v h-16"/>
@@ -47,11 +59,14 @@
       </div>
     </div>
 
-    <!-- Sticky mini bar：控制區離開可視區後，收束為一行摘要 -->
+    <!--
+      Sticky mini bar：控制區離開可視區後，收束為一行摘要。
+      lg+ 上 rail 常駐，mini bar 多餘 → `lg:hidden` 隱藏。
+    -->
     <transition name="mini-bar-fade">
       <div
         v-if="showControlMiniBar"
-        class="pointer-events-none fixed inset-x-0 z-[1090] top-[calc(env(safe-area-inset-top,0px)+4rem)]"
+        class="lg:hidden pointer-events-none fixed inset-x-0 z-[1090] top-[calc(env(safe-area-inset-top,0px)+4rem)]"
         data-testid="gallery-filter-mini-bar"
       >
         <GalleryControlMiniBar
@@ -300,6 +315,8 @@
         <div class="text-xs text-accent-400/50 dark:text-accent-500/35 mt-3 font-light tracking-[0.4em]">{{ footerSub }}</div>
       </div>
     </div>
+      </div>
+    </div>
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
@@ -356,6 +373,7 @@ import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
+import GalleryLeftRail from '~/components/gallery/GalleryLeftRail.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
