@@ -28,11 +28,16 @@ logs
 
 # Playwright CLI snapshots / screenshots（本機 review 產出的暫存，不入版控）
 .playwright-cli/
+.tmp/
 hero-*.png
 home-*.png
 gallery-review*.png
 live-*.png
 ykit-*.png
+rail-*.png
+
+# 視覺驗收：current/ 為本次跑出來的對照圖、baseline/ 是要 commit 的基準
+tests/screenshots/current/
 
 # Author-download skill 產出與輸入清單（本機用，含他人作品）
 downloads/
