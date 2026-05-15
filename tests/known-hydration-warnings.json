@@ -1,0 +1,34 @@
+{
+  "$schema": "凍結現存 Vue dev hydration mismatch — 跑 e2e/驗證時用來扣掉 pre-existing，方便分辨新引入的 regression。",
+  "lastVerified": "2026-05-15",
+  "rootCause": "useGalleryEventRoute 在 SSR 時沒同步 path param 到 gallery store；client mount 後才呼叫 setSelectedEvent，造成 SSR HTML 是 overview 狀態、client 是 event 狀態。",
+  "fixOwner": "未指派（建議：把 selectedEvent / yearFilter 的 store 初始化提到 useAsyncData 內，或在 setup() 同步讀 useRoute().params）",
+  "knownMismatches": [
+    {
+      "location": "進入 /gallery/photography/<event> 任意 event 頁",
+      "server": "categoryCount = 80 / selectedEvent = null（overview 狀態）",
+      "client": "對應 event 的 count（例 Annber 外拍 → 9）/ selectedEvent = '<event>'",
+      "components": [
+        "GalleryLeftRail（lg+）",
+        "EventFilter（mobile 摘要 + chips）",
+        "pages/gallery/[[category]]/[[event]].vue 頁眉 count 行"
+      ]
+    },
+    {
+      "location": "EventFilter mobile collapse 摘要",
+      "server": "全部事件",
+      "client": "<event name>"
+    },
+    {
+      "location": "EventFilter chip count 數字",
+      "server": "80",
+      "client": "9"
+    }
+  ],
+  "howToDistinguishNew": [
+    "1. 跑 dev server，瀏覽到觸發頁",
+    "2. 在 playwright-cli console 抓 `[Vue warn]: Hydration` 開頭的訊息",
+    "3. 對照本檔 knownMismatches；不在裡面的就是新 regression",
+    "4. 修完後 stash + reload 再對一次，確認 baseline 數量沒升"
+  ]
+}
