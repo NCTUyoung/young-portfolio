@@ -31,16 +31,28 @@ Six shots cover: lg+ rail / md fallback / sm top-stack / sticky mini bar / event
 
 ### 1. Pre-flight
 
+Dev server must be running. The base URL is resolved in this priority order:
+
+1. `BASE_URL` env var if set — full URL like `http://localhost:3007/young-portfolio`
+2. `.dev-ready.json` in the working directory (written by `/boot-worktree`) — uses `url` field
+3. Default `http://localhost:3000/young-portfolio`
+
 ```bash
-# Dev server must be running on :3000. If not, start it:
-npm run dev   # use run_in_background, wait for "Local:" line
+# Resolve BASE_URL: env > .dev-ready.json > default
+if [ -z "$BASE_URL" ] && [ -f .dev-ready.json ]; then
+  BASE_URL=$(node -e "console.log(require('./.dev-ready.json').url.replace(/\\/$/, ''))")
+fi
+BASE_URL="${BASE_URL:-http://localhost:3000/young-portfolio}"
+echo "BASE_URL=$BASE_URL"
 ```
+
+If neither dev nor `.dev-ready.json` exist, run `/boot-worktree` (worktree workflow) or `npm run dev` (main repo) first.
 
 Output dir: `tests/screenshots/baseline/` for the canonical set, `tests/screenshots/current/` for the post-change set. `current/` is gitignored; `baseline/` is committed.
 
 ### 2. Capture (baseline OR current mode)
 
-Set `MODE` to `baseline` or `current`. Then run the matrix:
+Set `MODE` to `baseline` or `current`. Then run the matrix using the resolved `$BASE_URL`:
 
 ```bash
 MODE=baseline   # or: current
@@ -48,7 +60,7 @@ OUT="tests/screenshots/$MODE"
 mkdir -p "$OUT"
 
 # Open session
-npx --no-install playwright-cli -s=vb open "http://localhost:3000/young-portfolio/gallery/photography"
+npx --no-install playwright-cli -s=vb open "$BASE_URL/gallery/photography"
 
 # 1440 × 900 — desktop overview top
 npx --no-install playwright-cli -s=vb resize 1440 900
@@ -60,12 +72,12 @@ npx --no-install playwright-cli -s=vb eval "window.scrollTo(0, 1500)"
 npx --no-install playwright-cli -s=vb screenshot --filename="$OUT/desktop-overview-mid.png"
 
 # 1440 × 900 — desktop event mode (immersive cover + rail)
-npx --no-install playwright-cli -s=vb goto "http://localhost:3000/young-portfolio/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D"
+npx --no-install playwright-cli -s=vb goto "$BASE_URL/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D"
 npx --no-install playwright-cli -s=vb eval "window.scrollTo(0, 0)"
 npx --no-install playwright-cli -s=vb screenshot --filename="$OUT/desktop-event-cover.png"
 
 # 768 × 1024 — tablet overview
-npx --no-install playwright-cli -s=vb goto "http://localhost:3000/young-portfolio/gallery/photography"
+npx --no-install playwright-cli -s=vb goto "$BASE_URL/gallery/photography"
 npx --no-install playwright-cli -s=vb resize 768 1024
 npx --no-install playwright-cli -s=vb eval "window.scrollTo(0, 0)"
 npx --no-install playwright-cli -s=vb screenshot --filename="$OUT/tablet-overview-top.png"
@@ -87,18 +99,13 @@ npx --no-install playwright-cli -s=vb close
 
 ### 3. Compare
 
-After capturing `current/`:
+After capturing `current/`, prefer the pixel diff over eyeball — invoke `/gallery-visual-diff`. It loops the matrix, emits red-overlay PNGs into `tests/screenshots/diff/`, and prints per-shot JSON `{ percent, regions: { tl…br } }`. Read each diff PNG once, glance at the JSON, and report:
 
-```bash
-ls tests/screenshots/baseline tests/screenshots/current
-```
+- `percent < 0.1` → effectively unchanged
+- Intended diff → describe in one sentence with the dominant region cells (e.g. "all change concentrated in `tl + ml + bl` — rail column only")
+- Unintended diff → flag with file path + viewport + region
 
-Then **Read each pair** (baseline vs current) using the Read tool with the absolute path — images render inline. Eyeball the diff and report per-shot:
-- Identical → no comment
-- Intended diff (the change you set out to make) → describe in one sentence
-- Unintended diff (regression) → flag with file path + which width/scroll it appeared in
-
-For pixel-precise diffs you'd need ImageMagick / pixelmatch; this skill stays at "human-eyeball gate" tier on purpose — the matrix is the value, not the diff math.
+For one-off subjective checks (typography, hover states) you can still Read the baseline/current pair directly, but for repeatable iteration the diff skill is faster and more honest about what actually changed.
 
 ## Known hydration warnings
 

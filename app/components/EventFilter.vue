@@ -100,17 +100,23 @@
               : 'h-0 bg-transparent'
           ]"
         />
-        <!-- 計數格式 name · n（rail 改為 name 與 count 兩端對齊） -->
+        <!--
+          計數格式 name · n（rail 改為 name 與 count 兩端對齊）。
+          Rail 版本（Path B）：count 永遠 stone-400 + 小一級，去掉 accent badge 感；
+          選中態僅由左側 1px accent 細線承擔，與 Rinko/McGinley 純文字 link 列同氣。
+        -->
         <span class="text-xs truncate">全部事件</span>
         <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
         <span
-          class="text-xs tabular-nums transition-colors duration-300 shrink-0"
-          :class="[
-            variant === 'rail' ? '' : '',
-            filterState.selectedEvent === null
-              ? 'text-accent-500 dark:text-accent-400'
-              : 'text-stone-400 dark:text-stone-600'
-          ]"
+          class="tabular-nums shrink-0"
+          :class="variant === 'rail'
+            ? 'text-[10px] text-stone-400 dark:text-stone-600'
+            : [
+              'text-xs transition-colors duration-300',
+              filterState.selectedEvent === null
+                ? 'text-accent-500 dark:text-accent-400'
+                : 'text-stone-400 dark:text-stone-600'
+            ]"
         >{{ totalWorksInCategory }}</span>
       </button>
 
@@ -151,14 +157,19 @@
                 : 'h-0 bg-transparent'
             ]"
           />
-          <!-- 計數格式 name · n -->
+          <!-- 計數格式 name · n（rail 同上：count 永遠 stone-400，選中態靠左側細線） -->
           <span class="text-xs truncate">{{ event.name }}</span>
           <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
           <span
-            class="text-xs tabular-nums transition-colors duration-300 shrink-0"
-            :class="filterState.selectedEvent === event.name
-              ? 'text-accent-500 dark:text-accent-400'
-              : 'text-stone-400 dark:text-stone-600'"
+            class="tabular-nums shrink-0"
+            :class="variant === 'rail'
+              ? 'text-[10px] text-stone-400 dark:text-stone-600'
+              : [
+                'text-xs transition-colors duration-300',
+                filterState.selectedEvent === event.name
+                  ? 'text-accent-500 dark:text-accent-400'
+                  : 'text-stone-400 dark:text-stone-600'
+              ]"
           >{{ event.count }}</span>
         </button>
 
@@ -170,8 +181,11 @@
       </template>
     </div>
 
-    <!-- 底部 hairline（兩端漸淡）— rail 版間距更緊湊 -->
-    <div :class="['jp-hairline w-full', variant === 'rail' ? 'mt-3' : 'mt-4']"/>
+    <!--
+      底部 hairline：horizontal 版才畫；rail 版（Path B）以余白拉開節奏，
+      避免 rail 從上到下被多條 hairline 切成 4 段（Windows panel 感的主因）。
+    -->
+    <div v-if="variant !== 'rail'" class="jp-hairline w-full mt-4"/>
   </div>
 </template>
 

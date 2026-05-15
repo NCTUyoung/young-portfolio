@@ -37,7 +37,14 @@ ykit-*.png
 rail-*.png
 
 # 視覺驗收：current/ 為本次跑出來的對照圖、baseline/ 是要 commit 的基準
+# diff/ 是 gallery-visual-diff skill 跑出來的紅色覆蓋差異圖
 tests/screenshots/current/
+tests/screenshots/diff/
+
+# boot-worktree skill 在 worktree dir 寫的 ready-state 標記
+.dev-ready.json
+.dev.log
+.dev.err.log
 
 # Author-download skill 產出與輸入清單（本機用，含他人作品）
 downloads/

@@ -9,8 +9,19 @@
       ? 'mb-2 flex flex-col gap-4 items-stretch'
       : 'mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'"
   >
-    <!-- 搜尋欄：hairline 下底線、無框 -->
-    <label class="relative flex min-w-0 flex-1 items-center gap-2 border-b border-stone-200 dark:border-stone-700 focus-within:border-accent-400 dark:focus-within:border-accent-500 transition-colors">
+    <!--
+      搜尋欄：hairline 下底線、無框。
+      Rail 版（Path B）：border 改 stone-200/50 半透明，幾乎隱身於余白中，
+      避免 rail 內 search + year 兩條粗 hairline 把空間切碎（Windows form 感的主因之一）。
+    -->
+    <label
+      :class="[
+        'relative flex min-w-0 flex-1 items-center gap-2 border-b focus-within:border-accent-400 dark:focus-within:border-accent-500 transition-colors',
+        variant === 'rail'
+          ? 'border-stone-200/50 dark:border-stone-700/40'
+          : 'border-stone-200 dark:border-stone-700'
+      ]"
+    >
       <Icon name="lucide:search" class="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" aria-hidden="true"/>
       <input
         :value="filterState.searchQuery"
@@ -37,8 +48,10 @@
       <select
         :value="filterState.yearFilter ?? ''"
         :class="[
-          'border-b border-stone-200 dark:border-stone-700 bg-transparent pb-1 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 focus:border-accent-400 focus:outline-none',
-          variant === 'rail' ? 'flex-1 min-w-0' : 'min-w-[6rem]'
+          'border-b bg-transparent pb-1 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 focus:border-accent-400 focus:outline-none',
+          variant === 'rail'
+            ? 'border-stone-200/50 dark:border-stone-700/40 flex-1 min-w-0'
+            : 'border-stone-200 dark:border-stone-700 min-w-[6rem]'
         ]"
         aria-label="依年份篩選"
         @change="onYearChange"
