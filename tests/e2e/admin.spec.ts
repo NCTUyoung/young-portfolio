@@ -18,8 +18,9 @@ import { test, expect, type Page } from '@playwright/test'
 async function openAdminAndWaitReady (page: Page) {
   await page.goto('/admin')
 
-  // header「後台管理」立刻會渲染（不受 pageReady 控制）
-  await expect(page.getByRole('heading', { name: '後台管理' })).toBeVisible()
+  // header「後台管理」會在 CSR 掛載後渲染。/admin 是 ssr:false（CSR-only），
+  // CI 冷載入有時 >5s，給較寬的 timeout 對齊下方 spinner 等待，避免 flaky。
+  await expect(page.getByRole('heading', { name: '後台管理' })).toBeVisible({ timeout: 15_000 })
 
   // pageReady 切到 true 後，載入 spinner 消失；用 role=status 的存在與否辨識
   await expect(page.getByRole('status').filter({ hasText: 'Loading' })).toBeHidden({ timeout: 15_000 })
