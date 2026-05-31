@@ -366,8 +366,9 @@ const applyMapViewForSelection = (L: LeafletModule) => {
   const fitPadding: [number, number] = isCompact ? [32, 48] : [36, 36]
   const fitMaxZoom = isCompact ? 6 : 12
   const singleZoom = isCompact ? 7 : 10
-  if (bounds.length === 1) {
-    runFly(() => mapInstance.flyTo(bounds[0], singleZoom, { duration: flyDuration }))
+  if (bounds.length === 1 && bounds[0]) {
+    const only = bounds[0]
+    runFly(() => mapInstance.flyTo(only, singleZoom, { duration: flyDuration }))
   } else if (bounds.length > 1) {
     const b = L.latLngBounds(bounds)
     runFly(() => mapInstance.flyToBounds(b, { padding: fitPadding, duration: flyDuration, maxZoom: fitMaxZoom }))

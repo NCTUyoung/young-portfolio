@@ -8,7 +8,10 @@
       Horizontal variant：原本的小標 + 手機 collapse 結構
     -->
     <div v-if="variant !== 'rail'" class="mb-3 flex items-end justify-between gap-3">
-      <p class="jp-section-label">Event</p>
+      <p class="jp-section-label inline-flex items-baseline gap-2">
+        <span class="font-jp text-base font-extralight tracking-[0.3em] text-stone-700 dark:text-stone-200 normal-case">{{ trackKanji }}</span>
+        <span>Events</span>
+      </p>
       <!-- 手機（< sm）：摘要 + 展開鈕；展開後改成「收起」 -->
       <button
         v-if="hasMultipleEvents"
@@ -30,8 +33,11 @@
       </button>
     </div>
 
-    <!-- Rail variant：小標單獨一行（無 collapse 鈕） -->
-    <p v-else class="jp-section-label mb-3">Event</p>
+    <!-- Rail variant：小標單獨一行（無 collapse 鈕） + Round 7 雙主線 kanji 統攝 -->
+    <p v-else class="jp-section-label mb-3 inline-flex items-baseline gap-2">
+      <span class="font-jp text-base font-extralight tracking-[0.3em] text-stone-700 dark:text-stone-200 normal-case">{{ trackKanji }}</span>
+      <span>Events</span>
+    </p>
 
     <!--
       手機（< sm）收束視圖：當前選擇 + 全部數量。點摘要列也展開。
@@ -214,6 +220,12 @@ const { setSelectedEvent } = galleryStore
 
 const mobileExpanded = ref(false)
 const hasMultipleEvents = computed(() => availableEvents.value.length > 0)
+
+// Round 7 雙主線統攝：依當前 category 切換 eyebrow 前置 kanji
+// digital → 繪、photography → 影；與首頁四錨點 + GalleryTabBar 同 motif
+const trackKanji = computed(() => {
+  return filterState.value.selectedCategory === 'digital' ? '繪' : '影'
+})
 
 // 「全部事件」顯示的是目前類別的總作品數（不受事件篩選影響）
 const totalWorksInCategory = computed(() => {

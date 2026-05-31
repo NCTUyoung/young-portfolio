@@ -45,18 +45,25 @@
             ]"
           />
 
-          <!-- 標籤文字 -->
-          <span class="text-sm">{{ tab.label }}</span>
-
-          <!-- 數量 badge -->
-          <span
-            :class="[
-              'ml-1.5 text-xs transition-colors duration-300',
-              isActive(tab.key)
-                ? 'text-accent-500/80 dark:text-accent-400/80'
-                : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-400 dark:group-hover:text-stone-500'
-            ]"
-          >{{ categoryStats[tab.key] }}</span>
+          <!--
+            標籤（Round 6 雙主線 + Round 8 rail 徹底解截斷）
+            critic Round 7 建議：rail context 下 latin 隱藏，只留「繪 35 / 影 80」
+            徹底斷截斷，反而更日式（kanji + 數字 minimal）。
+            default variant：kanji + latin + count 三件齊發（mobile + standalone）
+            rail variant：只顯示 kanji + count（lg+ 左 rail 寬約 220px）
+          -->
+          <span class="inline-flex items-baseline gap-x-2">
+            <span class="font-jp text-base lg:text-lg font-extralight tracking-[0.3em] leading-none whitespace-nowrap">{{ tab.kanji }}</span>
+            <span v-if="props.variant !== 'rail'" class="text-[0.62rem] tracking-[0.3em] uppercase opacity-80 whitespace-nowrap">{{ tab.latin }}</span>
+            <span
+              :class="[
+                'text-xs transition-colors duration-300 whitespace-nowrap',
+                isActive(tab.key)
+                  ? 'text-accent-500/80 dark:text-accent-400/80'
+                  : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-400 dark:group-hover:text-stone-500'
+              ]"
+            >{{ categoryStats[tab.key] }}</span>
+          </span>
         </NuxtLink>
 
         <!-- 豎向分隔線（非最後一個） -->
@@ -74,15 +81,25 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 
+const props = withDefaults(defineProps<{
+  /**
+   * default: 桌機/平板/手機通用 tab（含 kanji + latin + count）
+   * rail: 桌機左側 rail 內專用（隱藏 latin 避免窄寬截斷，只保 kanji + count）
+   */
+  variant?: 'default' | 'rail'
+}>(), { variant: 'default' })
+
 const route = useRoute()
 const galleryStore = useGalleryStore()
 const { categoryStats, filterState } = storeToRefs(galleryStore)
 
 // 2026-05-09：移除「全部作品」tab。雙主線敘事（繪 / 影）為策展核心；
 // mixed feed 與兩條獨立敘事弧不同質，反而稀釋每條主線。
+// 2026-05-25 Round 6：tab label 加上 kanji（繪 / 影）+ latin（Digital / Photography），
+// 與首頁四錨點 motif 統一，把雙主線敘事延伸到 gallery IA 入口。
 const tabs = [
-  { key: 'digital', label: '數位繪圖' },
-  { key: 'photography', label: '攝影作品' },
+  { key: 'digital', kanji: '繪', latin: 'Digital', label: '數位繪圖' },
+  { key: 'photography', kanji: '影', latin: 'Photography', label: '攝影作品' },
 ] as const
 
 function isActive (key: string) {

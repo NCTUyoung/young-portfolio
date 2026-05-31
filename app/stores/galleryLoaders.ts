@@ -9,10 +9,15 @@ import type {
   DigitalArtItem,
   PhotographyItem,
   GalleryData,
-  PhotographyData
+  PhotographyData,
+  SeriesNarrative,
+  TrackManifesto
 } from '~~/shared/types/gallery'
 
-export function transformDigitalWork (img: DigitalArtItem): GalleryItem {
+type NarrativeMap = Record<string, SeriesNarrative> | undefined
+
+export function transformDigitalWork (img: DigitalArtItem, narratives?: NarrativeMap): GalleryItem {
+  const eventName = img.event?.name
   return {
     id: generateImageId('digital', img.filename),
     filename: img.filename,
@@ -24,14 +29,16 @@ export function transformDigitalWork (img: DigitalArtItem): GalleryItem {
     event: img.event || null,
     category: 'digital' as const,
     visible: true,
-    // series 為 optional 策展 tag；若原資料未帶欄位則留 undefined 不佔空間
-    ...(Array.isArray((img as { series?: unknown }).series)
-      ? { series: [...(img as { series: string[] }).series] }
-      : {})
+    ...(Array.isArray((img as unknown as { series?: unknown }).series)
+      ? { series: [...((img as unknown as { series: string[] }).series)] }
+      : {}),
+    ...(eventName && narratives?.[eventName] ? { seriesNarrative: narratives[eventName] } : {}),
+    ...((img as { pairWith?: string }).pairWith ? { pairWith: (img as { pairWith?: string }).pairWith } : {})
   }
 }
 
-export function transformPhotographyWork (img: PhotographyItem): GalleryItem {
+export function transformPhotographyWork (img: PhotographyItem, narratives?: NarrativeMap): GalleryItem {
+  const eventName = img.event?.name
   return {
     id: generateImageId('photography', img.filename),
     filename: img.filename,
@@ -49,8 +56,10 @@ export function transformPhotographyWork (img: PhotographyItem): GalleryItem {
     shutterSpeed: img.shutterSpeed,
     category: 'photography' as const,
     visible: true,
-    // series 為 optional 策展 tag；未設定時留 undefined，下游用 `series?.includes(x)` 就安全
-    ...(Array.isArray(img.series) ? { series: [...img.series] } : {})
+    ...(Array.isArray(img.series) ? { series: [...img.series] } : {}),
+    ...(eventName && narratives?.[eventName] ? { seriesNarrative: narratives[eventName] } : {}),
+    ...(img.note ? { note: img.note } : {}),
+    ...(img.pairWith ? { pairWith: img.pairWith } : {})
   }
 }
 
@@ -106,28 +115,30 @@ export async function fetchJsonWithFallback (filename: string): Promise<unknown>
   return await $fetch(absolute)
 }
 
-export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> {
+export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }> {
   const data = await fetchJsonWithFallback('galleryList.json') as GalleryData
 
   const works = sortImagesByTime(
-    data.Img.map(transformDigitalWork)
+    data.Img.map((img) => transformDigitalWork(img, data.seriesNarratives))
   )
 
   return {
     works,
-    eventStats: data.eventStats || {}
+    eventStats: data.eventStats || {},
+    manifesto: data.trackManifesto
   }
 }
 
-export async function fetchPhotographyWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number> }> {
+export async function fetchPhotographyWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }> {
   const data = await fetchJsonWithFallback('photographyList.json') as PhotographyData
 
   const works = sortImagesByTime(
-    data.Img.map(transformPhotographyWork)
+    data.Img.map((img) => transformPhotographyWork(img, data.seriesNarratives))
   )
 
   return {
     works,
-    eventStats: data.eventStats || {}
+    eventStats: data.eventStats || {},
+    manifesto: data.trackManifesto
   }
 }

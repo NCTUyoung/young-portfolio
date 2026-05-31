@@ -127,6 +127,23 @@
         讓策展節奏取代功能感。
       -->
       <!--
+        R6（act-critic loop）：割面ゲートウェイ — overview 進站第一屏即見繪×影割面對峙。
+        回應 Round 5 critic next-step「把割面対置交互複製到 gallery 路由首屏，讓繪⇄影
+        對峙成為全站入口」。取代 R48 被動 dual-split 兩連結 grid：
+          舊：靜態並置兩張卡，點哪張進哪個 event（被動瀏覽）
+          新：可拖動接縫的割面，拖向繪/影改變重心 → 收重那側點擊進入 /gallery/<track>
+        把「選哪條主線」從 tab 切換的離散決定，變成一條可連續拉扯的分岐手勢。
+        與 index FeaturedConfrontation 差異：那是看作品（開 lightbox），這是選路（進路由）。
+      -->
+      <section
+        v-if="!galleryLoadFailed && !isGalleryLoading && !filterState.selectedEvent && !hasActiveSecondaryFilter && digitalWorks.length && photographyWorks.length"
+        class="max-w-7xl mx-auto mb-12 lg:mb-16 mt-2"
+        aria-label="繪×影 割面ゲートウェイ"
+      >
+        <GalleryConfrontGateway />
+      </section>
+
+      <!--
         其の一 Footsteps Map — 僅在 photography overview（未進 event）顯示。
         進 event 時改走扉頁（GalleryEventCover），跳過 map / statement / strip 三章節。
       -->
@@ -136,15 +153,12 @@
         class="mb-12 max-w-7xl mx-auto scroll-mt-24"
         aria-labelledby="photo-map-heading"
       >
-        <header class="mb-5 flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <p class="jp-section-label mb-2">其の一 · Footsteps</p>
-            <h2
-              id="photo-map-heading"
-              class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100"
-            >踏跡 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Visited Places</span></h2>
-          </div>
-          <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">{{ eventLocations.length }} locations · {{ totalPhotographyCount }} 葉</p>
+        <header class="mb-5">
+          <p class="jp-section-label mb-2">其の一 · Footsteps</p>
+          <h2
+            id="photo-map-heading"
+            class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100"
+          >踏跡 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Visited Places</span></h2>
         </header>
         <EventMap
           :events="eventLocations"
@@ -179,21 +193,46 @@
           </button>
         </div>
 
-        <!-- 數位繪圖 - 策展開場 + Pinterest 風格瀑布流佈局 -->
+        <!-- 數位繪圖 - 策展開場 + 年度章封 + Pinterest 風格瀑布流佈局（R40：補章封 dual-track 對位） -->
         <div v-else-if="currentCategory === 'digital'">
-          <!--
-            策展開場：縦書き「繪」+ Statement +年度索引
-            設計依據：design brief priority 4 — 補上電繪頁的「入口質感」，
-                      避免從 controls 直接掉入大量瀑布流圖片。
-          -->
           <GalleryDigitalIntro />
-          <div class="max-w-7xl mx-auto">
-            <GalleryMasonryLayout
-              :items="digitalArtItems"
-              :columns="4"
-              :gap="16"
-              @image-click="openImageViewer"
-            />
+          <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <!-- R40：digital 依 event.name (年份) 分組，每組前綴章封 cover；
+                 與 photography Timeline 章封對位，dual-track motif 一致 -->
+            <section
+              v-for="(group, gIdx) in digitalEventGroups"
+              :key="group.eventName"
+              class="mb-16 last:mb-0 scroll-mt-24"
+            >
+              <header class="digital-chapter-header" :class="`digital-chapter-header--${group.track}`">
+                <div class="digital-chapter-header__index">其の {{ formatChapterKansuji(gIdx + 1) }}</div>
+                <h3 class="digital-chapter-header__title font-jp">{{ group.eventName }}</h3>
+                <p v-if="group.strongestLine" class="digital-chapter-header__strongest">「{{ group.strongestLine }}」</p>
+                <p class="digital-chapter-header__meta jp-kansuji">
+                  <span>繪</span>
+                  <span aria-hidden="true">·</span>
+                  <span>DIGITAL</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{{ group.images.length }} 葉</span>
+                </p>
+
+                <!-- R45：digital chapter axes 改 3 row dt/dd 與 photography EventCover 對等（dual-track parity） -->
+                <dl v-if="digitalAxisRows(group).length" class="digital-chapter-axes-3row">
+                  <div v-for="row in digitalAxisRows(group)" :key="row.label" class="jp-axis-row">
+                    <dt>{{ row.label }}</dt>
+                    <dd>
+                      <span v-for="v in row.values" :key="v" class="jp-chip jp-chip--kai">{{ v }}</span>
+                    </dd>
+                  </div>
+                </dl>
+              </header>
+              <GalleryMasonryLayout
+                :items="group.images"
+                :columns="4"
+                :gap="16"
+                @image-click="(img) => openImageViewer(img, digitalArtItems)"
+              />
+            </section>
           </div>
         </div>
 
@@ -216,32 +255,10 @@
           />
 
           <!--
-            其の二 · 句 Statement（僅 overview 模式）
-            原 一行斜插的「まだ、撮っている。」太孤立（design brief priority 2）。
-            這版改為「章節節點」結構：左側縦書き章碼 + 中央句子 + ruby/譯註 + 兩端 hairline，
-            讓 statement 成為地圖與精選之間的過場頁，而非散落 caption。
+            R32：「其の二 · Artist Statement」整段刪除
+            「まだ、撮っている。」與首頁 Hero 序卷頭語、Epilogue 收筆語重複（site-wide 已有 3 處同質聲明）
+            砍掉後 gallery overview 章節從 4 章 → 3 章（Footsteps / Selected / Timeline）
           -->
-          <section
-            v-if="!filterState.selectedEvent"
-            class="max-w-3xl mx-auto px-6 mt-4 mb-12 md:mb-16 scroll-mt-24"
-            aria-labelledby="photo-statement-heading"
-          >
-            <p class="jp-section-label text-center mb-5">其の二 · Artist Statement</p>
-            <div class="relative flex items-center justify-center gap-6 md:gap-10">
-              <!-- 左側 hairline -->
-              <span class="hidden sm:block flex-1 max-w-[80px] h-px bg-gradient-to-r from-transparent to-stone-300/70 dark:to-stone-600/60" aria-hidden="true"/>
-              <blockquote
-                id="photo-statement-heading"
-                lang="ja"
-                class="font-jp text-xl sm:text-2xl md:text-[1.6rem] font-extralight tracking-[0.4em] text-stone-800 dark:text-stone-100 leading-[1.9] text-center"
-              >
-                まだ、<span class="inline-block mx-1"/>撮っている。
-              </blockquote>
-              <!-- 右側 hairline -->
-              <span class="hidden sm:block flex-1 max-w-[80px] h-px bg-gradient-to-l from-transparent to-stone-300/70 dark:to-stone-600/60" aria-hidden="true"/>
-            </div>
-            <p class="text-center text-[0.7rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500 mt-4">— Still, photographing.</p>
-          </section>
 
           <!--
             其の三 · 精選 Selected — Horizontal Featured Strip（僅 overview 模式）
@@ -249,12 +266,9 @@
             桌機獨享（元件內 md:hidden）。
             上方加 editorial section header，承接 statement 的氣口、避免和 strip 內側欄重複信號。
           -->
-          <header v-if="!filterState.selectedEvent" class="hidden md:flex max-w-7xl mx-auto px-6 mb-3 items-end justify-between gap-4 flex-wrap">
-            <div>
-              <p class="jp-section-label mb-2">其の三 · Selected</p>
-              <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">精選 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Featured Series</span></h2>
-            </div>
-            <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">Horizontal Cut</p>
+          <header v-if="!filterState.selectedEvent" class="hidden md:block max-w-7xl mx-auto px-6 mb-3">
+            <p class="jp-section-label mb-2">其の二 · Selected</p>
+            <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">精選 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Featured Series</span></h2>
           </header>
           <HorizontalStripFeatured v-if="!filterState.selectedEvent" />
 
@@ -264,13 +278,8 @@
           -->
           <header v-if="!filterState.selectedEvent" class="max-w-7xl mx-auto px-6 mt-12 md:mt-16 mb-8 md:mb-10">
             <div class="jp-hairline w-full mb-6"/>
-            <div class="flex items-end justify-between gap-4 flex-wrap">
-              <div>
-                <p class="jp-section-label mb-2">其の四 · Timeline</p>
-                <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">時間軸 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Chronicle</span></h2>
-              </div>
-              <p class="jp-kansuji text-[0.7rem] tracking-[0.35em] text-stone-500 dark:text-stone-400 uppercase">All by event</p>
-            </div>
+            <p class="jp-section-label mb-2">其の三 · Timeline</p>
+            <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">時間軸 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Chronicle</span></h2>
           </header>
 
           <!-- Timeline：兩種模式皆渲染；event 模式下扉頁的「展開全部」會 scroll 到此 -->
@@ -320,6 +329,12 @@
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
+
+    <!--
+      R9：繪⇄影 切換時的「起算尺」轉場 overlay 已上移至 app.vue 常駐，
+      確保 route param 變更卸載 page 時 overlay 仍能完整播放（見 GalleryTrackTransition.vue 註解）。
+    -->
+
 
     <!-- 回到地圖：桌機右側膠囊按鈕 -->
     <button
@@ -371,6 +386,7 @@ import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
 import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
+import GalleryConfrontGateway from '~/components/gallery/GalleryConfrontGateway.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
 import GalleryLeftRail from '~/components/gallery/GalleryLeftRail.vue'
@@ -468,9 +484,6 @@ const categoryCount = computed(() => {
   return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
 })
 
-// 攝影段落 Header 標示總葉數（與 categoryCount 一致；獨立 computed 以便其他段落引用）
-const totalPhotographyCount = computed(() => photographyWorks.value.length)
-
 const miniCategoryLabel = computed(() => {
   const labels: Record<FilterState['selectedCategory'], string> = { digital: 'Digital', photography: 'Photography' }
   return labels[currentCategory.value]
@@ -514,6 +527,64 @@ const clearSecondaryFilters = () => {
   setSearchQuery('')
   setYearFilter(null)
 }
+
+/**
+ * R40: digital 依 event.name (年份) 分組 — 與 photography timeline 章封對位
+ * 章首詩從第一張圖的 seriesNarrative.strongest_line 取
+ */
+const KANSUJI_DIGITAL = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一']
+function formatChapterKansuji (n: number): string {
+  return KANSUJI_DIGITAL[n] || String(n)
+}
+
+/**
+ * R45：digital chapter axes 3 row（與 photography EventCover 對等）
+ */
+function digitalAxisRows (g: {
+  tools?: string[]
+  techniques?: string[]
+  topics?: string[]
+}): { label: string; values: string[] }[] {
+  const rows: { label: string; values: string[] }[] = []
+  if (g.techniques?.length) rows.push({ label: '技法', values: g.techniques })
+  if (g.topics?.length) rows.push({ label: '題材', values: g.topics })
+  if (g.tools?.length) rows.push({ label: '工具', values: g.tools })
+  return rows
+}
+
+const digitalEventGroups = computed(() => {
+  const groups = new Map<string, {
+    eventName: string
+    images: typeof digitalArtItems.value
+    track: string
+    strongestLine: string | null
+    tools?: string[]
+    techniques?: string[]
+    topics?: string[]
+  }>()
+  for (const img of digitalArtItems.value) {
+    const name = img.event?.name || '其他作品'
+    if (!groups.has(name)) {
+      const sn = (img as { seriesNarrative?: { strongest_line?: string; tools?: string[]; techniques?: string[]; topics?: string[] } }).seriesNarrative
+      groups.set(name, {
+        eventName: name,
+        images: [],
+        track: 'kai',
+        strongestLine: sn?.strongest_line || null,
+        tools: sn?.tools,
+        techniques: sn?.techniques,
+        topics: sn?.topics
+      })
+    }
+    groups.get(name)!.images.push(img)
+  }
+  // 由年份 desc 排序 — 年份字串如「2025年電繪作品」、「2018年電繪作品」
+  return Array.from(groups.values()).sort((a, b) => {
+    const ay = parseInt(a.eventName.match(/(\d{4})/)?.[1] || '0', 10)
+    const by = parseInt(b.eventName.match(/(\d{4})/)?.[1] || '0', 10)
+    return by - ay
+  })
+})
 
 
 
@@ -820,6 +891,77 @@ useHead({
 </script>
 
 <style scoped>
+/* ===== R40：Digital section 章封 header（與 photography Timeline 對位） ===== */
+.digital-chapter-header {
+  position: relative;
+  padding: 1.6rem 0 1.2rem;
+  margin-bottom: 1.4rem;
+  border-bottom: 1px solid rgb(168 162 158 / 0.2);
+}
+.digital-chapter-header__index {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  color: rgb(217 123 46 / 0.85);
+  text-transform: uppercase;
+  font-family: 'Noto Serif JP', serif;
+  margin-bottom: 0.5rem;
+}
+.digital-chapter-header__title {
+  font-size: 1.85rem;
+  font-weight: 200;
+  letter-spacing: 0.18em;
+  color: rgb(68 64 60);
+  margin: 0;
+  line-height: 1.3;
+}
+:global(.dark) .digital-chapter-header__title { color: rgb(231 229 228); }
+.digital-chapter-header__strongest {
+  margin: 0.6rem 0 0;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: rgb(120 113 108);
+  font-weight: 300;
+}
+:global(.dark) .digital-chapter-header__strongest { color: rgb(168 162 158); }
+.digital-chapter-header__meta {
+  margin: 0.85rem 0 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  color: rgb(120 113 108);
+  text-transform: uppercase;
+}
+.digital-chapter-header__meta > span:first-child {
+  font-family: 'Noto Serif JP', serif;
+  color: rgb(217 123 46);
+  font-size: 0.92rem;
+}
+:global(.dark) .digital-chapter-header__meta > span:first-child { color: rgb(231 184 125); }
+.digital-chapter-header::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 1.8rem;
+  bottom: 1rem;
+  width: 2px;
+  border-radius: 1px;
+  background: rgb(217 123 46 / 0.55);
+}
+
+/* R45：digital chapter axes 3 row — 與 photography 對等 */
+.digital-chapter-axes-3row {
+  margin: 1rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgb(168 162 158 / 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 /* 僅保留頁面內過場與響應式 h1 調整；共用樣式（shadow-japanese、backdrop-blur-japanese、scrollbar 等）已遷入 assets/css/main.css */
 .gallery-fade-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
 .gallery-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }

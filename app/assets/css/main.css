@@ -323,6 +323,102 @@
 }
 
 /* =========================================================
+   R45：jp-chip + jp-axis-row 共用 tokens
+   統一 5+ 套 chip 樣式（article TOC track / gallery EventCover axes /
+   digital chapter inline / hero NOW axis / error page）
+   ========================================================= */
+
+/* Chip 基準 — pill + hairline + subtle stone bg + mincho-friendly */
+.jp-chip {
+  display: inline-block;
+  padding: 0.16rem 0.65rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  font-weight: 300;
+  color: rgb(120 113 108);
+  background: rgb(245 244 240 / 0.55);
+  border: 1px solid rgb(168 162 158 / 0.3);
+  border-radius: 9999px;
+  line-height: 1.5;
+}
+.dark .jp-chip {
+  color: rgb(214 211 209);
+  background: rgb(41 37 36 / 0.5);
+  border-color: rgb(120 113 108 / 0.4);
+}
+.jp-chip--kai {
+  border-color: rgb(217 123 46 / 0.45);
+  color: rgb(217 123 46);
+}
+.dark .jp-chip--kai {
+  border-color: rgb(231 184 125 / 0.45);
+  color: rgb(231 184 125);
+}
+.jp-chip--kage {
+  border-color: rgb(82 100 122 / 0.45);
+  color: rgb(82 100 122);
+}
+.dark .jp-chip--kage {
+  border-color: rgb(154 173 197 / 0.45);
+  color: rgb(154 173 197);
+}
+/* Filter chip — interactive variant，hover/active 強化 */
+.jp-chip--filter {
+  cursor: pointer;
+  background: transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.jp-chip--filter:hover {
+  background: rgb(217 123 46 / 0.08);
+  border-color: rgb(217 123 46 / 0.5);
+  color: rgb(217 123 46);
+}
+.dark .jp-chip--filter:hover {
+  background: rgb(231 184 125 / 0.1);
+  border-color: rgb(231 184 125 / 0.5);
+  color: rgb(231 184 125);
+}
+.jp-chip--filter[aria-pressed='true'],
+.jp-chip--active {
+  background: rgb(217 123 46 / 0.12);
+  border-color: rgb(217 123 46 / 0.7);
+  color: rgb(217 123 46);
+  font-weight: 400;
+}
+.dark .jp-chip--filter[aria-pressed='true'],
+.dark .jp-chip--active {
+  background: rgb(231 184 125 / 0.15);
+  border-color: rgb(231 184 125 / 0.7);
+  color: rgb(231 184 125);
+}
+
+/* Axis row — dt/dd 對齊：3 軸 chip rows 共用結構 */
+.jp-axis-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+.jp-axis-row dt {
+  flex-shrink: 0;
+  width: 3.2rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.24em;
+  color: rgb(217 123 46 / 0.85);
+  margin: 0;
+}
+.dark .jp-axis-row dt {
+  color: rgb(231 184 125 / 0.85);
+}
+.jp-axis-row dd {
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* =========================================================
    日式排版 — 間 / 余白 / 簡素 / 不均整
    ========================================================= */
 
@@ -383,8 +479,114 @@
   );
 }
 
+/* ============================================================
+   Journey ink-fill thread（Round 11 — scroll-driven）
+   現代瀏覽器（Chrome/Edge 115+）支援 animation-timeline: scroll()。
+   不支援者：fallback 是 jp-hairline-v 靜態 thread（已是設計鐵律），無破口。
+   做法：在 .journey-thread-fill 元素上跑 scaleY 0→1，transform-origin: top
+   timeline 綁 nearest 滾動容器（document），range 為 cover：scroll 越深 fill 越長
+   ============================================================ */
+.journey-thread {
+  position: relative;
+}
+.journey-thread-fill {
+  /* 不設 position/inset/width — 讓 caller 的 Tailwind utilities 控制定位（避免 inset: 0 蓋掉 left-1/2） */
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(219, 123, 46, 0.55) 12%,
+    rgba(219, 123, 46, 0.75) 50%,
+    rgba(219, 123, 46, 0.55) 88%,
+    transparent
+  );
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+.dark .journey-thread-fill {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(228, 150, 74, 0.45) 12%,
+    rgba(228, 150, 74, 0.65) 50%,
+    rgba(228, 150, 74, 0.45) 88%,
+    transparent
+  );
+}
+@supports (animation-timeline: view()) {
+  .journey-thread-fill {
+    animation: journey-fill linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+  }
+  @keyframes journey-fill {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-thread-fill { animation: none; transform: scaleY(0); }
+}
+
+/* ============================================================
+   合流 marker pulse（Round 12 — scroll-driven 抵達）
+   當「both」軌大菱形捲入視野時，做一次 scale 1 → 1.4 → 1 + accent ring pulse
+   實作：view-timeline-name 綁該元素，animation-range cover 30% cover 70%（停留中段）
+   ============================================================ */
+/* .confluence-marker 直接加在現有的「合流大菱形」span 上；
+   span 已有 Tailwind `absolute`，無需再覆寫 position。 */
+.confluence-marker::after {
+  /* 朱光 ring（Round 13 強化）：critic 指原 inset:-8px 太小看不到，
+     朱光該溢出菱形外 30-40px 才有「合流發光」儀式感 */
+  content: '';
+  position: absolute;
+  inset: -36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(219, 123, 46, 0.55) 0%, rgba(219, 123, 46, 0.18) 35%, rgba(219, 123, 46, 0) 75%);
+  opacity: 0;
+  pointer-events: none;
+  /* 取消父層 rotate(45deg) 對 ring 的影響：ring 應該是正圓不是斜方 */
+  transform: rotate(-45deg);
+}
+@supports (animation-timeline: view()) {
+  .confluence-marker {
+    view-timeline-name: --confluence;
+    view-timeline-axis: block;
+    animation: confluence-pulse linear both;
+    animation-timeline: --confluence;
+    animation-range: cover 35% cover 70%;
+  }
+  .confluence-marker::after {
+    animation: confluence-glow linear both;
+    animation-timeline: --confluence;
+    animation-range: cover 35% cover 75%;
+  }
+  @keyframes confluence-pulse {
+    0%   { transform: translate(-50%, 0) rotate(45deg) scale(1); }
+    40%  { transform: translate(-50%, 0) rotate(45deg) scale(1.6); }
+    60%  { transform: translate(-50%, 0) rotate(45deg) scale(1.6); }
+    100% { transform: translate(-50%, 0) rotate(45deg) scale(1); }
+  }
+  @keyframes confluence-glow {
+    0%   { opacity: 0; transform: rotate(-45deg) scale(0.6); }
+    35%  { opacity: 1; transform: rotate(-45deg) scale(1.1); }
+    65%  { opacity: 1; transform: rotate(-45deg) scale(1.3); }
+    100% { opacity: 0; transform: rotate(-45deg) scale(1.6); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confluence-marker { animation: none; }
+  .confluence-marker::after { animation: none; opacity: 0; }
+}
+
 /* 墨印 — 方形紅章 */
 .jp-seal {
+  /*
+    Round 17：朱印改為「手刻篆書」感
+    - clip-path 多點 polygon：corner 不對齊、邊微凹凸 → 像石章被刻過、邊角磨損
+    - background: 兩階朱色 radial gradient → ink wash 不均勻感（中濃外淡）
+    - inset shadow 雙層：外層深朱色 + 內層淡黃，模擬印章周邊朱泥較淺、中心較深
+    - 旋轉仍 -3deg，全站視覺一致；尺寸不變
+  */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -397,14 +599,96 @@
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1;
-  background: theme('colors.accent.50 / 70%');
+  background:
+    radial-gradient(circle at 35% 30%, theme('colors.accent.100 / 60%') 0%, transparent 55%),
+    theme('colors.accent.50 / 75%');
   transform: rotate(-3deg);
-  box-shadow: inset 0 0 0 2px theme('colors.accent.50 / 60%');
+  /* 雙層 inset：外圈淡淺色 + 內圈微深 */
+  box-shadow:
+    inset 0 0 0 2px theme('colors.accent.50 / 55%'),
+    inset 0 0 6px theme('colors.accent.700 / 18%');
+  /*
+    手刻邊：variant A（預設）
+    Round 18：用 css var `--seal-cut` 讓不同 seal 套不同 clip-path（每方石章獨刻）
+    fallback：var() 失敗回到 variant A polygon
+  */
+  clip-path: var(
+    --seal-cut,
+    polygon(
+      3% 0%, 18% 1%, 36% 0%, 52% 1.5%, 68% 0%, 84% 1%, 97% 0.5%,
+      100% 14%, 99% 30%, 100% 48%, 98.5% 64%, 100% 80%, 99% 96%,
+      85% 100%, 68% 99%, 50% 100%, 32% 98.5%, 16% 100%, 4% 99%,
+      0% 84%, 1.5% 68%, 0% 52%, 1% 36%, 0% 18%, 2% 4%
+    )
+  );
   user-select: none;
 }
+
+/*
+  Round 18：每方石章獨刻 — 3 種 variant + rotation 微調
+  variant B：右上角缺、左下角圓潤；rotate -2deg；ink wash 偏右上
+  variant C：左上角破口、右下角磨損；rotate -4deg；ink wash 偏右下
+  使用：在 jp-seal element 加 `jp-seal--b` 或 `jp-seal--c` modifier class
+*/
+.jp-seal--b {
+  --seal-cut: polygon(
+    4% 1%, 22% 0%, 40% 1.5%, 58% 0%, 76% 2%, 90% 0.5%, 99% 4%,
+    100% 22%, 99% 38%, 100% 56%, 99% 72%, 100% 88%, 96% 100%,
+    78% 99%, 60% 100%, 42% 98%, 24% 100%, 6% 99%, 1% 92%,
+    2% 76%, 0% 60%, 1.5% 44%, 0% 28%, 1% 12%
+  );
+  transform: rotate(-2deg);
+  background:
+    radial-gradient(circle at 70% 30%, theme('colors.accent.100 / 60%') 0%, transparent 55%),
+    theme('colors.accent.50 / 75%');
+}
+.jp-seal--c {
+  --seal-cut: polygon(
+    1% 4%, 14% 0%, 30% 2%, 48% 0%, 64% 1.5%, 82% 0%, 96% 2%,
+    100% 18%, 98% 34%, 100% 50%, 99% 66%, 100% 82%, 98% 96%,
+    82% 100%, 64% 98.5%, 48% 100%, 30% 99%, 14% 100%, 2% 96%,
+    0% 78%, 2% 62%, 0% 46%, 1% 30%, 0% 14%
+  );
+  transform: rotate(-4deg);
+  background:
+    radial-gradient(circle at 30% 70%, theme('colors.accent.100 / 60%') 0%, transparent 55%),
+    theme('colors.accent.50 / 75%');
+}
+.dark .jp-seal--b {
+  background:
+    radial-gradient(circle at 70% 30%, theme('colors.accent.700 / 25%') 0%, transparent 55%),
+    theme('colors.accent.900 / 30%');
+}
+.dark .jp-seal--c {
+  background:
+    radial-gradient(circle at 30% 70%, theme('colors.accent.700 / 25%') 0%, transparent 55%),
+    theme('colors.accent.900 / 30%');
+}
+
+/*
+  Round 19：印章字身 ink-bleed — 套 SVG filter（在 app.vue defs 內）
+  作法：用 ::before/::after 行不通（filter 需作用在 text node），
+  改用內層 span class `.jp-seal-ink` 包字身，class 加 filter:url(#seal-ink)
+  fallback：SVG filter 未支援時自動忽略，字身仍是楷體
+  reduce-motion / 低性能裝置：fallback 同上
+*/
+.jp-seal-ink {
+  display: inline-block;
+  filter: url(#seal-ink);
+  /* 補背景濃淡（filter 會讓字邊有微小空洞，補一層 text-shadow 讓墨色更實） */
+  text-shadow: 0 0 0.4px currentColor;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jp-seal-ink { filter: none; }
+}
+
 .dark .jp-seal {
-  background: theme('colors.accent.900 / 30%');
-  box-shadow: inset 0 0 0 2px theme('colors.accent.950 / 40%');
+  background:
+    radial-gradient(circle at 35% 30%, theme('colors.accent.700 / 25%') 0%, transparent 55%),
+    theme('colors.accent.900 / 30%');
+  box-shadow:
+    inset 0 0 0 2px theme('colors.accent.950 / 38%'),
+    inset 0 0 6px theme('colors.accent.300 / 12%');
 }
 
 /* 縦書き大字（裝飾用） */

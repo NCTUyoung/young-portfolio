@@ -32,7 +32,7 @@ describe('galleryUtils', () => {
     const a = mockItem({ filename: 'old.jpg', time: '2020 Jan 01' })
     const b = mockItem({ filename: 'new.jpg', time: '2025 Jan 01' })
     const sorted = sortImagesByTime([a, b])
-    expect(sorted[0].filename).toBe('new.jpg')
+    expect(sorted[0]!.filename).toBe('new.jpg')
   })
 
   it('filterVisibleImages drops visible: false', () => {

@@ -4,7 +4,7 @@
     class="group pointer-events-auto w-full border-b border-stone-200/70 bg-stone-50/85 px-4 py-2.5 text-left backdrop-blur-sm transition-colors hover:bg-stone-50/95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-400/70 dark:border-stone-700/60 dark:bg-stone-900/82 dark:hover:bg-stone-900/92 dark:focus-visible:ring-accent-500/70 sm:px-6"
     data-testid="gallery-filter-mini-toggle"
     :aria-controls="controlsId"
-    :aria-expanded="String(expanded)"
+    :aria-expanded="expanded"
     :aria-label="ariaLabel"
     @click="$emit('expand')"
   >

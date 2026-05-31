@@ -21,9 +21,9 @@ describe('computeJustifiedRows', () => {
   it('returns one row when three equal squares fit at ideal height', () => {
     const rows = computeJustifiedRows([img('a'), img('b'), img('c')], ratio1, 300, 0, 100)
     expect(rows).toHaveLength(1)
-    expect(rows[0].items).toHaveLength(3)
-    expect(rows[0].height).toBe(100)
-    expect(rows[0].widths.every(w => w === 100)).toBe(true)
+    expect(rows[0]!.items).toHaveLength(3)
+    expect(rows[0]!.height).toBe(100)
+    expect(rows[0]!.widths.every(w => w === 100)).toBe(true)
   })
 
   it('splits when row would exceed container at ideal height', () => {
@@ -34,8 +34,8 @@ describe('computeJustifiedRows', () => {
   it('uses DEFAULT_ASPECT_RATIO when all ratios are 1.5 in helper', () => {
     // idealRowHeight low enough that two images stay in one row at container 600
     const rows = computeJustifiedRows([img('a'), img('b')], () => DEFAULT_ASPECT_RATIO, 600, 12, 195)
-    expect(rows[0].items).toHaveLength(2)
-    const sumW = rows[0].widths.reduce((a, b) => a + b, 0) + 12
+    expect(rows[0]!.items).toHaveLength(2)
+    const sumW = rows[0]!.widths.reduce((a, b) => a + b, 0) + 12
     expect(sumW).toBeCloseTo(600, 5)
   })
 })

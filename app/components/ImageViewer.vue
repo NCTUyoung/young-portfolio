@@ -14,9 +14,10 @@
 
     <!-- 主要內容 -->
     <div class="relative w-full h-full flex">
-      <!-- 圖片檢視區域 -->
+      <!-- 圖片檢視區域 — info spread takeover 開啟時整塊隱去（spread 自己接管畫面） -->
       <div
 class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 transition-all duration-300"
+           :class="{ 'image-viewer-area--hidden': showInfoPanel }"
            :style="{
              marginRight: panelLayoutOffsetPx
            }"
@@ -200,6 +201,107 @@ v-if="viewerImages.length > 1 && hasNext"
 
         <!-- 導覽器 -->
         <ImageNavigator />
+
+        <!--
+          R50：對軌 PAIRED overlay — 當前 image 有 pairWith 時右下浮 thumb
+          首秒可見而非藏在 spread 第二屏（critic R49 ⚠）
+        -->
+        <NuxtLink
+          v-if="pairedImageInViewer"
+          :to="`/gallery/${pairedImageInViewer.category}?image=${encodeURIComponent(pairedImageInViewer.id)}`"
+          class="viewer-paired-overlay group"
+          :aria-label="`跳轉至對軌作品 ${pairedImageInViewer.title}`"
+        >
+          <span class="viewer-paired-overlay__label">
+            <span class="viewer-paired-overlay__kana font-jp">対</span>
+            <span class="viewer-paired-overlay__en">PAIRED</span>
+          </span>
+          <div class="viewer-paired-overlay__thumb">
+            <img
+              :src="getThumbPath(pairedImageInViewer.filename, 400)"
+              :alt="`對軌 — ${pairedImageInViewer.title}`"
+              decoding="async"
+              loading="lazy"
+            >
+          </div>
+          <span class="viewer-paired-overlay__cta">
+            {{ pairedImageInViewer.category === 'digital' ? '繪' : '影' }}
+            <span aria-hidden="true">→</span>
+          </span>
+        </NuxtLink>
+
+        <!--
+          ▌軌道縦書（編輯感）— 左側 vertical caption strip
+          首訪可見的 cinematic editorial layer：
+          - 縦書 category kanji（繪／影）與全站雙主線 motif 對位
+          - 序號 + total 走 jp-kansuji 大字
+          - 與右邊 InfoPanel 的「資訊」是兩種對讀層次（rail = 詩意 / panel = 數據）
+        -->
+        <aside
+          v-if="currentViewerImage"
+          class="viewer-track-rail pointer-events-none"
+          :class="trackRailVariantClass"
+          aria-hidden="true"
+        >
+          <span class="viewer-track-rail__kana">{{ trackRailKana }}</span>
+          <span class="viewer-track-rail__hairline"/>
+          <span class="viewer-track-rail__index jp-kansuji tabular-nums">
+            {{ formatIndex(currentImageIndex + 1) }}
+          </span>
+          <span class="viewer-track-rail__divider">／</span>
+          <span class="viewer-track-rail__total jp-kansuji tabular-nums">
+            {{ formatIndex(viewerImages.length) }}
+          </span>
+        </aside>
+
+        <!--
+          ▌底部 hairline progress 軌：圖庫位置的視覺化
+          一條 1px 漸層線（左淡 → 中亮 → 右淡），上方游標標示 currentIndex
+          首訪 3 秒可見，與全站 hairline motif 對位
+        -->
+        <div
+          v-if="viewerImages.length > 1"
+          class="viewer-progress-rail pointer-events-none"
+          :style="progressRailInsetStyle"
+          aria-hidden="true"
+        >
+          <span class="viewer-progress-rail__line"/>
+          <span
+            class="viewer-progress-rail__cursor"
+            :style="{ left: `${progressPercent}%` }"
+          />
+        </div>
+
+        <!--
+          ▌底部 keyboard shortcut footer（編輯感）
+          ESC · ← → · 0 · I — 列出主要快捷鍵，jp-eyebrow tracking
+        -->
+        <div
+          class="viewer-shortcut-footer pointer-events-none"
+          :style="progressRailInsetStyle"
+          aria-hidden="true"
+        >
+          <span class="viewer-shortcut-footer__group">
+            <kbd class="viewer-kbd">ESC</kbd>
+            <span>退出</span>
+          </span>
+          <span class="viewer-shortcut-footer__divider"/>
+          <span class="viewer-shortcut-footer__group">
+            <kbd class="viewer-kbd">←</kbd>
+            <kbd class="viewer-kbd">→</kbd>
+            <span>翻頁</span>
+          </span>
+          <span class="viewer-shortcut-footer__divider"/>
+          <span class="viewer-shortcut-footer__group">
+            <kbd class="viewer-kbd">I</kbd>
+            <span>資訊</span>
+          </span>
+          <span class="viewer-shortcut-footer__divider"/>
+          <span class="viewer-shortcut-footer__group">
+            <kbd class="viewer-kbd">0</kbd>
+            <span>重置</span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -213,6 +315,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComp
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
+import { useGalleryStore } from '~/stores/gallery'
 
 // 非關鍵子元件採 lazy 載入：使用者打開 lightbox 當下不一定會開資訊面板／縮圖盤，
 // 拆出去可以省首屏 JS 體積，首次點開圖片時再按需載入。
@@ -256,11 +359,11 @@ const {
 
 const isDesktopViewerLayout = useMediaQuery('(min-width: 768px)')
 
-/** 僅桌面側欄模式時為主圖區讓出寬度；手機改為全螢幕覆蓋面板，避免主圖被壓扁 */
-const panelLayoutOffsetPx = computed(() => {
-  if (!showInfoPanel.value || !isDesktopViewerLayout.value) return '0px'
-  return `${infoPanelWidth.value}px`
-})
+/**
+ * spread takeover 模式：InfoPanel 是 fixed inset-0 全屏，所以主圖不再需要 marginRight。
+ * 保留變數為 0 以維持其他樣式 binding（hit zones / toolbar inset）一致。
+ */
+const panelLayoutOffsetPx = computed(() => '0px')
 
 const toolbarInsetStyle = computed(() => {
   const pad = 16
@@ -281,6 +384,51 @@ const nextNavButtonStyle = computed(() => {
 const hitZoneRightStyle = computed(() => ({
   right: panelLayoutOffsetPx.value
 }))
+
+/** 軌道縦書 rail：依 current image category 切換 (繪 / 影 / 集)，與全站雙主線 motif 對位 */
+const trackRailKana = computed(() => {
+  const cat = (currentViewerImage.value as { category?: string } | null)?.category
+  if (cat === 'photography') return '影'
+  if (cat === 'digital') return '繪'
+  return '集'
+})
+
+const trackRailVariantClass = computed(() => {
+  const cat = (currentViewerImage.value as { category?: string } | null)?.category
+  if (cat === 'photography') return 'viewer-track-rail--kage'
+  if (cat === 'digital') return 'viewer-track-rail--kai'
+  return 'viewer-track-rail--mix'
+})
+
+/** Progress rail 百分比（依 currentImageIndex / (length - 1)） */
+const progressPercent = computed(() => {
+  const total = viewerImages.value.length
+  if (total <= 1) return 0
+  return (currentImageIndex.value / (total - 1)) * 100
+})
+
+/** Progress rail / shortcut footer 右側 inset 與 InfoPanel 連動 */
+const progressRailInsetStyle = computed(() => ({
+  right: panelLayoutOffsetPx.value
+}))
+
+/** R50：對軌 PAIRED — 從 store 找配對作品給 viewer overlay 用 */
+const galleryStoreViewer = useGalleryStore()
+const pairedImageInViewer = computed(() => {
+  const pairId = (currentViewerImage.value as { pairWith?: string } | null)?.pairWith
+  if (!pairId) return null
+  const all = [...galleryStoreViewer.digitalWorks, ...galleryStoreViewer.photographyWorks]
+  return all.find((w) => w.id === pairId) || null
+})
+
+/**
+ * 格式化序號為兩位數零墊（編輯感）— 1 → 01、12 → 12
+ * 不對 ≥100 做特別處理（保持自然）
+ */
+const formatIndex = (n: number) => {
+  if (n < 10) return `0${n}`
+  return `${n}`
+}
 
 const imageElement = ref<HTMLImageElement>()
 const lightboxRoot = ref<HTMLElement>()
@@ -337,6 +485,7 @@ const handleTabKey = (event: KeyboardEvent) => {
   }
   const first = items[0]
   const last = items[items.length - 1]
+  if (!first || !last) return
   const active = document.activeElement as HTMLElement | null
 
   if (event.shiftKey) {
@@ -418,6 +567,7 @@ const handleTouchStart = (event: TouchEvent) => {
 
   isDragging.value = true
   const touch = event.touches[0]
+  if (!touch) return
   const startX = touch.clientX - viewerTranslateX.value / dragSensitivity.value
   const startY = touch.clientY - viewerTranslateY.value / dragSensitivity.value
 
@@ -429,15 +579,16 @@ const handleTouchStart = (event: TouchEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const touch = e.touches[0]
+    const moveTouch = e.touches[0]
+    if (!moveTouch) return
 
     if (animationId) {
       cancelAnimationFrame(animationId)
     }
 
     animationId = requestAnimationFrame(() => {
-      viewerTranslateX.value = (touch.clientX - startX) * dragSensitivity.value
-      viewerTranslateY.value = (touch.clientY - startY) * dragSensitivity.value
+      viewerTranslateX.value = (moveTouch.clientX - startX) * dragSensitivity.value
+      viewerTranslateY.value = (moveTouch.clientY - startY) * dragSensitivity.value
     })
   }
 
@@ -735,5 +886,289 @@ img {
 .selection-border-animated {
   stroke-dasharray: 5, 5;
   animation: dash 0.5s linear infinite;
+}
+
+/* 對頁 takeover 開啟時主圖區整塊隱去（InfoPanel 自己渲染左頁影像） */
+.image-viewer-area--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===== R50：對軌 PAIRED overlay（viewer 右下角，首秒可見） ===== */
+.viewer-paired-overlay {
+  position: absolute;
+  right: 5rem;
+  bottom: 4.4rem;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.85rem 0.5rem 0.55rem;
+  background: rgb(12 10 9 / 0.7);
+  border: 1px solid rgb(231 184 125 / 0.45);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.4s ease;
+}
+.viewer-paired-overlay:hover {
+  background: rgb(12 10 9 / 0.88);
+  border-color: rgb(231 184 125 / 0.85);
+  transform: translateY(-2px);
+}
+.viewer-paired-overlay__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding-right: 0.4rem;
+  border-right: 1px solid rgb(214 211 209 / 0.25);
+}
+.viewer-paired-overlay__kana {
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  color: rgb(231 184 125 / 0.95);
+  font-weight: 300;
+  line-height: 1;
+}
+.viewer-paired-overlay__en {
+  font-size: 0.5rem;
+  letter-spacing: 0.32em;
+  color: rgb(214 211 209 / 0.8);
+  text-transform: uppercase;
+}
+.viewer-paired-overlay__thumb {
+  width: 56px;
+  height: 38px;
+  overflow: hidden;
+  background: rgb(28 25 23);
+  border: 1px solid rgb(214 211 209 / 0.18);
+  flex-shrink: 0;
+}
+.viewer-paired-overlay__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.viewer-paired-overlay:hover .viewer-paired-overlay__thumb img {
+  transform: scale(1.08);
+}
+.viewer-paired-overlay__cta {
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  color: rgb(231 184 125 / 0.92);
+  text-transform: uppercase;
+  font-family: 'Noto Serif JP', serif;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+@media (max-width: 640px) {
+  .viewer-paired-overlay {
+    right: 0.6rem;
+    bottom: 3.4rem;
+    padding: 0.4rem 0.6rem 0.4rem 0.45rem;
+    gap: 0.5rem;
+  }
+  .viewer-paired-overlay__thumb {
+    width: 44px;
+    height: 30px;
+  }
+}
+
+/* ===== 軌道縦書 rail（編輯感 cinematic layer） ===== */
+.viewer-track-rail {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  color: rgb(231 229 228 / 0.85);
+  text-shadow: 0 0 8px rgb(0 0 0 / 0.55);
+  user-select: none;
+}
+.viewer-track-rail__kana {
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  color: rgb(250 250 249 / 0.92);
+}
+.viewer-track-rail--kai .viewer-track-rail__kana {
+  color: rgb(231 184 125 / 0.82); /* accent-300 hint for digital track */
+}
+.viewer-track-rail--kage .viewer-track-rail__kana {
+  color: rgb(214 211 209 / 0.95); /* cooler stone for photography track */
+}
+.viewer-track-rail__hairline {
+  display: block;
+  width: 1px;
+  height: 56px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(231 229 228 / 0.4) 50%,
+    transparent 100%
+  );
+}
+.viewer-track-rail__index,
+.viewer-track-rail__total,
+.viewer-track-rail__divider {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  font-weight: 300;
+  color: rgb(214 211 209 / 0.78);
+  line-height: 1.4;
+}
+.viewer-track-rail__index {
+  color: rgb(250 250 249 / 0.95);
+  font-size: 0.85rem;
+}
+.viewer-track-rail__divider {
+  color: rgb(168 162 158 / 0.5);
+}
+
+@media (max-width: 640px) {
+  .viewer-track-rail {
+    left: 0.6rem;
+    gap: 0.6rem;
+  }
+  .viewer-track-rail__kana {
+    font-size: 2rem;
+  }
+  .viewer-track-rail__hairline {
+    height: 40px;
+  }
+}
+
+/* ===== 底部 hairline progress rail ===== */
+.viewer-progress-rail {
+  position: absolute;
+  bottom: 3.1rem;
+  left: 5rem;
+  height: 1px;
+  z-index: 6;
+}
+.viewer-progress-rail__line {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgb(231 229 228 / 0.18) 12%,
+    rgb(231 229 228 / 0.45) 50%,
+    rgb(231 229 228 / 0.18) 88%,
+    transparent 100%
+  );
+}
+.viewer-progress-rail__cursor {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  background: rgb(231 184 125 / 0.85); /* accent ink dot */
+  box-shadow:
+    0 0 0 1px rgb(28 25 23 / 0.65),
+    0 0 12px rgb(231 184 125 / 0.45);
+  transition: left 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.viewer-progress-rail__cursor::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  background: rgb(250 250 249 / 0.92);
+}
+
+@media (max-width: 640px) {
+  .viewer-progress-rail {
+    bottom: 2.4rem;
+    left: 2.6rem;
+  }
+  .viewer-progress-rail__cursor {
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+  }
+}
+
+/* ===== 底部 keyboard shortcut footer ===== */
+.viewer-shortcut-footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 5rem;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.32em;
+  color: rgb(214 211 209 / 0.62);
+  text-transform: uppercase;
+  font-weight: 300;
+  text-shadow: 0 0 6px rgb(0 0 0 / 0.55);
+  user-select: none;
+}
+.viewer-shortcut-footer__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.viewer-shortcut-footer__divider {
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: rgb(214 211 209 / 0.28);
+}
+.viewer-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 0.62rem;
+  color: rgb(250 250 249 / 0.9);
+  background: rgb(28 25 23 / 0.55);
+  border: 1px solid rgb(231 229 228 / 0.18);
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 640px) {
+  .viewer-shortcut-footer {
+    left: 2.6rem;
+    gap: 0.5rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+  }
+  .viewer-shortcut-footer__group span {
+    display: none; /* keep only the kbd glyphs visible on mobile */
+  }
+  .viewer-shortcut-footer__divider {
+    width: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer-progress-rail__cursor {
+    transition: none;
+  }
 }
 </style>

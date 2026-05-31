@@ -1,6 +1,276 @@
 {
   "totalNumber": "80",
   "category": "photography",
+  "seriesNarratives": {
+    "春日街拍": {
+      "prologue": "春日的台北街頭，旗袍與紅燈籠是不期而遇的小說封面。光圈開到 2.8，背景的招牌軟成水彩，讓人從都市裡剝離出來。給「都市孤獨美」的一封信。",
+      "annotation": "請看那把紅扇——它把整張照片的重心鎖在右下，旗袍的青藍跟燈籠的硃紅各自呼吸，沒有搶。",
+      "mood": "soft · urban · solitude",
+      "palette": [
+        "#c84040",
+        "#e8d4b9",
+        "#3a2a1f"
+      ],
+      "strongest_line": "旗袍與紅燈籠的城市偶遇",
+      "tools": [
+        "Nikon Z f",
+        "70-180 f/2.8"
+      ],
+      "techniques": [
+        "淺景深",
+        "逆光"
+      ],
+      "topics": [
+        "街頭",
+        "人物"
+      ]
+    },
+    "2024新北耶誕城": {
+      "prologue": "光太多的夜，反而能看見人。耶誕城是被霓虹包裹的劇場，鏡頭從遠處推近，捕捉幾束從巨大圖案漏出來的暖光，落在某張看向天空的側臉。",
+      "annotation": "霓虹有兩層：遠處的霜紅是燈飾光暈，近處的暖橘是反射在皮夾克上的二手光。前景跟後景各借了一道光。",
+      "mood": "festive · luminous · still",
+      "palette": [
+        "#d97b2e",
+        "#1c1814",
+        "#f4c8a2"
+      ],
+      "strongest_line": "光太多的夜也能看見人",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "夜景",
+        "霓虹色"
+      ],
+      "topics": [
+        "節慶",
+        "城市"
+      ]
+    },
+    "2025 桃猿三本柱": {
+      "prologue": "球場是 1/2000 秒的劇場。三本柱站姿穩、手套乾淨、球從未進框，但快門落下的瞬間，等待本身就是構圖。",
+      "annotation": "重點不在揮棒——看那隻沒戴手套的左手食指，輕輕指了方向，下一秒球才會被送出去。",
+      "mood": "tense · waiting · clean",
+      "palette": [
+        "#1f3d2e",
+        "#d4a857",
+        "#f2efe8"
+      ],
+      "strongest_line": "快門落下那刻，等待即構圖",
+      "tools": [
+        "Nikon Z f",
+        "70-180mm"
+      ],
+      "techniques": [
+        "1/2000s",
+        "高速快門"
+      ],
+      "topics": [
+        "棒球",
+        "球員"
+      ]
+    },
+    "攝影社 米倉團拍": {
+      "prologue": "米倉的木牆吃光特別溫和。團拍時人多手雜，反而是空檔最有戲——側臉、整理頭髮的瞬間、笑到一半的轉身。",
+      "annotation": "木紋已經吃掉一半冷色，剩下的暖光全留在皮膚上。背景人群的虛化深到剛好——看得到動作，認不出是誰。",
+      "mood": "warm · candid · wooden",
+      "palette": [
+        "#a78858",
+        "#3d2e22",
+        "#ead8b9"
+      ],
+      "strongest_line": "木牆吃光、空檔最戲",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "團拍",
+        "空檔捕捉"
+      ],
+      "topics": [
+        "人物",
+        "木牆"
+      ]
+    },
+    "調色測試": {
+      "prologue": "同一格畫面拉了七種曲線。練的是看光的方式，而不是套濾鏡。",
+      "annotation": "看天空的灰階——同一片雲被七張曲線拉成七種藍。這捲是練習簿，不是作品集。",
+      "mood": "study · curve · grade",
+      "palette": [
+        "#8a8a8a",
+        "#444",
+        "#d6d3d1"
+      ],
+      "strongest_line": "練看光，不是套濾鏡",
+      "tools": [
+        "DxO",
+        "Lightroom"
+      ],
+      "techniques": [
+        "曲線",
+        "色階"
+      ],
+      "topics": [
+        "練習",
+        "校色"
+      ]
+    },
+    "交大外拍": {
+      "prologue": "交大的紅樓在午後三點有最長的影子。外拍是場合，但好照片總在場合之外——裝備整理時、換場路上、有人轉頭問你「現在順光對嗎」。",
+      "annotation": "紅磚上的影子已經偏離正午 15 度。她剛轉身——身後光斑是「我們等了快一小時」的證據。",
+      "mood": "campus · in-between · brick",
+      "palette": [
+        "#b3493c",
+        "#3a2f25",
+        "#e8e1d4"
+      ],
+      "strongest_line": "紅樓三點影最長",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "長影",
+        "紅磚"
+      ],
+      "topics": [
+        "校園",
+        "人物"
+      ]
+    },
+    "2025 聖誕台北": {
+      "prologue": "跨年前的台北，每條街都掛了同一種金色，但路面回光不同。從信義走到松菸，攝影是場為了不錯過光線變化的散步。",
+      "annotation": "金色的反光在地面停留了大約 40 公分——那是行道樹的枝椏剛好遮住路燈的距離。光被切過。",
+      "mood": "walking · golden · drift",
+      "palette": [
+        "#c79d5b",
+        "#1a1814",
+        "#e4d3a4"
+      ],
+      "strongest_line": "一條街掛同色金光",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "金光",
+        "夜景"
+      ],
+      "topics": [
+        "城市",
+        "燈飾"
+      ]
+    },
+    "峨嵋湖風鈴木": {
+      "prologue": "黃色的花季短到只有十天。攝影者在這時候特別現實——不是等構圖，是等雲。",
+      "annotation": "黃花的飽和被天氣稀釋過——多雲、低光、無風。整張照片像一張剛洗好的舊明信片。",
+      "mood": "yellow · ephemeral · weather",
+      "palette": [
+        "#d9b94a",
+        "#3a4d3a",
+        "#f3eab8"
+      ],
+      "strongest_line": "花季只有十天，攝影者等雲",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "等雲",
+        "低光"
+      ],
+      "topics": [
+        "花季",
+        "黃花"
+      ]
+    },
+    "WBC 2026": {
+      "prologue": "WBC 第三屆。場邊的相機長到像砲管，業餘的我只用 119mm，反而看見另一些——選手繃緊的小腿、教練手指的方向、第八局的板凳席。",
+      "annotation": "右下角邊角那條紅色頭巾——那是場邊唯一沒在看球的人，他正在綁鞋帶。",
+      "mood": "amateur · 119mm · bench",
+      "palette": [
+        "#2c5f8d",
+        "#d9c98a",
+        "#f8f5ee"
+      ],
+      "strongest_line": "業餘 119mm，看小腿和板凳",
+      "tools": [
+        "Nikon Z f",
+        "119mm"
+      ],
+      "techniques": [
+        "場邊",
+        "裁切構圖"
+      ],
+      "topics": [
+        "棒球",
+        "板凳"
+      ]
+    },
+    "WBC東京 台澳": {
+      "prologue": "東京巨蛋的光是均勻的人造光，沒有風、沒有雲。但這種沒有變數的環境，逼著鏡頭把焦點還給人。",
+      "annotation": "巨蛋光太均勻，沒有方向。鏡頭撿到的是表情輪廓，而不是 cinematic lighting。等於只剩構圖。",
+      "mood": "dome · evenlight · focus-on-people",
+      "palette": [
+        "#a8a290",
+        "#3a3a3a",
+        "#e3dfd6"
+      ],
+      "strongest_line": "無風的人造光，焦點還給人",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "人造光",
+        "均勻光"
+      ],
+      "topics": [
+        "東京巨蛋",
+        "比賽"
+      ]
+    },
+    "Annber 外拍": {
+      "prologue": "人像外拍最難的不是光，是讓對方放鬆。和 Annber 在這條街走了三遍，到第三遍才有「沒在拍」的笑。",
+      "annotation": "頭髮的反光不是順光——她剛笑出來的時候頭微微一甩，光跟著她移了 30 度。",
+      "mood": "portrait · relax · third-take",
+      "palette": [
+        "#b08866",
+        "#3a2f28",
+        "#f1e6d6"
+      ],
+      "strongest_line": "走了三遍才有沒在拍的笑",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "第三遍",
+        "放鬆瞬間"
+      ],
+      "topics": [
+        "人像",
+        "校園"
+      ]
+    },
+    "栗子外拍": {
+      "prologue": "栗子家的窗灑進來的光是淺琥珀色。整組照片我們只動了兩次位置——這也是一種敘事克制。",
+      "annotation": "她沒看鏡頭，但眼角接住了從窗外滲進來的反差光。整張照片在說「窗邊的安靜時刻」。",
+      "mood": "amber · window · restraint",
+      "palette": [
+        "#c4a05c",
+        "#3a2e22",
+        "#ede1c8"
+      ],
+      "strongest_line": "只動兩次位置的克制",
+      "tools": [
+        "Nikon Z f"
+      ],
+      "techniques": [
+        "窗光",
+        "克制走位"
+      ],
+      "topics": [
+        "人像",
+        "室內"
+      ]
+    }
+  },
   "Img": [
     {
       "filename": "photography/春日街拍/DSC_7030-1.jpg",
@@ -23,7 +293,9 @@
       "focalLength": 119,
       "aperture": 2.8,
       "iso": 100,
-      "shutterSpeed": 0.002
+      "shutterSpeed": 0.002,
+      "note": "紅扇的角度幾乎跟旗袍領子平行——這不是擺出來的，是她剛要展開扇子的前一格。",
+      "pairWith": "digital-gallery/2025年電繪作品/17"
     },
     {
       "filename": "photography/春日街拍/DSC_7033-1.jpg",
@@ -144,7 +416,8 @@
       "shutterSpeed": 0.0025,
       "series": [
         "featured"
-      ]
+      ],
+      "note": "看燈飾後面的天空——還沒完全暗，是 18:15 左右的「藍調時刻」，最後一抹深藍墊底。"
     },
     {
       "filename": "photography/2024新北耶誕城/DSC_4379-NEF_DxO_DeepPRIMEXD-1.jpg",
@@ -229,7 +502,8 @@
       "focalLength": 300,
       "aperture": 6.3,
       "iso": 2500,
-      "shutterSpeed": 0.004
+      "shutterSpeed": 0.004,
+      "note": "球員的左手已經舉到肩線——這是揮棒準備的最後一格。下一張快門落下，球可能已經出去。"
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6487-1.jpg",
@@ -340,7 +614,8 @@
       "shutterSpeed": 0.016666666666666666,
       "series": [
         "featured"
-      ]
+      ],
+      "note": "木紋背景把人從現代街景剝出來。她回頭那一下，把肩頸的線條交給左上的窗光描了一遍。"
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_5758-編輯-1.jpg",
@@ -429,7 +704,8 @@
       "focalLength": 40,
       "aperture": 2.8,
       "iso": 100,
-      "shutterSpeed": 0.00025
+      "shutterSpeed": 0.00025,
+      "note": "這張是「練習簿」裡的第三種曲線——綠色被往上拉了 10%，畫面就從「下午」變成「初春」。"
     },
     {
       "filename": "photography/調色測試/DSC_3474-編輯-1.jpg",
@@ -495,7 +771,8 @@
       "focalLength": 110,
       "aperture": 2.8,
       "iso": 100,
-      "shutterSpeed": 0.004
+      "shutterSpeed": 0.004,
+      "note": "紅磚的反光顏色，跟她裙子的橘紅是巧合也是收成——這條街我們走了四遍才找到對的光。"
     },
     {
       "filename": "photography/交大外拍/DSC_3218-1.jpg",
@@ -604,7 +881,8 @@
       "focalLength": 16,
       "aperture": 3.5,
       "iso": 200,
-      "shutterSpeed": 0.002
+      "shutterSpeed": 0.002,
+      "note": "路面金光只在這幾步寬有，再走兩步就被建築陰影吃掉了。攝影是場跟光速賽跑的散步。"
     },
     {
       "filename": "photography/2025 聖誕台北/DSC_6418-編輯-編輯-1.jpg",
@@ -695,7 +973,9 @@
       "focalLength": 72,
       "aperture": 5.6,
       "iso": 100,
-      "shutterSpeed": 0.002
+      "shutterSpeed": 0.002,
+      "note": "黃花本身飽和度不到 60%，但天空陰沉成 wabi 灰，反而把它的暖色推到前面。",
+      "pairWith": "digital-gallery/2018年電繪作品/The_Great_Wave_off_Kanagawa"
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1377-編輯-1.jpg",
@@ -996,7 +1276,9 @@
       "focalLength": 300,
       "aperture": 6.3,
       "iso": 400,
-      "shutterSpeed": 0.016666666666666666
+      "shutterSpeed": 0.016666666666666666,
+      "note": "畫面右下角有 1/12 被切到——那是教練的手肘。整張在說「鏡頭沒對到比賽，但對到準備」。",
+      "pairWith": "digital-gallery/2023年電繪作品/22"
     },
     {
       "filename": "photography/WBC 2026/DSC_9996-編輯-1.jpg",
@@ -1262,7 +1544,8 @@
       "focalLength": 74,
       "aperture": 5,
       "iso": 200,
-      "shutterSpeed": 0.001
+      "shutterSpeed": 0.001,
+      "note": "第一鳥居的木紋已經被風雨啃過——這是 13 世紀以來的同一根柱子，攝影的本質是「目擊」。"
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9864-編輯-1.jpg",
@@ -1467,7 +1750,9 @@
       "shutterSpeed": 0.001,
       "series": [
         "featured"
-      ]
+      ],
+      "note": "她笑出來的那一刻肩膀微微鬆下，光線剛好接住下垂的耳邊髮——這是「沒在拍」的第二秒。",
+      "pairWith": "digital-gallery/2024年電繪作品/23"
     },
     {
       "filename": "photography/Annber 外拍/DSC_2216-編輯-1.jpg",
@@ -1491,7 +1776,8 @@
       "focalLength": 47,
       "aperture": 4,
       "iso": 100,
-      "shutterSpeed": 0.016666666666666666
+      "shutterSpeed": 0.016666666666666666,
+      "note": "紫藤是借景。前景手的伸出方向跟藤蔓的下垂方向交織成 X 型，重心剛好落在她抬頭的下巴。"
     },
     {
       "filename": "photography/Annber 外拍/DSC_2187-編輯-1.jpg",
@@ -1698,7 +1984,8 @@
       "focalLength": 73,
       "aperture": 3.2,
       "iso": 1250,
-      "shutterSpeed": 0.008
+      "shutterSpeed": 0.008,
+      "note": "泡沫散開的軌跡在她唇邊停留了 1/250 秒。再快快門會凍住、再慢會糊掉——這是 1/250 的特權。"
     },
     {
       "filename": "photography/栗子外拍/DSC_5910-編輯-1.jpg",
@@ -1723,7 +2010,9 @@
       "focalLength": 35,
       "aperture": 3.2,
       "iso": 400,
-      "shutterSpeed": 0.008
+      "shutterSpeed": 0.008,
+      "note": "暗紅織紋只佔畫面 1/4，但顏色重量已經夠把整張平衡。剩下 3/4 留給她側躺的鬆弛。",
+      "pairWith": "digital-gallery/2026年電繪作品/21-編輯-編輯-編輯-1"
     },
     {
       "filename": "photography/栗子外拍/DSC_5532-編輯-編輯-1.jpg",
@@ -1748,7 +2037,8 @@
       "focalLength": 86,
       "aperture": 2.7,
       "iso": 1000,
-      "shutterSpeed": 0.004
+      "shutterSpeed": 0.004,
+      "note": "花瓣牆的密度像背景音樂——聲量大但訊息少。她那條紅色高跟才是這張的主旋律。"
     },
     {
       "filename": "photography/栗子外拍/DSC_5958-編輯-1.jpg",
@@ -1875,5 +2165,12 @@
       "iso": 1000,
       "shutterSpeed": 0.03333333333333333
     }
-  ]
+  ],
+  "trackManifesto": {
+    "kana": "影",
+    "roman": "Photography",
+    "declaration": "六年後、光を待つことを覚えた",
+    "startYear": 2024,
+    "ink": "rgb(58 86 122)"
+  }
 }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, reactive, nextTick } from 'vue'
-import type { GalleryItem } from './gallery'
+import type { GalleryItem } from '~~/shared/types/gallery'
 import {
   calcRadialXY,
   computeRadialVisibleWindow,
@@ -352,7 +352,9 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
     const { start, end } = computeRadialVisibleWindow(total, centerIdx, 7)
     const out: Array<GalleryItem & { originalIndex: number }> = []
     for (let i = start; i <= end; i++) {
-      out.push({ ...viewerImages.value[i], originalIndex: i })
+      const img = viewerImages.value[i]
+      if (!img) continue
+      out.push({ ...img, originalIndex: i })
     }
     return out
   }
@@ -372,8 +374,9 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
 
     // 為舊的可見圖片設置起始位置
     oldVisibleImages.forEach((img, displayIdx) => {
-      startCoords[img.originalIndex] = calcXY(displayIdx, oldVisibleImages.findIndex(v => v.originalIndex === oldIdx))
-      posMap[img.originalIndex] = { ...startCoords[img.originalIndex] }
+      const xy = calcXY(displayIdx, oldVisibleImages.findIndex(v => v.originalIndex === oldIdx))
+      startCoords[img.originalIndex] = xy
+      posMap[img.originalIndex] = { x: xy.x, y: xy.y }
     })
 
     // 為新的可見圖片設置目標位置
@@ -393,8 +396,9 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
 
       // 插值動畫
       newVisibleImages.forEach((img) => {
-        const start = startCoords[img.originalIndex] || targetCoords[img.originalIndex]
         const target = targetCoords[img.originalIndex]
+        if (!target) return
+        const start = startCoords[img.originalIndex] ?? target
 
         posMap[img.originalIndex] = {
           x: lerp(start.x, target.x, k),

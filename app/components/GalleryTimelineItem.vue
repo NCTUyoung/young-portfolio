@@ -113,13 +113,28 @@ v-if="eventInfo.location" class="text-stone-400 dark:text-stone-500 truncate fle
         <slot />
       </div>
     </Transition>
+
+    <!--
+      R34：摺合狀態的「章封」cover slot — 取代 R33 純隱藏行為
+      讓 user 看到「這裡有 N 葉作品 + caption」並能一鍵展開，不再是空白
+    -->
+    <Transition name="collapse-fade" mode="out-in">
+      <div
+        v-if="!shouldShowContent && showEventControl"
+        class="flex-1 min-w-0 relative chapter-fold"
+        :class="[index % 2 === 0 ? 'md:ml-16' : 'md:mr-16']"
+      >
+        <slot name="cover" />
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useGalleryStore, type PhotoEvent } from '~/stores/gallery'
+import { useGalleryStore } from '~/stores/gallery'
+import type { PhotoEvent } from '~~/shared/types/gallery'
 
 interface Props {
   index: number
@@ -128,13 +143,16 @@ interface Props {
   eventKey?: string
   showEventControl?: boolean
   showEventInfo?: boolean
+  /** R33：若 true，user 未操作過時預設摺合（用於 timeline 較舊的 events 減負） */
+  defaultCollapsed?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   eventInfo: null,
   eventKey: '',
   showEventControl: false,
-  showEventInfo: false
+  showEventInfo: false,
+  defaultCollapsed: false
 })
 
 const galleryStore = useGalleryStore()
@@ -143,11 +161,15 @@ const { toggleGroupExpansion } = galleryStore
 
 const eventName = computed(() => props.eventInfo?.name || '事件')
 
-// 預設為展開；只有在使用者操作過該群組時才依照狀態收合/展開
+// 預設展開行為：
+//   - defaultCollapsed=false（前 N 個 events）：state 未設 → 展開
+//   - defaultCollapsed=true（較舊 events）：state 未設 → 摺合
+//   user 一旦點 toggle，明確 state 接管預設
 const isExpanded = computed(() => {
   if (!props.eventKey) return true
   const state = expandedGroups.value[props.eventKey]
-  return state === undefined ? true : state
+  if (state === undefined) return !props.defaultCollapsed
+  return state
 })
 
 // 若沒有顯示控制按鈕，內容一律顯示

@@ -91,11 +91,13 @@ const generateHistogram = async () => {
     histogramData.green.fill(0)
     histogramData.blue.fill(0)
 
-    // 計算直方圖
+    // 計算直方圖；Uint8ClampedArray 在 noUncheckedIndexedAccess 下回傳 number | undefined。
+    // 邏輯上 RGBA 連續四 byte 必定存在，但顯式 narrow 一下避免 index 用 undefined。
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i]
       const g = data[i + 1]
       const b = data[i + 2]
+      if (r === undefined || g === undefined || b === undefined) continue
 
       histogramData.red[r]++
       histogramData.green[g]++

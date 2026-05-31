@@ -78,7 +78,7 @@ export function snapRowWidthsToContainer (
   const sum = floored.reduce((a, b) => a + b, 0)
   const diff = budget - sum
   if (diff !== 0 && n > 0) {
-    floored[n - 1] = Math.max(1, floored[n - 1] + diff)
+    floored[n - 1] = Math.max(1, (floored[n - 1] ?? 0) + diff)
   }
   return floored
 }

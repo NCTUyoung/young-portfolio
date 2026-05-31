@@ -1,5 +1,166 @@
 {
   "totalNumber": "35",
+  "seriesNarratives": {
+    "2018年電繪作品": {
+      "prologue": "從 SAI 開始的第一年。學的是「不是線稿不夠細，而是色塊還沒講完故事」。膠囊、機械、單一物件當主角，背景留白。",
+      "annotation": "看這個物件的影子——只佔畫面 1/5，卻把整個物件「黏」在地面。形體是色塊堆的，影子是留白擠的。",
+      "mood": "object · isolation · sai",
+      "palette": [
+        "#7b3fa3",
+        "#1c1c1c",
+        "#dcd4e8"
+      ],
+      "strongest_line": "SAI 的第一年，色塊講故事",
+      "tools": [
+        "SAI",
+        "Illustrator"
+      ],
+      "techniques": [
+        "色塊",
+        "幾何向量"
+      ],
+      "topics": [
+        "膠囊·機械",
+        "單一物件"
+      ]
+    },
+    "2021年電繪作品": {
+      "prologue": "Procreate 上手第三年。開始把線條故意拉粗、影子故意拉長，像浮世繪那種「形不準才好看」的味道。",
+      "annotation": "粗線條的好處是給筆觸節奏。看主體輪廓——同一條線有的地方乾掉、有的地方還是濕的，像剛畫完還沒乾透。",
+      "mood": "thick-line · ukiyo · daring",
+      "palette": [
+        "#c44a4a",
+        "#202b3a",
+        "#e7d6b8"
+      ],
+      "strongest_line": "粗線條的浮世繪味",
+      "tools": [
+        "Procreate"
+      ],
+      "techniques": [
+        "粗線條",
+        "浮世繪風"
+      ],
+      "topics": [
+        "人物",
+        "練習稿"
+      ]
+    },
+    "2022年電繪作品": {
+      "prologue": "從個人練習轉向「畫給別人看」。委託、社團封面、視覺主視覺輪流上場。學會把概念講清楚，比把細節畫精細更重要。",
+      "annotation": "委託作品的構圖通常更「正」——主體置中、留白對稱。這張的偏移是刻意的：把概念留在右下，讓觀者的眼睛自己過去找。",
+      "mood": "client · concept · clarity",
+      "palette": [
+        "#3d5a7c",
+        "#d4a85b",
+        "#f4eedb"
+      ],
+      "strongest_line": "畫給別人看的第三年",
+      "tools": [
+        "Procreate",
+        "Photoshop"
+      ],
+      "techniques": [
+        "構圖偏移",
+        "概念主視覺"
+      ],
+      "topics": [
+        "委託案",
+        "社團封面"
+      ]
+    },
+    "2023年電繪作品": {
+      "prologue": "工具換到 Photoshop + 數位板。一年裡學會「光從哪裡來」是構圖的開始，而不是收尾。",
+      "annotation": "光來自左上 45 度——這是攝影常識，但在電繪很容易忘。看陰影方向就知道作者有沒有先想清楚這件事。",
+      "mood": "lighting · structure · ps",
+      "palette": [
+        "#a3733e",
+        "#1c1814",
+        "#ecd9b7"
+      ],
+      "strongest_line": "PS+板，光是構圖的開始",
+      "tools": [
+        "Photoshop",
+        "數位板"
+      ],
+      "techniques": [
+        "光源結構",
+        "左上 45°"
+      ],
+      "topics": [
+        "人物",
+        "場景"
+      ]
+    },
+    "2024年電繪作品": {
+      "prologue": "開始對「兩條軸線」有意識——數位藝術與攝影並行。電繪這邊也學著保留更多模糊與空缺，像水彩留白。",
+      "annotation": "畫面留白佔了將近 40%。攝影那邊學來的——不是每個角落都要填滿訊息，呼吸空間本身就是訊息。",
+      "mood": "dual-track · negative-space · soft",
+      "palette": [
+        "#7a8a9c",
+        "#2a2620",
+        "#ebe4d4"
+      ],
+      "strongest_line": "雙軌並行，留白入畫",
+      "tools": [
+        "Photoshop"
+      ],
+      "techniques": [
+        "負空間",
+        "水彩留白"
+      ],
+      "topics": [
+        "雙軌共構",
+        "寧靜敘事"
+      ]
+    },
+    "2025年電繪作品": {
+      "prologue": "嘗試把攝影裡學到的「決定性瞬間」帶回電繪。畫前先想：這張要凍結的是哪 1/100 秒。",
+      "annotation": "看主體的肢體——重心已經偏了，下一秒就要動。電繪好處是這個 1/100 秒可以反覆推敲，不像快門按下去就過了。",
+      "mood": "decisive · still · borrowed",
+      "palette": [
+        "#456a8a",
+        "#d8b870",
+        "#f0e8d8"
+      ],
+      "strongest_line": "攝影的決定性瞬間搬回紙上",
+      "tools": [
+        "Photoshop",
+        "攝影參照"
+      ],
+      "techniques": [
+        "決定性瞬間",
+        "凍結 1/100s"
+      ],
+      "topics": [
+        "動勢",
+        "肢體"
+      ]
+    },
+    "2026年電繪作品": {
+      "prologue": "最近的實驗——AI 輔助構圖草稿、人手上色完成。重點不在誰畫的，是這幅畫該有的「氣息」是否還在。",
+      "annotation": "AI 給的草稿到後段全被重畫——細看皮膚的暖灰跟陰影的冷紫沒有 AI 那種「平均色」，是手刷出來的差異。",
+      "mood": "ai-assist · breath · 2026",
+      "palette": [
+        "#5b4a7a",
+        "#d9c98a",
+        "#e8e0f0"
+      ],
+      "strongest_line": "AI 輔助，手刷氣息還在",
+      "tools": [
+        "AI 草稿",
+        "Photoshop 手刷"
+      ],
+      "techniques": [
+        "AI 輔助構圖",
+        "手工色層"
+      ],
+      "topics": [
+        "人物",
+        "氣息保留"
+      ]
+    }
+  },
   "Img": [
     {
       "filename": "gallery/2018年電繪作品/Capsule.png",
@@ -38,7 +199,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "pairWith": "photography-photography/峨嵋湖風鈴木/DSC_1721-編輯-1"
     },
     {
       "filename": "gallery/2018年電繪作品/vectorpath.png",
@@ -245,7 +407,8 @@
         "name": "2023年電繪作品",
         "description": "2023年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "pairWith": "photography-photography/WBC 2026/DSC_9991-編輯-1"
     },
     {
       "filename": "gallery/2023年電繪作品/20.jpg",
@@ -308,7 +471,8 @@
         "name": "2024年電繪作品",
         "description": "2024年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "pairWith": "photography-photography/Annber 外拍/DSC_2702-編輯-1"
     },
     {
       "filename": "gallery/2024年電繪作品/18-4.jpg",
@@ -356,7 +520,8 @@
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "pairWith": "photography-photography/春日街拍/DSC_7030-1"
     },
     {
       "filename": "gallery/2025年電繪作品/36-編輯-1.jpg",
@@ -443,7 +608,15 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "pairWith": "photography-photography/栗子外拍/DSC_5910-編輯-1"
     }
-  ]
+  ],
+  "trackManifesto": {
+    "kana": "繪",
+    "roman": "Digital Art",
+    "declaration": "板に置いた最初の一筆。線で世界を起こす",
+    "startYear": 2018,
+    "ink": "rgb(196 110 58)"
+  }
 }

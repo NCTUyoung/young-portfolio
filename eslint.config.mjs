@@ -32,7 +32,10 @@ export default withNuxt(
       '@typescript-eslint/consistent-type-imports': ['warn', {
         prefer: 'type-imports',
         fixStyle: 'separate-type-imports'
-      }]
+      }],
+      // 失敗路徑用 console.error；debug print 一律 warn 出來避免提交到 master。
+      // 已 ship 2026-05-15：admin.ts 21 條 debug log + ImageInfoPanel.vue 1 條 dev-only log 清空。
+      'no-console': ['warn', { allow: ['warn', 'error'] }]
     }
   }
 )

@@ -1,0 +1,89 @@
+# Gallery Left Rail — Baseline Observations (2026-05-15)
+
+Dev server: http://localhost:3002/young-portfolio/  (port 3000 was taken)
+Captured by visual-baseline-gallery skill, six-shot matrix, all under tests/screenshots/baseline/.
+Branch: master @ 9089be0  (rail shipped at 94864a2, 2026-05-15 早)
+
+## 為什麼像 Windows 瀏覽器（按證據點名）
+
+### desktop-overview-top.png (1440×900, scroll 0)
+- 左 rail 240px 是一條 **硬邊矩形**：eyebrow → H1 → count → hairline → tabs → EVENT 列 → search → year，
+  全部水平對齊、間距均等。是 Windows 檔案總管 / Outlook 左欄的標準長相。
+- EVENT chips（12 個）垂直堆成列表，**標號 + 文字 + 數字** 三段對齊像 file-tree 的 folder count。
+- rail 與主欄之間沒有過渡（沒有玻璃、沒有書脊、沒有縦書き）—— 兩塊矩形貼著。
+- accent (terracotta) 只用在「Photography」count 與選中底線，**沒有任何 wabi-sabi 破口**。
+- 主欄 hero 是世界地圖 + 「踏跡 FOOTSTEPS」，氣質本來就成立；rail 卻把氣質往下拉。
+
+### desktop-overview-mid.png (1440×900, scroll 1500)
+- rail sticky 在原位、但 **下半 ~50% 是空白**（YEAR 之後沒內容）。空白本身不錯，
+  問題是空白與主欄並排時，rail 看起來像「被釘住的 UI panel」而非「書頁的書脊」。
+- 主欄 timeline grid 排得很好。痛點不在主欄。
+
+### desktop-event-cover.png (1440×900, event mode)
+- rail 與 immersive cover 並存。cover 氣質拉滿（人像佔右側 80%、純白邊），
+  rail 卻仍是「全部事件 / Annber 外拍 / 婚禮溫感鈴木 ...」的列表，**像是強迫進電影院前
+  先看一張系統 menu**。
+- 兩種視覺語言（沉浸 vs 系統工具）同屏直接衝突。
+
+### tablet-overview-top.png (768×1024)
+- 沒進 lg+，沒 rail。回到 top-stack header + FILTERS sticky bar。
+- 「全部事件 80 / Annber 外拍 9 / ...」變成 **網格 chips**，反而比 rail 列表氣質好。
+- 這暗示：rail 的問題不是「左側放東西」，是「列式排列」。
+
+### mobile-overview-top.png (375×800) / mobile-overview-minibar.png (scrolled)
+- 「選 12 EVENTS ↓」收成下拉，乾淨。
+- scroll 後 sticky FILTERS 條收束良好。
+- mobile 沒問題，**痛點獨家在 lg+ 桌機**。
+
+---
+
+## 對比參考站（wiki/sites/）
+
+| 站 | 左側做法 | 為什麼不像 Windows |
+|---|---|---|
+| Rinko Kawauchi | 極窄 fixed（~12px 字級）| 字小到像書頁腰線、不像 panel |
+| Ryan McGinley   | 中等寬度、純字 link | 沒 hairline 切段、沒 chips |
+| McGinley 系列頁 | 同上 + 中央翻頁 | rail 變成「書的目錄頁」氣質 |
+| 我們現況       | 240px + hairline 切 4 段 + chips + 三種字級 | 看起來像 settings 視窗 |
+
+**根因**：我們把「filters chrome 整層搬到側邊」搬得太完整。Rinko / McGinley 的 rail
+是「身份標籤 + 導覽」，不是「filters 控制台」。我們在 rail 裡塞了 search input、year
+dropdown、12 個 event chips，**控制台密度直接複製到側邊** —— 這就是 Windows 感的源頭。
+
+---
+
+## 三條改造路線（成本由低到高）
+
+### A. 玻璃書腰（最低風險）
+- rail 容器換 `bg-stone-50/70 backdrop-blur` + 移除 hairline 切段
+- 主欄與 rail 之間不再是「兩塊矩形貼著」，而是「主欄圖像隱約透到 rail 後面」
+- 來源：wiki/inspirations/strip-side-caption.md（POC 已驗）
+- 成本：改 GalleryLeftRail.vue 一個 class，30 分鐘可驗
+
+### B. 縦書き書脊 + chip 改純文字 list
+- A + rail 左邊緣加 5–7 字縦書き（「作品をめぐる」或當前 category 名）
+- EVENT chips 不要框、不要 hairline 區隔、不要 count badge，改成 Rinko 式純小字 link 列
+  - 選中態：左側 1px accent 細線（不是底線、不是 fill）
+- 來源：wiki/concepts/japanese-editorial-cover.md（縦書き）+ sites/rinko-kawauchi.md
+- 成本：改 EventFilter.vue rail variant + GalleryLeftRail.vue，2-3 hr POC
+
+### C. 全面改造：rail 變成「書脊」而非「工具列」
+- B + 搬走 search input 與 year dropdown（這兩個是「臨時動作」，不該住在 rail）
+  - 搬到主欄上方 sticky mini bar，與既有 GalleryControlMiniBar 合併
+- rail 只剩：身份（Works/Photography 80）+ EVENT list + 底部一句 artist statement（已 shipped）
+- 來源：wiki/inspirations/chrome-budget-rule.md（加 chrome 要砍一個）
+- 成本：頁面 shell + 兩個 component variant + e2e fixture，半天到一天
+
+**初步推 B**：A 太表面、C 動到頁面骨架。B 一個下午能進 worktree、出 current/ 截圖對比。
+
+---
+
+## 提醒（不要踩的雷）
+
+- visual-baseline-gallery skill 的 procedure 寫死 :3000，這次跑在 :3002 上正常。
+  若日後加環境變數覆寫，可避免 port 衝突時手改。
+- Node 22 經 fnm 裝好，default = v22.22.3。新開 PowerShell 自動帶 PATH（winget 改了
+  系統環境變數）。若要自動 cd 切版，需在 $PROFILE 加：
+    fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+- desktop-event-cover.png 那個「沉浸 cover × 系統 menu rail」衝突值得獨立思考：
+  進 event 後是否讓 rail collapse 成 8-12px 細條只剩身份？這是 C 的子問題，先擱置。

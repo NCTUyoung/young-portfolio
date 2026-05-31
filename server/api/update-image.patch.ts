@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
             .map((tag) => tag.trim())
             .filter(Boolean)
         }
-        typed.Img[imageIndex] = next
+        typed.Img[imageIndex] = next as CategoryData['Img'][number]
         updatedImage = next
         return data
       }

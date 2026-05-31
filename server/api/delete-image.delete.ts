@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
         typed.Img.splice(imageIndex, 1)
         typed.totalNumber = typed.Img.length.toString()
 
-        const eventName = imageRecord.event?.name
+        const eventName = imageRecord?.event?.name
         if (eventName && typed.eventStats?.[eventName]) {
           typed.eventStats[eventName] -= 1
           if (typed.eventStats[eventName] <= 0) {

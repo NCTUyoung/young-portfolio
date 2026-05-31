@@ -28,7 +28,7 @@ v-for="visibleImage in getVisibleRadialImages"
                 :title="`${visibleImage.title} (${visibleImage.originalIndex + 1}/${viewerImages.length})`"
                 @click="selectRadialImage(visibleImage.originalIndex)">
           <!-- 縮圖圖片 -->
-          <img :src="getThumbPath(visibleImage.filename, 400)" :alt="visibleImage.title" class="w-full h-full object-cover" decoding="async" loading="lazy">
+          <img :src="getThumbPath(visibleImage.filename ?? '', 400)" :alt="visibleImage.title" class="w-full h-full object-cover" decoding="async" loading="lazy">
         </button>
       </div>
 

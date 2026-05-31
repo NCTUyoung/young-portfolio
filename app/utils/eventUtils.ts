@@ -126,14 +126,12 @@ export const groupEventsByYear = (): Record<string, PhotoEvent[]> => {
   const groups: Record<string, PhotoEvent[]> = {}
 
   Object.values(PREDEFINED_EVENTS).forEach(event => {
-    // 從事件名稱中提取年份
+    // 從事件名稱中提取年份；regex group [1] 在 noUncheckedIndexedAccess 下視為 string | undefined
     const yearMatch = event.name.match(/(\d{4})/)
-    const year = yearMatch ? yearMatch[1] : 'unknown'
+    const year = yearMatch?.[1] ?? 'unknown'
 
-    if (!groups[year]) {
-      groups[year] = []
-    }
-    groups[year].push(event)
+    const bucket = groups[year] ?? (groups[year] = [])
+    bucket.push(event)
   })
 
   return groups

@@ -25,7 +25,7 @@ describe('gallerySelectors', () => {
     const d = [item({ filename: 'd.jpg', category: 'digital', time: '2020 Jan 01' })]
     const p = [item({ filename: 'p.jpg', time: '2025 Jan 01' })]
     const out = combineAndSortAllWorks(d, p)
-    expect(out[0].filename).toBe('p.jpg')
+    expect(out[0]!.filename).toBe('p.jpg')
   })
 
   it('getCurrentWorks respects category and event', () => {

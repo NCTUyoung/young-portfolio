@@ -49,18 +49,30 @@ export const extractCaptureTime = (exif: ExifData): Date => {
 
 /**
  * 驗證和清理 EXIF 數據
+ *
+ * exifr 回傳值型別為 `unknown`，欄位可能缺漏或型別不符；用小型 helper 將欄位
+ * 收斂到 ExifData 期望的 string / number / Date|string 型別，避免下游使用時又要重複防禦。
  */
+const asString = (v: unknown): string =>
+  typeof v === 'string' ? v : ''
+
+const asNumber = (v: unknown): number =>
+  typeof v === 'number' && Number.isFinite(v) ? v : 0
+
+const asDateLike = (v: unknown): string | Date | undefined =>
+  v instanceof Date ? v : (typeof v === 'string' ? v : undefined)
+
 export const normalizeExifData = (exif: Record<string, unknown>): ExifData => {
   return {
-    Make: exif?.Make || '',
-    Model: exif?.Model || '',
-    FocalLength: exif?.FocalLength || 0,
-    FNumber: exif?.FNumber || 0,
-    ISO: exif?.ISO || 0,
-    ExposureTime: exif?.ExposureTime || 0,
-    DateTimeOriginal: exif?.DateTimeOriginal,
-    DateTime: exif?.DateTime,
-    CreateDate: exif?.CreateDate
+    Make: asString(exif?.Make),
+    Model: asString(exif?.Model),
+    FocalLength: asNumber(exif?.FocalLength),
+    FNumber: asNumber(exif?.FNumber),
+    ISO: asNumber(exif?.ISO),
+    ExposureTime: asNumber(exif?.ExposureTime),
+    DateTimeOriginal: asDateLike(exif?.DateTimeOriginal),
+    DateTime: asDateLike(exif?.DateTime),
+    CreateDate: asDateLike(exif?.CreateDate)
   }
 }
 
@@ -190,7 +202,7 @@ export const getPrimaryTag = (image: GalleryItem): string | null => {
     }
   }
 
-  return image.tags[0]
+  return image.tags[0] ?? null
 }
 
 // ==================== 標題和描述生成 ====================
@@ -247,6 +259,7 @@ export const generateImageId = (category: 'digital' | 'photography', filename: s
  * 根據 index 決定圖片卡片高度 class（瀑布流錯落效果）
  */
 export const getImageClass = (index: number): string => {
-  const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56']
-  return classes[index % classes.length]
+  const classes = ['h-64', 'h-80', 'h-48', 'h-72', 'h-56'] as const
+  // 陣列為 const literal，長度 ≥ 1，modulo 後一定命中；以非 null 斷言收掉 noUncheckedIndexedAccess。
+  return classes[index % classes.length]!
 }

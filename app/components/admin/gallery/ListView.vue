@@ -14,7 +14,7 @@
       >
       <div class="flex-1 min-w-0">
         <h4 class="text-sm font-light text-stone-800 truncate mb-1">{{ item.title }}</h4>
-        <p class="text-sm text-stone-600 truncate mb-2">{{ item.content }}</p>
+        <p class="text-sm text-stone-600 truncate mb-2">{{ (item as { content?: string; description?: string }).content ?? (item as { description?: string }).description ?? '' }}</p>
         <div class="flex items-center space-x-4">
           <span class="text-xs text-stone-400 font-light">{{ item.time }}</span>
           <span class="text-xs text-stone-400 font-light">{{ item.filename }}</span>

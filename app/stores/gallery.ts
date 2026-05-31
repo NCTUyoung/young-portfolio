@@ -16,13 +16,14 @@ import {
 } from '~/stores/gallerySelectors'
 import type {
   GalleryItem,
-  FilterState
+  FilterState,
+  TrackManifesto
 } from '~~/shared/types/gallery'
 
 export const useGalleryStore = defineStore('gallery', () => {
   // 基本狀態
-  const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
-  const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number> }>({ works: [], eventStats: {} })
+  const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }>({ works: [], eventStats: {} })
+  const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }>({ works: [], eventStats: {} })
   const isLoadingDigital = ref(false)
   const isLoadingPhotography = ref(false)
   const digitalError = ref<string | null>(null)
@@ -48,6 +49,82 @@ export const useGalleryStore = defineStore('gallery', () => {
   }
   const eventStats = computed(() => computeEventStats(photographyWorks.value))
   const digitalEventStats = computed(() => computeEventStats(digitalWorks.value))
+
+  /**
+   * R7：軌道入口導言（繪 / 影）。讀 JSON 頂層 trackManifesto，
+   * leafLabel 缺省時用實際 works 數補上「N 葉」。
+   * 終結「Featured cap 只吃某張剛好帶的 strongest_line」的資料偏食。
+   */
+  function resolveManifesto (
+    raw: TrackManifesto | undefined,
+    works: GalleryItem[],
+    fallback: TrackManifesto
+  ): TrackManifesto {
+    const base = raw ?? fallback
+    const leafLabel = base.leafLabel ?? `${works.length} 葉`
+    return { ...base, leafLabel }
+  }
+  const digitalManifesto = computed<TrackManifesto>(() => resolveManifesto(
+    digitalData.value?.manifesto,
+    digitalWorks.value,
+    { kana: '繪', roman: 'Digital Art', declaration: '線で世界を起こす', startYear: 2018, ink: 'rgb(196 110 58)' }
+  ))
+  const photographyManifesto = computed<TrackManifesto>(() => resolveManifesto(
+    photographyData.value?.manifesto,
+    photographyWorks.value,
+    { kana: '影', roman: 'Photography', declaration: '光を待つことを覚えた', startYear: 2024, ink: 'rgb(58 86 122)' }
+  ))
+
+  /**
+   * R10：精選年尺（FeaturedYearRuler 用）。
+   * critic R9 jump-out：「別再雕轉場——把 startYear 升級成每張作品的『距起算第幾年』
+   * 敘事 metadata，讓六年尺長駐在 gallery 內容本身，而非只活在 1.7 秒過場幕裡」。
+   *
+   * 回應：在資料／衍生層直接算出每張 featured 作品的「第幾年（yearIndex = 該作年份 − 軌起始年）」，
+   * 並把雙軌共用一把 0..span 的整數年尺。讓「繪 8 年 vs 影 2 年」成為版面上的實體距離，
+   * 首屏即見，不靠等待。年差角標（第 N 年）掛在每個節點上 = 敘事活在內容，不在轉場。
+   */
+  const FEATURED_TAG = 'featured' as const
+  function yearOfWork (item: GalleryItem): number {
+    const m = String(item.time || item.event?.name || '').match(/(\d{4})/)
+    return m ? Number(m[1]) : 0
+  }
+  function buildTrackNodes (works: GalleryItem[], startYear: number) {
+    return works
+      .filter(w => Array.isArray(w.series) && w.series.includes(FEATURED_TAG))
+      .map(w => ({ work: w, year: yearOfWork(w) }))
+      .filter(n => n.year > 0)
+      .map(n => ({ work: n.work, year: n.year, yearIndex: Math.max(0, n.year - startYear) }))
+      .sort((a, b) => a.yearIndex - b.yearIndex)
+  }
+  /** 同年同軌只保留最後一張代表，避免年尺上節點重疊糊成一團 */
+  function dedupeByYear<T extends { yearIndex: number }> (nodes: T[]): T[] {
+    const byYear = new Map<number, T>()
+    for (const n of nodes) byYear.set(n.yearIndex, n)
+    return [...byYear.values()].sort((a, b) => a.yearIndex - b.yearIndex)
+  }
+  const featuredChronology = computed(() => {
+    const kaiStart = digitalManifesto.value.startYear
+    const kageStart = photographyManifesto.value.startYear
+    const kaiNodes = dedupeByYear(buildTrackNodes(digitalWorks.value, kaiStart))
+    const kageNodes = dedupeByYear(buildTrackNodes(photographyWorks.value, kageStart))
+    // 共用年尺：以「繪起始年」為原點 0，跨度取兩軌最遠的一年
+    const origin = Math.min(kaiStart, kageStart)
+    const lastYear = Math.max(
+      kaiStart + (kaiNodes.at(-1)?.yearIndex ?? 0),
+      kageStart + (kageNodes.at(-1)?.yearIndex ?? 0)
+    )
+    const span = Math.max(1, lastYear - origin)
+    // 把每軌節點重新投影到共用尺（offset = 軌起始年 − 共用原點）
+    const project = (nodes: ReturnType<typeof buildTrackNodes>, start: number) =>
+      nodes.map(n => ({ ...n, rulerPos: (start - origin + n.yearIndex) / span }))
+    return {
+      origin,
+      span,
+      kai: { startYear: kaiStart, nodes: project(kaiNodes, kaiStart) },
+      kage: { startYear: kageStart, nodes: project(kageNodes, kageStart) }
+    }
+  })
 
   const isLoading = computed(() => isLoadingDigital.value || isLoadingPhotography.value)
 
@@ -221,9 +298,25 @@ export const useGalleryStore = defineStore('gallery', () => {
     clearCache(['mixedItems', 'filteredItems'])
   }, 300)
 
+  /**
+   * R9：軌道切換轉場觸發器。
+   * setSelectedCategory 偵測到「類別真的變了」時，在 client 端 bump 一個 tick，
+   * 記下「從哪軌切到哪軌」。GalleryTrackTransition（掛在 app.vue，跨路由常駐）watch
+   * 此 tick 播放「起算尺」overlay。放在 store 而非元件內 watch 的原因：
+   * 切 tab 會走 router param 變更，page 元件在某些情況下會被 transition 卸載，
+   * 元件內 watch 的 prev 會丟失；store 是全站單例，trigger 不會因路由卸載而消失。
+   */
+  const trackTransitionTick = ref(0)
+  const trackTransitionTo = ref<'digital' | 'photography'>('photography')
+
   const setSelectedCategory = (category: 'digital' | 'photography') => {
+    const prev = filterState.value.selectedCategory
     filterState.value.selectedCategory = category
     clearCache(['mixedItems'])
+    if (import.meta.client && prev && prev !== category) {
+      trackTransitionTo.value = category
+      trackTransitionTick.value += 1
+    }
   }
 
   const setSelectedEvent = (event: string | null) => {
@@ -312,6 +405,11 @@ export const useGalleryStore = defineStore('gallery', () => {
     photographyWorks,
     eventStats,
     digitalEventStats,
+    digitalManifesto,
+    photographyManifesto,
+    featuredChronology,
+    trackTransitionTick,
+    trackTransitionTo,
     expandedGroups,
     isLoading,
     filterState,

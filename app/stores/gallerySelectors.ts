@@ -189,6 +189,7 @@ export function buildEventLocations (
   groups.forEach((group, name) => {
     const imagesSorted = sortImagesByTime(group.images)
     const cover = imagesSorted[0]
+    if (!cover) return
     const timeRange = calculateTimeRange(imagesSorted)
 
     const info = group.eventInfo
@@ -291,7 +292,7 @@ export function shouldShowEventOnTimeline (currentWorks: GalleryItem[], index: n
   const currentEvent = image.event.name
   for (let i = 0; i < index; i++) {
     const prevImage = currentWorks[i]
-    if (prevImage.event && prevImage.event.name === currentEvent) {
+    if (prevImage?.event && prevImage.event.name === currentEvent) {
       return false
     }
   }

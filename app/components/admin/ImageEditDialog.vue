@@ -212,20 +212,25 @@ function toggleSeries (tag: SeriesTag, checked: boolean) {
 
 watch(() => props.imageData, (newData) => {
   if (newData) {
-    let dateOnly = ''
+    // 兩種型別都不會走 undefined 分支（split('T') 至少回 ['YYYY-MM-DD']），但
+    // noUncheckedIndexedAccess 下 `[0]` 仍視為 string | undefined，補 fallback。
+    const todayDate = new Date().toISOString().split('T')[0] ?? '2026-01-01'
+    let dateOnly = todayDate
     try {
       const date = new Date(newData.time)
       if (!isNaN(date.getTime())) {
-        dateOnly = date.toISOString().split('T')[0]
-      } else {
-        dateOnly = new Date().toISOString().split('T')[0]
+        dateOnly = date.toISOString().split('T')[0] ?? todayDate
       }
     } catch {
-      dateOnly = new Date().toISOString().split('T')[0]
+      dateOnly = todayDate
     }
+    // 兩個型別其中一個有 `content`，另一個有 `description`；用聯集視角讀，避免 TS narrow 報錯。
+    const contentField = (newData as { content?: string; description?: string }).content
+      ?? (newData as { description?: string }).description
+      ?? ''
     formData.value = {
       title: newData.title || '',
-      content: newData.content || '',
+      content: contentField,
       date: dateOnly,
       color: (newData as GalleryItem).color || 'blue',
       tagsString: props.category === 'photography'
@@ -242,7 +247,7 @@ watch(() => props.imageData, (newData) => {
 
 const confirm = () => {
   if (!isFormValid.value) return
-  const updateData: Record<string, unknown> = {
+  const updateData: { title: string; content: string; date: string; color?: string; tags?: string[]; series?: string[] } = {
     title: formData.value.title.trim(),
     content: formData.value.content.trim(),
     date: formData.value.date

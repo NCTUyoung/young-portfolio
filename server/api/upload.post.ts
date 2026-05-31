@@ -59,7 +59,10 @@ export default defineEventHandler(async (event) => {
 
     const [fields, files] = await form.parse(event.node.req)
 
-    const uploadedFiles = []
+    // uploadedFiles 在攝影 / 繪圖兩支同名陣列中分別 push 後成為 PhotographyData['Img'] / GalleryData['Img']；
+    // 此處先以聯集型別承接，下游再依 category 收斂 cast。
+    type UploadedRecord = PhotographyData['Img'][number] | GalleryData['Img'][number]
+    const uploadedFiles: UploadedRecord[] = []
     const category = (fields.category?.[0] || 'gallery') as 'gallery' | 'photography'
     const manualEventName = fields.event?.[0] || ''
     const eventDescription = fields.eventDescription?.[0] || ''
@@ -180,12 +183,13 @@ export default defineEventHandler(async (event) => {
             content: fields[`content_${originalName}`]?.[0] || autoDescription,
             tags: tags,
             event: eventInfo,
-            camera: exifData.Make,
-            model: exifData.Model,
-            focalLength: exifData.FocalLength,
-            aperture: exifData.FNumber,
-            iso: exifData.ISO,
-            shutterSpeed: exifData.ExposureTime
+            // ExifData 欄位均為 optional；PhotographyItem 要求 required，缺項一律給安全預設。
+            camera: exifData.Make ?? '',
+            model: exifData.Model ?? '',
+            focalLength: exifData.FocalLength ?? 0,
+            aperture: exifData.FNumber ?? 0,
+            iso: exifData.ISO ?? 0,
+            shutterSpeed: exifData.ExposureTime ?? 0
           })
         } else {
           // 繪圖作品：優先使用用戶指定的創作日期，否則嘗試 EXIF
@@ -251,7 +255,7 @@ export default defineEventHandler(async (event) => {
           uploadedFiles.push({
             filename: `${category}/${eventInfo.name}/${originalName}`,
             time: formatDateFull(captureTime),
-            title: fields[`title_${originalName}`]?.[0] || originalName.split('.')[0],
+            title: fields[`title_${originalName}`]?.[0] || (originalName.split('.')[0] ?? originalName),
             content: fields[`content_${originalName}`]?.[0] || '',
             color: fields[`color_${originalName}`]?.[0] || 'blue',
             event: eventInfo

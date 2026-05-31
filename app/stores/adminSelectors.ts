@@ -72,16 +72,14 @@ export function buildGroupedManageData (
       location = ''
     }
 
-    if (!groups[currentEventName]) {
-      groups[currentEventName] = {
-        eventName: currentEventName,
-        description,
-        location,
-        items: []
-      }
-    }
+    const bucket = groups[currentEventName] ?? (groups[currentEventName] = {
+      eventName: currentEventName,
+      description,
+      location,
+      items: []
+    })
 
-    groups[currentEventName].items.push(item)
+    bucket.items.push(item)
   })
 
   let result: GroupedManageRow[] = Object.values(groups).map(group => {

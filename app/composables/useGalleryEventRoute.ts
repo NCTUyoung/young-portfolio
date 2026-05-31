@@ -37,16 +37,13 @@ export function useGalleryEventRoute () {
   }
 
   function applyEventFromRoute () {
-    if (!import.meta.client) return
     if (isLoading.value) return
 
     const cat = filterState.value.selectedCategory
     const pathEvent = readEventParam()
 
-    // 2026-05-09：移除 'all' 後僅 'photography' / 'digital' 兩類；narrow 一下避免 type drift
     if (cat !== 'photography' && cat !== 'digital') return
 
-    // 必須等 hydrate / loadAllWorks 完成，否則 availableEvents 仍空，會誤把合法 event redirect 掉。
     if (!galleryDataReady.value) return
 
     if (pathEvent === null) {
@@ -60,7 +57,10 @@ export function useGalleryEventRoute () {
 
     const valid = eventNamesForCurrentCategory()
     if (!valid.has(pathEvent)) {
-      router.replace({ path: `/gallery/${cat}`, query: route.query })
+      // SSR：不執行 router.replace（讓 client 進來再導正），但仍把 store 拉回 null 與 URL 保持一致渲染。
+      if (import.meta.client) {
+        router.replace({ path: `/gallery/${cat}`, query: route.query })
+      }
       if (filterState.value.selectedEvent !== null) {
         syncingFromRoute.value = true
         setSelectedEvent(null)
@@ -71,6 +71,8 @@ export function useGalleryEventRoute () {
 
     if (filterState.value.selectedEvent === pathEvent) return
 
+    // SSR 也要跑：path event 是 source of truth，store 必須在 first paint 前同步，
+    // 否則 SSR HTML 是 overview（count 全攬子）/ client 是 event（count 縮成單一 event）→ hydration mismatch。
     syncingFromRoute.value = true
     setSelectedEvent(pathEvent)
     nextTick(() => { syncingFromRoute.value = false })
@@ -92,6 +94,7 @@ export function useGalleryEventRoute () {
   // 同步由 setSelectedEvent / store → URL watcher 自然處理。
 
   // store → URL：使用者點 EventFilter 時 setSelectedEvent 觸發；同步把 path 段補上 / 撤掉。
+  // 純 client-only：SSR 階段 store 已由 path 同步進來，反方向 router.replace 不該在 SSR 執行。
   watch(
     () => filterState.value.selectedEvent,
     (ev) => {

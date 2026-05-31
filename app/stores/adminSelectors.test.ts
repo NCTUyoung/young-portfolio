@@ -72,6 +72,6 @@ describe('adminSelectors', () => {
     ]
     const groups = buildGroupedManageData(items, 'photography', 'Only')
     expect(groups).toHaveLength(1)
-    expect(groups[0].eventName).toBe('Only')
+    expect(groups[0]!.eventName).toBe('Only')
   })
 })

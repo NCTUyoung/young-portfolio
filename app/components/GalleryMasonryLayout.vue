@@ -208,8 +208,9 @@ const buildRowsFromBucket = (images: ImageWithAspectRatio[], maxAR: number): Ima
   // 最後一行：如果只剩 1 張，嘗試併入前一行
   if (currentRow.length === 1 && rows.length > 0) {
     const lastRow = rows[rows.length - 1]
-    if (lastRow.items.length < 4) {
-      lastRow.items.push(currentRow[0])
+    const lonelyImg = currentRow[0]
+    if (lastRow && lonelyImg && lastRow.items.length < 4) {
+      lastRow.items.push(lonelyImg)
       lastRow.key = lastRow.items.map(i => i.filename).join('|')
     } else {
       rows.push({
@@ -256,10 +257,12 @@ const imageRows = computed(() => {
   while (li < landscapeRows.length || pi < portraitRows.length) {
     // 每次先放 2 行橫式，再放 1 行直式，保持視覺節奏
     for (let n = 0; n < 2 && li < landscapeRows.length; n++) {
-      merged.push(landscapeRows[li++])
+      const row = landscapeRows[li++]
+      if (row) merged.push(row)
     }
     if (pi < portraitRows.length) {
-      merged.push(portraitRows[pi++])
+      const row = portraitRows[pi++]
+      if (row) merged.push(row)
     }
   }
 

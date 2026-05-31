@@ -147,7 +147,7 @@ export const useImageProcessing = () => {
       }
     }
 
-    return image.tags[0]
+    return image.tags[0] ?? null
   }
 
   // ==================== 標題和描述生成 ====================
@@ -207,18 +207,26 @@ export const useImageProcessing = () => {
 
   /**
    * 驗證和清理 EXIF 數據
+   * 與 utils/imageUtils.ts 的版本同義；exifr 回傳 unknown，欄位逐一型別 narrow。
    */
+  const asString = (v: unknown): string =>
+    typeof v === 'string' ? v : ''
+  const asNumber = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) ? v : 0
+  const asDateLike = (v: unknown): string | Date | undefined =>
+    v instanceof Date ? v : (typeof v === 'string' ? v : undefined)
+
   const normalizeExifData = (exif: Record<string, unknown>): ExifData => {
     return {
-      Make: exif?.Make || '',
-      Model: exif?.Model || '',
-      FocalLength: exif?.FocalLength || 0,
-      FNumber: exif?.FNumber || 0,
-      ISO: exif?.ISO || 0,
-      ExposureTime: exif?.ExposureTime || 0,
-      DateTimeOriginal: exif?.DateTimeOriginal,
-      DateTime: exif?.DateTime,
-      CreateDate: exif?.CreateDate
+      Make: asString(exif?.Make),
+      Model: asString(exif?.Model),
+      FocalLength: asNumber(exif?.FocalLength),
+      FNumber: asNumber(exif?.FNumber),
+      ISO: asNumber(exif?.ISO),
+      ExposureTime: asNumber(exif?.ExposureTime),
+      DateTimeOriginal: asDateLike(exif?.DateTimeOriginal),
+      DateTime: asDateLike(exif?.DateTime),
+      CreateDate: asDateLike(exif?.CreateDate)
     }
   }
 
@@ -238,6 +246,7 @@ export const useImageProcessing = () => {
 
     for (let i = 0; i < images.length; i++) {
       const image = images[i]
+      if (!image) continue
 
       // 處理單張圖片
       const processedImage = {

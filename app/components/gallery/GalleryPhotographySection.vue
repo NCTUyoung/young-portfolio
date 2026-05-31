@@ -22,6 +22,7 @@
           :event-key="item.eventName || 'no-event'"
           :show-event-control="!!item.eventName"
           :show-event-info="!!item.eventName"
+          :default-collapsed="index >= 2"
         >
           <div
             :ref="el => bindStripRef(item.key, el, 'desktop')"
@@ -99,31 +100,88 @@
               </div>
             </div>
           </div>
+
+          <!-- R34/R35：摺合時章封 cover — 章節編號 + 章名 + 章首詩 + 縮圖（R35 升級 layout） -->
+          <template #cover>
+            <button
+              type="button"
+              class="chapter-cover-btn group w-full text-left"
+              :aria-label="`展開 ${item.eventName || ''} 章節作品`"
+              @click="item.eventName && toggleExpand(item.eventName)"
+            >
+              <div class="chapter-cover-grid">
+                <div class="chapter-cover-thumb">
+                  <!-- Skeleton placeholder while loading -->
+                  <div class="chapter-cover-thumb__skeleton" aria-hidden="true"/>
+                  <img
+                    v-if="item.images?.[0]?.filename"
+                    :src="getThumbPath(item.images[0].filename, 400)"
+                    :alt="`${item.eventName} 章封`"
+                    loading="lazy"
+                    decoding="async"
+                    :class="['chapter-cover-thumb__img', { 'is-loaded': isImageLoaded(item.images[0].filename) }]"
+                    @load="onImgLoad(item.images[0].filename, $event)"
+                  >
+                  <span class="chapter-cover-thumb__seal" aria-hidden="true">{{ item.images?.length || 0 }}</span>
+                </div>
+                <div class="chapter-cover-meta">
+                  <p class="chapter-cover-index">其の {{ formatKansuji(index + 1) }}</p>
+                  <h3 class="chapter-cover-title font-jp">
+                    {{ item.eventName || '其他作品' }}
+                  </h3>
+                  <p v-if="getEventCaption(item)" class="chapter-cover-strongest">
+                    「{{ getEventCaption(item) }}」
+                  </p>
+                  <p class="chapter-cover-cta">
+                    <span class="chapter-cover-cta__line" aria-hidden="true"/>
+                    <span>展開全部</span>
+                    <span class="chapter-cover-cta__arrow" aria-hidden="true">→</span>
+                  </p>
+                </div>
+              </div>
+            </button>
+          </template>
         </GalleryTimelineItem>
       </div>
     </div>
   </div>
 
-  <!-- Mobile -->
+  <!-- Mobile（R34：接 fold 機制；前 2 個展開、其餘預設摺合） -->
   <div class="md:hidden block">
-    <div class="space-y-12">
+    <div class="space-y-10">
       <div
-        v-for="item in items"
+        v-for="(item, mIdx) in items"
         :key="item.key"
         :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
         class="[content-visibility:auto] scroll-mt-24"
       >
-        <div v-if="item.eventName" class="mb-4">
-          <h3 class="text-base font-jp font-extralight text-stone-700 dark:text-stone-200 tracking-wider">
-            {{ item.eventName }}
-          </h3>
+        <button
+          v-if="item.eventName"
+          type="button"
+          class="mobile-event-header w-full text-left"
+          :aria-label="`${isMobileExpanded(item, mIdx) ? '摺合' : '展開'} ${item.eventName} 章節`"
+          :aria-expanded="isMobileExpanded(item, mIdx)"
+          @click="item.eventName && toggleExpand(item.eventName)"
+        >
+          <div class="flex items-baseline justify-between gap-2">
+            <h3 class="text-base font-jp font-extralight text-stone-700 dark:text-stone-200 tracking-wider">
+              {{ item.eventName }}
+            </h3>
+            <span class="text-[0.7rem] text-stone-400 jp-kansuji">
+              {{ isMobileExpanded(item, mIdx) ? '−' : '+' }}
+            </span>
+          </div>
           <p class="text-[0.65rem] text-stone-400 dark:text-stone-500 mt-1 font-light tracking-[0.3em] jp-kansuji">
             {{ item.images?.length || 0 }} <span class="text-stone-400 dark:text-stone-600">·</span> 作品
           </p>
-        </div>
+          <p v-if="!isMobileExpanded(item, mIdx) && getEventCaption(item)" class="mt-2 text-[0.78rem] leading-relaxed text-stone-500 dark:text-stone-400">
+            {{ getEventCaption(item) }}
+          </p>
+        </button>
         <div
+          v-if="isMobileExpanded(item, mIdx)"
           :ref="el => bindStripRef(item.key, el, 'mobile')"
-          class="w-full min-w-0 overflow-x-hidden"
+          class="w-full min-w-0 overflow-x-hidden mt-4"
         >
           <div class="flex flex-col" :style="{ gap: GAP_MOBILE + 'px' }">
             <div
@@ -175,11 +233,51 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, ref, type ComponentPublicInstance } from 'vue'
-import type { GalleryItem, MixedPhotoItem } from '~~/shared/types/gallery'
+import type { GalleryItem, MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
 import { formatShutterSpeed } from '~/utils/formatters'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
 import { useImageViewerStore } from '~/stores/imageViewer'
+import { useGalleryStore } from '~/stores/gallery'
 import { computeJustifiedRows, DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
+
+const galleryStore = useGalleryStore()
+
+/** 給章封展開按鈕用 — 同 GalleryTimelineItem 的 toggleGroupExpansion */
+function toggleExpand (eventName: string) {
+  galleryStore.toggleGroupExpansion(eventName)
+}
+
+/**
+ * Mobile timeline 預設摺合邏輯 — 與 desktop 對齊（前 2 個展開、其餘摺合）
+ * 沒有 eventName 的散圖一律展開
+ */
+function isMobileExpanded (item: MixedPhotoItem, idx: number): boolean {
+  if (!item.eventName) return true
+  const state = galleryStore.expandedGroups[item.eventName]
+  if (state === undefined) return idx < 2
+  return state
+}
+
+/** 1~12 → 一/二/三/四/.../十二 漢數字 */
+const KANSUJI = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五']
+function formatKansuji (n: number): string {
+  return KANSUJI[n] || String(n)
+}
+
+/**
+ * 章封 caption 來源（R35 優先序）：
+ *   1. strongest_line（章首詩，≤24 字，editorial 精煉）
+ *   2. annotation（fallback，截 36 字）
+ *   3. prologue / narrative（更次 fallback）
+ */
+function getEventCaption (item: MixedPhotoItem): string | null {
+  const sn = (item.images?.[0] as { seriesNarrative?: SeriesNarrative } | undefined)?.seriesNarrative
+  if (sn?.strongest_line && sn.strongest_line.trim()) return sn.strongest_line
+  const text = sn?.annotation || sn?.prologue || sn?.narrative
+  if (!text) return null
+  if (text.length > 36) return text.slice(0, 36) + '…'
+  return text
+}
 
 /**
  * ResizeObserver debounce：視窗拖拉時每毫秒都會觸發 RO，
@@ -317,3 +415,192 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
   imageViewerStore.openImageViewer(clickedImage, images)
 }
 </script>
+
+<style scoped>
+/* ===== R34 章封 chapter-cover（摺合事件視覺） ===== */
+.chapter-cover-btn {
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  width: 100%;
+  transition: opacity 0.3s ease;
+}
+.chapter-cover-btn:hover { opacity: 0.92; }
+.chapter-cover-btn:focus-visible {
+  outline: 1px solid rgb(217 123 46 / 0.5);
+  outline-offset: 4px;
+}
+.chapter-cover-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 2rem;
+  padding: 1.6rem 0;
+  align-items: center;
+  border-top: 1px solid rgb(168 162 158 / 0.2);
+  border-bottom: 1px solid rgb(168 162 158 / 0.2);
+}
+.chapter-cover-thumb {
+  width: 220px;
+  height: 160px;
+  overflow: hidden;
+  background: rgb(245 244 240);
+  border: 1px solid rgb(168 162 158 / 0.18);
+  position: relative;
+}
+:global(.dark) .chapter-cover-thumb {
+  background: rgb(28 25 23);
+  border-color: rgb(120 113 108 / 0.32);
+}
+/* Skeleton placeholder — R36：避免 loading 灰塊刺眼 */
+.chapter-cover-thumb__skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgb(245 244 240) 30%,
+    rgb(231 229 228) 50%,
+    rgb(245 244 240) 70%
+  );
+  background-size: 200% 100%;
+  animation: chapter-cover-shimmer 2.4s ease-in-out infinite;
+}
+:global(.dark) .chapter-cover-thumb__skeleton {
+  background: linear-gradient(
+    100deg,
+    rgb(41 37 36) 30%,
+    rgb(68 64 60) 50%,
+    rgb(41 37 36) 70%
+  );
+  background-size: 200% 100%;
+}
+@keyframes chapter-cover-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-cover-thumb__skeleton { animation: none; }
+}
+
+.chapter-cover-thumb__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.92);
+  opacity: 0;
+  transition: opacity 0.45s ease, filter 0.4s ease, transform 0.6s ease;
+}
+.chapter-cover-thumb__img.is-loaded {
+  opacity: 1;
+}
+.chapter-cover-btn:hover .chapter-cover-thumb__img.is-loaded {
+  filter: saturate(1.05);
+  transform: scale(1.02);
+}
+/* 縮圖右下角朱印標葉數 */
+.chapter-cover-thumb__seal {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: rgb(217 123 46 / 0.92);
+  color: rgb(250 250 249);
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 300;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.55rem;
+  line-height: 1.4;
+}
+
+.chapter-cover-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.chapter-cover-index {
+  margin: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.42em;
+  color: rgb(217 123 46 / 0.85);
+  text-transform: uppercase;
+  font-family: 'Noto Serif JP', serif;
+}
+.chapter-cover-title {
+  font-size: 1.55rem;
+  font-weight: 200;
+  letter-spacing: 0.16em;
+  color: rgb(68 64 60);
+  margin: 0;
+  line-height: 1.3;
+}
+:global(.dark) .chapter-cover-title { color: rgb(231 229 228); }
+
+/* 章首詩 — strongest_line 用 mincho 包引號顯示 */
+.chapter-cover-strongest {
+  margin: 0;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 1.02rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: rgb(120 113 108);
+  font-weight: 300;
+  max-width: 32rem;
+}
+:global(.dark) .chapter-cover-strongest {
+  color: rgb(168 162 158);
+}
+
+.chapter-cover-cta {
+  margin: 0.5rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  color: rgb(217 123 46);
+  text-transform: uppercase;
+  font-weight: 300;
+}
+.chapter-cover-cta__line {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: rgb(217 123 46 / 0.55);
+  transition: width 0.3s ease;
+}
+.chapter-cover-cta__arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+.chapter-cover-btn:hover .chapter-cover-cta__arrow { transform: translateX(4px); }
+.chapter-cover-btn:hover .chapter-cover-cta__line { width: 48px; }
+
+@media (max-width: 1023px) {
+  .chapter-cover-grid {
+    grid-template-columns: 160px 1fr;
+    gap: 1.2rem;
+    padding: 1.1rem 0;
+  }
+  .chapter-cover-thumb { width: 160px; height: 110px; }
+  .chapter-cover-title { font-size: 1.3rem; }
+  .chapter-cover-strongest { font-size: 0.9rem; }
+}
+
+/* ===== R34 mobile header button affordance ===== */
+.mobile-event-header {
+  background: transparent;
+  border: 0;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  display: block;
+  border-top: 1px solid rgb(168 162 158 / 0.18);
+  padding-top: 0.85rem;
+}
+.mobile-event-header:focus-visible {
+  outline: 1px solid rgb(217 123 46 / 0.5);
+  outline-offset: 4px;
+}
+</style>

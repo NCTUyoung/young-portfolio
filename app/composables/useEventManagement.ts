@@ -35,12 +35,10 @@ export const useEventManagement = () => {
     Object.values(events.value).forEach(event => {
       // 從事件名稱中提取年份
       const yearMatch = event.name.match(/(\d{4})/)
-      const year = yearMatch ? yearMatch[1] : 'unknown'
+      const year = yearMatch?.[1] ?? 'unknown'
 
-      if (!groups[year]) {
-        groups[year] = []
-      }
-      groups[year].push(event)
+      const bucket = groups[year] ?? (groups[year] = [])
+      bucket.push(event)
     })
 
     return groups
@@ -55,7 +53,7 @@ export const useEventManagement = () => {
 
     return Object.values(events.value).filter(event => {
       const yearMatch = event.name.match(/(\d{4})/)
-      const eventYear = yearMatch ? parseInt(yearMatch[1]) : 0
+      const eventYear = yearMatch?.[1] ? parseInt(yearMatch[1]) : 0
       return eventYear >= lastYear
     })
   })
@@ -249,7 +247,7 @@ export const useEventManagement = () => {
     const totalEvents = Object.keys(events.value).length
     const years = [...new Set(Object.values(events.value).map(event => {
       const yearMatch = event.name.match(/(\d{4})/)
-      return yearMatch ? yearMatch[1] : 'unknown'
+      return yearMatch?.[1] ?? 'unknown'
     }))]
 
     const locations = [...new Set(Object.values(events.value)
@@ -279,7 +277,9 @@ export const useEventManagement = () => {
     const entries = Object.entries(eventsData)
 
     for (let i = 0; i < entries.length; i++) {
-      const [key, event] = entries[i]
+      const entry = entries[i]
+      if (!entry) continue
+      const [key, event] = entry
 
       if (validateEvent(event)) {
         events.value[key] = event

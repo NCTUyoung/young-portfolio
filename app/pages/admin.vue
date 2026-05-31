@@ -107,7 +107,7 @@ v-if="tab.id === 'upload' && adminStore.selectedFiles.length > 0"
             <p class="jp-section-label mb-4">Overview</p>
             <div class="flex flex-wrap items-center gap-x-1 gap-y-2">
               <button
-                v-for="cat in [{ id: 'gallery', name: '繪圖作品' }, { id: 'photography', name: '攝影作品' }]"
+                v-for="cat in ([{ id: 'gallery', name: '繪圖作品' }, { id: 'photography', name: '攝影作品' }] as const)"
                 :key="cat.id"
                 class="relative px-4 py-2.5 font-light tracking-wide transition-all duration-300 rounded-none"
                 :class="adminStore.overviewCategory === cat.id
@@ -658,8 +658,9 @@ onMounted(async () => {
       adminStore.loadGalleryByCategory('photography')
     ])
     await nextTick()
-    if (adminStore.groupedManageData.length > 0) {
-      adminStore.expandedEvents = [adminStore.groupedManageData[0].eventName]
+    const firstGroup = adminStore.groupedManageData[0]
+    if (firstGroup) {
+      adminStore.expandedEvents = [firstGroup.eventName]
     }
   } catch (error) {
     console.error('Failed to initialize admin page:', error)

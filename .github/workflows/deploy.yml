@@ -51,6 +51,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Typecheck — 2026-05-15 從 99 → 0 ship 完一輪後改為 hard gate。
+      # 若 dev 環境又累積新 error，CI 會擋下 PR；本機跑 `npm run typecheck` 自查。
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Test
         run: npm run test
 

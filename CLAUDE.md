@@ -102,7 +102,7 @@ All `reveal` classes have `prefers-reduced-motion` fallback built in. Any custom
 - **Stone is the spine.** UI chrome uses `stone.*` only. `accent.*` (terracotta) appears on eyebrows, seals, and hairline focus — never as a fill colour.
 - **Hairline over border.** Use `jp-hairline` or `border-stone-300/60 dark:border-stone-600/60`, not `border-2` or solid thick lines.
 - **No coloured dot lists.** Use `jp-sumi-dot` or omit decoration entirely.
-- **Hero is static.** No autoplay, carousel, or auto-switching. Hero strategy is one of: A (single full-bleed + greyscale + cream overlay), B (left-text / right-photo split), or C (2–4 tile collage showing both art tracks). See `.cursor/rules/design-aesthetic.mdc §11` for selection criteria.
+- **Hero has no autoplay.** Time-based motion (carousel, timer rotation, swipe-rotation) is forbidden because the editorial reading should start from a still surface. **User-initiated interaction is allowed** — e.g. R27 added a 繪／影 toggle that the visitor clicks to shift collage focus (no timer, no auto-rotate). Hero strategy is one of: A (single full-bleed + greyscale + cream overlay), B (left-text / right-photo split), or C (2–4 tile collage with optional user-initiated track toggle). See `.cursor/rules/design-aesthetic.mdc §11` for selection criteria.
 - **Decorative text** (vertical kanji, `jp-kana-bg`) must have `aria-hidden="true"` and `pointer-events-none`.
 - **Default theme is light** (`useDark({ initialValue: 'light' })`). The theme-boot inline script in `nuxt.config.ts` sets the class before Vue loads to avoid FOUC. Dark mode is optional but must remain functional — never remove `dark:*` classes.
 
@@ -113,3 +113,20 @@ All `reveal` classes have `prefers-reduced-motion` fallback built in. Any custom
 - **Payload extraction**: Disabled in dev (Windows ENOENT on `.nuxt/cache`), enabled in production via `experimental.payloadExtraction`.
 - **Non-ASCII image paths**: Always go through `useImagePath` — it handles `encodeURIComponent` for Chinese characters and spaces in filenames.
 - **Admin panel**: Requires the dev server running (upload API endpoint is only available in dev). It is excluded from `nuxt generate` and has `ssr: false`.
+
+## Goal-Driven Execution
+
+Before non-trivial work, state the success criterion up front and verify against it — don't loop on "make it work." Weak criteria ("looks better", "should be fine") mean stop and tighten the criterion first.
+
+Map task types to concrete checks in this repo:
+
+| Task type | Verify with |
+|---|---|
+| Logic / refactor | `npm run typecheck` + `npm run lint` pass; relevant `npm run test` green |
+| Gallery JSON edit | `npm run lint:data` passes; affected event page renders in dev |
+| Visual / layout / chrome change | `/visual-baseline-gallery` before & after; diff acceptable across desktop / tablet / mobile |
+| New image asset | `npm run thumbs` regenerated; `useImagePath.getThumbPath` resolves; no 404 in dev console |
+| Hero image swap | `series: ['hero']` flipped in `photographyList.json` only (see Images §); OG meta updates follow automatically |
+| Inspiration ship | `/ship-inspiration` flow: cherry-pick → verify → visual baseline → update `wiki/index.md` + `wiki/log.md` |
+
+For multi-step tasks, sketch the plan as `step → verify` pairs before editing. If a step has no check, it's not done — it's pending.

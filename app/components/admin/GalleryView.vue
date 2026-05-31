@@ -468,6 +468,7 @@ const handleDrop = (targetFilename: string, targetEventName: string) => {
 
   const newOrder = items.map(i => i.filename)
   const [moved] = newOrder.splice(fromIdx, 1)
+  if (!moved) return
   newOrder.splice(toIdx, 0, moved)
 
   adminStore.reorderEventImages(targetEventName, newOrder)

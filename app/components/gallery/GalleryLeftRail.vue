@@ -33,8 +33,8 @@
       <span>{{ categoryCount }} works</span>
     </p>
 
-    <!-- Category tabs：保留橫向，w-60 容得下兩個 tab -->
-    <GalleryTabBar />
+    <!-- Category tabs：保留橫向，w-60 容得下兩個 tab；rail 變體隱藏 latin 避免溢出 -->
+    <GalleryTabBar variant="rail" />
 
     <!-- Event filter：rail 模式（垂直列） -->
     <EventFilter variant="rail" />

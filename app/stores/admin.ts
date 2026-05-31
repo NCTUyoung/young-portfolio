@@ -227,7 +227,7 @@ export const useAdminStore = defineStore('admin', () => {
             file,
             name: file.name,
             preview: e.target?.result as string,
-            title: file.name.split('.')[0],
+            title: file.name.split('.')[0] ?? file.name,
             content: '',
             color: 'blue'
           }
@@ -495,22 +495,15 @@ export const useAdminStore = defineStore('admin', () => {
 
     // 樂觀更新：先在本地更新數據
     try {
-      console.log('開始樂觀更新...')
-      console.log('原始圖片:', originalImage)
-      console.log('更新數據:', updateData)
-
       // 找到本地數據中對應的圖片並更新
       const dataArray = manageCategory.value === 'gallery' ? galleryData.value : photographyData.value
-      console.log('當前數據數組長度:', dataArray.length)
-
       const imageIndex = dataArray.findIndex(img => img.filename === originalImage.filename)
-      console.log('找到圖片索引:', imageIndex)
 
       if (imageIndex !== -1) {
-        console.log('更新前的圖片:', dataArray[imageIndex])
-
+        const target = dataArray[imageIndex]
+        if (!target) throw new Error('imageIndex 有效但取不到 target — 不應發生')
         // 建立更新後的圖片對象
-        const updatedImage = { ...dataArray[imageIndex] }
+        const updatedImage = { ...target }
         updatedImage.title = updateData.title
         if (manageCategory.value === 'gallery') {
           (updatedImage as GalleryItem).description = updateData.content
@@ -520,14 +513,12 @@ export const useAdminStore = defineStore('admin', () => {
 
         // 處理日期格式轉換
         if (updateData.date) {
-          console.log('原始日期:', updateData.date)
           const date = new Date(updateData.date)
           const year = date.getFullYear()
           const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
           const month = monthNames[date.getMonth()]
           const day = String(date.getDate()).padStart(2, '0')
           updatedImage.time = `${year} ${month} ${day}`
-          console.log('轉換後的時間:', updatedImage.time)
         }
 
         // 分類特定更新
@@ -543,11 +534,8 @@ export const useAdminStore = defineStore('admin', () => {
           }
         }
 
-        console.log('更新後的圖片:', updatedImage)
-
-                // 更新本地數據 - 直接替換以觸發響應性
+        // 更新本地數據 - 直接替換以觸發響應性
         dataArray.splice(imageIndex, 1, updatedImage)
-        console.log('本地數據已更新')
 
         // 強制觸發響應性更新 - 重新分配數組以確保 Vue 偵測到變化
         if (manageCategory.value === 'gallery') {

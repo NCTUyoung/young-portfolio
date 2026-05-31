@@ -16,6 +16,9 @@ logs
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
 
+# Claude Code git worktrees (nested checkouts — never commit into the main repo)
+.claude/worktrees/
+
 # Misc
 .DS_Store
 .fleet
@@ -35,6 +38,12 @@ gallery-review*.png
 live-*.png
 ykit-*.png
 rail-*.png
+
+# Wiki / inspiration ingest 暫存（Playwright a11y snapshot、screenshot 腳本等）
+# 規則：散落 root 的 yml/snap-tmp 一律不入版，建議跑 ingest 時直接寫進 .tmp/
+/*.yml
+!/.github/**
+.snap-tmp.*
 
 # 視覺驗收：current/ 為本次跑出來的對照圖、baseline/ 是要 commit 的基準
 # diff/ 是 gallery-visual-diff skill 跑出來的紅色覆蓋差異圖
