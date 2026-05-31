@@ -163,6 +163,7 @@ const {
 
 const isDesktopInfoLayout = useMediaQuery('(min-width: 768px)')
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- WIP: 桌機可調寬資訊面板，尚未接進 template
 const panelWidthStyle = computed(() => {
   if (!isDesktopInfoLayout.value) return {}
   return { width: `${infoPanelWidth.value}px` }
@@ -178,6 +179,7 @@ const MIN_WIDTH = 280
 const MAX_WIDTH = 600
 
 // 開始調整寬度
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- WIP: 拖拽調整面板寬度，尚未接上 resize handle
 const startResize = (event: MouseEvent | TouchEvent) => {
   event.preventDefault()
   isResizing.value = true
@@ -401,6 +403,7 @@ const exifLine = computed(() => {
   return parts.length ? parts.join('  ·  ') : null
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- WIP: 檔案大小顯示，尚未接進 template
 const formattedFileSize = computed(() => {
   if (!imageInfo.value?.fileSize) return '未知'
 
@@ -411,6 +414,7 @@ const formattedFileSize = computed(() => {
   return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- WIP: 拍攝日期格式化，尚未接進 template
 const formatDate = (date: Date | null) => {
   if (!date) return '未知'
 
