@@ -35,11 +35,23 @@
         改法：bar 只留「燈位切換(繪/影 tab) + 搜尋/年份輔助 + 統計」當輕量工具列；
         唯一的 event 導航交給緊接其下的「接觸印樣綜覽目次」(視覺優先、一眼命中)。
       -->
-      <!-- 中：燈位切換（繪/影 tab）+ 搜尋/年份輔助工具列（無 event 文字清單） -->
+      <!--
+        two-rooms-r2（act-critic / 廢統一篩選鷹架 → 影房做成負片邊框齒孔刻度）：
+        回應 critic「TabBar 兩房同款」。影世界的 track 切換／搜尋年份不再是中性 rail 列，
+        而是負片邊框上的「齒孔刻度尺 perforation scale」：控制列鑲在一條上下齒孔軌之間，
+        像底片邊緣的曝光刻度。與繪房製図台抽屜形成兩種房間語彙。
+        控制元件本身（store 綁定）不動，僅外層包齒孔刻度骨架。
+      -->
       <div class="darkroom-bar__controls">
-        <GalleryTabBar variant="rail" />
-        <div class="darkroom-bar__tools-inline">
-          <GalleryFilterToolbar variant="rail" />
+        <div class="darkroom-bar__perf-scale">
+          <span class="darkroom-bar__perf-edge darkroom-bar__perf-edge--t" aria-hidden="true"/>
+          <div class="darkroom-bar__perf-track">
+            <GalleryTabBar variant="rail" />
+            <div class="darkroom-bar__tools-inline">
+              <GalleryFilterToolbar variant="rail" />
+            </div>
+          </div>
+          <span class="darkroom-bar__perf-edge darkroom-bar__perf-edge--b" aria-hidden="true"/>
         </div>
       </div>
 
@@ -152,6 +164,38 @@ defineProps<{
 .darkroom-bar__controls :deep(.text-stone-400),
 .darkroom-bar__controls :deep(.text-stone-500) { color: #8a98a8 !important; }
 .darkroom-bar__controls :deep(.bg-stone-200\/70) { background: rgba(154, 173, 197, 0.25) !important; }
+
+/* =========================================================
+   two-rooms-r2：負片邊框齒孔刻度尺（控制列鑲在上下齒孔軌之間）
+   像底片邊緣的曝光刻度——track 切換／搜尋年份夾在兩條齒孔軌中間。
+   與繪房製図台抽屜分家。
+   ========================================================= */
+.darkroom-bar__perf-scale {
+  position: relative;
+  padding: 0.65rem 0;
+}
+.darkroom-bar__perf-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+  /* 縱向小齒孔（負片穿孔），亮孔跑滿整條控制列寬 */
+  background-image: radial-gradient(
+    circle at center,
+    rgba(195, 210, 226, 0.6) 0 1.3px,
+    transparent 1.6px
+  );
+  background-size: 11px 6px;
+  background-repeat: repeat-x;
+  opacity: 0.5;
+}
+.darkroom-bar__perf-edge--t { top: -1px; }
+.darkroom-bar__perf-edge--b { bottom: -1px; }
+.darkroom-bar__perf-track {
+  position: relative;
+  padding: 0.15rem 0.2rem;
+}
 
 /* g2：搜尋/年份輔助工具列移入第一列右側（暗底反白 input/select） */
 .darkroom-bar__tools-inline {

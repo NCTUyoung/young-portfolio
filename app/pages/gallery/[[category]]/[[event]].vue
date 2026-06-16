@@ -35,16 +35,16 @@
       />
       <div class="lg:flex-1 lg:min-w-0">
         <!--
-          j5（整併 / consolidation）：移除 GalleryWorldGate 3D 立體書台。
-          原因：trace 證實它是互動卡頓根源——翻頁改變「葉寬」(open ~80% ↔ verso ~19%)，
-          每次切換/點擊都重排整棵 ~700 物件的 preserve-3d 子樹（單次 Layout 1.5–3s）；
-          且它與下方 Diptych Ledger 為冗餘的雙世界裝置（critic 標 clutter + below-fold）。
-          雙主線入口改由較輕的【對開帳 GalleryDiptychLedger】承擔（見下方），
-          世界切換仍由 GalleryFacingEdge 書口 + tab 承擔。 -->
+          j5：移除 GalleryWorldGate 3D 立體書台（互動卡頓根源——翻頁重排 ~700 物件 preserve-3d 子樹）。
+          two-rooms-r1：跨世界對開帳（GalleryDiptychLedger）亦已移除——雙主線不再靠「同頁混兩世界」，
+          而是各自成一間自洽房間（繪=左 rail+製図台 / 影=DarkroomBar+光桌）。
+          世界互穿收斂為單一書口門檻 GalleryFacingEdge（桌機）／翻面帶（手機）。 -->
 
         <!-- 影世界專屬：頂部暗房光桌橫條（取代左 rail；僅 lg+）。
-             i1：overview 入口屏由 GalleryWorldGate 承擔門面，暗房橫條隱藏避免重複信號。 -->
-        <div v-if="worldId === 'kage' && !isOverviewEntry" class="hidden lg:block container mx-auto px-4 sm:px-6 pt-8">
+             two-rooms-r1：暗房橫條改為「影世界 desktop 的常駐房間標牌」——
+             overview 與 event 皆顯示（取代被移除的對開帳作為房間門面），
+             與繪世界左 rail 標牌對位，讓影室 desktop 也有自洽的 masthead → 光桌 → footer。 -->
+        <div v-if="worldId === 'kage'" class="hidden lg:block container mx-auto px-4 sm:px-6 pt-8">
           <div class="max-w-7xl mx-auto">
             <GalleryDarkroomBar :category-count="categoryCount" />
           </div>
@@ -68,8 +68,8 @@
             影(kage)：serif「暗室 / Darkroom」+ 常駐手記 note（非 hover）+ 細體張數
           讓手機首訪 3 秒就分得出在哪個世界。world-enter 提供首屏進場呼吸。
         -->
-        <!-- 繪 (kai)：overview 入口屏的 mobile 標牌由 GalleryWorldGate 承擔 → 隱藏避免重複 -->
-        <div v-if="worldId === 'kai' && !isOverviewEntry" :key="`mh-kai`" class="gallery-masthead-m gallery-masthead-m--kai world-enter world-enter-d1 mb-6">
+        <!-- 繪 (kai)：mobile 房間標牌（two-rooms-r1：overview 與 event 皆顯示，作製図室門面） -->
+        <div v-if="worldId === 'kai'" :key="`mh-kai`" class="gallery-masthead-m gallery-masthead-m--kai world-enter world-enter-d1 mb-6">
           <p class="gallery-masthead-m__eyebrow gallery-masthead-m__eyebrow--mono">
             <span aria-hidden="true">[</span>繪 / DIGITAL<span aria-hidden="true">]</span>
           </p>
@@ -86,7 +86,7 @@
           影 (kage)：R8 — mobile 首屏也包進暗室負片膠捲（齒孔 + 反白），
           與繪 mobile 的製圖白底正好相反相，手機首訪 3 秒就分世界。
         -->
-        <div v-else-if="worldId === 'kage' && !isOverviewEntry" :key="`mh-kage`" class="gallery-filmpanel-m world-enter world-enter-d1 mb-6">
+        <div v-else-if="worldId === 'kage'" :key="`mh-kage`" class="gallery-filmpanel-m world-enter world-enter-d1 mb-6">
           <span class="gallery-filmpanel-m__sprockets" aria-hidden="true"/>
           <div class="gallery-masthead-m gallery-masthead-m--kage">
             <p class="gallery-masthead-m__eyebrow gallery-masthead-m__eyebrow--serif">影 — Photography</p>
@@ -101,7 +101,19 @@
           </div>
         </div>
 
-        <div id="gallery-filter-controls">
+        <!--
+          two-rooms-r2：mobile 控制列也按房間語彙分家——繪冠製図抽屜頂緣（細直角把手 + DR 編號），
+          影冠負片齒孔頂緣，呼應桌機兩房的篩選骨架，避免手機兩房又回到同款鷹架。
+        -->
+        <div
+          id="gallery-filter-controls"
+          class="gallery-mctrl"
+          :class="worldId === 'kai' ? 'gallery-mctrl--kai' : 'gallery-mctrl--kage'"
+        >
+          <p class="gallery-mctrl__pull" aria-hidden="true">
+            <span class="gallery-mctrl__pull-no">{{ worldId === 'kai' ? 'DR·INDEX' : 'FRAME·SEL' }}</span>
+            <span class="gallery-mctrl__pull-name font-jp">{{ worldId === 'kai' ? '製図索引' : '齣選び' }}</span>
+          </p>
           <!-- Category Tabs -->
           <div class="mb-4">
             <GalleryTabBar />
@@ -218,47 +230,45 @@
         其の一 Footsteps Map — 僅在 photography overview（未進 event）顯示。
         進 event 時改走扉頁（GalleryEventCover），跳過 map / statement / strip 三章節。
       -->
+      <!--
+        two-rooms-r2（act-critic / 暗室を sumi に統一）：影世界踏跡地圖過去是一塊 cream/light
+        leaflet 區塊，把暗室沉浸打斷三次中的第一次。改為把整段包進【安全光暗房框 safelight】：
+        近黑 sumi 底盤 + 紅安全燈暈，地圖 tile 以 CSS filter 反相＋紅化（像在暗房紅光下看一張
+        定位負片），section header 反白為冷銀 serif。地圖功能（leaflet）不動，僅視覺收進暗室。
+      -->
       <section
         v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography' && !filterState.selectedEvent"
         ref="mapSectionRef"
-        class="mb-12 max-w-7xl mx-auto scroll-mt-24"
+        class="kage-safelight mb-12 max-w-7xl mx-auto scroll-mt-24"
         aria-labelledby="photo-map-heading"
       >
-        <header class="mb-5 world-enter world-enter-d1">
-          <p class="jp-section-label mb-2">其の二 · Footsteps</p>
+        <span class="kage-safelight__lamp" aria-hidden="true"/>
+        <header class="kage-safelight__head world-enter world-enter-d1">
+          <p class="kage-safelight__eyebrow">其の一 · Footsteps</p>
           <h2
             id="photo-map-heading"
-            class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100"
-          >踏跡 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Visited Places</span></h2>
+            class="kage-safelight__title font-jp"
+          >踏跡 <span class="kage-safelight__roman">Visited Places</span></h2>
         </header>
-        <EventMap
-          :events="eventLocations"
-          :selected-event-name="filterState.selectedEvent"
-          variant="compact"
-          @focus-event="handleFocusEvent"
-        />
-        <div class="jp-hairline w-full mt-6"/>
+        <div class="kage-safelight__plate">
+          <EventMap
+            :events="eventLocations"
+            :selected-event-name="filterState.selectedEvent"
+            variant="compact"
+            @focus-event="handleFocusEvent"
+          />
+        </div>
       </section>
 
       <!--
-        j4（act-critic / 一組對位敘事）：overview 入口的雙世界本體。
-        門（GalleryWorldGate）之後，主欄不再各自落到「該世界最新 N 張」的單軌流，
-        而是先攤開一冊【對開帳 GalleryDiptychLedger】——由頂層 crossWorldSpreads 編定的
-        繪×影同題對頁配對（資料層驅動），讓雙主線從「兩個入口」進化為「一組對位敘事」。
-        對開帳之後才接該世界的 timeline / 光桌（深入單軌）。
-        只在 overview 入口、且有解析到配對時顯示；進 event 沉浸閱讀時收起。SSR 安全。
+        two-rooms-r1（act-critic / 雙主線＝兩間獨立沉浸室）：移除 overview 入口的
+        【對開帳 GalleryDiptychLedger】—— 它是「既A又B」把 繪×影 對頁並置的跨世界裝置，
+        在兩世界 overview 同時渲染，正是 critic 與使用者指出的「很雜亂」根源。
+        雙主線敘事不再靠「在同一頁混兩世界」表達，而是各自成為一間自洽的房間：
+          繪(kai)  = 製図室：左 rail 標牌 → AtelierTimeline 製図台 → footer
+          影(kage) = 暗室：頂部 DarkroomBar 標牌 → LightTable 光桌 → footer
+        世界互穿收斂為單一門檻（書口 GalleryFacingEdge / 手機翻面帶），點擊才跨。
       -->
-      <div
-        v-if="!isGalleryLoading && !galleryLoadFailed && isOverviewEntry && crossWorldSpreads.length"
-        class="mb-14 sm:mb-20 world-enter world-enter-d2"
-      >
-        <GalleryDiptychLedger
-          :spreads="crossWorldSpreads"
-          @open-kai="openKaiSpread"
-          @open-kage="openKageSpread"
-        />
-        <div class="jp-hairline w-full mt-12 sm:mt-16"/>
-      </div>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
@@ -413,24 +423,11 @@
     </div>
 
     <!--
-      R3：繪⇄影「世界幕」轉場 overlay（回應 Round 2 critic「缺 tab/route 兩世界互轉轉場」）。
-      切換 track 時播一次定向幕：
-        繪(kai) = 暖色製圖網格幕，由右上「俐落 grid-snap」橫掃離場（呼應對齊牆語法）
-        影(kage) = 冷色顯影幕，中央「緩慢 develop blur-fade」消散（呼應顯影盤語法）
-      純一次性、user-initiated（點 tab 才觸發），無 timer/autoplay，不違 hero 靜態鐵律
-      （此為 gallery 非 hero）。fixed 滿版、pointer-events-none、aria-hidden，不擋互動。
-      所有 keyframe 在 prefers-reduced-motion 下停用（見 main.css）。
+      two-rooms-r1：移除「世界幕」轉場 overlay（world-curtain）。
+      它在每次切 track 都閃一次滿版幕，與書口門檻 + 對開帳同時釋放「對向世界」信號，
+      正是本輪要消的多重跨世界噪音之一。世界互穿收斂為單一門檻（書口 GalleryFacingEdge），
+      點擊翻面即由路由切換完成，不再額外加一層幕。
     -->
-    <transition :name="worldId === 'kai' ? 'world-curtain-kai' : 'world-curtain-kage'">
-      <div
-        v-if="worldCurtainOn"
-        class="world-curtain"
-        :data-world="worldId"
-        aria-hidden="true"
-      >
-        <span class="world-curtain__kana font-jp">{{ worldId === 'kai' ? '繪' : '影' }}</span>
-      </div>
-    </transition>
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
@@ -491,7 +488,6 @@ import GalleryAtelierTimeline from '~/components/gallery/GalleryAtelierTimeline.
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
 import GalleryLightTable from '~/components/gallery/GalleryLightTable.vue'
-import GalleryDiptychLedger from '~/components/gallery/GalleryDiptychLedger.vue'
 import GalleryFacingEdge from '~/components/gallery/GalleryFacingEdge.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
@@ -513,7 +509,6 @@ const {
   digitalWorks,
   photographyWorks,
   filteredItems,
-  crossWorldSpreads,
 } = storeToRefs(galleryStore)
 
 const {
@@ -623,23 +618,11 @@ const armWorld = () => {
 }
 
 /**
- * 世界幕轉場：切換 track 時短暫掛上 overlay 播放定向幕，播完即卸載。
- * 只在「真正切換 track」時觸發（worldId 變更），初次掛載不觸發。
- * prefers-reduced-motion 下不掛幕（避免無謂閃白）。
+ * 切換 track 時重新觸發世界進場（質地淡入 + .world-enter 重播）。
+ * two-rooms-r1：移除「世界幕」overlay 後，跨世界只靠書口門檻 + 進場呼吸，不再額外掛幕。
  */
-const worldCurtainOn = ref(false)
-let worldCurtainTimer: number | null = null
 watch(worldId, () => {
   armWorld()
-  if (typeof window === 'undefined') return
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  worldCurtainOn.value = true
-  if (worldCurtainTimer !== null) window.clearTimeout(worldCurtainTimer)
-  // 略長於 leave transition（kage 0.85s）以確保播完離場
-  worldCurtainTimer = window.setTimeout(() => {
-    worldCurtainOn.value = false
-    worldCurtainTimer = null
-  }, 120)
 })
 
 // Gallery header dynamic info
@@ -880,18 +863,6 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
   imageViewerStore.openImageViewer(clickedImage, images)
 }
 
-/**
- * j4：對開帳 — 點繪葉開繪世界全卷 lightbox、點影葉開影世界全卷 lightbox。
- * 徑向導航在該世界整卷內前後翻（與該世界 timeline / 光桌同質）。
- */
-const openKaiSpread = (img: GalleryItem) => {
-  imageViewerStore.openImageViewer(img, digitalWorks.value)
-}
-const openKageSpread = (img: GalleryItem) => {
-  imageViewerStore.openImageViewer(img, allPhotographyImages.value)
-}
-
-
 // ===== 監聽器 =====
 /**
  * 篩選某一事件時：
@@ -963,7 +934,6 @@ onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', handleScroll)
     cancelAnimationFrame(worldReadyRaf)
-    if (worldCurtainTimer !== null) window.clearTimeout(worldCurtainTimer)
   }
 })
 
@@ -1244,6 +1214,136 @@ useHead({
 }
 .gallery-filmpanel-m .gallery-masthead-m__meta {
   color: rgba(190, 200, 212, 0.78) !important;
+}
+
+/* =========================================================
+   two-rooms-r2：影世界踏跡地圖「安全光暗房框」safelight
+   把過去打斷暗室的 cream leaflet 區塊收進 sumi 底盤 + 紅安全燈，
+   tile 反相＋紅化 → 像暗房紅光下定位的一張負片地圖。
+   ========================================================= */
+.kage-safelight {
+  position: relative;
+  padding: 1.5rem clamp(1rem, 3vw, 2rem) 1.7rem;
+  background: linear-gradient(168deg, #1c2127 0%, #121519 100%);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.1);
+  overflow: hidden;
+}
+:global(.dark) .kage-safelight {
+  background: linear-gradient(168deg, #15191e 0%, #0c0f12 100%);
+}
+/* 紅安全燈暈：暗房唯一光源，右上一抹紅光散開（不作填色，僅氛圍暈） */
+.kage-safelight__lamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 50% at 92% 0%, rgba(176, 58, 46, 0.22) 0%, transparent 70%),
+    radial-gradient(60% 70% at 50% 120%, rgba(120, 40, 34, 0.1) 0%, transparent 60%);
+}
+.kage-safelight__head {
+  position: relative;
+  margin-bottom: 1.1rem;
+}
+.kage-safelight__eyebrow {
+  margin: 0 0 0.55rem;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.42em;
+  color: #c98b80;
+}
+.kage-safelight__title {
+  margin: 0;
+  font-family: var(--world-display, 'Shippori Mincho', 'Noto Serif JP', serif);
+  font-size: 1.75rem;
+  font-weight: var(--world-display-weight, 500);
+  letter-spacing: 0.28em;
+  line-height: 1.2;
+  color: #eef1f3;
+}
+.kage-safelight__roman {
+  margin-left: 0.6rem;
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(201, 139, 128, 0.85);
+  vertical-align: middle;
+}
+/* tile 反相＋紅化：地圖在暗房紅光下讀作一張定位負片，不再打斷 sumi 沉浸。
+   leaflet 互動（hover card / marker）由內層元件控制，filter 僅作用於 tile pane。 */
+.kage-safelight__plate {
+  position: relative;
+  border: 1px solid rgba(176, 58, 46, 0.22);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.kage-safelight__plate :deep(.leaflet-tile-pane) {
+  filter: invert(0.92) hue-rotate(150deg) saturate(0.7) brightness(0.82) sepia(0.35);
+}
+.kage-safelight__plate :deep(.event-map-container) {
+  background: #0d1014;
+}
+/* 邊緣漸層遮罩在暗底改暗，不再是 cream */
+.kage-safelight__plate :deep([class*='from-stone-50']) {
+  --tw-gradient-from: rgba(13, 16, 20, 0.85) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kage-safelight__lamp { animation: none; }
+}
+
+/* =========================================================
+   two-rooms-r2：mobile 控制列房間語彙頂緣（繪抽屜把手 / 影齒孔）
+   ========================================================= */
+.gallery-mctrl {
+  position: relative;
+  padding-top: 1.1rem;
+}
+.gallery-mctrl__pull {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.9rem;
+}
+.gallery-mctrl__pull-no {
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-size: 0.54rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.gallery-mctrl__pull-name {
+  font-size: 0.74rem;
+  letter-spacing: 0.3em;
+  color: rgb(120 113 108);
+}
+:global(.dark) .gallery-mctrl__pull-name { color: rgb(168 162 158); }
+/* 繪：製図抽屜頂緣——細直角把手短橫 + 極淺凹陷感 */
+.gallery-mctrl--kai::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.2rem;
+  height: 2px;
+  background: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+/* 影：負片齒孔頂緣——亮孔跑滿頂邊 */
+.gallery-mctrl--kage::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--accent) 70%, transparent) 0 1.3px,
+    transparent 1.6px
+  );
+  background-size: 11px 6px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
 }
 
 /* ===== j1：手機「翻面帶」（對向世界橫向入口；fixed 書口僅桌機，手機在此補位） ===== */

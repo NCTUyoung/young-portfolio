@@ -75,16 +75,47 @@
       </div>
     </div>
 
-    <!-- Category tabs：保留橫向，w-60 容得下兩個 tab；rail 變體隱藏 latin 避免溢出 -->
-    <div class="mt-7">
-      <GalleryTabBar variant="rail" />
+    <!--
+      two-rooms-r2（act-critic / 廢統一篩選鷹架 → 繪房做成製図台抽屜）：
+      回應 critic「TabBar 兩房同款」。繪世界的 EVENTS/YEAR/search 不再是中性 rail 列，
+      而是製図台的三格抽屜：每格冠製圖抽屜標籤（抽屜把手 + mono 編號 + 漢字面板名），
+      抽屜面為極淺凹陷格（藍圖紙觸感）。與影房負片齒孔刻度形成兩種房間語彙。
+      控制元件本身（store 綁定）不動，僅外層包抽屜骨架。
+    -->
+    <div class="rail-drawers mt-7">
+      <!-- 抽屜一：燈位切換（繪/影 track） -->
+      <section class="rail-drawer world-enter world-enter-d2">
+        <p class="rail-drawer__pull">
+          <span class="rail-drawer__pull-no" aria-hidden="true">DR·01</span>
+          <span class="rail-drawer__pull-name font-jp">図室</span>
+        </p>
+        <div class="rail-drawer__face">
+          <GalleryTabBar variant="rail" />
+        </div>
+      </section>
+
+      <!-- 抽屜二：事件索引（製図綴じの見出し） -->
+      <section class="rail-drawer world-enter world-enter-d3">
+        <p class="rail-drawer__pull">
+          <span class="rail-drawer__pull-no" aria-hidden="true">DR·02</span>
+          <span class="rail-drawer__pull-name font-jp">綴じ</span>
+        </p>
+        <div class="rail-drawer__face">
+          <EventFilter variant="rail" />
+        </div>
+      </section>
+
+      <!-- 抽屜三：検索／年次（製図台の検索引き出し） -->
+      <section class="rail-drawer world-enter world-enter-d3">
+        <p class="rail-drawer__pull">
+          <span class="rail-drawer__pull-no" aria-hidden="true">DR·03</span>
+          <span class="rail-drawer__pull-name font-jp">検索</span>
+        </p>
+        <div class="rail-drawer__face">
+          <GalleryFilterToolbar variant="rail" />
+        </div>
+      </section>
     </div>
-
-    <!-- Event filter：rail 模式（垂直列） -->
-    <EventFilter variant="rail" />
-
-    <!-- 搜尋 + 年份：rail 模式（垂直堆疊） -->
-    <GalleryFilterToolbar variant="rail" />
   </aside>
 </template>
 
@@ -116,6 +147,17 @@ const worldId = computed(() => (filterState.value.selectedCategory === 'digital'
 </script>
 
 <style scoped>
+/* =========================================================
+   two-rooms-r2：rail 必須浮在製図台 full-bleed（100vw 負margin）之上。
+   AtelierTimeline 在 DOM 後於 rail 且 full-bleed 拉到視窗左緣，會蓋住 rail；
+   給 rail 不透明 cream 底 + z-index（低於書口 1040 / miniBar 1090），
+   讓製図台抽屜在桌機 digital overview 真正可見、可讀。
+   ========================================================= */
+.gallery-rail {
+  z-index: 30;
+  background: var(--bg);
+}
+
 /* =========================================================
    R6：rail masthead 兩套世界語言（繪=mono製図 / 影=serif暗室）
    ========================================================= */
@@ -270,4 +312,69 @@ const worldId = computed(() => (filterState.value.selectedCategory === 'digital'
 @media (prefers-reduced-motion: reduce) {
   .rail-filmpanel { transition: none; }
 }
+
+/* =========================================================
+   two-rooms-r2：繪房製図台抽屜（廢統一篩選鷹架 → 房間語彙）
+   每格篩選 = 一格製図抽屜：抽屜把手標籤 + 極淺凹陷面板。
+   藍圖紙觸感、mono 編號、直角骨架，與影房負片齒孔刻度分家。
+   ========================================================= */
+.rail-drawers {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.rail-drawer {
+  position: relative;
+}
+/* 抽屜把手標籤：左側短橫把手 + mono 編號 + 漢字面板名 */
+.rail-drawer__pull {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  padding-left: 0.85rem;
+}
+.rail-drawer__pull::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.32rem;
+  width: 0.5rem;
+  height: 2px;
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.rail-drawer__pull-no {
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-size: 0.52rem;
+  letter-spacing: 0.24em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  opacity: 0.85;
+}
+.rail-drawer__pull-name {
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  color: rgb(120 113 108);
+}
+:global(.dark) .rail-drawer__pull-name { color: rgb(168 162 158); }
+/* 抽屜面：極淺凹陷格（藍圖紙），直角、薄 inset，不用粗框 */
+.rail-drawer__face {
+  position: relative;
+  padding: 0.7rem 0.75rem 0.55rem;
+  background:
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px) 0 0 / 14px 100%,
+    color-mix(in srgb, var(--accent) 3%, var(--surface));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 10%, transparent),
+    inset 0 -1px 0 rgb(0 0 0 / 0.04);
+  border-radius: 1px;
+}
+:global(.dark) .rail-drawer__face {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 14%, transparent),
+    inset 0 -1px 0 rgb(0 0 0 / 0.25);
+}
+/* 抽屜面內的篩選列去掉自身 margin-bottom，交由抽屜 gap 統一節奏 */
+.rail-drawer__face > * { margin-bottom: 0 !important; }
 </style>
