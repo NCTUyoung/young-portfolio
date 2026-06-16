@@ -12,18 +12,20 @@ import {
   buildEventLocations,
   buildAvailableEvents,
   buildAvailableYears,
+  buildCrossWorldSpreads,
   shouldShowEventOnTimeline as shouldShowEventOnTimelineForWorks
 } from '~/stores/gallerySelectors'
 import type {
   GalleryItem,
   FilterState,
-  TrackManifesto
+  TrackManifesto,
+  CrossWorldSpread
 } from '~~/shared/types/gallery'
 
 export const useGalleryStore = defineStore('gallery', () => {
   // 基本狀態
-  const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }>({ works: [], eventStats: {} })
-  const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }>({ works: [], eventStats: {} })
+  const digitalData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }>({ works: [], eventStats: {} })
+  const photographyData = ref<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }>({ works: [], eventStats: {} })
   const isLoadingDigital = ref(false)
   const isLoadingPhotography = ref(false)
   const digitalError = ref<string | null>(null)
@@ -125,6 +127,17 @@ export const useGalleryStore = defineStore('gallery', () => {
       kage: { startYear: kageStart, nodes: project(kageNodes, kageStart) }
     }
   })
+
+  /**
+   * j4：跨世界對位敘事對頁。頂層 crossWorldSpreads 任一檔提供即可（兩檔保持一致）；
+   * selector 依 event.name 把左右葉接回 live digital / photography works。
+   * 缺資料的配對自動剔除（bold ≠ broken）。
+   */
+  const crossWorldSpreads = computed(() => buildCrossWorldSpreads(
+    digitalData.value?.crossWorldSpreads ?? photographyData.value?.crossWorldSpreads,
+    digitalWorks.value,
+    photographyWorks.value
+  ))
 
   const isLoading = computed(() => isLoadingDigital.value || isLoadingPhotography.value)
 
@@ -277,8 +290,8 @@ export const useGalleryStore = defineStore('gallery', () => {
 
   /** SSR / useAsyncData：一次寫入兩類作品，避免重複 fetch */
   const hydrateFromPayload = (payload: {
-    digital?: { works: GalleryItem[], eventStats: Record<string, number> }
-    photography?: { works: GalleryItem[], eventStats: Record<string, number> }
+    digital?: { works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }
+    photography?: { works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }
   }) => {
     if (payload.digital && Array.isArray(payload.digital.works)) {
       digitalData.value = payload.digital
@@ -350,6 +363,11 @@ export const useGalleryStore = defineStore('gallery', () => {
     }
   }
 
+  /** g1：綜覽目次跳轉用 — 直接設定章節展開狀態（不 toggle） */
+  const setGroupExpansion = (groupKey: string, expanded: boolean) => {
+    expandedGroups.value[groupKey] = expanded
+  }
+
   const shouldShowEventOnTimeline = (image: GalleryItem, index: number): boolean => {
     if (!image.event) return false
     return shouldShowEventOnTimelineForWorks(currentWorks.value, index)
@@ -408,6 +426,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     digitalManifesto,
     photographyManifesto,
     featuredChronology,
+    crossWorldSpreads,
     trackTransitionTick,
     trackTransitionTo,
     expandedGroups,
@@ -435,6 +454,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     setYearFilter,
     clearFilters,
     toggleGroupExpansion,
+    setGroupExpansion,
     shouldShowEventOnTimeline,
     refreshData,
     clearCache,

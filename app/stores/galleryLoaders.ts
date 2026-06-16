@@ -11,7 +11,8 @@ import type {
   GalleryData,
   PhotographyData,
   SeriesNarrative,
-  TrackManifesto
+  TrackManifesto,
+  CrossWorldSpread
 } from '~~/shared/types/gallery'
 
 type NarrativeMap = Record<string, SeriesNarrative> | undefined
@@ -115,7 +116,7 @@ export async function fetchJsonWithFallback (filename: string): Promise<unknown>
   return await $fetch(absolute)
 }
 
-export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }> {
+export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }> {
   const data = await fetchJsonWithFallback('galleryList.json') as GalleryData
 
   const works = sortImagesByTime(
@@ -125,11 +126,12 @@ export async function fetchDigitalWorks (): Promise<{ works: GalleryItem[], even
   return {
     works,
     eventStats: data.eventStats || {},
-    manifesto: data.trackManifesto
+    manifesto: data.trackManifesto,
+    crossWorldSpreads: data.crossWorldSpreads
   }
 }
 
-export async function fetchPhotographyWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto }> {
+export async function fetchPhotographyWorks (): Promise<{ works: GalleryItem[], eventStats: Record<string, number>, manifesto?: TrackManifesto, crossWorldSpreads?: CrossWorldSpread[] }> {
   const data = await fetchJsonWithFallback('photographyList.json') as PhotographyData
 
   const works = sortImagesByTime(
@@ -139,6 +141,7 @@ export async function fetchPhotographyWorks (): Promise<{ works: GalleryItem[], 
   return {
     works,
     eventStats: data.eventStats || {},
-    manifesto: data.trackManifesto
+    manifesto: data.trackManifesto,
+    crossWorldSpreads: data.crossWorldSpreads
   }
 }

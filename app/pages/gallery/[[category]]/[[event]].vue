@@ -1,18 +1,57 @@
 <template>
-  <div ref="pageRef" class="min-h-screen transition-colors duration-300">
+  <div
+    ref="pageRef"
+    class="gallery-world min-h-screen transition-colors duration-300"
+    :data-world="worldId"
+    :class="{ 'gallery-world--ready': worldReady }"
+  >
     <!--
       桌機 lg+：左 rail（filters 常駐）+ 主欄（內容從 viewport 頂端開始）
       mobile/tablet（<lg）：rail 隱藏，沿用原本 top-stack 結構 + sticky mini bar
       詳見 wiki/inspirations/gallery-left-rail.md（survives chrome-budget rule：加 rail = 砍頂部 chrome）
     -->
-    <div class="lg:flex lg:gap-8 lg:items-start">
+    <!--
+      R1（強硬大膽 galleryWorlds）：破「兩世界共用左 rail + 主欄」拓樸。
+        繪 (kai)  = 製図室：左 spec 索引 rail 常駐 → 側railed 工作室。
+        影 (kage) = 暗室：取消左 rail，改主欄頂部「暗房光桌橫條」(GalleryDarkroomBar)
+                    → 全幅 full-bleed 縱捲膠卷，無側欄吃 ~240px（同時消右側死白）。
+      lg+ 兩世界頁面外框本身不同，一眼分得出「兩本不同的書」。
+      mobile/tablet（<lg）兩世界都沿用原 top-stack，不受影響。
+    -->
+    <!--
+      j1（双面綴じ・裏地の書口）：持續性「對向世界書口」縱向書脊，貫穿整頁釘在主欄外緣。
+      在繪世界(kai)右緣露出影書口、在影世界(kage)左緣露出繪書口 → 兩世界整頁皆可感知、
+      單擊翻面切換世界。取代「門之後對向世界即消失」的單世界部落格地層。
+      只在 overview 入口顯示（進 event 沉浸閱讀時收起，避免干擾深讀）。SSR 安全。
+    -->
+    <GalleryFacingEdge v-if="isOverviewEntry" :current="worldId" />
+
+    <div class="lg:flex lg:gap-8 lg:items-start" :class="worldId === 'kage' ? 'lg:block' : ''">
       <GalleryLeftRail
+        v-if="worldId === 'kai'"
         :category-label="categoryLabel"
         :category-count="categoryCount"
         class="hidden lg:block"
       />
       <div class="lg:flex-1 lg:min-w-0">
-    <!-- Header — 個性化設計（lg+ 改由左 rail 承擔，隱藏避免重複） -->
+        <!--
+          j5（整併 / consolidation）：移除 GalleryWorldGate 3D 立體書台。
+          原因：trace 證實它是互動卡頓根源——翻頁改變「葉寬」(open ~80% ↔ verso ~19%)，
+          每次切換/點擊都重排整棵 ~700 物件的 preserve-3d 子樹（單次 Layout 1.5–3s）；
+          且它與下方 Diptych Ledger 為冗餘的雙世界裝置（critic 標 clutter + below-fold）。
+          雙主線入口改由較輕的【對開帳 GalleryDiptychLedger】承擔（見下方），
+          世界切換仍由 GalleryFacingEdge 書口 + tab 承擔。 -->
+
+        <!-- 影世界專屬：頂部暗房光桌橫條（取代左 rail；僅 lg+）。
+             i1：overview 入口屏由 GalleryWorldGate 承擔門面，暗房橫條隱藏避免重複信號。 -->
+        <div v-if="worldId === 'kage' && !isOverviewEntry" class="hidden lg:block container mx-auto px-4 sm:px-6 pt-8">
+          <div class="max-w-7xl mx-auto">
+            <GalleryDarkroomBar :category-count="categoryCount" />
+          </div>
+        </div>
+    <!-- Header — 個性化設計（lg+ 改由左 rail 承擔，隱藏避免重複）。
+         i1：mobile overview 入口屏的世界標牌由 GalleryWorldGate（縱向疊）承擔，
+         此 masthead 在 overview 入口隱藏（保留 controls 區供篩選），避免雙標牌重複。 -->
     <div ref="controlsSectionRef" class="container mx-auto px-4 py-8 sm:px-6 md:py-20 relative lg:hidden">
       <!-- 右側縦書き裝飾字（配 hairline 收尾，不再孤立色點） -->
       <div class="absolute top-10 right-[6%] hidden lg:flex flex-col items-center gap-4 select-none pointer-events-none">
@@ -22,25 +61,45 @@
 
       <div class="max-w-7xl mx-auto">
         <!--
-          頁眉 — 對齊 ui_kits/portfolio_site/GalleryControls.jsx：
-          「— Gallery」accent eyebrow 帶 em-dash → 大 sans「Works」+ 中性 hairline → category · count 行
-          em-dash hairline 由 .jp-eyebrow::before 自動產生（取代右側漸層裝飾線，回歸對稱）
+          頁眉（mobile/tablet <lg；lg+ 由左 rail 承擔）
+          R6（act-critic galleryWorlds）：mobile 首屏也是 critic 指出的「共用頂欄」之一。
+          改為依 worldId 換整套標牌語言，與 GalleryLeftRail masthead 同步：
+            繪(kai)：mono「製図室 / DRAFTING ROOM」+ 直角方括號 eyebrow + tabular 葉數
+            影(kage)：serif「暗室 / Darkroom」+ 常駐手記 note（非 hover）+ 細體張數
+          讓手機首訪 3 秒就分得出在哪個世界。world-enter 提供首屏進場呼吸。
         -->
-        <div class="mb-2">
-          <p class="jp-eyebrow text-accent-500 dark:text-accent-400 mb-2"><span>Gallery</span></p>
-          <div class="flex items-end gap-6">
-            <h1 class="text-3xl md:text-4xl font-extralight text-stone-800 dark:text-stone-200 tracking-wider">Works</h1>
-            <!-- 中性 hairline（對齊 ui_kit Works ___ 的橫線），不再用 accent 漸層搶焦 -->
-            <span class="hidden sm:block h-px flex-1 max-w-[120px] bg-stone-300/70 dark:bg-stone-600/50 mb-2"/>
+        <!-- 繪 (kai)：overview 入口屏的 mobile 標牌由 GalleryWorldGate 承擔 → 隱藏避免重複 -->
+        <div v-if="worldId === 'kai' && !isOverviewEntry" :key="`mh-kai`" class="gallery-masthead-m gallery-masthead-m--kai world-enter world-enter-d1 mb-6">
+          <p class="gallery-masthead-m__eyebrow gallery-masthead-m__eyebrow--mono">
+            <span aria-hidden="true">[</span>繪 / DIGITAL<span aria-hidden="true">]</span>
+          </p>
+          <div class="flex items-end gap-5">
+            <h1 class="gallery-masthead-m__title gallery-masthead-m__title--mono">製図室</h1>
+            <span class="hidden sm:block h-px flex-1 max-w-[120px] bg-accent-500/30 mb-2"/>
           </div>
+          <p class="gallery-masthead-m__meta gallery-masthead-m__meta--mono">
+            DRAFTING ROOM <span class="opacity-50">·</span> {{ String(categoryCount).padStart(3, '0') }} 葉
+          </p>
         </div>
 
-        <!-- 作品數量 -->
-        <p class="text-stone-500 dark:text-stone-400 font-light mb-6 text-sm tracking-wide flex items-center gap-2">
-          <span class="text-accent-500 dark:text-accent-400">{{ categoryLabel }}</span>
-          <span class="text-stone-300 dark:text-stone-700">·</span>
-          <span>{{ categoryCount }} works</span>
-        </p>
+        <!--
+          影 (kage)：R8 — mobile 首屏也包進暗室負片膠捲（齒孔 + 反白），
+          與繪 mobile 的製圖白底正好相反相，手機首訪 3 秒就分世界。
+        -->
+        <div v-else-if="worldId === 'kage' && !isOverviewEntry" :key="`mh-kage`" class="gallery-filmpanel-m world-enter world-enter-d1 mb-6">
+          <span class="gallery-filmpanel-m__sprockets" aria-hidden="true"/>
+          <div class="gallery-masthead-m gallery-masthead-m--kage">
+            <p class="gallery-masthead-m__eyebrow gallery-masthead-m__eyebrow--serif">影 — Photography</p>
+            <div class="flex items-end gap-5">
+              <h1 class="gallery-masthead-m__title gallery-masthead-m__title--serif">暗室</h1>
+              <span class="hidden sm:block h-px flex-1 max-w-[120px] bg-stone-400/40 mb-2"/>
+            </div>
+            <p class="gallery-masthead-m__note world-enter world-enter-d2">光と影を、現像する。</p>
+            <p class="gallery-masthead-m__meta gallery-masthead-m__meta--serif">
+              Darkroom · 手記 <span class="opacity-50">·</span> {{ categoryCount }} 枚
+            </p>
+          </div>
+        </div>
 
         <div id="gallery-filter-controls">
           <!-- Category Tabs -->
@@ -135,13 +194,25 @@
         把「選哪條主線」從 tab 切換的離散決定，變成一條可連續拉扯的分岐手勢。
         與 index FeaturedConfrontation 差異：那是看作品（開 lightbox），這是選路（進路由）。
       -->
-      <section
-        v-if="!galleryLoadFailed && !isGalleryLoading && !filterState.selectedEvent && !hasActiveSecondaryFilter && digitalWorks.length && photographyWorks.length"
-        class="max-w-7xl mx-auto mb-12 lg:mb-16 mt-2"
-        aria-label="繪×影 割面ゲートウェイ"
-      >
-        <GalleryConfrontGateway />
-      </section>
+      <!--
+        R2（galleryWorlds 大改）：割面ゲートウェイ「只在影路由 overview」當作雙主線總入口
+        （影為預設落地路由）。回應 Round 1「兩首屏並排幾乎一樣」——digital 不再先吃同一個
+        gateway，而是直接由 GalleryDigitalIntro（製圖宣言）+ 製圖格牆領銜，photography 則保留
+        gateway 作雙線對峙入口後接顯影 Map/Timeline。如此兩路由首屏結構分歧：
+          繪 = 製圖宣言 → 嚴格格牆（對齊牆）
+          影 = 割面對峙 → 顯影地圖 → 直落流時間軸
+      -->
+      <!--
+        i1：舊 GalleryConfrontGateway（被埋在 DarkroomBar/Index 之後、非全幅）已由
+        頁首 full-bleed GalleryWorldGate 取代（見上方 lg:flex-1 欄頂）。此處保留註解標記移除點。
+      -->
+
+      <!--
+        i4：暗室「綜覽接觸印樣格目次」(GalleryDarkroomIndex) 已移除 —— 它本身是一張
+        縮圖格牆（部落格目次感），與本輪 overview 主欄的橫向膠卷光桌(GalleryLightTable)
+        重複（光桌自帶巻尺 roll-ruler 作橫向綜覽導航）。改由光桌單一承擔「綜覽 + 深入」，
+        消除「縮圖格牆目次 + 內容」的雙層格牆冗餘。
+      -->
 
       <!--
         其の一 Footsteps Map — 僅在 photography overview（未進 event）顯示。
@@ -153,8 +224,8 @@
         class="mb-12 max-w-7xl mx-auto scroll-mt-24"
         aria-labelledby="photo-map-heading"
       >
-        <header class="mb-5">
-          <p class="jp-section-label mb-2">其の一 · Footsteps</p>
+        <header class="mb-5 world-enter world-enter-d1">
+          <p class="jp-section-label mb-2">其の二 · Footsteps</p>
           <h2
             id="photo-map-heading"
             class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100"
@@ -168,6 +239,26 @@
         />
         <div class="jp-hairline w-full mt-6"/>
       </section>
+
+      <!--
+        j4（act-critic / 一組對位敘事）：overview 入口的雙世界本體。
+        門（GalleryWorldGate）之後，主欄不再各自落到「該世界最新 N 張」的單軌流，
+        而是先攤開一冊【對開帳 GalleryDiptychLedger】——由頂層 crossWorldSpreads 編定的
+        繪×影同題對頁配對（資料層驅動），讓雙主線從「兩個入口」進化為「一組對位敘事」。
+        對開帳之後才接該世界的 timeline / 光桌（深入單軌）。
+        只在 overview 入口、且有解析到配對時顯示；進 event 沉浸閱讀時收起。SSR 安全。
+      -->
+      <div
+        v-if="!isGalleryLoading && !galleryLoadFailed && isOverviewEntry && crossWorldSpreads.length"
+        class="mb-14 sm:mb-20 world-enter world-enter-d2"
+      >
+        <GalleryDiptychLedger
+          :spreads="crossWorldSpreads"
+          @open-kai="openKaiSpread"
+          @open-kage="openKageSpread"
+        />
+        <div class="jp-hairline w-full mt-12 sm:mt-16"/>
+      </div>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
@@ -193,47 +284,30 @@
           </button>
         </div>
 
-        <!-- 數位繪圖 - 策展開場 + 年度章封 + Pinterest 風格瀑布流佈局（R40：補章封 dual-track 對位） -->
+        <!--
+          數位繪圖（繪 · 製図室）
+          i3（act-critic）：KILL 部落格地層 —— 移除舊「v-for stacked 章節 header
+          (其の N / 20XX年電繪作品) → GridWall」逐年上下堆疊（critic verdict #2「太像部落格」）。
+          改為單一【橫向可拖動製図台年表】GalleryAtelierTimeline：年份左→右鋪在同一張製圖桌上，
+          頂部年尺可點跳年，使用者主動橫拖／⇧滾輪／方向鍵探索（user-initiated，無 timer）。
+          桌機橫向、手機降級直落（normal scroll，瀏覽不破）。Intro 製圖宣言保留領銜。
+        -->
         <div v-else-if="currentCategory === 'digital'">
-          <GalleryDigitalIntro />
-          <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <!-- R40：digital 依 event.name (年份) 分組，每組前綴章封 cover；
-                 與 photography Timeline 章封對位，dual-track motif 一致 -->
-            <section
-              v-for="(group, gIdx) in digitalEventGroups"
-              :key="group.eventName"
-              class="mb-16 last:mb-0 scroll-mt-24"
-            >
-              <header class="digital-chapter-header" :class="`digital-chapter-header--${group.track}`">
-                <div class="digital-chapter-header__index">其の {{ formatChapterKansuji(gIdx + 1) }}</div>
-                <h3 class="digital-chapter-header__title font-jp">{{ group.eventName }}</h3>
-                <p v-if="group.strongestLine" class="digital-chapter-header__strongest">「{{ group.strongestLine }}」</p>
-                <p class="digital-chapter-header__meta jp-kansuji">
-                  <span>繪</span>
-                  <span aria-hidden="true">·</span>
-                  <span>DIGITAL</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{{ group.images.length }} 葉</span>
-                </p>
-
-                <!-- R45：digital chapter axes 改 3 row dt/dd 與 photography EventCover 對等（dual-track parity） -->
-                <dl v-if="digitalAxisRows(group).length" class="digital-chapter-axes-3row">
-                  <div v-for="row in digitalAxisRows(group)" :key="row.label" class="jp-axis-row">
-                    <dt>{{ row.label }}</dt>
-                    <dd>
-                      <span v-for="v in row.values" :key="v" class="jp-chip jp-chip--kai">{{ v }}</span>
-                    </dd>
-                  </div>
-                </dl>
-              </header>
-              <GalleryMasonryLayout
-                :items="group.images"
-                :columns="4"
-                :gap="16"
-                @image-click="(img) => openImageViewer(img, digitalArtItems)"
-              />
-            </section>
+          <!--
+            i6（act-critic / 門と台を一本の軌に縫う）：overview 入口屏顯示 GalleryWorldGate
+            時，KILL 中間那層 GalleryDigitalIntro 的「製圖格牆 hero-row」——它在門（已含 繪
+            製図台 preview 條）正下方再起一條等寬方格列，正是 critic 指的「門／grid 兩種視覺
+            語言並存的斷層」（門→hero-row→年表三條橫條堆疊）。改為門直接接續 AtelierTimeline
+            縫合條，一條軌貫穿。非 overview（進 event / 有篩選、無門）時才保留 Intro 領銜。
+          -->
+          <div v-if="!isOverviewEntry" class="world-enter world-enter-d1">
+            <GalleryDigitalIntro />
           </div>
+          <GalleryAtelierTimeline
+            :groups="atelierYearGroups"
+            class="world-enter world-enter-d2"
+            @image-click="(img) => openImageViewer(img, digitalArtItems)"
+          />
         </div>
 
         <!-- 攝影作品 - 保持原有的日式佈局 -->
@@ -255,36 +329,27 @@
           />
 
           <!--
-            R32：「其の二 · Artist Statement」整段刪除
-            「まだ、撮っている。」與首頁 Hero 序卷頭語、Epilogue 收筆語重複（site-wide 已有 3 處同質聲明）
-            砍掉後 gallery overview 章節從 4 章 → 3 章（Footsteps / Selected / Timeline）
-          -->
+            R32：「其の二 · Artist Statement」整段刪除（與首頁 Hero/Epilogue 重複）。
 
-          <!--
-            其の三 · 精選 Selected — Horizontal Featured Strip（僅 overview 模式）
-            放在地圖之後、時間軸之前：工具性（地圖） → 策展焦點（strip） → 全量（時間軸）
-            桌機獨享（元件內 md:hidden）。
-            上方加 editorial section header，承接 statement 的氣口、避免和 strip 內側欄重複信號。
+            i4（act-critic / 暗室の横引き膠卷光桌）：KILL 影世界舊「stacked 摺合章 timeline
+            + 精選 strip」部落格地層（critic AVOID jump-out：影仍是死板縮圖格牆）。
+            overview 主欄改為一條【橫向可拖動的暗房光桌膠卷流】GalleryLightTable，
+            與繪 GalleryAtelierTimeline（製図台）對位——一張製圖桌、一卷底片，
+            兩世界各有招牌橫向手勢。HorizontalStripFeatured / GalleryPhotographySection
+            （逐年 stacked）只在「進 event 沉浸模式」保留垂直閱讀。
           -->
-          <header v-if="!filterState.selectedEvent" class="hidden md:block max-w-7xl mx-auto px-6 mb-3">
-            <p class="jp-section-label mb-2">其の二 · Selected</p>
-            <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">精選 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Featured Series</span></h2>
-          </header>
-          <HorizontalStripFeatured v-if="!filterState.selectedEvent" />
+          <!-- overview：橫向膠卷光桌（取代精選 strip + 逐年 stacked timeline） -->
+          <GalleryLightTable
+            v-if="!filterState.selectedEvent"
+            :items="photographyEventItems"
+            class="world-enter world-enter-d2"
+            @image-click="(img) => openImageViewer(img, allPhotographyImages)"
+          />
 
-          <!--
-            其の四 · 時間軸 Timeline header — 僅 overview 模式顯示章節 header；
-            event 模式下章節標題感由扉頁取代，timeline 直接展開以保留沉浸氣口。
-          -->
-          <header v-if="!filterState.selectedEvent" class="max-w-7xl mx-auto px-6 mt-12 md:mt-16 mb-8 md:mb-10">
-            <div class="jp-hairline w-full mb-6"/>
-            <p class="jp-section-label mb-2">其の三 · Timeline</p>
-            <h2 class="font-jp text-2xl sm:text-3xl font-extralight tracking-[0.3em] text-stone-800 dark:text-stone-100">時間軸 <span class="text-[0.7rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 ml-2 align-middle uppercase">Chronicle</span></h2>
-          </header>
-
-          <!-- Timeline：兩種模式皆渲染；event 模式下扉頁的「展開全部」會 scroll 到此 -->
-          <div ref="eventTimelineRef" :class="{ 'scroll-mt-24': filterState.selectedEvent }">
+          <!-- Timeline：僅 event 沉浸模式渲染；扉頁的「展開全部」會 scroll 到此 -->
+          <div v-if="filterState.selectedEvent" ref="eventTimelineRef" class="scroll-mt-24">
             <GalleryPhotographySection
+              ref="photographySectionRef"
               :items="photographyEventItems"
               :focused-event-name="focusedEventName"
               :register-event-ref="setEventRef"
@@ -300,6 +365,26 @@
       </div>
       </transition>
     </div>
+
+    <!--
+      j1：手機「翻面帶」—— fixed 縱向書口僅桌機(lg+)出現，手機在頁尾補一條橫向
+      「翻到對向世界」帶，確保手機也保有整頁雙世界可感知＋可切換（user-initiated）。
+    -->
+    <NuxtLink
+      v-if="isOverviewEntry"
+      :to="`/gallery/${worldId === 'kai' ? 'photography' : 'digital'}`"
+      class="facing-band lg:hidden"
+      :data-world="worldId === 'kai' ? 'kage' : 'kai'"
+      :aria-label="worldId === 'kai' ? '影の世界（暗室）へ翻る' : '繪の世界（製図室）へ翻る'"
+    >
+      <span class="facing-band__rule" aria-hidden="true"/>
+      <span class="facing-band__kana font-jp" aria-hidden="true">{{ worldId === 'kai' ? '影' : '繪' }}</span>
+      <span class="facing-band__copy">
+        <span class="facing-band__lead">{{ worldId === 'kai' ? '対向の世界へ' : '対向の世界へ' }}</span>
+        <span class="facing-band__sub">{{ worldId === 'kai' ? '影 · Photography へ翻る →' : '← 繪 · Digital へ翻る' }}</span>
+      </span>
+      <span class="facing-band__rule" aria-hidden="true"/>
+    </NuxtLink>
 
     <!-- Footer — 根據分類變化 -->
     <div class="container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:py-28 text-center relative overflow-hidden">
@@ -326,6 +411,26 @@
     </div>
       </div>
     </div>
+
+    <!--
+      R3：繪⇄影「世界幕」轉場 overlay（回應 Round 2 critic「缺 tab/route 兩世界互轉轉場」）。
+      切換 track 時播一次定向幕：
+        繪(kai) = 暖色製圖網格幕，由右上「俐落 grid-snap」橫掃離場（呼應對齊牆語法）
+        影(kage) = 冷色顯影幕，中央「緩慢 develop blur-fade」消散（呼應顯影盤語法）
+      純一次性、user-initiated（點 tab 才觸發），無 timer/autoplay，不違 hero 靜態鐵律
+      （此為 gallery 非 hero）。fixed 滿版、pointer-events-none、aria-hidden，不擋互動。
+      所有 keyframe 在 prefers-reduced-motion 下停用（見 main.css）。
+    -->
+    <transition :name="worldId === 'kai' ? 'world-curtain-kai' : 'world-curtain-kage'">
+      <div
+        v-if="worldCurtainOn"
+        class="world-curtain"
+        :data-world="worldId"
+        aria-hidden="true"
+      >
+        <span class="world-curtain__kana font-jp">{{ worldId === 'kai' ? '繪' : '影' }}</span>
+      </div>
+    </transition>
 
     <!-- 圖片檢視器 -->
     <ImageViewer />
@@ -382,14 +487,16 @@ import { useGlobalToast } from '~/composables/useToast'
 import GalleryTabBar from '~/components/GalleryTabBar.vue'
 import EventFilter from '~/components/EventFilter.vue'
 import GalleryFilterToolbar from '~/components/GalleryFilterToolbar.vue'
-import GalleryMasonryLayout from '~/components/GalleryMasonryLayout.vue'
+import GalleryAtelierTimeline from '~/components/gallery/GalleryAtelierTimeline.vue'
 import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
 import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
-import HorizontalStripFeatured from '~/components/gallery/HorizontalStripFeatured.vue'
-import GalleryConfrontGateway from '~/components/gallery/GalleryConfrontGateway.vue'
+import GalleryLightTable from '~/components/gallery/GalleryLightTable.vue'
+import GalleryDiptychLedger from '~/components/gallery/GalleryDiptychLedger.vue'
+import GalleryFacingEdge from '~/components/gallery/GalleryFacingEdge.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
 import GalleryLeftRail from '~/components/gallery/GalleryLeftRail.vue'
+import GalleryDarkroomBar from '~/components/gallery/GalleryDarkroomBar.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
@@ -406,6 +513,7 @@ const {
   digitalWorks,
   photographyWorks,
   filteredItems,
+  crossWorldSpreads,
 } = storeToRefs(galleryStore)
 
 const {
@@ -473,6 +581,67 @@ const showControlMiniBar = ref(false)
 // 當前選擇的類別
 const currentCategory = computed(() => filterState.value.selectedCategory)
 
+/**
+ * R1（galleryWorlds）：世界身分 — 繪=kai / 影=kage。
+ * 由此一個 data-world attribute 驅動整頁氛圍（底紋／環境光／accent 色溫／進場節奏），
+ * 讓兩條 track 像兩個截然不同的世界，而非同一個 image browser 換內容。
+ */
+const worldId = computed(() => (currentCategory.value === 'digital' ? 'kai' : 'kage'))
+
+/**
+ * i2（act-critic / 雙世界共同入口）：overview「双世界の門」入口屏條件。
+ * 回應 Round 1 critic「門被鎖在 photography 單一路由，/gallery/digital 與 /gallery/all
+ * 落地仍是 header+左rail+逐年堆疊的部落格格」。
+ * 改為：**任一 overview 路由**（digital 或 photography）未選 event、無次級篩選、
+ * 兩軌都有資料時，第一屏都先見 full-bleed 繪×影對峙門面 —— 門已偏向當前世界（bias），
+ * 但岐 seam 仍可拖回對側。門之後才是該世界內容（仍可瀏覽，bold ≠ broken）。
+ * 進入任一 event（選 event）即離開門面、回到該世界沉浸導航。
+ */
+const isOverviewEntry = computed(() =>
+  !galleryLoadFailed.value &&
+  !isGalleryLoading.value &&
+  !filterState.value.selectedEvent &&
+  !hasActiveSecondaryFilter.value &&
+  digitalWorks.value.length > 0 &&
+  photographyWorks.value.length > 0
+)
+
+/**
+ * worldReady：控制 ::before/::after 質地層淡入。
+ * 切換 track 時先抽離再掛回 → 重新觸發世界進場（質地淡入 + .world-enter 動畫重播）。
+ * 純一次性進場，無 timer/autoplay，不違 hero 靜態鐵律（此處非 hero）。
+ */
+const worldReady = ref(false)
+let worldReadyRaf = 0
+const armWorld = () => {
+  worldReady.value = false
+  if (typeof window === 'undefined') return
+  cancelAnimationFrame(worldReadyRaf)
+  worldReadyRaf = requestAnimationFrame(() => {
+    worldReadyRaf = requestAnimationFrame(() => { worldReady.value = true })
+  })
+}
+
+/**
+ * 世界幕轉場：切換 track 時短暫掛上 overlay 播放定向幕，播完即卸載。
+ * 只在「真正切換 track」時觸發（worldId 變更），初次掛載不觸發。
+ * prefers-reduced-motion 下不掛幕（避免無謂閃白）。
+ */
+const worldCurtainOn = ref(false)
+let worldCurtainTimer: number | null = null
+watch(worldId, () => {
+  armWorld()
+  if (typeof window === 'undefined') return
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  worldCurtainOn.value = true
+  if (worldCurtainTimer !== null) window.clearTimeout(worldCurtainTimer)
+  // 略長於 leave transition（kage 0.85s）以確保播完離場
+  worldCurtainTimer = window.setTimeout(() => {
+    worldCurtainOn.value = false
+    worldCurtainTimer = null
+  }, 120)
+})
+
 // Gallery header dynamic info
 // 2026-05-09：移除 'all'，labels 收斂為雙主線
 const categoryLabel = computed(() => {
@@ -529,60 +698,37 @@ const clearSecondaryFilters = () => {
 }
 
 /**
- * R40: digital 依 event.name (年份) 分組 — 與 photography timeline 章封對位
- * 章首詩從第一張圖的 seriesNarrative.strongest_line 取
+ * i3：digital 依 event.name (年份) 分組，餵給橫向製図台年表（GalleryAtelierTimeline）。
+ * 取代舊 digitalEventGroups + stacked 章節 header（部落格地層）。
+ * 年份 asc（左→右＝舊→新，橫向時間軸自然由過去往現在推進）。
+ * year 欄位：從 event.name 抽 4 位年份，作年尺刻度與年脊大字。
  */
-const KANSUJI_DIGITAL = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一']
-function formatChapterKansuji (n: number): string {
-  return KANSUJI_DIGITAL[n] || String(n)
+interface AtelierYearGroup {
+  eventName: string
+  year: string
+  images: typeof digitalArtItems.value
+  strongestLine: string | null
 }
-
-/**
- * R45：digital chapter axes 3 row（與 photography EventCover 對等）
- */
-function digitalAxisRows (g: {
-  tools?: string[]
-  techniques?: string[]
-  topics?: string[]
-}): { label: string; values: string[] }[] {
-  const rows: { label: string; values: string[] }[] = []
-  if (g.techniques?.length) rows.push({ label: '技法', values: g.techniques })
-  if (g.topics?.length) rows.push({ label: '題材', values: g.topics })
-  if (g.tools?.length) rows.push({ label: '工具', values: g.tools })
-  return rows
-}
-
-const digitalEventGroups = computed(() => {
-  const groups = new Map<string, {
-    eventName: string
-    images: typeof digitalArtItems.value
-    track: string
-    strongestLine: string | null
-    tools?: string[]
-    techniques?: string[]
-    topics?: string[]
-  }>()
+const atelierYearGroups = computed<AtelierYearGroup[]>(() => {
+  const groups = new Map<string, AtelierYearGroup>()
   for (const img of digitalArtItems.value) {
     const name = img.event?.name || '其他作品'
     if (!groups.has(name)) {
-      const sn = (img as { seriesNarrative?: { strongest_line?: string; tools?: string[]; techniques?: string[]; topics?: string[] } }).seriesNarrative
+      const sn = (img as { seriesNarrative?: { strongest_line?: string } }).seriesNarrative
       groups.set(name, {
         eventName: name,
+        year: name.match(/(\d{4})/)?.[1] || name,
         images: [],
-        track: 'kai',
-        strongestLine: sn?.strongest_line || null,
-        tools: sn?.tools,
-        techniques: sn?.techniques,
-        topics: sn?.topics
+        strongestLine: sn?.strongest_line || null
       })
     }
     groups.get(name)!.images.push(img)
   }
-  // 由年份 desc 排序 — 年份字串如「2025年電繪作品」、「2018年電繪作品」
+  // 年份 asc（左→右＝舊→新）：橫向製図台的時間自然由左往右推進
   return Array.from(groups.values()).sort((a, b) => {
-    const ay = parseInt(a.eventName.match(/(\d{4})/)?.[1] || '0', 10)
-    const by = parseInt(b.eventName.match(/(\d{4})/)?.[1] || '0', 10)
-    return by - ay
+    const ay = parseInt(a.year.match(/(\d{4})/)?.[1] || '0', 10)
+    const by = parseInt(b.year.match(/(\d{4})/)?.[1] || '0', 10)
+    return ay - by
   })
 })
 
@@ -596,6 +742,14 @@ const photographyEventItems = computed(() => {
 })
 
 /**
+ * i4：橫向膠卷光桌的 lightbox 來源 —— 攤平所有 event 群組成單一順序照片陣列，
+ * 讓在光桌任一格開圖後，徑向導航能跨整卷前後翻（與 stacked timeline 同質）。
+ */
+const allPhotographyImages = computed<GalleryItem[]>(() =>
+  photographyEventItems.value.flatMap(g => g.images || [])
+)
+
+/**
  * 進入 event path 時的扉頁來源 group。
  * `mixedPhotoItems` 已套 selectedEvent filter，所以選 event 時通常只剩一個 group；
  * 仍 explicit 用 eventName 比對以防其他 filter 介入。
@@ -606,6 +760,7 @@ const currentEventGroup = computed(() => {
 })
 
 const eventTimelineRef = ref<HTMLDivElement | null>(null)
+const photographySectionRef = ref<{ expandEvent: (name: string) => void } | null>(null)
 
 /** 扉頁「展開全部」→ 平滑捲到 timeline；prefers-reduced-motion 改為瞬移 */
 const scrollToEventTimeline = () => {
@@ -725,6 +880,17 @@ const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
   imageViewerStore.openImageViewer(clickedImage, images)
 }
 
+/**
+ * j4：對開帳 — 點繪葉開繪世界全卷 lightbox、點影葉開影世界全卷 lightbox。
+ * 徑向導航在該世界整卷內前後翻（與該世界 timeline / 光桌同質）。
+ */
+const openKaiSpread = (img: GalleryItem) => {
+  imageViewerStore.openImageViewer(img, digitalWorks.value)
+}
+const openKageSpread = (img: GalleryItem) => {
+  imageViewerStore.openImageViewer(img, allPhotographyImages.value)
+}
+
 
 // ===== 監聽器 =====
 /**
@@ -789,12 +955,15 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
+    armWorld()
   }
 })
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', handleScroll)
+    cancelAnimationFrame(worldReadyRaf)
+    if (worldCurtainTimer !== null) window.clearTimeout(worldCurtainTimer)
   }
 })
 
@@ -900,16 +1069,20 @@ useHead({
 }
 .digital-chapter-header__index {
   font-size: 0.62rem;
-  letter-spacing: 0.4em;
+  letter-spacing: 0.34em;
   color: rgb(217 123 46 / 0.85);
   text-transform: uppercase;
-  font-family: 'Noto Serif JP', serif;
+  /* R4：章碼改等寬 mono 製圖字（繪世界專屬 --world-mono），與影 serif 章碼分歧 */
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
   margin-bottom: 0.5rem;
 }
 .digital-chapter-header__title {
+  /* R2：繪章名改世界字族（Zen Kaku Gothic New，幾何 gothic），與影 Shippori 明體分家 */
+  font-family: var(--world-display, 'Noto Serif JP', serif);
   font-size: 1.85rem;
-  font-weight: 200;
-  letter-spacing: 0.18em;
+  font-weight: var(--world-display-weight, 400);
+  letter-spacing: var(--world-display-spacing, 0.18em);
   color: rgb(68 64 60);
   margin: 0;
   line-height: 1.3;
@@ -930,10 +1103,14 @@ useHead({
   display: inline-flex;
   align-items: baseline;
   gap: 0.55rem;
-  font-size: 0.66rem;
-  letter-spacing: 0.34em;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
   color: rgb(120 113 108);
   text-transform: uppercase;
+  /* R4：meta 行（繪 · DIGITAL · N 葉）等寬 mono，製圖標註觸感。
+     「繪」漢字首字由既有 .digital-chapter-header__meta > span:first-child 規則覆寫回 serif */
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
 }
 .digital-chapter-header__meta > span:first-child {
   font-family: 'Noto Serif JP', serif;
@@ -960,6 +1137,161 @@ useHead({
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+/* ===== R6：mobile/tablet 世界標牌（與 GalleryLeftRail masthead 同步換骨） ===== */
+.gallery-masthead-m__eyebrow {
+  margin: 0 0 0.6rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.gallery-masthead-m__eyebrow--mono {
+  font-family: var(--world-mono, ui-monospace, monospace);
+  letter-spacing: 0.2em;
+}
+.gallery-masthead-m__eyebrow--mono span { opacity: 0.6; }
+.gallery-masthead-m__eyebrow--serif {
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  letter-spacing: 0.42em;
+  text-transform: none;
+}
+.gallery-masthead-m__title {
+  margin: 0;
+  font-weight: 200;
+  color: rgb(41 37 36);
+  line-height: 1.1;
+}
+:global(.dark) .gallery-masthead-m__title { color: rgb(245 245 244); }
+.gallery-masthead-m__title--mono {
+  /* R2：繪標題改用世界字族（Zen Kaku Gothic New，幾何 gothic），
+     與影的 Shippori 明體分家；mono 留給 meta/格號標註 */
+  font-family: var(--world-display, var(--world-mono, ui-monospace, monospace));
+  font-weight: var(--world-display-weight, 400);
+  font-size: 2rem;
+  letter-spacing: var(--world-display-spacing, 0.08em);
+}
+.gallery-masthead-m__title--serif {
+  /* R2：影標題改用世界字族（Shippori Mincho，高對比文人明體） */
+  font-family: var(--world-display, 'Noto Serif JP', 'Source Han Serif TC', serif);
+  font-size: 2.3rem;
+  letter-spacing: var(--world-display-spacing, 0.2em);
+  font-weight: var(--world-display-weight, 500);
+}
+.gallery-masthead-m__note {
+  margin: 0.8rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+  color: rgb(87 83 78);
+}
+:global(.dark) .gallery-masthead-m__note { color: rgb(190 184 178); }
+.gallery-masthead-m__meta {
+  margin: 0.7rem 0 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  color: rgb(120 113 108);
+}
+:global(.dark) .gallery-masthead-m__meta { color: rgb(168 162 158); }
+.gallery-masthead-m__meta--mono {
+  font-family: var(--world-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+.gallery-masthead-m__meta--serif {
+  font-family: 'Noto Serif JP', serif;
+  letter-spacing: 0.2em;
+}
+
+/* ===== R8：mobile 影世界暗室負片膠捲面板（齒孔 + 反白） ===== */
+.gallery-filmpanel-m {
+  position: relative;
+  padding: 1.25rem 1.5rem 1.35rem 1.75rem;
+  background: linear-gradient(165deg, #20262c 0%, #14181c 100%);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.12);
+}
+:global(.dark) .gallery-filmpanel-m {
+  background: linear-gradient(165deg, #1a1f24 0%, #0e1114 100%);
+}
+/* 左緣縱向齒孔 */
+.gallery-filmpanel-m__sprockets {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 8px;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(238, 241, 243, 0.85) 0 1.6px,
+    transparent 1.9px
+  );
+  background-size: 8px 15px;
+  background-repeat: repeat-y;
+  opacity: 0.5;
+}
+/* 面板內反白覆寫 */
+.gallery-filmpanel-m .gallery-masthead-m__title { color: #eef1f3 !important; }
+.gallery-filmpanel-m .gallery-masthead-m__eyebrow--serif { color: #9aadc5 !important; }
+.gallery-filmpanel-m .gallery-masthead-m__note {
+  color: rgba(206, 214, 224, 0.85) !important;
+  border-left-color: rgba(154, 173, 197, 0.55) !important;
+}
+.gallery-filmpanel-m .gallery-masthead-m__meta {
+  color: rgba(190, 200, 212, 0.78) !important;
+}
+
+/* ===== j1：手機「翻面帶」（對向世界橫向入口；fixed 書口僅桌機，手機在此補位） ===== */
+.facing-band {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 32rem;
+  margin: 0.5rem auto 0;
+  padding: 1.1rem 1.4rem;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+.facing-band__rule {
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--hairline);
+}
+.facing-band__kana {
+  flex: 0 0 auto;
+  font-size: 2rem;
+  font-weight: 200;
+  line-height: 1;
+}
+.facing-band[data-world='kai'] .facing-band__kana { color: color-mix(in srgb, var(--accent) 60%, rgb(68 64 60)); }
+.facing-band[data-world='kage'] .facing-band__kana { color: color-mix(in srgb, var(--accent) 55%, rgb(120 113 108)); }
+:global(.dark) .facing-band[data-world='kage'] .facing-band__kana { color: color-mix(in srgb, var(--accent) 55%, rgb(214 211 209)); }
+.facing-band__copy {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.18rem;
+}
+.facing-band__lead {
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  color: rgb(87 83 78);
+}
+:global(.dark) .facing-band__lead { color: rgb(214 211 209); }
+.facing-band__sub {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-family: var(--world-mono, ui-monospace, monospace);
 }
 
 /* 僅保留頁面內過場與響應式 h1 調整；共用樣式（shadow-japanese、backdrop-blur-japanese、scrollbar 等）已遷入 assets/css/main.css */
@@ -994,15 +1326,20 @@ useHead({
 }
 
 @media (max-width: 768px) {
-  h1 {
+  h1:not(.gallery-masthead-m__title) {
     font-size: 2rem !important;
     line-height: 1.2;
   }
+  /* R6：世界標牌在手機略收，但保留兩世界字級差（mono 緊 / serif 鬆） */
+  .gallery-masthead-m__title--mono { font-size: 1.75rem; }
+  .gallery-masthead-m__title--serif { font-size: 2rem; }
 }
 
 @media (max-width: 480px) {
-  h1 {
+  h1:not(.gallery-masthead-m__title) {
     font-size: 1.75rem !important;
   }
+  .gallery-masthead-m__title--mono { font-size: 1.6rem; }
+  .gallery-masthead-m__title--serif { font-size: 1.85rem; }
 }
 </style>

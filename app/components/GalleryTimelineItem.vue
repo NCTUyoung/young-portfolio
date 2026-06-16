@@ -1,5 +1,49 @@
 <template>
-  <div class="flex items-start relative" :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'">
+  <!--
+    R10：wide 模式（影世界膠卷流專用）——把原本竊取 ~160px 寬的縱書き時間側欄
+    改成「橫向章首帶」(time-band)，內容區因此吃滿主欄全寬（896px），
+    讓單欄全寬膠卷真正落地，消除 critic 連兩輪點名的右側巨幅死白。
+    非 wide（保留舊行為）仍走左右交替的縱書き timeline 側欄。
+  -->
+  <div v-if="wide" class="film-tl">
+    <!-- 橫向章首帶：左 sprocket-node + 時間讀數 + 事件描述/地點，hairline 收尾 -->
+    <div class="film-tl__band">
+      <span class="film-tl__node" aria-hidden="true">
+        <span class="film-tl__node-diamond"/>
+      </span>
+      <span class="film-tl__time font-jp">{{ timeLabel }}</span>
+      <span
+        v-if="eventInfo && showEventInfo && (eventInfo.description || eventInfo.location)"
+        class="film-tl__meta"
+      >
+        <span v-if="eventInfo.location" class="film-tl__loc">
+          <span class="jp-sumi-dot !w-1 !h-1 flex-shrink-0" aria-hidden="true"/>{{ eventInfo.location }}
+        </span>
+      </span>
+      <span class="film-tl__rule" aria-hidden="true"/>
+      <button
+        v-if="showEventControl"
+        type="button"
+        class="film-tl__toggle"
+        :aria-expanded="isExpanded"
+        :title="`${isExpanded ? '折疊' : '展開'} ${eventName} 的作品`"
+        @click="eventKey && toggleGroupExpansion(eventKey)"
+      >
+        <span class="font-jp">{{ isExpanded ? '收' : '展' }}</span>
+      </button>
+    </div>
+
+    <Transition name="collapse-fade" mode="out-in">
+      <div v-if="shouldShowContent" class="film-tl__content collapse-from-left relative">
+        <slot />
+      </div>
+      <div v-else-if="!shouldShowContent && showEventControl" class="film-tl__content chapter-fold relative">
+        <slot name="cover" />
+      </div>
+    </Transition>
+  </div>
+
+  <div v-else class="flex items-start relative" :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'">
     <!-- Timeline Section -->
     <div
       class="md:w-40 flex-shrink-0 text-right md:text-left mb-4 md:mb-0 relative overflow-visible"
@@ -145,6 +189,8 @@ interface Props {
   showEventInfo?: boolean
   /** R33：若 true，user 未操作過時預設摺合（用於 timeline 較舊的 events 減負） */
   defaultCollapsed?: boolean
+  /** R10：wide 模式 — 影世界膠卷流走橫向章首帶 + 全寬內容（消除側欄竊寬死白） */
+  wide?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -152,7 +198,8 @@ const props = withDefaults(defineProps<Props>(), {
   eventKey: '',
   showEventControl: false,
   showEventInfo: false,
-  defaultCollapsed: false
+  defaultCollapsed: false,
+  wide: false
 })
 
 const galleryStore = useGalleryStore()
@@ -179,6 +226,82 @@ const shouldShowContent = computed(() => {
 </script>
 
 <style scoped>
+/* ===== R10：wide 模式（影世界膠卷流）橫向章首帶 + 全寬內容 ===== */
+.film-tl { position: relative; }
+.film-tl__band {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* g2：band 下距由 1.6rem 收為 0.5rem——摺合章「時間帶 + 現像條」讀作單一章單元，
+     不再每章撐開一段空距（下半冷調空白的次要來源）。展開時內容自帶 padding 氣口。 */
+  margin-bottom: 0.5rem;
+}
+/* 章首節點：膠卷齒孔色的小菱形（serif 影世界調性，與繪 mono 標牌對立） */
+.film-tl__node {
+  flex-shrink: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.film-tl__node-diamond {
+  width: 0.55rem;
+  height: 0.55rem;
+  transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--fg-muted));
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.film-tl__time {
+  flex-shrink: 0;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.92rem;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  color: rgb(120 113 108);
+  white-space: nowrap;
+}
+:global(.dark) .film-tl__time { color: rgb(168 162 158); }
+.film-tl__meta { flex-shrink: 0; display: inline-flex; align-items: center; }
+.film-tl__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgb(168 162 158);
+}
+/* hairline 收尾：橫貫剩餘寬度，影世界的「顯影軌」 */
+.film-tl__rule {
+  flex: 1;
+  height: 1px;
+  min-width: 1.5rem;
+  background: linear-gradient(to right,
+    color-mix(in srgb, var(--accent) 28%, transparent),
+    color-mix(in srgb, var(--accent) 10%, transparent) 60%,
+    transparent);
+}
+.film-tl__toggle {
+  flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--accent) 80%, var(--fg-muted));
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.film-tl__toggle:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.film-tl__toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.film-tl__content { width: 100%; min-width: 0; }
+
 /* 紙の展開 — 輕微 scale 如紙張落定 */
 /* 方向性滑入 — 依時間軸左右，自軸心滑出 */
 .collapse-fade-enter-active {

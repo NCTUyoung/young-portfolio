@@ -1,6 +1,56 @@
 {
   "totalNumber": "80",
   "category": "photography",
+  "crossWorldSpreads": [
+    {
+      "id": "machi-no-hito",
+      "theme": "街の人",
+      "themeRoman": "Figures in the City",
+      "kaiEvent": "2022年電繪作品",
+      "kageEvent": "春日街拍",
+      "connector": "繪裡的人物是構圖排出來的，影裡的人物是等出來的——同一座城市的兩種捕捉"
+    },
+    {
+      "id": "hikari-no-moto",
+      "theme": "光源",
+      "themeRoman": "Where the Light Comes From",
+      "kaiEvent": "2023年電繪作品",
+      "kageEvent": "2024新北耶誕城",
+      "connector": "電繪那年學會「光從哪裡來是構圖的開始」，耶誕城的夜把這句話拍成了現場"
+    },
+    {
+      "id": "matsu",
+      "theme": "待つ",
+      "themeRoman": "The Act of Waiting",
+      "kaiEvent": "2024年電繪作品",
+      "kageEvent": "2025 桃猿三本柱",
+      "connector": "一邊是反覆修線等畫面成形，一邊是 1/2000 秒等球進框——兩種等待都是構圖"
+    },
+    {
+      "id": "yawarakai-hikari",
+      "theme": "柔光",
+      "themeRoman": "Soft Light on Skin",
+      "kaiEvent": "2021年電繪作品",
+      "kageEvent": "攝影社 米倉團拍",
+      "connector": "粗線條故意留下的筆觸節奏，對望木牆吃光後留在皮膚上的暖——都在追同一種柔"
+    },
+    {
+      "id": "shoki",
+      "theme": "初期",
+      "themeRoman": "The First Year",
+      "kaiEvent": "2018年電繪作品",
+      "kageEvent": "調色測試",
+      "connector": "SAI 第一年用色塊講故事，與調色測試的第一手實驗對望——兩條線各自的起點"
+    },
+    {
+      "id": "saishin",
+      "theme": "最新",
+      "themeRoman": "What I Make Now",
+      "kaiEvent": "2026年電繪作品",
+      "kageEvent": "WBC 2026",
+      "connector": "此刻的繪是一台保時捷 356，此刻的影是 WBC 的球場——兩條主線推進到的現在"
+    }
+  ],
   "seriesNarratives": {
     "春日街拍": {
       "prologue": "春日的台北街頭，旗袍與紅燈籠是不期而遇的小說封面。光圈開到 2.8，背景的招牌軟成水彩，讓人從都市裡剝離出來。給「都市孤獨美」的一封信。",
@@ -318,7 +368,8 @@
       "focalLength": 79,
       "aperture": 2.5,
       "iso": 100,
-      "shutterSpeed": 0.001
+      "shutterSpeed": 0.001,
+      "note": "1/1000 街上沒人察覺我按了快門。她轉頭的瞬間，淺景深替我把整條街的雜訊收乾淨。"
     },
     {
       "filename": "photography/春日街拍/DSC_7069-編輯-1.jpg",
@@ -659,7 +710,8 @@
       "focalLength": 101,
       "aperture": 2.7,
       "iso": 100,
-      "shutterSpeed": 0.004
+      "shutterSpeed": 0.004,
+      "note": "101mm f/2.7 從人群外圍偷一張。米倉的鐵皮反光當了側補光——沒帶燈，光自己來了。"
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_5124-1.jpg",
@@ -795,7 +847,8 @@
       "focalLength": 73,
       "aperture": 2.5,
       "iso": 100,
-      "shutterSpeed": 0.002
+      "shutterSpeed": 0.002,
+      "note": "f/2.5 把背後的紅磚牆全化開。對焦點只給了睫毛——後面那道走廊只是顏色，不是地點。"
     },
     {
       "filename": "photography/交大外拍/DSC_3312-1.jpg",
@@ -997,7 +1050,8 @@
       "focalLength": 35,
       "aperture": 5,
       "iso": 100,
-      "shutterSpeed": 0.004
+      "shutterSpeed": 0.004,
+      "note": "35mm 把整排風鈴木壓進一個畫面——黃花不是重點，是它們把湖面對岸的山稜一段段切開的節奏。"
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1398-編輯-1.jpg",
@@ -1020,7 +1074,8 @@
       "focalLength": 150,
       "aperture": 5,
       "iso": 100,
-      "shutterSpeed": 0.002
+      "shutterSpeed": 0.002,
+      "note": "150mm 抽出單一株。1/500 凝住風裡的花，但你看最末端那幾朵還是糊的——風比快門快了一格。"
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1437-編輯-1.jpg",
@@ -1299,7 +1354,8 @@
       "focalLength": 300,
       "aperture": 6.3,
       "iso": 400,
-      "shutterSpeed": 0.008
+      "shutterSpeed": 0.008,
+      "note": "300mm 隔著全場找到他。1/125 在這個距離其實不夠快，賭的是他出手前那半秒的靜止。"
     },
     {
       "filename": "photography/WBC 2026/DSC_0582-編輯-1.jpg",
@@ -1322,7 +1378,8 @@
       "focalLength": 130,
       "aperture": 5,
       "iso": 2000,
-      "shutterSpeed": 0.001
+      "shutterSpeed": 0.001,
+      "note": "ISO 2000、巨蛋頂光很髒。但 1/1000 把汗珠釘在空中，雜訊反而像看台的熱氣。"
     },
     {
       "filename": "photography/WBC 2026/DSC_0483-編輯-1.jpg",

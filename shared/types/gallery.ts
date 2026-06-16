@@ -48,6 +48,39 @@ export interface SeriesNarrative {
 }
 
 /**
+ * j4（act-critic / 一組對位敘事）— 跨世界對頁配對。
+ *
+ * 回應 Round j3 critic 的 BOLD NEXT STEP：「跳到資料層，把雙主線從『兩個入口、各自最新 N 張』
+ * 進化為『一組對位敘事』——繪某事↔影某事的同題對頁配對，讓對開本左右葉渲染成真正成對的
+ * 跨世界 spread」。
+ *
+ * 一個 spread = 一個共同命題（題），左葉繫一個繪 event、右葉繫一個影 event，
+ * 由 connector（一句話）說明這兩者為何同題對望。封面圖由左右 event 第一張代表作自動帶出
+ * （或以 kaiCover / kageCover 明確指定 filename 覆寫）。
+ *
+ * 由 galleryList.json / photographyList.json 頂層 `crossWorldSpreads` 提供
+ * （兩檔保持一致，任一 loader 帶出即可）。selector 依 event.name 把左右葉接回 live works。
+ */
+export interface CrossWorldSpread {
+  /** 配對 id（穩定 key） */
+  id: string
+  /** 共同命題（題）— 一個漢字詞，如「待つ」「光源」 */
+  theme: string
+  /** 命題羅馬字副題（≤ 24 字） */
+  themeRoman: string
+  /** 左葉：繪 event 名（對 galleryList.json event.name） */
+  kaiEvent: string
+  /** 右葉：影 event 名（對 photographyList.json event.name） */
+  kageEvent: string
+  /** 對位敘事 — 一句說明這兩件為何同題對望（≤ 40 字，不含尾標點） */
+  connector: string
+  /** 左葉封面 filename 覆寫（可選；省略時取該 event 第一張） */
+  kaiCover?: string
+  /** 右葉封面 filename 覆寫（可選；省略時取該 event 第一張） */
+  kageCover?: string
+}
+
+/**
  * 軌道入口導言（R7）— 一條主線（繪 / 影）的「入口元資料」，
  * 不掛在單張作品或單一 event 上，而是整條主線的開場宣言。
  *
@@ -181,6 +214,8 @@ export interface GalleryData {
   seriesNarratives?: Record<string, SeriesNarrative>
   /** R7：整條主線的入口導言（給 index Featured 雙軌題詞） */
   trackManifesto?: TrackManifesto
+  /** j4：跨世界對頁配對（繪↔影同題對望）— 兩檔保持一致 */
+  crossWorldSpreads?: CrossWorldSpread[]
   Img: DigitalArtItem[]
 }
 
@@ -192,6 +227,8 @@ export interface PhotographyData {
   seriesNarratives?: Record<string, SeriesNarrative>
   /** R7：整條主線的入口導言（給 index Featured 雙軌題詞） */
   trackManifesto?: TrackManifesto
+  /** j4：跨世界對頁配對（繪↔影同題對望）— 兩檔保持一致 */
+  crossWorldSpreads?: CrossWorldSpread[]
   Img: PhotographyItem[]
 }
 

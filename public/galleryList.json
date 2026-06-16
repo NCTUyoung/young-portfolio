@@ -1,5 +1,55 @@
 {
   "totalNumber": "35",
+  "crossWorldSpreads": [
+    {
+      "id": "machi-no-hito",
+      "theme": "街の人",
+      "themeRoman": "Figures in the City",
+      "kaiEvent": "2022年電繪作品",
+      "kageEvent": "春日街拍",
+      "connector": "繪裡的人物是構圖排出來的，影裡的人物是等出來的——同一座城市的兩種捕捉"
+    },
+    {
+      "id": "hikari-no-moto",
+      "theme": "光源",
+      "themeRoman": "Where the Light Comes From",
+      "kaiEvent": "2023年電繪作品",
+      "kageEvent": "2024新北耶誕城",
+      "connector": "電繪那年學會「光從哪裡來是構圖的開始」，耶誕城的夜把這句話拍成了現場"
+    },
+    {
+      "id": "matsu",
+      "theme": "待つ",
+      "themeRoman": "The Act of Waiting",
+      "kaiEvent": "2024年電繪作品",
+      "kageEvent": "2025 桃猿三本柱",
+      "connector": "一邊是反覆修線等畫面成形，一邊是 1/2000 秒等球進框——兩種等待都是構圖"
+    },
+    {
+      "id": "yawarakai-hikari",
+      "theme": "柔光",
+      "themeRoman": "Soft Light on Skin",
+      "kaiEvent": "2021年電繪作品",
+      "kageEvent": "攝影社 米倉團拍",
+      "connector": "粗線條故意留下的筆觸節奏，對望木牆吃光後留在皮膚上的暖——都在追同一種柔"
+    },
+    {
+      "id": "shoki",
+      "theme": "初期",
+      "themeRoman": "The First Year",
+      "kaiEvent": "2018年電繪作品",
+      "kageEvent": "調色測試",
+      "connector": "SAI 第一年用色塊講故事，與調色測試的第一手實驗對望——兩條線各自的起點"
+    },
+    {
+      "id": "saishin",
+      "theme": "最新",
+      "themeRoman": "What I Make Now",
+      "kaiEvent": "2026年電繪作品",
+      "kageEvent": "WBC 2026",
+      "connector": "此刻的繪是一台保時捷 356，此刻的影是 WBC 的球場——兩條主線推進到的現在"
+    }
+  ],
   "seriesNarratives": {
     "2018年電繪作品": {
       "prologue": "從 SAI 開始的第一年。學的是「不是線稿不夠細，而是色塊還沒講完故事」。膠囊、機械、單一物件當主角，背景留白。",
@@ -138,21 +188,21 @@
       ]
     },
     "2026年電繪作品": {
-      "prologue": "最近的實驗——AI 輔助構圖草稿、人手上色完成。重點不在誰畫的，是這幅畫該有的「氣息」是否還在。",
-      "annotation": "AI 給的草稿到後段全被重畫——細看皮膚的暖灰跟陰影的冷紫沒有 AI 那種「平均色」，是手刷出來的差異。",
-      "mood": "ai-assist · breath · 2026",
+      "prologue": "最近的實驗——從構圖草稿到上色，逐筆推敲。重點是這幅畫該有的「氣息」有沒有被刷出來。",
+      "annotation": "草稿到後段幾乎全被重畫——細看皮膚的暖灰與陰影的冷紫，是手刷一層層疊出來的差異，不是平塗。",
+      "mood": "hand-painted · breath · 2026",
       "palette": [
         "#5b4a7a",
         "#d9c98a",
         "#e8e0f0"
       ],
-      "strongest_line": "AI 輔助，手刷氣息還在",
+      "strongest_line": "一筆一刷，氣息還在",
       "tools": [
-        "AI 草稿",
-        "Photoshop 手刷"
+        "Photoshop 手刷",
+        "數位厚塗"
       ],
       "techniques": [
-        "AI 輔助構圖",
+        "構圖草稿",
         "手工色層"
       ],
       "topics": [

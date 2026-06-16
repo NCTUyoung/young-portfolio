@@ -56,12 +56,12 @@ interface Chapter {
   label: string
 }
 
-// 章節順序對應書本目次（R32：Domains 已砍 → 5 章節）：序 → 対 → 步 → 選 → 印
+// 章節順序對應書本目次（R6：対話 併入 Journey → 4 章節）：序 → 步 → 選 → 印
+// 「対話」couplet 現為 Journey 的 masthead，不再獨立章節；步 一節同時承載宣言與時間軸。
 // hero 沒有 id（即 top of page），active 偵測單靠 scrollY < 第二章 top 邊界
 const chapters: Chapter[] = [
   { id: 'top', kanji: '序', label: 'Hero' },
-  { id: 'dialogue', kanji: '対', label: 'Dialogue 対話' },
-  { id: 'journey', kanji: '步', label: 'Journey 步履' },
+  { id: 'journey', kanji: '步', label: 'Journey 步履・対話' },
   { id: 'featured', kanji: '選', label: 'Featured 選' },
   { id: 'epilogue', kanji: '印', label: 'Epilogue 印' },
 ]

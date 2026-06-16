@@ -5,12 +5,15 @@
   </NuxtLayout>
 
   <!--
-    R9：gallery 軌道切換「起算尺」轉場 overlay。
+    j2（act-critic / 翻面：書頁を繰る本物の過場）：gallery 軌道切換「翻頁」過場 overlay。
+    取代 R9『起算尺 overlay』(GalleryTrackTransition) —— 那把切軌抽象成「尺上移動讀數」，
+    critic BOLD NEXT STEP 要的是「看得見的翻面動作」：離場世界整頁繞中央書脊摺起、
+    背面進場世界由書口展開，一次過場同時呈現兩世界正反面。桌機與手機同一過場。
     掛在 app.vue 而非 gallery 頁內，確保切 tab（route param 變更可能卸載 page）時
-    overlay 仍常駐。元件自身只在 store trackTransitionTick bump 時才 render，
-    非 gallery 頁不會觸發（setSelectedCategory 只在 gallery 路由被呼叫）。
+    overlay 仍常駐。元件自身只在 store trackTransitionTick bump 時才 render（user-initiated：
+    點 tab / 點對向書口 / 點翻面帶 → setSelectedCategory → bump tick），非 gallery 頁不觸發。
   -->
-  <GalleryTrackTransition />
+  <GalleryPageFlip />
 
   <!--
     Round 19：全站 SVG defs — 印章 ink-bleed 濾鏡（用於 .jp-seal 字身）

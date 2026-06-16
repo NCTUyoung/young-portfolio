@@ -5,194 +5,155 @@
       編輯化目次：序 / 領 / 対 / 步 / 選 / 印 — 把首頁敘事擬書目
     -->
     <ChapterRail />
+
+    <!--
+      R8（CSS 動態效果 — scroll-driven，非 hero/entrance）：綴じ糸 — 全頁裝幀縫線進度。
+      一條極細縫線沿頁面左版心垂直貫穿，隨捲動「縫合」往下走（draw-down），縫頭一枚朱結
+      停在當前讀到的位置。把「翻一本和裝書」的裝幀隱喻做成全站唯一的 scroll-driven 動態：
+        - 縫線進度 = window scroll / scrollable height（rAF 節流，passive listener）。
+        - 縫頭朱結（knot）沿線下滑，到段落節點短暫「打結」感（純 CSS scale pulse via class）。
+      與 hero 對開帶（封面）呼應：封面翻開 → 內頁被一條裝幀線縫起。
+      鐵律守線：hairline-only 縫線（stone）+ accent 僅縫頭一點（非填面）；fixed、aria-hidden、
+      pointer-events-none，不擋互動；lg+ 才出現（窄屏版心無餘裕，避免壓內容）。
+      reduced-motion：保留靜態縫線與當前縫頭位置（仍 scroll-driven 但去除平滑過渡，見 main.css）。
+    -->
+    <div
+      class="home-binding"
+      aria-hidden="true"
+      :style="{ '--stitch': bindingProgress }"
+    >
+      <span class="home-binding__track"/>
+      <span class="home-binding__thread"/>
+      <span class="home-binding__knot"/>
+    </div>
+
     <!-- =====================================================================
-         Hero — 表紙（靜照扉頁，Phase 3A）
-         構成：左縦書き年號／中主標（和欧混植）／右作品集縦書き／單張靜照背景
-         2026-04-19：廢除「風中翻書」5 張輪播鐵律（見 design-aesthetic.mdc §5）。
-                     保留扉頁氣質（余白主標、引言、令和年號、繪と影對聯）；
-                     單張靜照改從 photographyList.json 標 `series: ['hero']` 取，
-                     與 useSeoMeta.ogImage / nuxt.config.ts 同源，修資料債。
-                     高度 88dvh → 60vh 讓 strip 上緣在首屏內露臉。
+         Hero — 対開扉頁（R4 強硬大膽：對開帶升格為首屏 hero）
+         上一輪 critic jump-out：「破『hero 三連拼貼』鐵律——首屏直接做左繪/右影對開，
+           兩半各鋪一張該世界代表圖（繪滿版方格/影膠卷流），背景色拉開明度差，
+           中央書脊縫即導覽，點任一半進對應 gallery；對開帶本身就是新 hero。
+           兩半 reveal 從書脊向外展開（reduced-motion 改淡入）。」
+         回應（結構性大改，非 chrome）：
+           - 廢除 3 連拼貼 hero-collage（5 年的 §11 策略 C），改 hero-spread 對開兩半。
+           - 左半 = 繪世界（暖陽 fdfaf4 + 工程方格紙 + Zen Kaku 幾何字 + 滿版代表電繪）。
+           - 右半 = 影世界（暗室 14181b + 顯影顆粒 + Shippori 明體 + 滿版代表攝影，明度差 ~15 階）。
+           - 中央書脊縫（hero-spine）= 導覽：縦書き「繪／影」與令和年號，視覺鉚定「翻開兩本書」。
+           - 兩半各掛世界標牌（製図室／暗室）+ 進場 reveal 從書脊向外展開（hero-spread--in）。
+           - 點任一半 → /gallery/digital | /gallery/photography（heroFocus toggle hover 強化）。
+         鐵律破例（見 rulesBroken）：破 hero 三連拼貼策略 C；右半 stone 主軸內換暗室冷青 +
+           serif 字族；左半暖陽 + 幾何 sans。皆有「兩世界 identity 首屏即兌現」之敘事正當性。
+         hero static 守線：無 autoplay/timer/carousel；hover/click 才變化（user-initiated）。
          ===================================================================== -->
     <section
-      class="relative min-h-[560px] h-[78vh] md:h-[82vh] md:min-h-[640px] overflow-hidden flex flex-col lg:flex-row-reverse"
+      class="hero-spread relative min-h-[600px] h-[82vh] md:min-h-[680px] overflow-hidden"
+      :class="{ 'hero-spread--in': heroIn }"
       role="region"
-      aria-roledescription="封面主視覺"
-      aria-label="Young Portfolio 表紙 — amble 封面式分塊"
+      aria-roledescription="封面對開主視覺"
+      aria-label="繪と影 — 左繪右影對開扉頁，點任一半進入對應圖片庫"
     >
-      <!-- 右半（desktop）／上半（mobile）：Hero 拼貼區（§11 策略 C 清爽拼貼）
-           desktop：3 張縦照片並排、錯位偏移，彰顯電繪 + 攝影雙主線
-           mobile：單張主攝影出血 + 上下封面式收束（避免「圖+文」兩 block 感）
-           overlay caption：左/右兩側標 Digital / Photo（中圖不貼，保 SEO 中性與余白）
-           2026-04-28：依 design brief priority 3，調 desktop offset 防右側裁切；
-                       mobile 加底部漸層 + 縦書き「影」與下方文字區搭橋。 -->
-      <div class="relative h-[46%] lg:h-full lg:w-[58%] overflow-hidden bg-stone-50 dark:bg-stone-900">
-        <!--
-          Mobile / Tablet：單張主圖 — R29 起依 heroFocus 換代表作
-          balanced/kage → 攝影主圖（與 SEO/og:image 同源）
-          kai → 電繪代表作（同 desktop 左圖）
-        -->
-        <img
-          v-if="heroCollage.mobileMain"
-          :src="heroCollage.mobileMain"
-          alt=""
-          class="lg:hidden absolute inset-0 w-full h-full object-cover dark:brightness-[0.82] hero-mobile-img"
-          :class="{ 'hero-mobile-img--kai': heroFocus === 'kai' }"
-          fetchpriority="high"
-          loading="eager"
-          decoding="async"
-          aria-hidden="true"
+      <!-- 對開兩半：lg+ 左右；mobile 上下 -->
+      <div class="hero-spread__pages" :data-hover="heroHover || 'none'">
+        <!-- ============ 左半：繪世界（製図室） ============ -->
+        <NuxtLink
+          to="/gallery/digital"
+          class="hero-page hero-page--kai group"
+          aria-label="進入繪世界 — 製図室 Digital Gallery"
+          @mouseenter="setHoverFocus('kai')"
+          @mouseleave="setHoverFocus(null)"
         >
+          <img
+            v-if="heroCollage.art"
+            :src="heroCollage.art"
+            :alt="`電繪作品代表 — ${heroCollage.artTitle}`"
+            class="hero-page__img"
+            fetchpriority="high"
+            loading="eager"
+            decoding="async"
+          >
+          <span class="hero-page__texture" aria-hidden="true"/>
+          <span class="hero-page__wash hero-page__wash--kai" aria-hidden="true"/>
+          <span class="hero-page__plate">
+            <span class="hero-page__eyebrow hero-page__eyebrow--mono"><span aria-hidden="true">[</span>繪 / DIGITAL<span aria-hidden="true">]</span></span>
+            <span class="hero-page__title hero-page__title--kai">製図室</span>
+            <span class="hero-page__note hero-page__note--kai">幾何から角色へ、規矩から自由へ。</span>
+            <span class="hero-page__enter">
+              <span class="hero-page__enter-label">繪を見る</span>
+              <svg class="hero-page__enter-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </span>
+        </NuxtLink>
 
-        <!--
-          Mobile 封面收束：底部漸層 + 縦書き「影」/「繪」對聯
-          - 漸層讓圖片下緣自然融入下方文字區的 stone-50（書封 → 內頁的轉場）
-          - 縦書き「繪」「影」貼右下角，承擔 desktop 上「繪と影」對聯的角色
-          - lg:hidden 確保只在手機/平板出現，桌機不干擾 3 圖拼貼
-        -->
-        <div class="lg:hidden absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent via-stone-50/40 to-stone-50 dark:via-stone-900/40 dark:to-stone-900 pointer-events-none" aria-hidden="true"/>
-        <div class="lg:hidden absolute bottom-3 right-4 flex flex-col items-center gap-1.5 pointer-events-none select-none" aria-hidden="true">
-          <span class="font-jp text-[0.92rem] tracking-[0.4em] text-stone-700 dark:text-stone-200 font-extralight leading-none [writing-mode:vertical-rl]">繪と影</span>
-          <span class="block w-px h-6 bg-stone-400/60 dark:bg-stone-500/60"/>
+        <!-- ============ 中央書脊縫：導覽軸（縦書き 繪／影 + 令和年號） ============ -->
+        <div class="hero-spine" aria-hidden="true">
+          <span class="hero-spine__rule hero-spine__rule--top"/>
+          <span class="hero-spine__kana font-jp">繪<span class="hero-spine__div">／</span>影</span>
+          <span class="hero-spine__era font-jp">令和七年</span>
+          <span class="hero-spine__rule hero-spine__rule--bot"/>
         </div>
-        <div class="lg:hidden absolute top-4 left-4 font-jp text-[0.6rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none pointer-events-none select-none" aria-hidden="true">
-          {{ heroFocus === 'kai' ? 'Digital' : 'Photo' }}
-        </div>
 
-        <!--
-          Desktop：3 張縦拼貼
-          - py-6 → py-8：替最大 translate-y 預留呼吸，避免最後一張底邊被裁
-          - translate-y-8 → translate-y-5：縮小最右張下移幅度（依 brief priority 3）
-          - flex-[1.3] → flex-[1.25]：中心圖略收，讓兩側更平衡
-        -->
-        <div class="hidden lg:flex absolute inset-0 items-stretch gap-3 px-4 pt-6 pb-10 hero-collage" :data-focus="heroFocus">
-          <!-- 左：電繪代表（上偏） -->
-          <figure class="relative flex-1 -translate-y-1 overflow-hidden bg-stone-100 dark:bg-stone-800 hero-figure hero-figure--kai">
-            <img
-              v-if="heroCollage.art"
-              :src="heroCollage.art"
-              :alt="`電繪作品代表 — ${heroCollage.artTitle}`"
-              class="w-full h-full object-cover dark:brightness-[0.85]"
-              fetchpriority="high"
-              loading="eager"
-              decoding="async"
-            >
-            <figcaption class="absolute bottom-3 left-3 font-jp text-[0.62rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none">
-              Digital
-            </figcaption>
-          </figure>
-
-          <!-- 中：攝影主（與 SEO / og:image 同源，最大、定軸） -->
-          <figure class="relative flex-[1.25] translate-y-2 overflow-hidden bg-stone-100 dark:bg-stone-800 hero-figure hero-figure--kage hero-figure--main">
-            <img
-              v-if="heroCollage.main"
-              :src="heroCollage.main"
-              alt=""
-              class="w-full h-full object-cover dark:brightness-[0.82]"
-              fetchpriority="high"
-              loading="eager"
-              decoding="async"
-              aria-hidden="true"
-            >
-          </figure>
-
-          <!-- 右：攝影副（下偏，但收斂以免裁邊） -->
-          <figure class="relative flex-1 translate-y-5 overflow-hidden bg-stone-100 dark:bg-stone-800 hero-figure hero-figure--kage">
-            <img
-              v-if="heroCollage.sub"
-              :src="heroCollage.sub"
-              :alt="`攝影作品代表 — ${heroCollage.subTitle}`"
-              class="w-full h-full object-cover dark:brightness-[0.82]"
-              loading="eager"
-              decoding="async"
-            >
-            <figcaption class="absolute bottom-3 right-3 font-jp text-[0.62rem] tracking-[0.35em] text-stone-50 bg-stone-900/55 px-2 py-[3px] uppercase leading-none">
-              Photo
-            </figcaption>
-          </figure>
-        </div>
+        <!-- ============ 右半：影世界（暗室） ============ -->
+        <NuxtLink
+          to="/gallery/photography"
+          class="hero-page hero-page--kage group"
+          aria-label="進入影世界 — 暗室 Photography Gallery"
+          @mouseenter="setHoverFocus('kage')"
+          @mouseleave="setHoverFocus(null)"
+        >
+          <img
+            v-if="heroCollage.main"
+            :src="heroCollage.main"
+            alt=""
+            class="hero-page__img"
+            fetchpriority="high"
+            loading="eager"
+            decoding="async"
+            aria-hidden="true"
+          >
+          <span class="hero-page__texture" aria-hidden="true"/>
+          <span class="hero-page__wash hero-page__wash--kage" aria-hidden="true"/>
+          <span class="hero-page__plate hero-page__plate--right">
+            <span class="hero-page__eyebrow hero-page__eyebrow--serif">影 — Photography</span>
+            <span class="hero-page__title hero-page__title--kage">暗室</span>
+            <span class="hero-page__note hero-page__note--kage">光と影を、現像する。</span>
+            <span class="hero-page__enter hero-page__enter--right">
+              <svg class="hero-page__enter-arrow hero-page__enter-arrow--left" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 8l-4 4m0 0l4 4m-4-4h18"/></svg>
+              <span class="hero-page__enter-label hero-page__enter-label--serif">影を見る</span>
+            </span>
+          </span>
+        </NuxtLink>
       </div>
 
-      <!--
-        左半（desktop）／下半（mobile）：純米白底文字區，無疊加
-        2026-04-28 priority 3：mobile 高度 58% → 54%，與 image 區的 46% 互補；
-                                文字向上 -mt-8（負外距）讓 hero collage 漸層與標題交疊一格，
-                                配合 image 區底部 stone-50 漸層形成「同一封面」感。
-      -->
-      <div class="relative bg-stone-50 dark:bg-stone-900 flex items-center h-[54%] lg:h-full lg:w-[42%] px-6 sm:px-10 lg:pl-16 lg:pr-6 py-10 lg:py-0 -mt-8 lg:mt-0 z-[1]">
-        <!-- 縦書き「繪と影」：貼文字區右緣（= 照片區左緣），留在白底側不押圖 -->
-        <aside class="hidden lg:flex absolute inset-y-0 right-0 items-center pr-4" aria-hidden="false">
-          <span
-            class="writing-vertical font-jp text-[1.5rem] font-light tracking-[0.5em] text-stone-700 dark:text-stone-300 leading-none select-none"
-            aria-label="繪と影 — Digital Art and Photography"
-          >
-            <span aria-hidden="true">繪<span class="block h-3"/>と<span class="block h-3"/>影</span>
-          </span>
-        </aside>
+      <!-- 對開帶上方一行余白主題（極簡 overlay，不搶圖；首屏即見命題） -->
+      <p class="hero-spread__masthead" aria-label="余白 — 繪と影、二つの世界">
+        <span class="hero-spread__masthead-kanji font-jp">余白</span>
+        <span class="hero-spread__masthead-en">Two worlds · one ink</span>
+      </p>
+    </section>
 
-        <div class="relative w-full max-w-xl lg:pr-12">
-          <!-- 主標：余白 + 雙軌副題（Round 4 升級）
-               critic 指原「Digital Art & Photography」一行讀為「一個攝影師講余白」，
-               雙主線在首屏太晚兌現。改為「繪 · DIGITAL｜影 · PHOTOGRAPHY」對稱對聯，
-               中央 1px hairline-v 分隔，把 Journey 與 Domains 的「繪 ↔ 影」對位
-               提前到 hero 主標下，視線停留 0.4s 即兌現雙主線命題 -->
-          <h1 class="reveal hero-title-block">
-            <span class="block font-jp font-extralight text-6xl sm:text-7xl lg:text-[7.5rem] tracking-[0.14em] text-stone-900 dark:text-stone-50 leading-[1]">
-              余<span class="inline-block mx-4"/>白
-            </span>
-            <!-- R27：繪／影 雙軌 toggle（user-initiated） -->
-            <span class="mt-6 inline-flex items-center gap-3 sm:gap-4 hero-toggle-row" role="group" aria-label="Track focus toggle">
-              <button
-                type="button"
-                class="hero-toggle"
-                :class="{ 'hero-toggle--active': heroFocus === 'kai' }"
-                :aria-pressed="heroFocus === 'kai'"
-                aria-label="切換至電繪主視覺"
-                @click="setHeroFocus(heroFocus === 'kai' ? 'balanced' : 'kai')"
-              >
-                <span class="font-jp text-base sm:text-lg font-extralight tracking-[0.3em]">繪</span>
-                <span class="text-[0.66rem] sm:text-xs tracking-[0.35em] uppercase font-light">Digital</span>
-              </button>
-              <span class="block w-px h-4 bg-stone-400/70 dark:bg-stone-500" aria-hidden="true"/>
-              <button
-                type="button"
-                class="hero-toggle"
-                :class="{ 'hero-toggle--active': heroFocus === 'kage' }"
-                :aria-pressed="heroFocus === 'kage'"
-                aria-label="切換至攝影主視覺"
-                @click="setHeroFocus(heroFocus === 'kage' ? 'balanced' : 'kage')"
-              >
-                <span class="font-jp text-base sm:text-lg font-extralight tracking-[0.3em]">影</span>
-                <span class="text-[0.66rem] sm:text-xs tracking-[0.35em] uppercase font-light">Photography</span>
-              </button>
-            </span>
+    <!-- =====================================================================
+         序・自己紹介 — 合併開卷（R8 強硬大膽 · 首頁精簡）
+         R8：把原獨立的「序 Prologue band」（py-14 lg:py-20 + border-b 整帶）併入
+             「自己紹介 About」成單一開卷 section，砍掉一整段堆疊的版面與分隔帶。
+             critic 連輪點名「序/自介/步履未再精簡合併、整頁仍長」——本輪不再各據一帶：
+               · 序 = 開卷 masthead（章題 序 + 起算 ledger + 入口），承接 hero 對開帶。
+               · 自己紹介 = 開卷下半的 portrait + 人物文字，與序共用同一版心、同一進場節奏。
+             兩者本就同屬「翻開封面後的第一頁自序」，分成兩個 full-bleed band 是冗餘 scroll。
+             合併後首訪由 hero → 一頁自序（序＋人）→ 步履，少一次整屏停頓。
+             SEO：頁面唯一 <h1>序 保留於此（移進合併 section，層級不變）。
+         ===================================================================== -->
+    <section class="relative pt-12 pb-16 lg:pt-16 lg:pb-24">
+      <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
+        <!-- 序 — 開卷 masthead：章題 + 双軌起算 ledger + 入口（原 prologue band 內容） -->
+        <div class="relative w-full max-w-xl lg:pr-12 mb-12 lg:mb-16">
+          <h1 class="reveal jp-section-title text-3xl sm:text-4xl">序
+            <span class="jp-section-ruby">Prologue</span>
           </h1>
-          <!-- R46：余白 副題隨 focus 動態變化（h1 外層 sibling，避免 inline 違規） -->
-          <div
-            v-if="heroFocus !== 'balanced'"
-            class="hero-title-subline"
-            :class="`hero-title-subline--${heroFocus}`"
-          >
-            <span class="hero-title-subline__dot" aria-hidden="true"/>
-            <span class="hero-title-subline__kana font-jp">{{ heroFocus === 'kai' ? '繪' : '影' }}</span>
-            <span class="hero-title-subline__en">{{ heroFocus === 'kai' ? 'Digital lean' : 'Photography lean' }}</span>
-          </div>
 
           <!--
-            R48：Hero 第一屏「双軌起算 ledger」（大改 — 回應 critic first-screen-invisible）
-            上輪 verdict：2018 vs 2024 的時間差埋在 Featured / Epilogue，首屏不可見。
-            jump-out：把 trackManifesto.startYear 差做進 Hero 第一屏，3 秒內可讀；
-                      declaration 從 plate 下緣上提到與 plate 並置。
-            做法（全新版面，非舊 motif 深 5%）：
-              - 一條「起算尺」橫貫：左端 繪・二〇一八、右端 影・二〇二四，
-                兩端之間以 hairline 量出「六年」先行差（中央 badge 直接寫數字）。
-              - 每軌 startYear 正下方並置該軌 declaration（trackManifesto.declaration），
-                不再是一段散文 prose，而是「軌頭宣言」對位。
-              - 後發軌（影）左側留一段 dashed hairline，視覺化「2018-2024 影軌尚未存在」的空白
-                （承接 Journey 的「未だ無し」墓誌語彙，但移到首屏、改為量化尺）。
-            鐵律守門：stone 主軸 / hairline-only 尺身 / accent 僅中央 badge 與兩端 kanji 描邊；
-                      軌墨色（trackManifesto.ink）僅做 kanji 色，不填面（延續 R7 克制破例）。
-            data 來源：digitalManifesto / photographyManifesto store getter（startYear + declaration）。
+            R48：「双軌起算 ledger」— 把 2018 vs 2024 的六年時間差量化成一條起算尺
+            （左 繪・二〇一八、右 影・二〇二四、中央 badge 寫先行年數），首訪可讀。
+            data 來源：digitalManifesto / photographyManifesto store getter。
+            R8：原 prologue band 整段移入此合併 section，內容與行為不變。
           -->
           <div class="reveal reveal-delay-2 track-ledger" aria-label="双軌起算：繪自二〇一八、影自二〇二四，影軌晚六年">
             <p class="track-ledger__eyebrow">起算 · Since</p>
@@ -251,15 +212,12 @@
             </NuxtLink>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- =====================================================================
-         自己紹介 — 左肖像、右文字；書頁式版心（R31 縮減 padding）
-         ===================================================================== -->
-    <section class="relative py-16 lg:py-24">
-      <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-        <header class="reveal mb-14 lg:mb-20 flex items-baseline justify-between flex-wrap gap-4">
+        <!-- 序 ⇄ 自己紹介 之間的開卷折縫 hairline（取代原兩 section 的 border-b 整帶分隔） -->
+        <div class="reveal jp-hairline w-full mb-12 lg:mb-16"/>
+
+        <!-- 自己紹介 About — 與序共用版心、同一進場節奏（R8 併入開卷下半） -->
+        <header class="reveal mb-10 lg:mb-14 flex items-baseline justify-between flex-wrap gap-4">
           <div>
             <h2 class="jp-section-title text-4xl sm:text-5xl">自己紹介
               <span class="jp-section-ruby">About</span>
@@ -296,11 +254,14 @@
             <!-- hairline separator -->
             <div class="reveal reveal-delay-1 jp-hairline my-8 max-w-xs"/>
 
+            <!--
+              R3（首頁精簡合併）：原 About 兩段並置——第一段講「兩條線並行」（與 Hero ledger
+              + 対話 重複命題），第二段是「此處收錄…」的功能性導覽（與 gallery 本身重複）。
+              併為單段：保留媒材具體性（插畫題材 / Nikon Z / 街拍夜景），剪掉重複的雙主線宣言
+              與導覽說明，讓 About 回到「人」而非「再講一次雙主線」。
+            -->
             <p class="reveal reveal-delay-2 jp-body text-[0.95rem] max-w-xl">
-              電繪與攝影兩條線並行——插畫自幾何、角色至場景；攝影則以街拍、活動與城市夜景為主，以 Nikon Z 系統將當下的光影留下。
-            </p>
-            <p class="reveal reveal-delay-2 jp-body mt-6 text-[0.95rem] max-w-xl text-stone-500 dark:text-stone-400">
-              此處收錄電繪作品與依事件整理的攝影相簿，攝影區附地圖與拍攝資訊。零碎日常亦會在 Instagram 與 Threads 更新。
+              插畫自幾何、角色至場景；攝影以街拍、活動與城市夜景為主，用 Nikon Z 系統把當下的光影留下。零碎日常亦會在 Instagram 與 Threads 更新。
             </p>
 
             <div class="reveal reveal-delay-3 mt-10">
@@ -318,78 +279,19 @@
       訪客在 Hero 已被告知雙主線、在 Journey 看到時間軸、在 Featured 看到作品 — Domains 是多餘的「教學頁」
       ===================================================================== -->
 
-    <!-- =====================================================================
-         対話 — 雙主線宣言（Round 9 創新）
-         Domains 立兩條軌、Journey 走兩條軌、Featured 收兩條軌。
-         此節是「兩條軌的自我矛盾」— 一句文學悖論直接收束雙主線敘事。
-         構成：左右對位縦書、中央 hairline-v + 朱印「対」釘住、底部羅馬副題
-         鐵律守門：stone-only / hairline-v / 縦書き字級不通膨 / accent 僅朱印
-         §1 不均整：左聯字距 0.4em、右聯字距 0.5em，刻意非對稱
-         ===================================================================== -->
-    <section
-      id="dialogue"
-      class="relative py-28 lg:py-36 overflow-hidden scroll-mt-24"
-      role="region"
-      aria-roledescription="雙主線宣言"
-      aria-label="繪と影 — 対話"
-    >
-      <!--
-        背景：極淡縦書「対」單字承接朱印
-        Round 10：opacity 50/35 → 25/15（critic 指太明顯，改為「耳語」級）
-      -->
-      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-        <span class="font-jp text-[clamp(11rem,28vw,22rem)] font-extralight text-stone-200/25 dark:text-stone-800/15 leading-none [writing-mode:vertical-rl] tracking-[0.1em]">対</span>
-      </div>
-
-      <div class="relative max-w-4xl mx-auto px-6 sm:px-10">
-        <!-- 章題 minimal eyebrow（不蓋 jp-section-title，避免與 Domains 同級競爭） -->
-        <p class="reveal jp-eyebrow justify-center text-stone-500 mb-14 lg:mb-20">
-          <span>Dialogue · 対話</span>
-        </p>
-
-        <!-- 對位悖論：左聯（繪以影） + 中釘（朱印「対」） + 右聯（影以繪） -->
-        <div class="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16">
-          <!-- 左聯：繪 で 影 を 描く -->
-          <blockquote
-            class="reveal reveal-left writing-vertical font-jp text-2xl sm:text-3xl lg:text-[2rem] font-extralight tracking-[0.4em] text-stone-800 dark:text-stone-100 leading-[2.2] flex-shrink-0"
-          >
-            繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>影<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>描く
-          </blockquote>
-
-          <!-- 中釘：朱印「対」+ 上下 hairline-v -->
-          <div class="reveal flex flex-col items-center gap-3 self-stretch py-2" aria-hidden="true">
-            <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-            <span class="jp-seal jp-seal--b text-[0.78rem] tracking-[0.2em] font-jp font-light shrink-0"><span class="jp-seal-ink">対</span></span>
-            <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-          </div>
-
-          <!-- 右聯：影 で 繪 を 撮る（字距 0.5em，刻意比左聯寬 — §1 不均整） -->
-          <blockquote
-            class="reveal reveal-right reveal-delay-1 writing-vertical font-jp text-2xl sm:text-3xl lg:text-[2rem] font-extralight tracking-[0.5em] text-stone-800 dark:text-stone-100 leading-[2.2] flex-shrink-0"
-          >
-            影<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>撮る
-          </blockquote>
-        </div>
-
-        <!--
-          底部副題（Round 10 詩化收束）
-          critic 指原雙句羅馬副題是「直譯複讀」資訊冗餘。改為單行詩意句：
-          「Two hands · One ink」— 兩條主線、同一筆墨之意，比直譯張力強。
-        -->
-        <p class="reveal reveal-delay-2 mt-14 lg:mt-20 text-center text-[0.62rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500">
-          Two hands <span class="mx-2 opacity-60">·</span> One ink
-        </p>
-      </div>
-    </section>
-
     <!--
       R31：砍掉「道具 Tools」section（generic spec list，非 dual-track narrative，user 反饋首頁太冗雜）
       R31：砍掉「侘寂 引言」section（單句 quote，与 Epilogue 收筆語重疊）
-      原 ~150 行刪除；保留下方 Journey 直接連接
+      R6（act-critic 首頁精簡）：砍掉獨立的 `<section id="dialogue">`（原 py-28 lg:py-36，
+      約一整屏高度）。critic 連 3 輪點名首頁過長、対話 couplet 與 Journey 命題重複。
+      対話 的「繪で影を描く／影で繪を撮る」對位悖論本就是「走兩條軌之前的宣言」，
+      把它折進 Journey 的 masthead（軌頭上方），讓宣言緊貼它要走的時間軸，
+      不再獨佔一屏。`id="dialogue"` 錨點移到 Journey section（ChapterRail 對齊調整）。
       ===================================================================== -->
 
     <!-- =====================================================================
          步履 — Journey（雙軌時間軸：繪左／影右／合流中）— id="journey"（Round 15 ChapterRail）
+         R6：併入 対話 couplet 作 masthead；保留 id="dialogue" 兼容 ChapterRail 錨點
          2026-05-25：由單線 zig-zag 改為 track-driven 雙軌
            - desktop：digital → 左欄；photo → 右欄；both → 跨欄置中（合流節點）
            - 影軌頭部加「未だ無し」縦書き墓誌，把 2018-2024 的空白變成敘事
@@ -397,7 +299,41 @@
          守門：marker 不破 stone 系；縦書き只在 desktop 軌頭出現 1 次，不通膨
          ===================================================================== -->
     <section id="journey" class="relative py-20 lg:py-28 scroll-mt-24">
+      <!-- ChapterRail 的「対」錨點：併入 Journey 後，dialogue 錨點落在此 masthead 上緣 -->
+      <span id="dialogue" class="absolute -top-24" aria-hidden="true"/>
       <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
+        <!--
+          R6 併入的 対話 couplet masthead — 走時間軸前的雙主線宣言。
+          原 py-28 整屏縮成 Journey 開場一帶；左右對位縦書 + 中釘朱印「対」，
+          §1 不均整：左聯字距 0.4em、右聯字距 0.5em 刻意非對稱。
+          背景極淡縦書「対」承接朱印（opacity 耳語級）。
+        -->
+        <div class="reveal relative mb-14 lg:mb-20 overflow-hidden" aria-label="繪と影 — 対話">
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+            <span class="font-jp text-[clamp(7rem,18vw,14rem)] font-extralight text-stone-200/20 dark:text-stone-800/12 leading-none [writing-mode:vertical-rl] tracking-[0.1em]">対</span>
+          </div>
+          <div class="relative flex items-center justify-center gap-6 sm:gap-10 lg:gap-14 py-2">
+            <blockquote
+              class="writing-vertical font-jp text-xl sm:text-2xl lg:text-[1.7rem] font-extralight tracking-[0.4em] text-stone-800 dark:text-stone-100 leading-[2.1] flex-shrink-0"
+            >
+              繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>影<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>描く
+            </blockquote>
+            <div class="flex flex-col items-center gap-3 self-stretch py-2" aria-hidden="true">
+              <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
+              <span class="jp-seal jp-seal--b text-[0.7rem] tracking-[0.2em] font-jp font-light shrink-0"><span class="jp-seal-ink">対</span></span>
+              <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
+            </div>
+            <blockquote
+              class="writing-vertical font-jp text-xl sm:text-2xl lg:text-[1.7rem] font-extralight tracking-[0.5em] text-stone-800 dark:text-stone-100 leading-[2.1] flex-shrink-0"
+            >
+              影<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>撮る
+            </blockquote>
+          </div>
+          <p class="relative mt-8 text-center text-[0.6rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500">
+            Two hands <span class="mx-2 opacity-60">·</span> One ink
+          </p>
+        </div>
+
         <header class="reveal mb-16 flex items-baseline justify-between flex-wrap gap-4">
           <h2 class="jp-section-title text-3xl sm:text-4xl">步履
             <span class="jp-section-ruby">Journey</span>
@@ -645,23 +581,54 @@
                      兩個 medium 各自有書腰 + 橫卷，呼應「雙主線並行」首頁敘事；
                      手機由 HorizontalStripFeatured 內部 fallback 為 2-col grid。
          ===================================================================== -->
-    <section id="featured" class="relative py-20 lg:py-28 bg-stone-100/40 dark:bg-stone-800/25 scroll-mt-24">
+    <section id="featured" class="relative py-20 lg:py-28 scroll-mt-24 overflow-hidden">
       <div class="jp-hairline absolute top-0 left-0 right-0"/>
-      <div class="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
-        <header class="reveal mb-12 lg:mb-16 flex items-baseline justify-between flex-wrap gap-4">
-          <h2 class="jp-section-title text-3xl sm:text-4xl">選
-            <span class="jp-section-ruby">Featured Works</span>
-          </h2>
-          <NuxtLink
-            to="/gallery"
-            class="group inline-flex items-center gap-2 text-xs tracking-[0.35em] uppercase text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors"
-          >
-            <span class="font-jp tracking-[0.35em]">全てを見る</span>
-            <svg class="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </NuxtLink>
-        </header>
+      <!--
+        R10 強硬大膽（首頁精簡 — 砍重複入口帶）：
+        刪除原 Featured「對開雙世界帶」（製図室／暗室 兩片入口 plate）。
+        critic 連輪點名首頁精簡停滯——這片 plate 與第一屏 Hero-spread 的兩半
+        逐字重複：同 製図室／暗室 標牌、同 繪を見る／影を見る CTA、同暖陽/暗室質地。
+        訪客在首屏已被兩世界入口擊中，Featured 再貼一次同樣的門牌＝冗餘 scroll 與
+        敘事原地踏步。本輪把 Featured 從「入口承諾 #2」改成「實證」——
+        只留資料驅動的年尺（FeaturedYearRuler，繪八年/影兩年的實體距離差），
+        並由 §header 一行 bridge 承接 Hero 的暖/冷 identity（文字一線而非整片門牌）。
+        為了讓兩世界 identity 仍延續到 Featured，section 底鋪一層 scroll-driven
+        暖→冷掃描層（featured-sweep），隨捲動把版面從繪暖陽過渡到影冷銀，
+        呼應 Hero 對開兩半，但不再重述門牌。砍掉約 190 行 .featured-half CSS。
+      -->
+      <header class="reveal mb-3 lg:mb-4 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 flex items-baseline justify-between flex-wrap gap-4">
+        <h2 class="jp-section-title text-3xl sm:text-4xl">選
+          <span class="jp-section-ruby">Featured · 二つの世界</span>
+        </h2>
+        <NuxtLink
+          to="/gallery"
+          class="group inline-flex items-center gap-2 text-xs tracking-[0.35em] uppercase text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors"
+        >
+          <span class="font-jp tracking-[0.35em]">全てを見る</span>
+          <svg class="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </NuxtLink>
+      </header>
+
+      <!-- bridge：一行承接 Hero 暖/冷 identity（繪暖 → 影冷），不再貼整片門牌 -->
+      <p class="reveal reveal-delay-1 mb-10 lg:mb-14 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 text-[0.78rem] sm:text-sm tracking-[0.18em] text-stone-500 dark:text-stone-400 font-jp leading-[2]">
+        <span class="featured-bridge-kai">製図室の暖い陽</span><span class="mx-2 text-stone-300 dark:text-stone-600" aria-hidden="true">——</span><span class="featured-bridge-kage">暗室の冷たい銀</span>。同じ一冊の、二つの頁。
+      </p>
+
+      <div class="featured-section relative max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+        <!--
+          R10 新動效：暖→冷 scroll-driven 掃描底層。
+          隨頁面捲動進度（bindingProgress 0→1）把背景 hue 從繪暖陽推向影冷銀，
+          視覺上「翻過繪頁、現出影頁」，把兩世界 identity 延續進 Featured 而不重述門牌。
+          純 scroll-driven（沿用 home-binding 的 rAF 進度，無 timer/autoplay）。
+          reduced-motion：CSS 端凍結在中性值（見 .featured-sweep）。
+        -->
+        <span
+          class="featured-sweep"
+          aria-hidden="true"
+          :style="{ '--sweep': bindingProgress }"
+        />
 
         <!--
           Round 10（act-critic loop）：題詞見開き FeaturedManifesto → 年尺 FeaturedYearRuler。
@@ -754,33 +721,11 @@
         </p>
 
         <!--
-          Round 20（收官）：雙主線時間軸（繪 2018 ─ ✦ ─ 2024 影）
-          整個 portfolio 的最後一抹——把 19 輪建立的「繪×影」motif 用一條
-          橫向 hairline + 中央朱菱形濃縮成一句編輯話：
-            「2018 起繪、2024 加影、合於 2025」
-          位置：epilogue 底部，緊接年代落款上方
-          鐵律：stone-only hairline + accent 僅中央 marker 與兩端 kanji
+          R3（首頁精簡合併）：刪除 Epilogue 底部「繪 2018 ─ ✦ ─ 2024 影」雙主線時間軸。
+          這是站內第三處同一條 2018/2024 時間差敘事——Hero 第一屏已有 track-ledger
+          「六年先行」尺、Featured 已有 FeaturedYearRuler 年尺。Epilogue 應收束於署名朱印，
+          不該再複述一次時間軸。砍掉縮短書末頁、讓落款更純粹（回應 critic 首頁精簡停滯）。
         -->
-        <div
-          class="reveal reveal-delay-2 mt-14 lg:mt-20 mx-auto max-w-md flex items-center justify-center gap-3 text-stone-500 dark:text-stone-400"
-          role="figure"
-          aria-label="雙主線時間軸：繪 二〇一八 起、影 二〇二四 起、合流 二〇二五"
-        >
-          <!-- 左端：繪 2018 -->
-          <span class="inline-flex items-baseline gap-2 shrink-0">
-            <span class="font-jp text-base font-extralight tracking-[0.3em] text-stone-700 dark:text-stone-200">繪</span>
-            <span class="font-jp text-[0.62rem] tracking-[0.35em] text-stone-400 dark:text-stone-500">二〇一八</span>
-          </span>
-          <!-- 左半 hairline + 中央菱形 + 右半 hairline -->
-          <span class="flex-1 h-px bg-gradient-to-r from-transparent via-stone-300/70 dark:via-stone-600/60 to-accent-500/40" aria-hidden="true"/>
-          <span class="w-2 h-2 rotate-45 bg-accent-500 dark:bg-accent-400 shrink-0 shadow-sm" aria-hidden="true"/>
-          <span class="flex-1 h-px bg-gradient-to-r from-accent-500/40 via-stone-300/70 dark:via-stone-600/60 to-transparent" aria-hidden="true"/>
-          <!-- 右端：2024 影 -->
-          <span class="inline-flex items-baseline gap-2 shrink-0">
-            <span class="font-jp text-[0.62rem] tracking-[0.35em] text-stone-400 dark:text-stone-500">二〇二四</span>
-            <span class="font-jp text-base font-extralight tracking-[0.3em] text-stone-700 dark:text-stone-200">影</span>
-          </span>
-        </div>
 
         <!--
           年代落款（與 Hero 的「令和」+「二〇二六」對接）
@@ -812,7 +757,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useImagePath } from '~/composables/useImagePath'
@@ -830,6 +775,30 @@ import ChapterRail from '~/components/ChapterRail.vue'
 const { getThumbPath } = useImagePath()
 const { observeAll } = useScrollReveal()
 const pageRef = ref<HTMLElement | null>(null)
+
+/**
+ * R8：綴じ糸（裝幀縫線）scroll-driven 進度（0→1）。
+ * = scrollTop / (documentHeight - viewportHeight)，rAF 節流避免每次 scroll 同步 reflow。
+ * 純 scroll-driven、無 timer/autoplay；驅動左版心縫線「往下縫合」與縫頭朱結下滑。
+ * reduced-motion 下仍更新數值（位置正確），CSS 端去掉平滑過渡（見 main.css .home-binding）。
+ */
+const bindingProgress = ref(0)
+let bindingRaf = 0
+let bindingTicking = false
+function updateBindingProgress () {
+  bindingTicking = false
+  if (typeof window === 'undefined') return
+  const doc = document.documentElement
+  const scrollable = doc.scrollHeight - window.innerHeight
+  bindingProgress.value = scrollable > 0
+    ? Math.min(1, Math.max(0, window.scrollY / scrollable))
+    : 0
+}
+function onBindingScroll () {
+  if (bindingTicking) return
+  bindingTicking = true
+  bindingRaf = requestAnimationFrame(updateBindingProgress)
+}
 
 /**
  * Round 14 epilogue：「回開卷」 + 朱印點擊都會回到頁首。
@@ -927,8 +896,25 @@ const trackLedger = computed(() => {
 // 把「首屏選擇」變成 site-wide 敘事承諾（critic R27 ⚠ 跳出建議）。
 type HeroFocus = 'balanced' | 'kai' | 'kage'
 const route = useRoute()
-const router = useRouter()
 const heroFocus = ref<HeroFocus>('balanced')
+
+/**
+ * R4：對開帶進場 — heroIn 在 mount 後一拍翻 true，觸發兩半「從書脊向外展開」
+ * 的 CSS transition（hero-spread--in）。純一次性，無 timer/loop，不違 hero 靜態。
+ * prefers-reduced-motion 由 CSS 改為純淡入。
+ */
+const heroIn = ref(false)
+onMounted(() => {
+  if (typeof window === 'undefined') { heroIn.value = true; return }
+  requestAnimationFrame(() => requestAnimationFrame(() => { heroIn.value = true }))
+})
+
+/**
+ * R4：對開兩半 hover 時把該世界推前（hero-page--lift），另一半微退，
+ * 強化「翻開哪一本書」的選擇感。user-initiated（mouseenter），無 autoplay。
+ */
+const heroHover = ref<'kai' | 'kage' | null>(null)
+function setHoverFocus (v: 'kai' | 'kage' | null) { heroHover.value = v }
 
 // Init from URL or sessionStorage on mount (R47：跨頁持久化)
 onMounted(() => {
@@ -942,20 +928,7 @@ onMounted(() => {
   }
 })
 
-function setHeroFocus (mode: HeroFocus) {
-  heroFocus.value = mode
-  const next = { ...route.query } as Record<string, string | string[] | undefined>
-  if (mode === 'balanced') delete next.focus
-  else next.focus = mode
-  router.replace({ query: next })
-  // R47: sessionStorage 跨頁持久化（用 sessionStorage — tab 關閉重置）
-  if (typeof window !== 'undefined') {
-    if (mode === 'balanced') window.sessionStorage.removeItem('nctu-hero-focus')
-    else window.sessionStorage.setItem('nctu-hero-focus', mode)
-  }
-}
-
-/** Gallery CTA 目標路徑 — 跟著 heroFocus 走，formalize 首屏選擇 */
+/** Gallery CTA 目標路徑 — 跟著 heroFocus（URL/sessionStorage 持久化）走 */
 const galleryTarget = computed(() => {
   if (heroFocus.value === 'kai') return '/gallery/digital'
   if (heroFocus.value === 'kage') return '/gallery/photography'
@@ -1091,6 +1064,19 @@ const milestonesWithPlace = computed(() => {
 
 onMounted(() => {
   observeAll(pageRef.value)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', onBindingScroll, { passive: true })
+    window.addEventListener('resize', onBindingScroll, { passive: true })
+    updateBindingProgress()
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', onBindingScroll)
+    window.removeEventListener('resize', onBindingScroll)
+    cancelAnimationFrame(bindingRaf)
+  }
 })
 
 // SEO — og:image / twitterImage / personImage 皆指向 heroImageAbsolute，
@@ -1147,6 +1133,360 @@ useHead({
 </script>
 
 <style scoped>
+/* =========================================================================
+   R8 — 綴じ糸（裝幀縫線）scroll-driven 進度
+   全頁左版心一條極細縫線，隨捲動 draw-down「縫合」內頁；縫頭朱結沿線下滑。
+   --stitch（0→1）由 JS scroll 進度驅動；hairline-only + accent 僅縫頭一點。
+   lg+ 才出現（窄屏版心無餘裕）；fixed / aria-hidden / pointer-events-none。
+   ========================================================================= */
+.home-binding {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .home-binding {
+    display: block;
+    position: fixed;
+    /* 貼齊 max-w-5xl 版心左緣外側一指（與 ChapterRail 右側目次對位左右成書脊） */
+    left: max(1.5rem, calc((100vw - 64rem) / 2 - 1.75rem));
+    top: 14vh;
+    bottom: 10vh;
+    width: 14px;
+    z-index: 30;
+    pointer-events: none;
+  }
+}
+/* 縫線基底：整段極淡 dashed（尚未縫合的針腳預留孔） */
+.home-binding__track {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  transform: translateX(-50%);
+  border-left: 1px dashed rgb(168 162 158 / 0.28);
+}
+:global(.dark) .home-binding__track {
+  border-left-color: rgb(120 113 108 / 0.35);
+}
+/* 已縫合段：實線自上往下長到縫頭位置（scroll-driven draw-down） */
+.home-binding__thread {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  transform: translateX(-50%);
+  height: calc(100% * var(--stitch, 0));
+  border-left: 1px solid rgb(120 113 108 / 0.5);
+  transition: height 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:global(.dark) .home-binding__thread {
+  border-left-color: rgb(168 162 158 / 0.5);
+}
+/* 縫頭朱結：accent 小菱形結，停在當前縫合位置（唯一 accent 著色點） */
+.home-binding__knot {
+  position: absolute;
+  left: 50%;
+  top: calc(100% * var(--stitch, 0));
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  transition: top 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* 位置仍由 scroll 驅動（正確），但去掉平滑過渡避免動態暈眩 */
+  .home-binding__thread,
+  .home-binding__knot { transition: none; }
+}
+
+/* =========================================================================
+   R4 — Hero 対開扉頁（左繪／右影對開，書脊縫導覽，reveal 從脊向外展開）
+   破「hero 三連拼貼策略 C」；兩半各自字族＋質地＋明度差，首屏即「兩本不同的書」。
+   ========================================================================= */
+.hero-spread {
+  background: #fdfaf4; /* 繪半暖底兜底（影半自有暗底） */
+}
+:global(.dark) .hero-spread { background: #1a1714; }
+
+.hero-spread__pages {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ---- 單半（page）共用 ---- */
+/*
+  R7（強硬大膽 · first-screen-invisible 修復）：
+  critic 連點「首屏整頁死白」。根因＝兩半起手 opacity:0 等 heroIn rAF + 800w 圖晚解碼，
+  首訪 3 秒只見奶白。結構性改法：兩半「世界底色 + 版面拓樸縮影（繪方格紙／影膠卷齒孔）」
+  在 first paint 即實心可見，不再依賴圖片解碼或進場動畫。只有照片本身做 cross-fade。
+  → 一進站就撞到「左暖製図室／右暗暗室」明度對開，圖片是後補的層，不是身分本身。
+*/
+.hero-page {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-decoration: none;
+  /* 世界底色：第一幀即見明度對開（與圖片解碼無關） */
+  background: var(--hp-base, #f3e9d6);
+  /* 進場只動 hover lift / flex；位移淡入交給內層 __img + __plate，避免整半藏起來 */
+  transition: flex-grow 0.55s ease;
+}
+.hero-page__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 圖片晚解碼也不害首屏：底色＋拓樸縮影已可見，圖在其上 cross-fade */
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.hero-spread--in .hero-page__img { opacity: 1; }
+.hero-spread--in .hero-page--kage .hero-page__img { transition-delay: 0.08s; }
+.hero-page__texture { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.hero-page__wash { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+/* 繪半：暖製図桌底色 + 工程方格紙（first-paint 即見「攤在製圖桌」的繪世界拓樸縮影） */
+.hero-page--kai { --hp-base: #f3e9d6; }
+.hero-page--kai .hero-page__wash--kai {
+  /* R7：wash 大幅降透明（0.62→0.34），讓代表電繪暖暖透出，不再washed-to-white */
+  background:
+    linear-gradient(105deg, rgba(243,233,214,0.40) 0%, rgba(243,233,214,0.14) 46%, rgba(243,233,214,0.04) 100%),
+    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.24) 0%, transparent 72%);
+}
+.hero-page--kai .hero-page__texture {
+  /* R7：粗 + 細雙層方格（製圖格牆縮影），底色上即可見的繪世界版面語彙 */
+  background-image:
+    linear-gradient(to right, rgba(180,98,46,0.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(180,98,46,0.16) 1px, transparent 1px),
+    linear-gradient(to right, rgba(180,98,46,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(180,98,46,0.06) 1px, transparent 1px);
+  background-size: 46px 46px, 46px 46px, 9.2px 9.2px, 9.2px 9.2px;
+  opacity: 0.7;
+}
+:global(.dark) .hero-page--kai { --hp-base: #1a1714; }
+:global(.dark) .hero-page--kai .hero-page__wash--kai {
+  background:
+    linear-gradient(105deg, rgba(26,23,20,0.42) 0%, rgba(26,23,20,0.16) 46%, rgba(26,23,20,0.05) 100%),
+    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.18) 0%, transparent 72%);
+}
+
+/* 影半：暗室底色 + 顯影顆粒 + 膠卷齒孔縮影；明度刻意比繪半低（一眼分兩本書） */
+.hero-page--kage { --hp-base: #14181b; }
+.hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
+.hero-page--kage .hero-page__wash--kage {
+  background:
+    linear-gradient(255deg, rgba(15,18,21,0.66) 0%, rgba(15,18,21,0.3) 48%, rgba(15,18,21,0.12) 100%),
+    radial-gradient(75% 65% at 90% 10%, rgba(154,173,197,0.16) 0%, transparent 66%);
+}
+.hero-page--kage .hero-page__texture {
+  /* R7：顯影顆粒 + 左緣縱向膠卷齒孔（影世界膠卷流拓樸縮影，first-paint 可見） */
+  background-image:
+    radial-gradient(circle at center, rgba(238,241,243,0.6) 0 1.5px, transparent 1.8px),
+    radial-gradient(rgba(206,214,224,0.12) 0.6px, transparent 0.7px),
+    repeating-linear-gradient(to bottom, rgba(206,214,224,0.035) 0px, rgba(206,214,224,0.035) 1px, transparent 1px, transparent 5px);
+  background-size: 9px 17px, 4px 4px, 100% 5px;
+  background-position: 8px 0, 0 0, 0 0;
+  background-repeat: repeat-y, repeat, repeat;
+  opacity: 0.7;
+}
+
+/* ---- 進場：底色 + 拓樸縮影 first-paint 即在；只有 plate 標牌做輕量滑入淡入 ----
+   （不再讓整半 opacity:0，杜絕「首屏整頁死白」。位移/淡入細節見下方 plate 區塊） */
+.hero-spread--in .hero-page__plate { opacity: 1; transform: translateY(0); }
+.hero-spread--in .hero-page--kage .hero-page__plate { transition-delay: 0.1s; }
+
+/* ---- hover lift：把選中那半的 plate 與圖略推前，另一半微暗 ---- */
+.hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
+.hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
+  filter: grayscale(0.5) brightness(0.6);
+  transition: filter 0.5s ease;
+}
+.hero-spread--in .hero-page:hover .hero-page__plate { transform: translateY(-4px); }
+
+/* ---- 標牌 plate（左下／右下對位）；起手 opacity:0+下移，--in 後滑入 ---- */
+.hero-page__plate {
+  position: absolute;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,0.61,0.36,1);
+  left: clamp(1.4rem, 4vw, 4rem);
+  bottom: clamp(1.6rem, 5vh, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: 80%;
+}
+.hero-page__plate--right {
+  left: auto;
+  right: clamp(1.4rem, 4vw, 4rem);
+  align-items: flex-end;
+  text-align: right;
+}
+.hero-page__eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.hero-page__eyebrow--mono {
+  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
+  color: #b9601f;
+}
+.hero-page__eyebrow--mono span { opacity: 0.55; }
+:global(.dark) .hero-page__eyebrow--mono { color: #e7b87d; }
+.hero-page__eyebrow--serif {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  letter-spacing: 0.4em;
+  text-transform: none;
+  color: #b9c6d6;
+}
+.hero-page__title {
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1;
+  margin: 0.1rem 0 0.2rem;
+}
+.hero-page__title--kai {
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #2b2017;
+}
+:global(.dark) .hero-page__title--kai { color: #f7efe4; }
+.hero-page__title--kage {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #eef1f3;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.45);
+}
+.hero-page__note {
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.8;
+  letter-spacing: 0.08em;
+}
+.hero-page__note--kai { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; color: #5a4b3c; }
+:global(.dark) .hero-page__note--kai { color: #c9b9a6; }
+.hero-page__note--kage { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; color: #c2cdda; }
+
+.hero-page__enter {
+  margin-top: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8a7a68;
+  transition: color 0.4s ease, gap 0.4s ease;
+}
+.hero-page__enter--right { color: #9aadc5; }
+.hero-page--kai:hover .hero-page__enter { color: #b9601f; }
+.hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
+.hero-page__enter-label { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; font-size: 1rem; letter-spacing: 0.2em; }
+.hero-page__enter-label--serif { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.24em; }
+.hero-page__enter-arrow { width: 1rem; height: 1rem; transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
+.hero-page--kai:hover .hero-page__enter-arrow { transform: translateX(0.4rem); }
+.hero-page--kage:hover .hero-page__enter-arrow--left { transform: translateX(-0.4rem); }
+.hero-page:focus-visible { outline: 2px solid currentColor; outline-offset: -6px; }
+
+/* ---- 中央書脊縫（hero-spine）：對開頁的書脊 = 導覽軸 ---- */
+.hero-spine {
+  position: absolute;
+  z-index: 5;
+  top: 0; bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.16), rgba(0,0,0,0.04) 35%, rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.04) 65%, rgba(0,0,0,0.16));
+}
+.hero-spine__rule { width: 1px; flex: 1; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
+.hero-spine__kana {
+  writing-mode: vertical-rl;
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  line-height: 1.1;
+}
+.hero-spine__div { color: rgba(255,255,255,0.5); }
+.hero-spine__era {
+  writing-mode: vertical-rl;
+  font-size: 0.6rem;
+  letter-spacing: 0.42em;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ---- 對開帶上方余白主題（極簡，居中上緣） ---- */
+.hero-spread__masthead {
+  position: absolute;
+  z-index: 6;
+  top: clamp(1.6rem, 5vh, 3.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  pointer-events: none;
+  text-align: center;
+}
+.hero-spread__masthead-kanji {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 200;
+  letter-spacing: 0.5em;
+  color: rgba(255,255,255,0.96);
+  text-shadow: 0 2px 14px rgba(0,0,0,0.45);
+}
+.hero-spread__masthead-en {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.46em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+}
+
+/* ---- mobile：對開頁改上下堆疊，書脊轉橫 ---- */
+@media (max-width: 1023px) {
+  .hero-spread__pages { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .hero-page--kai  { transform: translateY(-5%); }
+  .hero-page--kage { transform: translateY(5%); }
+  .hero-spread--in .hero-page--kai,
+  .hero-spread--in .hero-page--kage { transform: translateY(0); }
+  .hero-spine {
+    top: 50%; bottom: auto; left: 0; right: 0; width: 100%;
+    transform: translateY(-50%);
+    flex-direction: row;
+    height: 2.2rem;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.16));
+  }
+  .hero-spine__rule { width: auto; height: 1px; flex: 1; background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
+  .hero-spine__kana, .hero-spine__era { writing-mode: horizontal-tb; }
+  .hero-page__plate { max-width: 88%; }
+}
+
+/* ---- reduced-motion：底色 + 拓樸縮影 + 標牌 + 圖片全部即刻顯示，無位移無淡入 ---- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-page { transition: none; }
+  .hero-page__img { opacity: 1 !important; transition: none; }
+  .hero-page__plate {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none;
+  }
+  .hero-page__enter-arrow { transition: none; }
+  .hero-spread--in .hero-page:hover .hero-page__plate { transform: none; }
+}
+
 /* ===== R27 — Hero 雙軌 toggle + 序卷頭語（挑戰 Hero static 鐵律） ===== */
 
 .hero-toggle-row {
@@ -1503,6 +1843,69 @@ useHead({
   .hero-toggle {
     padding: 0.3rem 0.55rem;
     gap: 0.4rem;
+  }
+}
+
+/* =========================================================================
+   R10 — Featured：暖→冷 scroll-driven 掃描底層 + bridge 文字暖/冷分色
+   （取代 R3 .featured-half 對開門牌——已與 Hero-spread 逐字重複，本輪刪除）
+   兩世界 identity 不再靠整片門牌重述，而是：
+     ① bridge 一行裡「製図室の暖い陽」走暖橘、「暗室の冷たい銀」走冷青；
+     ② section 底鋪 .featured-sweep，隨 --sweep（=頁面捲動進度 0→1）把暖陽
+        radial 推向冷銀 radial，視覺像「翻過繪頁、現出影頁」。
+   ========================================================================= */
+
+/* bridge 文字：暖/冷一線承接 Hero 對開兩半（字族亦分家：繪幾何 sans / 影明體） */
+.featured-bridge-kai {
+  color: #b9601f;
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
+  letter-spacing: 0.1em;
+}
+:global(.dark) .featured-bridge-kai { color: #e7b87d; }
+.featured-bridge-kage {
+  color: #52647a;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  letter-spacing: 0.16em;
+}
+:global(.dark) .featured-bridge-kage { color: #9aadc5; }
+
+/* 暖→冷掃描底層：絕對鋪滿 .featured-section，年尺浮於其上 */
+.featured-section { isolation: isolate; }
+.featured-sweep {
+  --sweep: 0;
+  position: absolute;
+  inset: -1.5rem -1rem;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 2px;
+  /* 暖陽（左上，繪）opacity 隨 sweep 退去；冷銀（右下，影）隨 sweep 浮現 */
+  background:
+    radial-gradient(58% 60% at 14% 8%,
+      rgba(228, 150, 74, calc(0.16 * (1 - var(--sweep)))) 0%, transparent 68%),
+    radial-gradient(64% 66% at 88% 96%,
+      rgba(120, 146, 178, calc(0.04 + 0.13 * var(--sweep))) 0%, transparent 70%);
+  transition: background 0.45s linear;
+}
+:global(.dark) .featured-sweep {
+  background:
+    radial-gradient(58% 60% at 14% 8%,
+      rgba(228, 150, 74, calc(0.12 * (1 - var(--sweep)))) 0%, transparent 68%),
+    radial-gradient(64% 66% at 88% 96%,
+      rgba(154, 173, 197, calc(0.03 + 0.10 * var(--sweep))) 0%, transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 凍結在中性（暖/冷各半顯），去除 scroll 牽動的 transition */
+  .featured-sweep {
+    transition: none;
+    background:
+      radial-gradient(58% 60% at 14% 8%, rgba(228, 150, 74, 0.09) 0%, transparent 68%),
+      radial-gradient(64% 66% at 88% 96%, rgba(120, 146, 178, 0.09) 0%, transparent 70%);
+  }
+  :global(.dark) .featured-sweep {
+    background:
+      radial-gradient(58% 60% at 14% 8%, rgba(228, 150, 74, 0.07) 0%, transparent 68%),
+      radial-gradient(64% 66% at 88% 96%, rgba(154, 173, 197, 0.06) 0%, transparent 70%);
   }
 }
 </style>

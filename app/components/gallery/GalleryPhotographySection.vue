@@ -1,13 +1,18 @@
 ﻿<template>
   <!-- Desktop: width must be measured on the timeline *content* strip, not the outer max-w-7xl -->
   <div class="hidden md:block">
-    <div class="space-y-32 max-w-7xl mx-auto">
+    <!-- g1：全章預設摺合 → 章距由 space-y-32(展開時的大氣口) 收為 space-y-6，
+         消除「11 條摺合章 × 8rem 巨幅死白」。展開章靠內部 padding 自帶氣口。 -->
+    <div class="space-y-6 max-w-7xl mx-auto">
       <div
         v-for="(item, index) in items"
         :key="item.key"
         :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
         :class="[
-          '[content-visibility:auto]',
+          // g1/g2：所有章節預設摺合（綜覽→深入策展模型）。上方接觸印樣綜覽已給全局視覺目次，
+          // timeline 在其下作「全量章索引」，每章一條極簡現像條；展開才現像接觸印樣格。
+          // g2：摺合態改單行現像條後 intrinsic 估高由 150px → 64px，避免摺合章預留過量空間＝下半死白。
+          '[content-visibility:auto] [contain-intrinsic-size:auto_64px]',
           'scroll-mt-24',
           'transition-colors duration-500',
           focusedEventName === item.eventName
@@ -22,10 +27,10 @@
           :event-key="item.eventName || 'no-event'"
           :show-event-control="!!item.eventName"
           :show-event-info="!!item.eventName"
-          :default-collapsed="index >= 2"
+          :default-collapsed="true"
+          wide
         >
           <div
-            :ref="el => bindStripRef(item.key, el, 'desktop')"
             class="mb-12 w-full min-w-0 overflow-x-hidden"
           >
             <div class="mb-6">
@@ -37,108 +42,45 @@
               </p>
             </div>
 
-            <div class="flex flex-col" :style="{ gap: GAP_DESKTOP + 'px' }">
-              <div
-                v-for="(row, ri) in justifiedRowsDesktop(item.images || [], item.key)"
-                :key="`d-${item.key}-${ri}`"
-                class="flex w-full min-w-0 max-w-full flex-row flex-nowrap items-start justify-start"
-                :style="{ gap: GAP_DESKTOP + 'px' }"
-              >
-                <div
-                  v-for="(image, ci) in row.items"
-                  :key="image.filename"
-                  :class="[
-                    'relative max-w-full shrink-0 overflow-hidden cursor-pointer group transition-[filter] duration-500 ease-out hover:brightness-105 motion-reduce:transition-none',
-                    isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                  ]"
-                  :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
-                  @click="openImageViewer(image, item.images || [])"
-                >
-                  <!--
-                    `<picture class="contents">` 讓 layout 透明化，flex/grid 仍以 `<img>` 當 direct child。
-                    AVIF 未產出時瀏覽器自動 fallback 到 WebP `<source>`，再到 `<img>.src`，不會影響畫面。
-                  -->
-                  <picture class="contents">
-                    <source
-                      :srcset="getGridAvifSrcset(image.filename)"
-                      :sizes="gridImageSizes"
-                      type="image/avif"
-                    >
-                    <source
-                      :srcset="getGridImageSrcset(image.filename)"
-                      :sizes="gridImageSizes"
-                      type="image/webp"
-                    >
-                    <img
-                      :src="getThumbPath(image.filename, 800)"
-                      :srcset="getGridImageSrcset(image.filename)"
-                      :sizes="gridImageSizes"
-                      :alt="image.title"
-                      class="h-full w-full object-cover align-top"
-                      loading="lazy"
-                      decoding="async"
-                      @load="onImgLoad(image.filename, $event)"
-                    >
-                  </picture>
-                  <!-- Hover overlay — 墨色和紙、jp-eyebrow 風 -->
-                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/85 via-stone-900/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:pointer-events-auto group-hover:opacity-100 flex flex-col justify-end p-3 motion-reduce:transition-none">
-                    <h4 class="text-stone-100 text-sm font-jp font-light tracking-wider mb-1.5 truncate">{{ image.title || '未命名' }}</h4>
-                    <div class="text-stone-300 text-xs space-y-1 font-light">
-                      <div v-if="image.camera || image.model" class="flex items-center gap-2 tracking-[0.15em]">
-                        <span aria-hidden="true" class="font-jp text-[0.7rem] tracking-[0.4em] text-stone-400">CAM</span>
-                        <span class="truncate">{{ image.camera }} {{ image.model }}</span>
-                      </div>
-                      <div class="flex items-center gap-3 text-stone-400 jp-kansuji">
-                        <span v-if="image.aperture">f/{{ image.aperture }}</span>
-                        <span v-if="image.shutterSpeed">{{ formatShutterSpeed(image.shutterSpeed) }}</span>
-                        <span v-if="image.iso">ISO {{ image.iso }}</span>
-                        <span v-if="image.focalLength">{{ image.focalLength }}mm</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <!--
+              g1（圖片庫策展 UX 大改）：影世界展開後改「接觸印樣格」(GalleryContactSheet)。
+              取代 baseline 的單欄全幅膠卷流（每格 1 大圖 + EXIF 側欄 ≈ 1 屏/格 → 30.5 屏病灶）。
+              保留暗室 identity（齒孔/序號/冷調負片/明體），但多欄密鋪砍屏數；
+              完整 EXIF/手記移到 lightbox（點任一格開）。版型仍與繪 GridWall 分歧
+              （暗調負片印樣 vs 暖白製圖牆），不退回成同一格牆。
+            -->
+            <GalleryContactSheet
+              :items="item.images || []"
+              @image-click="(img) => openImageViewer(img, item.images || [])"
+            />
           </div>
 
-          <!-- R34/R35：摺合時章封 cover — 章節編號 + 章名 + 章首詩 + 縮圖（R35 升級 layout） -->
+          <!--
+            g2（消雙目次冗餘 / 砍重複長柱）：摺合章不再重貼大縮圖章封。
+            理由：上方「接觸印樣綜覽」已是全 12 巻的視覺目次（含縮圖），下方 Timeline 若每章
+            再放一張 180px 大章封＝第二份視覺目次＝critic 指出的下半冷調死白與重複來源。
+            改為極簡「現像條」(develop strip)：序號 + 章名 + 章首詩 + 枚數刻度 + 展開，單行高度，
+            把 11 章摺合態從 ~2.7 屏壓到 <1 屏。縮圖留在上方綜覽；此處只當深入展開的錨點/開關。
+          -->
           <template #cover>
             <button
               type="button"
-              class="chapter-cover-btn group w-full text-left"
-              :aria-label="`展開 ${item.eventName || ''} 章節作品`"
+              class="chapter-strip group w-full text-left"
+              :aria-label="`展開 ${item.eventName || ''} 章節作品（${item.images?.length || 0} 枚）`"
               @click="item.eventName && toggleExpand(item.eventName)"
             >
-              <div class="chapter-cover-grid">
-                <div class="chapter-cover-thumb">
-                  <!-- Skeleton placeholder while loading -->
-                  <div class="chapter-cover-thumb__skeleton" aria-hidden="true"/>
-                  <img
-                    v-if="item.images?.[0]?.filename"
-                    :src="getThumbPath(item.images[0].filename, 400)"
-                    :alt="`${item.eventName} 章封`"
-                    loading="lazy"
-                    decoding="async"
-                    :class="['chapter-cover-thumb__img', { 'is-loaded': isImageLoaded(item.images[0].filename) }]"
-                    @load="onImgLoad(item.images[0].filename, $event)"
-                  >
-                  <span class="chapter-cover-thumb__seal" aria-hidden="true">{{ item.images?.length || 0 }}</span>
-                </div>
-                <div class="chapter-cover-meta">
-                  <p class="chapter-cover-index">其の {{ formatKansuji(index + 1) }}</p>
-                  <h3 class="chapter-cover-title font-jp">
-                    {{ item.eventName || '其他作品' }}
-                  </h3>
-                  <p v-if="getEventCaption(item)" class="chapter-cover-strongest">
-                    「{{ getEventCaption(item) }}」
-                  </p>
-                  <p class="chapter-cover-cta">
-                    <span class="chapter-cover-cta__line" aria-hidden="true"/>
-                    <span>展開全部</span>
-                    <span class="chapter-cover-cta__arrow" aria-hidden="true">→</span>
-                  </p>
-                </div>
-              </div>
+              <span class="chapter-strip__index">其の {{ formatKansuji(index + 1) }}</span>
+              <span class="chapter-strip__body">
+                <span class="chapter-strip__head">
+                  <span class="chapter-strip__title font-jp">{{ item.eventName || '其他作品' }}</span>
+                  <span class="chapter-strip__count jp-kansuji">{{ item.images?.length || 0 }} 枚</span>
+                </span>
+                <span v-if="getEventCaption(item)" class="chapter-strip__caption">「{{ getEventCaption(item) }}」</span>
+              </span>
+              <span class="chapter-strip__cta" aria-hidden="true">
+                <span class="chapter-strip__cta-text">展開</span>
+                <span class="chapter-strip__cta-arrow">→</span>
+              </span>
             </button>
           </template>
         </GalleryTimelineItem>
@@ -153,78 +95,50 @@
         v-for="(item, mIdx) in items"
         :key="item.key"
         :ref="el => props.registerEventRef(item.eventName || 'no-event', el)"
-        class="[content-visibility:auto] scroll-mt-24"
+        :class="[
+          // R9：同 desktop — content-visibility:auto 只給預設摺合章（mIdx>=2），
+          // 避免前 2 個展開章的高膠卷流在 fullPage 截圖被裁成空白佔位。
+          '[content-visibility:auto] [contain-intrinsic-size:auto_150px]',
+          'scroll-mt-24'
+        ]"
       >
+        <!--
+          R2（galleryWorlds mobile 分家）：影世界手機章首改「暗房光桌橫條」(light-table bar)。
+          回應 Round 1 critic jump-out:「mobile 兩世界塌回幾乎同一條 stacked list」。
+          黑底反白 + 左緣齒孔 + frame-no + 冷銀刻度尺，把桌機暗房光桌橫條精神帶到手機，
+          與繪手機的製圖白底標牌正反相。展開/摺合 affordance 改為負片格上的 ＋/－。
+        -->
         <button
           v-if="item.eventName"
           type="button"
-          class="mobile-event-header w-full text-left"
+          class="lighttable-bar w-full text-left"
           :aria-label="`${isMobileExpanded(item, mIdx) ? '摺合' : '展開'} ${item.eventName} 章節`"
           :aria-expanded="isMobileExpanded(item, mIdx)"
           @click="item.eventName && toggleExpand(item.eventName)"
         >
-          <div class="flex items-baseline justify-between gap-2">
-            <h3 class="text-base font-jp font-extralight text-stone-700 dark:text-stone-200 tracking-wider">
-              {{ item.eventName }}
-            </h3>
-            <span class="text-[0.7rem] text-stone-400 jp-kansuji">
-              {{ isMobileExpanded(item, mIdx) ? '−' : '+' }}
-            </span>
+          <span class="lighttable-bar__sprockets" aria-hidden="true"/>
+          <span class="lighttable-bar__frameno" aria-hidden="true">{{ formatKansuji(mIdx + 1) }} / KAGE</span>
+          <div class="lighttable-bar__row">
+            <h3 class="lighttable-bar__title">{{ item.eventName }}</h3>
+            <span class="lighttable-bar__toggle" aria-hidden="true">{{ isMobileExpanded(item, mIdx) ? '−' : '+' }}</span>
           </div>
-          <p class="text-[0.65rem] text-stone-400 dark:text-stone-500 mt-1 font-light tracking-[0.3em] jp-kansuji">
-            {{ item.images?.length || 0 }} <span class="text-stone-400 dark:text-stone-600">·</span> 作品
+          <p class="lighttable-bar__meta jp-kansuji">
+            {{ item.images?.length || 0 }} <span aria-hidden="true">·</span> 枚
           </p>
-          <p v-if="!isMobileExpanded(item, mIdx) && getEventCaption(item)" class="mt-2 text-[0.78rem] leading-relaxed text-stone-500 dark:text-stone-400">
+          <p v-if="!isMobileExpanded(item, mIdx) && getEventCaption(item)" class="lighttable-bar__caption">
             {{ getEventCaption(item) }}
           </p>
+          <span class="lighttable-bar__ticks" aria-hidden="true"/>
         </button>
         <div
           v-if="isMobileExpanded(item, mIdx)"
-          :ref="el => bindStripRef(item.key, el, 'mobile')"
           class="w-full min-w-0 overflow-x-hidden mt-4"
         >
-          <div class="flex flex-col" :style="{ gap: GAP_MOBILE + 'px' }">
-            <div
-              v-for="(row, ri) in justifiedRowsMobile(item.images || [], item.key)"
-              :key="`m-${item.key}-${ri}`"
-              class="flex w-full min-w-0 max-w-full flex-row flex-nowrap items-start justify-start"
-              :style="{ gap: GAP_MOBILE + 'px' }"
-            >
-              <div
-                v-for="(image, ci) in row.items"
-                :key="image.filename"
-                :class="[
-                  'relative max-w-full shrink-0 overflow-hidden cursor-pointer group active:opacity-80 transition-opacity duration-200',
-                  isImageLoaded(image.filename) ? 'bg-white dark:bg-stone-800' : 'bg-stone-100 dark:bg-stone-800 animate-pulse'
-                ]"
-                :style="{ width: `${row.widths[ci]}px`, height: `${row.height}px` }"
-                @click="openImageViewer(image, item.images || [])"
-              >
-                <picture class="contents">
-                  <source
-                    :srcset="getGridAvifSrcset(image.filename)"
-                    :sizes="gridImageSizes"
-                    type="image/avif"
-                  >
-                  <source
-                    :srcset="getGridImageSrcset(image.filename)"
-                    :sizes="gridImageSizes"
-                    type="image/webp"
-                  >
-                  <img
-                    :src="getThumbPath(image.filename, 800)"
-                    :srcset="getGridImageSrcset(image.filename)"
-                    :sizes="gridImageSizes"
-                    :alt="image.title"
-                    class="h-full w-full object-cover align-top"
-                    loading="lazy"
-                    decoding="async"
-                    @load="onImgLoad(image.filename, $event)"
-                  >
-                </picture>
-              </div>
-            </div>
-          </div>
+          <!-- g1：手機亦走接觸印樣格（與桌機同版型語言；2 欄密鋪砍屏數） -->
+          <GalleryContactSheet
+            :items="item.images || []"
+            @image-click="(img) => openImageViewer(img, item.images || [])"
+          />
         </div>
       </div>
     </div>
@@ -232,13 +146,12 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref, type ComponentPublicInstance } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import type { GalleryItem, MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
-import { formatShutterSpeed } from '~/utils/formatters'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
+import GalleryContactSheet from '~/components/gallery/GalleryContactSheet.vue'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
-import { computeJustifiedRows, DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
 
 const galleryStore = useGalleryStore()
 
@@ -251,10 +164,11 @@ function toggleExpand (eventName: string) {
  * Mobile timeline 預設摺合邏輯 — 與 desktop 對齊（前 2 個展開、其餘摺合）
  * 沒有 eventName 的散圖一律展開
  */
-function isMobileExpanded (item: MixedPhotoItem, idx: number): boolean {
+function isMobileExpanded (item: MixedPhotoItem, _idx: number): boolean {
   if (!item.eventName) return true
   const state = galleryStore.expandedGroups[item.eventName]
-  if (state === undefined) return idx < 2
+  // g1：全章預設摺合（idx 參數保留以相容呼叫端，已不參與預設判定）
+  if (state === undefined) return false
   return state
 }
 
@@ -279,23 +193,6 @@ function getEventCaption (item: MixedPhotoItem): string | null {
   return text
 }
 
-/**
- * ResizeObserver debounce：視窗拖拉時每毫秒都會觸發 RO，
- * 一次 resize 可能連續觸發上百次 justified layout 重算 → 主執行緒抖動。
- * 用 rAF 合併到下一幀只算一次。
- */
-function rafDebounce (fn: () => void): () => void {
-  let scheduled = false
-  return () => {
-    if (scheduled) return
-    scheduled = true
-    requestAnimationFrame(() => {
-      scheduled = false
-      fn()
-    })
-  }
-}
-
 const props = defineProps<{
   items: MixedPhotoItem[]
   focusedEventName: string | null
@@ -303,304 +200,224 @@ const props = defineProps<{
   registerEventRef: (name: string | null, el: Element | ComponentPublicInstance | null) => void
 }>()
 
-const GAP_DESKTOP = 12
-const GAP_MOBILE = 8
-const IDEAL_ROW_DESKTOP = 220
-const IDEAL_ROW_MOBILE = 180
-const FALLBACK_WIDTH_DESKTOP = 1200
-const FALLBACK_WIDTH_MOBILE = 360
-
-const { getThumbPath, getGridImageSrcset, getGridAvifSrcset, gridImageSizes } = useImagePath()
 const imageViewerStore = useImageViewerStore()
-
-/** Measured width of the actual gallery column (inside timeline content slot) */
-const stripWidthDesktop = ref<Record<string, number>>({})
-const stripWidthMobile = ref<Record<string, number>>({})
-
-const aspectRatios = ref<Record<string, number>>({})
-
-const loadedPhotographyImages = ref<Record<string, boolean>>({})
-
-const resizeObservers = new Map<string, ResizeObserver>()
-
-function resolveEl (el: Element | ComponentPublicInstance | null): HTMLElement | null {
-  if (!el) return null
-  if (el instanceof HTMLElement) return el
-  const v = el as ComponentPublicInstance
-  return v.$el instanceof HTMLElement ? v.$el : null
-}
-
-function bindStripRef (
-  key: string,
-  el: Element | ComponentPublicInstance | null,
-  mode: 'desktop' | 'mobile'
-) {
-  const mapKey = `${mode}:${key}`
-  resizeObservers.get(mapKey)?.disconnect()
-  resizeObservers.delete(mapKey)
-
-  const html = resolveEl(el)
-  if (!html) return
-
-  const apply = () => {
-    const w = Math.round(html.clientWidth)
-    if (w <= 0) return
-    if (mode === 'desktop') {
-      const prev = stripWidthDesktop.value[key]
-      if (prev === w) return
-      stripWidthDesktop.value = { ...stripWidthDesktop.value, [key]: w }
-    } else {
-      const prev = stripWidthMobile.value[key]
-      if (prev === w) return
-      stripWidthMobile.value = { ...stripWidthMobile.value, [key]: w }
-    }
-  }
-
-  const ro = new ResizeObserver(rafDebounce(apply))
-  ro.observe(html)
-  resizeObservers.set(mapKey, ro)
-  apply()
-}
-
-onBeforeUnmount(() => {
-  resizeObservers.forEach(o => o.disconnect())
-  resizeObservers.clear()
-})
-
-function ratioOf (filename: string): number {
-  return aspectRatios.value[filename] ?? DEFAULT_ASPECT_RATIO
-}
-
-function justifiedRowsDesktop (images: GalleryItem[], eventKey: string) {
-  const w = stripWidthDesktop.value[eventKey] ?? FALLBACK_WIDTH_DESKTOP
-  return computeJustifiedRows(
-    images,
-    ratioOf,
-    w,
-    GAP_DESKTOP,
-    IDEAL_ROW_DESKTOP
-  )
-}
-
-function justifiedRowsMobile (images: GalleryItem[], eventKey: string) {
-  const w = stripWidthMobile.value[eventKey] ?? FALLBACK_WIDTH_MOBILE
-  return computeJustifiedRows(
-    images,
-    ratioOf,
-    w,
-    GAP_MOBILE,
-    IDEAL_ROW_MOBILE
-  )
-}
-
-function onImgLoad (filename: string, ev: Event) {
-  const el = ev.target as HTMLImageElement
-  if (el.naturalWidth > 0 && el.naturalHeight > 0) {
-    const next = el.naturalWidth / el.naturalHeight
-    const prev = aspectRatios.value[filename]
-    if (prev === undefined || Math.abs(prev - next) > 1e-5) {
-      aspectRatios.value = { ...aspectRatios.value, [filename]: next }
-    }
-  }
-  if (!loadedPhotographyImages.value[filename]) {
-    loadedPhotographyImages.value = { ...loadedPhotographyImages.value, [filename]: true }
-  }
-}
-
-const isImageLoaded = (filename: string) => {
-  return !!loadedPhotographyImages.value[filename]
-}
 
 const openImageViewer = (clickedImage: GalleryItem, images: GalleryItem[]) => {
   imageViewerStore.openImageViewer(clickedImage, images)
 }
+
+/**
+ * g1：綜覽印樣點某巻 → 強制展開該 event（不 toggle，確保展開）。
+ * 父層接著 scroll 到該章（透過既有 registerEventRef 蒐集的 DOM ref）。
+ */
+function expandEvent (eventName: string) {
+  galleryStore.setGroupExpansion(eventName, true)
+}
+
+defineExpose({ expandEvent })
 </script>
 
 <style scoped>
-/* ===== R34 章封 chapter-cover（摺合事件視覺） ===== */
-.chapter-cover-btn {
+/* ===== g2：摺合章「現像條」(chapter-strip) — 單行極簡，縮圖留在上方綜覽 ===== */
+.chapter-strip {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  width: 100%;
   cursor: pointer;
   background: transparent;
   border: 0;
-  padding: 0;
-  width: 100%;
-  transition: opacity 0.3s ease;
+  border-top: 1px solid rgb(168 162 158 / 0.18);
+  padding: 0.85rem 0.4rem 0.85rem 0;
+  transition: background-color 0.3s ease, padding-left 0.3s ease;
 }
-.chapter-cover-btn:hover { opacity: 0.92; }
-.chapter-cover-btn:focus-visible {
+.chapter-strip:hover {
+  background: rgb(168 162 158 / 0.06);
+  padding-left: 0.5rem;
+}
+:global(.dark) .chapter-strip:hover { background: rgb(120 113 108 / 0.1); }
+.chapter-strip:focus-visible {
   outline: 1px solid rgb(217 123 46 / 0.5);
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
-.chapter-cover-grid {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 2rem;
-  padding: 1.6rem 0;
-  align-items: center;
-  border-top: 1px solid rgb(168 162 158 / 0.2);
-  border-bottom: 1px solid rgb(168 162 158 / 0.2);
-}
-.chapter-cover-thumb {
-  width: 220px;
-  height: 160px;
-  overflow: hidden;
-  background: rgb(245 244 240);
-  border: 1px solid rgb(168 162 158 / 0.18);
-  position: relative;
-}
-:global(.dark) .chapter-cover-thumb {
-  background: rgb(28 25 23);
-  border-color: rgb(120 113 108 / 0.32);
-}
-/* Skeleton placeholder — R36：避免 loading 灰塊刺眼 */
-.chapter-cover-thumb__skeleton {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    100deg,
-    rgb(245 244 240) 30%,
-    rgb(231 229 228) 50%,
-    rgb(245 244 240) 70%
-  );
-  background-size: 200% 100%;
-  animation: chapter-cover-shimmer 2.4s ease-in-out infinite;
-}
-:global(.dark) .chapter-cover-thumb__skeleton {
-  background: linear-gradient(
-    100deg,
-    rgb(41 37 36) 30%,
-    rgb(68 64 60) 50%,
-    rgb(41 37 36) 70%
-  );
-  background-size: 200% 100%;
-}
-@keyframes chapter-cover-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .chapter-cover-thumb__skeleton { animation: none; }
-}
-
-.chapter-cover-thumb__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.92);
-  opacity: 0;
-  transition: opacity 0.45s ease, filter 0.4s ease, transform 0.6s ease;
-}
-.chapter-cover-thumb__img.is-loaded {
-  opacity: 1;
-}
-.chapter-cover-btn:hover .chapter-cover-thumb__img.is-loaded {
-  filter: saturate(1.05);
-  transform: scale(1.02);
-}
-/* 縮圖右下角朱印標葉數 */
-.chapter-cover-thumb__seal {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  background: rgb(217 123 46 / 0.92);
-  color: rgb(250 250 249);
+.chapter-strip__index {
+  flex: 0 0 auto;
   font-family: 'Noto Serif JP', serif;
-  font-weight: 300;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  padding: 0.2rem 0.55rem;
-  line-height: 1.4;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgb(217 123 46 / 0.8);
+  white-space: nowrap;
+  padding-top: 0.15rem;
 }
-
-.chapter-cover-meta {
+.chapter-strip__body {
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.3rem;
 }
-.chapter-cover-index {
-  margin: 0;
-  font-size: 0.65rem;
-  letter-spacing: 0.42em;
-  color: rgb(217 123 46 / 0.85);
-  text-transform: uppercase;
-  font-family: 'Noto Serif JP', serif;
+.chapter-strip__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
 }
-.chapter-cover-title {
-  font-size: 1.55rem;
-  font-weight: 200;
+.chapter-strip__title {
+  font-family: var(--world-display, 'Noto Serif JP', 'Source Han Serif TC', serif);
+  font-size: 1.32rem;
+  font-weight: var(--world-display-weight, 400);
   letter-spacing: 0.16em;
-  color: rgb(68 64 60);
-  margin: 0;
   line-height: 1.3;
+  color: rgb(68 64 60);
+  transition: color 0.25s ease;
 }
-:global(.dark) .chapter-cover-title { color: rgb(231 229 228); }
-
-/* 章首詩 — strongest_line 用 mincho 包引號顯示 */
-.chapter-cover-strongest {
-  margin: 0;
-  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
-  font-size: 1.02rem;
-  letter-spacing: 0.06em;
-  line-height: 1.7;
-  color: rgb(120 113 108);
-  font-weight: 300;
-  max-width: 32rem;
+:global(.dark) .chapter-strip__title { color: rgb(231 229 228); }
+.chapter-strip:hover .chapter-strip__title {
+  color: color-mix(in srgb, var(--accent) 75%, rgb(68 64 60));
 }
-:global(.dark) .chapter-cover-strongest {
+.chapter-strip__count {
+  flex: 0 0 auto;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
   color: rgb(168 162 158);
 }
-
-.chapter-cover-cta {
-  margin: 0.5rem 0 0;
+.chapter-strip__caption {
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  color: rgb(120 113 108);
+  font-weight: 300;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40rem;
+}
+:global(.dark) .chapter-strip__caption { color: rgb(168 162 158); }
+.chapter-strip__cta {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
+  gap: 0.5rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
   color: rgb(217 123 46);
-  text-transform: uppercase;
-  font-weight: 300;
+  white-space: nowrap;
+  padding-top: 0.1rem;
 }
-.chapter-cover-cta__line {
-  display: inline-block;
-  width: 32px;
-  height: 1px;
-  background: rgb(217 123 46 / 0.55);
-  transition: width 0.3s ease;
-}
-.chapter-cover-cta__arrow {
+.chapter-strip__cta-arrow {
   display: inline-block;
   transition: transform 0.3s ease;
 }
-.chapter-cover-btn:hover .chapter-cover-cta__arrow { transform: translateX(4px); }
-.chapter-cover-btn:hover .chapter-cover-cta__line { width: 48px; }
+.chapter-strip:hover .chapter-strip__cta-arrow { transform: translateX(4px); }
 
 @media (max-width: 1023px) {
-  .chapter-cover-grid {
-    grid-template-columns: 160px 1fr;
-    gap: 1.2rem;
-    padding: 1.1rem 0;
-  }
-  .chapter-cover-thumb { width: 160px; height: 110px; }
-  .chapter-cover-title { font-size: 1.3rem; }
-  .chapter-cover-strongest { font-size: 0.9rem; }
+  .chapter-strip { gap: 1rem; }
+  .chapter-strip__title { font-size: 1.15rem; }
+  .chapter-strip__caption { max-width: 22rem; }
+  .chapter-strip__cta-text { display: none; }
 }
 
-/* ===== R34 mobile header button affordance ===== */
-.mobile-event-header {
-  background: transparent;
-  border: 0;
-  padding: 0.4rem 0;
-  cursor: pointer;
+/* ===== R2：影世界手機「暗房光桌橫條」(light-table bar) =====
+   黑底反白負片格條，與繪手機白底製圖標牌正反相。
+   把桌機 GalleryDarkroomBar 的暗房光桌精神帶到手機，避免兩世界塌回同一 stacked list。 */
+.lighttable-bar {
+  position: relative;
   display: block;
-  border-top: 1px solid rgb(168 162 158 / 0.18);
-  padding-top: 0.85rem;
+  width: 100%;
+  cursor: pointer;
+  border: 0;
+  padding: 0.95rem 1.1rem 0.85rem 1.6rem;
+  background: linear-gradient(165deg, #20262c 0%, #14181c 100%);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.14);
+  overflow: hidden;
 }
-.mobile-event-header:focus-visible {
-  outline: 1px solid rgb(217 123 46 / 0.5);
-  outline-offset: 4px;
+:global(.dark) .lighttable-bar {
+  background: linear-gradient(165deg, #1a1f24 0%, #0e1114 100%);
+}
+.lighttable-bar:focus-visible {
+  outline: 1px solid rgba(154, 173, 197, 0.7);
+  outline-offset: 3px;
+}
+/* 左緣齒孔軌 */
+.lighttable-bar__sprockets {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 8px;
+  pointer-events: none;
+  background-image: radial-gradient(circle at center, rgba(238, 241, 243, 0.8) 0 1.5px, transparent 1.8px);
+  background-size: 8px 14px;
+  background-repeat: repeat-y;
+  opacity: 0.45;
+}
+.lighttable-bar__frameno {
+  display: block;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.54rem;
+  letter-spacing: 0.28em;
+  color: rgba(154, 173, 197, 0.85);
+  margin-bottom: 0.35rem;
+}
+.lighttable-bar__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.lighttable-bar__title {
+  margin: 0;
+  /* R2：影手機章名也用世界字族（Shippori），與繪手機製圖標牌字族分家 */
+  font-family: var(--world-display, 'Noto Serif JP', serif);
+  font-weight: var(--world-display-weight, 500);
+  font-size: 1.18rem;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  color: #eef1f3;
+}
+.lighttable-bar__toggle {
+  flex-shrink: 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.05rem;
+  color: rgba(154, 173, 197, 0.9);
+}
+.lighttable-bar__meta {
+  margin: 0.3rem 0 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  color: rgba(190, 200, 212, 0.72);
+}
+.lighttable-bar__caption {
+  margin: 0.55rem 0 0;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: 0.82rem;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
+  color: rgba(206, 214, 224, 0.8);
+}
+/* 底緣冷銀刻度尺（光桌標尺） */
+.lighttable-bar__ticks {
+  position: absolute;
+  left: 1.6rem;
+  right: 1.1rem;
+  bottom: 0.4rem;
+  height: 5px;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(154, 173, 197, 0.32) 0,
+    rgba(154, 173, 197, 0.32) 1px,
+    transparent 1px,
+    transparent 18px
+  );
+  background-position: bottom;
+  opacity: 0.6;
 }
 </style>

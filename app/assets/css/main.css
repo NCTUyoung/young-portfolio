@@ -805,3 +805,340 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-fadeInUp { animation: none; opacity: 1; transform: none; }
 }
+
+/* ============================================================
+   R1（act-critic galleryWorlds）— 兩個世界 (Two Worlds)
+   ------------------------------------------------------------
+   進 /gallery/digital（繪）與 /gallery/photography（影）必須讀起來像
+   兩個截然不同的雙線敘事世界，而不是同一個「圖片瀏覽器」換內容。
+   做法：在 gallery 頁根節點掛 `data-world="kai" | "kage"`，由此一個
+   attribute 驅動整個世界的氛圍：
+     · 背景質地（繪＝暖陽方格製圖紙 / 影＝冷銀墨暈＋顆粒）
+     · 環境光暈（繪＝右上暖光 / 影＝中央冷散景）
+     · accent 色相不通膨（繪＝既有テラコッタ / 影＝冷青 slate）
+     · 進場節奏（繪＝俐落格線對齊 grid-snap / 影＝緩慢顯影 fade）
+   所有 motion 皆有 prefers-reduced-motion fallback；不違 hero 靜態鐵律
+   （此處是 gallery，非 hero；且無 timer/autoplay，純進場一次性）。
+   stone 仍是脊樑：兩個世界都建立在 stone 之上，僅色溫＋質地分歧。
+   ============================================================ */
+
+/* --- 世界容器：底紋 + 環境光 + 色溫 --- */
+.gallery-world {
+  position: relative;
+  isolation: isolate;
+  /* 世界切換時，色溫過渡（非 hero，允許 transition） */
+  transition: background-color 0.6s ease;
+}
+.gallery-world::before {
+  /* 底層質地（方格紙 / 顆粒），極淡、pointer-events-none、aria 無關 */
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.gallery-world::after {
+  /* 環境光暈層 */
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.gallery-world.gallery-world--ready::before,
+.gallery-world.gallery-world--ready::after { opacity: 1; }
+
+/* R2：字族載入鉤 — @nuxt/fonts 以「字面 font-family 宣告」掃描下載字型，
+   不追蹤 CSS 變數間接引用。下列 0 尺寸 helper 持有 Shippori Mincho / Zen Kaku
+   Gothic New 的字面宣告，確保兩世界專屬字族被子集化下載；實際套用仍由
+   --world-display 變數驅動（見各 data-world 區塊）。aria/版面無影響。 */
+.world-font-kage-probe { font-family: 'Shippori Mincho', serif; position: absolute; width: 0; height: 0; overflow: hidden; }
+.world-font-kai-probe { font-family: 'Zen Kaku Gothic New', sans-serif; position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* === 繪 (kai)：暖陽 · 製圖方格紙 · 俐落 ===
+   R4（act-critic galleryWorlds）：回應 Round 3 next-step「繪世界補質地層：
+   藍圖紙紋/網點背景 + 等寬 mono 製圖字體，與影的顯影顆粒拉出觸感差」。
+   - --world-mono：繪世界專屬等寬製圖字體 token，由格牌/章碼/尺規標註統一引用
+     （影世界不設此 token → 仍走 serif 顯影氣口，字體節奏一眼分歧）。
+   - ::before 由單層細格線 → 主格(38px)＋次格(分 5 等分的更細亮線) 雙層方格紙，
+     像真正的工程方格紙（major/minor grid），觸感比影的顯影顆粒「硬」。 */
+.gallery-world[data-world='kai'] {
+  background-color: #fdfaf4;
+  --world-mono: ui-monospace, 'SFMono-Regular', 'Roboto Mono', 'DejaVu Sans Mono', monospace;
+  /* R2：繪世界標題字族 — Zen Kaku Gothic New（幾何 gothic，製圖俐落、直角骨架）。
+     與影的高對比文人明體拉開「乾／硬 vs 濕／柔」字體節奏。 */
+  --world-display: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
+  --world-display-weight: 400;
+  --world-display-spacing: 0.16em;
+}
+.dark .gallery-world[data-world='kai'] {
+  background-color: #1a1714;
+}
+.gallery-world[data-world='kai']::before {
+  /* 製圖方格紙：major(38px 暖格線) + minor(7.6px 更細更淡的次格) → 雙層工程方格紙 */
+  background-image:
+    linear-gradient(to right, rgba(219, 123, 46, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(219, 123, 46, 0.06) 1px, transparent 1px),
+    linear-gradient(to right, rgba(219, 123, 46, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(219, 123, 46, 0.028) 1px, transparent 1px);
+  background-size: 38px 38px, 38px 38px, 7.6px 7.6px, 7.6px 7.6px;
+}
+.dark .gallery-world[data-world='kai']::before {
+  background-image:
+    linear-gradient(to right, rgba(231, 184, 125, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(231, 184, 125, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(231, 184, 125, 0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(231, 184, 125, 0.022) 1px, transparent 1px);
+  background-size: 38px 38px, 38px 38px, 7.6px 7.6px, 7.6px 7.6px;
+}
+.gallery-world[data-world='kai']::after {
+  /* 右上暖陽光暈 + 頂部暖帶（讓 gateway 也坐在暖世界裡） */
+  background:
+    radial-gradient(55% 45% at 90% 2%, rgba(228, 150, 74, 0.18) 0%, transparent 68%),
+    linear-gradient(to bottom, rgba(228, 150, 74, 0.06) 0%, transparent 18%);
+}
+.dark .gallery-world[data-world='kai']::after {
+  background:
+    radial-gradient(55% 45% at 90% 2%, rgba(228, 150, 74, 0.14) 0%, transparent 68%),
+    linear-gradient(to bottom, rgba(228, 150, 74, 0.05) 0%, transparent 18%);
+}
+
+/* === 影 (kage)：冷銀 · 墨暈顆粒 · 緩慢顯影 === */
+.gallery-world[data-world='kage'] {
+  background-color: #eef1f3;
+  /* R2：影世界標題字族 — Shippori Mincho（高對比文人明體，暗房抒情、縱長筆勢）。
+     字重稍實、字距更鬆，與繪的幾何 gothic 形成第一眼可辨的字體家族分歧。 */
+  --world-display: 'Shippori Mincho', 'Noto Serif JP', serif;
+  --world-display-weight: 500;
+  --world-display-spacing: 0.22em;
+}
+.dark .gallery-world[data-world='kage'] {
+  background-color: #14181b;
+}
+.gallery-world[data-world='kage']::before {
+  /* 顆粒底紋（film grain）：多層細點 radial + 極淡水平顯影流痕，
+     R4：補一層 horizontal develop streak，與繪的「乾」方格紙拉出「濕」顯影觸感差 */
+  background-image:
+    radial-gradient(rgba(82, 100, 122, 0.05) 0.5px, transparent 0.5px),
+    radial-gradient(rgba(82, 100, 122, 0.04) 0.5px, transparent 0.5px),
+    repeating-linear-gradient(to bottom, rgba(82, 100, 122, 0.018) 0px, rgba(82, 100, 122, 0.018) 1px, transparent 1px, transparent 4px);
+  background-size: 3px 3px, 5px 5px, 100% 4px;
+  background-position: 0 0, 2px 2px, 0 0;
+}
+.dark .gallery-world[data-world='kage']::before {
+  background-image:
+    radial-gradient(rgba(154, 173, 197, 0.05) 0.5px, transparent 0.5px),
+    radial-gradient(rgba(154, 173, 197, 0.04) 0.5px, transparent 0.5px),
+    repeating-linear-gradient(to bottom, rgba(154, 173, 197, 0.016) 0px, rgba(154, 173, 197, 0.016) 1px, transparent 1px, transparent 4px);
+  background-size: 3px 3px, 5px 5px, 100% 4px;
+  background-position: 0 0, 2px 2px, 0 0;
+}
+.gallery-world[data-world='kage']::after {
+  /* 中央冷散景：暗角 vignette + 微冷光，像顯影盤；頂部冷帶讓 gateway 入冷世界
+     R8：加深 vignette 並補一層上下暗緣，讓影世界整頁巨幅留白讀作「暗房暗角的
+     刻意留白」而非空頁（回應 Round 7 critic「巨幅留白損害世界完整感」）。 */
+  background:
+    radial-gradient(75% 60% at 50% 34%, rgba(154, 173, 197, 0.14) 0%, transparent 62%),
+    linear-gradient(to bottom, rgba(82, 100, 122, 0.10) 0%, transparent 16%),
+    linear-gradient(to top, rgba(82, 100, 122, 0.09) 0%, transparent 14%),
+    radial-gradient(130% 125% at 50% 45%, transparent 46%, rgba(58, 72, 90, 0.16) 100%);
+}
+.dark .gallery-world[data-world='kage']::after {
+  background:
+    radial-gradient(75% 60% at 50% 38%, rgba(154, 173, 197, 0.07) 0%, transparent 65%),
+    radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.30) 100%);
+}
+
+/* --- accent 色溫分歧：影世界把 accent 由テラコッタ → 冷青 slate ---
+   只在 kage 容器內 re-map 語意 token，jp-section-label / jp-eyebrow / hairline
+   全部自動跟著轉冷，無需逐元件改 class。繪世界保留既有暖色（不動）。
+   stone 仍為主軸；此為「色溫」差異，非把 accent 變主色。 */
+.gallery-world[data-world='kage'] {
+  --accent:      #52647a;
+  --accent-ink:  #3f4f63;
+  --accent-soft: #9aadc5;
+}
+.dark .gallery-world[data-world='kage'] {
+  --accent:      #9aadc5;
+  --accent-ink:  #b6c6da;
+  --accent-soft: #52647a;
+}
+
+/* === R5（galleryWorlds 大改）：世界級「字體聲音」橫貫層 ===
+   回應 Round 4 critic jump-out：「兩世界字族分家只活在 masthead H1，捲進內文（章名／
+   caption／timeline／footer）全部仍是同一支 Noto Serif JP，讀起來還是同一本書。」
+
+   解法不是再加一個 widget，而是把世界字族 **直接灌進 `--font-jp` 本身**——
+   `.font-jp` / `.jp-body` / `.jp-kansuji` / `theme(fontFamily.jp)` 全站皆引用此變數，
+   一次覆寫即讓整個世界的閱讀表面換聲：
+     繪(kai)  = Zen Kaku Gothic New：幾何 gothic、直角骨架、字距收緊、行距壓短 → 製圖／技術語氣（乾、硬）
+     影(kage) = Shippori Mincho：高對比文人明體、字距放鬆、行距拉高 → 暗房／抒情語氣（濕、柔）
+   連 body 的字距與行高都隨世界改，兩世界一捲就是兩種呼吸節奏，徹底脫離「同一個瀏覽器換內容」。
+
+   stone 仍是脊樑：只動字族與字律（typographic voice），顏色／版面骨架不在此層。
+   accent 仍只在 eyebrow/hairline（見上方色溫層）。a11y/SEO 無影響（純 font-family）。 */
+.gallery-world[data-world='kai'] {
+  /* 繪：整個世界以幾何 gothic 為閱讀聲音；字距收緊、行距壓短 → 製圖紙的「乾」 */
+  --font-jp: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
+  --track-jp-body: 0.02em;
+  --lh-jp-body: 1.85;
+}
+.gallery-world[data-world='kage'] {
+  /* 影：整個世界以文人明體為閱讀聲音；字距放鬆、行距拉高 → 顯影盤的「濕」 */
+  --font-jp: 'Shippori Mincho', 'Noto Serif JP', serif;
+  --track-jp-body: 0.08em;
+  --lh-jp-body: 2.2;
+}
+/* `.font-jp`（Tailwind utility）與 `.jp-body` / `.jp-kansuji`（theme(fontFamily.jp)）
+   都寫死指向 Noto Serif JP 字族清單，不會自動吃 `--font-jp`。在世界容器內顯式覆寫，
+   讓整個 gallery 閱讀表面（章名 / caption / timeline / footer 引言 / 漢數字）換成世界字族；
+   homepage 等容器外不受影響（scoped 在 .gallery-world 內）。 */
+.gallery-world .font-jp,
+.gallery-world .jp-body,
+.gallery-world .jp-kansuji {
+  font-family: var(--font-jp), serif;
+}
+/* body 字律隨世界 token 走（jp-body 原寫死 0.05em / line-height:2，改吃變數） */
+.gallery-world .jp-body {
+  letter-spacing: var(--track-jp-body, 0.05em);
+  line-height: var(--lh-jp-body, 2);
+}
+/* 章名「最強句」原寫死 Noto Serif JP，改隨世界字族（繪轉 sans，影留明體）。
+   用屬性選擇器精準命中本頁 scoped class，避免動到別處。 */
+.gallery-world[data-world='kai'] .digital-chapter-header__strongest {
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* --- 世界進場：標題與章節序列進場 --- */
+/* 繪：俐落 grid-snap（短促、稍硬的 ease，像對齊到格線） */
+@keyframes world-snap-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.gallery-world[data-world='kai'] .world-enter {
+  opacity: 0;
+  animation: world-snap-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+/* 影：緩慢顯影（長、柔，像照片在顯影盤裡浮現） */
+@keyframes world-develop-in {
+  from { opacity: 0; transform: translateY(18px); filter: blur(6px) saturate(0.7); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0) saturate(1); }
+}
+.gallery-world[data-world='kage'] .world-enter {
+  opacity: 0;
+  animation: world-develop-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+/* 進場階梯（章節依序） */
+.world-enter-d1 { animation-delay: 0.05s; }
+.world-enter-d2 { animation-delay: 0.16s; }
+.world-enter-d3 { animation-delay: 0.28s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-world::before,
+  .gallery-world::after { transition: none; }
+  .gallery-world[data-world='kai'] .world-enter,
+  .gallery-world[data-world='kage'] .world-enter {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   R3（act-critic galleryWorlds）— 繪⇄影「世界幕」route/tab 轉場
+   ------------------------------------------------------------
+   切換 track 時播一次定向幕，補上 critic R2 指出「缺 tab/route 兩世界
+   互轉轉場、動效集中 entrance/hover 層」的空白。
+   兩個世界的幕語言刻意分歧：
+     繪(kai) = 暖色製圖網格幕，從右上俐落 grid-snap 橫掃離場
+     影(kage) = 冷色顯影幕，中央緩慢 develop blur-fade 消散
+   純一次性、user-initiated、無 timer/autoplay；fixed 滿版但 pointer-events-none。
+   ============================================================ */
+.world-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.world-curtain__kana {
+  font-size: clamp(6rem, 22vw, 18rem);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: 0.1em;
+}
+/* 繪幕：暖色 + 製圖網格疊紋 */
+.world-curtain[data-world='kai'] {
+  background:
+    linear-gradient(to right, rgba(219, 123, 46, 0.10) 1px, transparent 1px) 0 0 / 38px 38px,
+    linear-gradient(to bottom, rgba(219, 123, 46, 0.10) 1px, transparent 1px) 0 0 / 38px 38px,
+    #fdfaf4;
+}
+.world-curtain[data-world='kai'] .world-curtain__kana { color: rgba(217, 123, 46, 0.6); }
+.dark .world-curtain[data-world='kai'] { background: #1a1714; }
+.dark .world-curtain[data-world='kai'] .world-curtain__kana { color: rgba(231, 184, 125, 0.5); }
+/* 影幕：冷銀顯影盤 */
+.world-curtain[data-world='kage'] {
+  background:
+    radial-gradient(75% 60% at 50% 45%, rgba(154, 173, 197, 0.30) 0%, transparent 70%),
+    #eef1f3;
+}
+.world-curtain[data-world='kage'] .world-curtain__kana { color: rgba(82, 100, 122, 0.55); }
+.dark .world-curtain[data-world='kage'] { background: #14181b; }
+.dark .world-curtain[data-world='kage'] .world-curtain__kana { color: rgba(154, 173, 197, 0.45); }
+
+/* 進場：幕快速覆上（兩世界共用，差異在離場） */
+.world-curtain-kai-enter-active,
+.world-curtain-kage-enter-active { transition: opacity 0.12s ease; }
+.world-curtain-kai-enter-from,
+.world-curtain-kage-enter-from { opacity: 0; }
+
+/* 繪離場：俐落 grid-snap 橫掃（往右上 clip + 字微縮） */
+.world-curtain-kai-leave-active {
+  animation: curtain-kai-sweep 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+.world-curtain-kai-leave-active .world-curtain__kana {
+  animation: curtain-kana-snap 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes curtain-kai-sweep {
+  from { clip-path: inset(0 0 0 0); opacity: 1; }
+  to   { clip-path: inset(0 0 0 100%); opacity: 1; }
+}
+@keyframes curtain-kana-snap {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(40px) scale(0.92); }
+}
+
+/* 影離場：緩慢顯影消散（blur + fade，呼應顯影盤） */
+.world-curtain-kage-leave-active {
+  animation: curtain-kage-develop 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.world-curtain-kage-leave-active .world-curtain__kana {
+  animation: curtain-kana-develop 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes curtain-kage-develop {
+  from { opacity: 1; filter: blur(0); }
+  to   { opacity: 0; filter: blur(8px); }
+}
+@keyframes curtain-kana-develop {
+  from { opacity: 1; filter: blur(0); letter-spacing: 0.1em; }
+  to   { opacity: 0; filter: blur(10px); letter-spacing: 0.4em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* JS 已 guard 不掛幕；雙保險：即便掛上也不播放、瞬時消失 */
+  .world-curtain { display: none !important; }
+  .world-curtain-kai-leave-active,
+  .world-curtain-kage-leave-active,
+  .world-curtain-kai-leave-active .world-curtain__kana,
+  .world-curtain-kage-leave-active .world-curtain__kana { animation: none !important; }
+}

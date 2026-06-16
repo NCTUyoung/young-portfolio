@@ -96,6 +96,21 @@ export default defineNuxtConfig({
         name: 'Noto Serif JP',
         weights: [100, 200, 300],
         provider: 'google'
+      },
+      // R2（galleryWorlds 字體分家）：繪/影 各擁獨立字體家族 —
+      // 影(kage)＝Shippori Mincho（高對比文人明體，暗房抒情）；
+      // 繪(kai)＝Zen Kaku Gothic New（幾何 gothic，製圖俐落）。
+      // 由 .gallery-world[data-world] re-map --world-display token 驅動，
+      // 桌機/手機同源，徹底拉開兩世界字體節奏（回應 Round 1 critic「字體家族未分家」）。
+      {
+        name: 'Shippori Mincho',
+        weights: [400, 500, 600],
+        provider: 'google'
+      },
+      {
+        name: 'Zen Kaku Gothic New',
+        weights: [300, 400, 500],
+        provider: 'google'
       }
     ]
   },

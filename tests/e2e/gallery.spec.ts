@@ -1,27 +1,32 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Gallery /gallery/photography', () => {
-  // 桌機 viewport（lg+）時，filter chrome 集中在左側 rail（aria-label="Gallery filters"）。
-  // 原 top-stack header 在同一 DOM 樹中仍以 `lg:hidden` 保留（mobile 渲染用），
-  // 所以工作數量／h1 等文字在 DOM 上會出現兩份；測試一律收斂到 rail 內，避免 strict-mode 命中兩個。
-  // Playwright 預設 Desktop Chrome viewport 1280×720 屬 lg+，rail 可見。
-  const rail = (page: import('@playwright/test').Page) => page.getByLabel('Gallery filters')
+  // galleryWorlds 大改（破共用版面拓樸）：lg+ 時 繪/影 兩世界的頁面外框分歧。
+  //   繪(kai)  = 製図室：左側 spec 索引 rail（aria-label="Gallery filters"）。
+  //   影(kage) = 暗室：取消左 rail，改主欄頂部「暗房光桌橫條」(GalleryDarkroomBar, .darkroom-bar)。
+  // /gallery/photography 落在影(kage) 世界 → chrome 收斂在 .darkroom-bar，而非舊的 rail。
+  // mobile top-stack masthead 在同 DOM 以 `lg:hidden` 保留，故文字會出現兩份；
+  // 測試一律收斂到 .darkroom-bar 內，避免 strict-mode 命中兩個。
+  // Playwright 預設 Desktop Chrome viewport 1280×720 屬 lg+，bar 可見。
+  const bar = (page: import('@playwright/test').Page) => page.locator('.darkroom-bar')
 
   test('載入後顯示 80+ 攝影作品與事件分類', async ({ page }) => {
     await page.goto('/gallery/photography')
 
+    // 影(kage) 世界暗房光桌橫條 masthead h1 = 「暗室」(Darkroom)。
     await expect(
-      rail(page).getByRole('heading', { level: 1, name: /Works/ })
+      bar(page).getByRole('heading', { level: 1, name: '暗室' })
     ).toBeVisible()
 
-    // `Photography · 80 works` 是三個 inline span。匹配 `<數字> works`，N >= 雙位數避免把 0 當通過。
+    // 張數摘要：bar 右側 `<span>080</span><span>枚 · frames</span>`（stat-num 補零三位）。
+    // 用含「枚 · frames」單位 + 雙位數，避免把 0 當通過。
     await expect(
-      rail(page).locator('p').filter({ hasText: /\d{2,} works/ })
+      bar(page).locator('.darkroom-bar__stat').filter({ hasText: /\d{2,}\s*枚\s*·\s*frames/ })
     ).toBeVisible({ timeout: 10_000 })
 
-    // 事件 tab「全部事件」永遠存在，等到它可見代表資料已進畫面。
-    // rail 版用 justify-between 兩端對齊，無 `·` 分隔點；改用 `\s*\d+$` 通配（horizontal 版仍能匹配）。
-    await expect(rail(page).getByRole('button', { name: /^全部事件\s*·?\s*\d+$/ })).toBeVisible({
+    // 事件 filter「全部事件」永遠存在，等到它可見代表資料已進畫面。
+    // EventFilter rail 變體用 justify-between 兩端對齊，無 `·` 分隔點；`\s*\d+$` 通配。
+    await expect(bar(page).getByRole('button', { name: /^全部事件\s*·?\s*\d+$/ })).toBeVisible({
       timeout: 10_000
     })
   })
@@ -29,10 +34,9 @@ test.describe('Gallery /gallery/photography', () => {
   test('切換到特定事件 tab 只剩該事件的作品', async ({ page }) => {
     await page.goto('/gallery/photography')
 
-    // 事件 filter 的按鈕 accessible name 是 `Annber 外拍 9` (rail) 或 `Annber 外拍·9` (horizontal)
-    // 形式（N 為該事件作品數）。指定 `^...\s*·?\s*\d+$` 能匹配兩種 variant，並把 tab 按鈕和地圖點
-    // toggle 按鈕（名稱是「顯示 ...」）分開。
-    const eventButton = rail(page).getByRole('button', { name: /^Annber 外拍\s*·?\s*\d+$/ })
+    // 事件 filter 的按鈕 accessible name 形如 `Annber 外拍 9`（N 為該事件作品數）。
+    // `^...\s*·?\s*\d+$` 把 tab 按鈕和地圖點 toggle 按鈕（名稱是「顯示 ...」）分開。
+    const eventButton = bar(page).getByRole('button', { name: /^Annber 外拍\s*·?\s*\d+$/ })
     await eventButton.waitFor({ state: 'visible', timeout: 15_000 })
 
     const label = (await eventButton.textContent()) ?? ''
@@ -48,10 +52,11 @@ test.describe('Gallery /gallery/photography', () => {
       await page.waitForURL(/\/gallery\/photography\/Annber/, { timeout: 1_000 })
     }).toPass({ timeout: 15_000, intervals: [200, 500, 1000] })
 
-    // 頂部摘要 `Photography · N works` 會切換成選取事件的 N
+    // bar 右側張數（stat-num）會切換成選取事件的 N，且以 padStart(3,'0') 補零三位。
+    const expected = String(count).padStart(3, '0')
     await expect(
-      rail(page).locator('p').filter({ hasText: new RegExp(`\\b${count} works\\b`) })
-    ).toBeVisible({ timeout: 10_000 })
+      bar(page).locator('.darkroom-bar__stat-num')
+    ).toHaveText(expected, { timeout: 10_000 })
   })
 
   test('進入 event 顯示扉頁、Map/Statement/Strip 隱藏', async ({ page }) => {

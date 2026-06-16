@@ -8,8 +8,72 @@ import type {
   PhotoEvent,
   EventGroup,
   MixedPhotoItem,
-  FilterState
+  FilterState,
+  CrossWorldSpread
 } from '~~/shared/types/gallery'
+
+/**
+ * j4：一個解析後的「對位敘事對頁」——左葉繪 / 右葉影 各自接回 live works。
+ * leaf 缺資料（event 不存在）時整個 spread 會被剔除，避免渲染空葉。
+ */
+export interface ResolvedSpreadLeaf {
+  eventName: string
+  cover: GalleryItem
+  count: number
+  /** 該 event 章首詩（strongest_line）— 對位的單句註腳 */
+  strongestLine: string | null
+}
+export interface ResolvedCrossWorldSpread {
+  id: string
+  theme: string
+  themeRoman: string
+  connector: string
+  kai: ResolvedSpreadLeaf
+  kage: ResolvedSpreadLeaf
+}
+
+function buildLeaf (
+  works: GalleryItem[],
+  eventName: string,
+  coverOverride?: string
+): ResolvedSpreadLeaf | null {
+  const inEvent = works.filter(w => w.event?.name === eventName)
+  if (inEvent.length === 0) return null
+  const cover = (coverOverride && inEvent.find(w => w.filename === coverOverride)) || inEvent[0]!
+  return {
+    eventName,
+    cover,
+    count: inEvent.length,
+    strongestLine: cover.seriesNarrative?.strongest_line || null
+  }
+}
+
+/**
+ * j4：把頂層 crossWorldSpreads（純命題配對）接回 live digital / photography works，
+ * 產出可直接渲染的成對對頁。任一葉缺資料則丟棄該配對（bold ≠ broken）。
+ */
+export function buildCrossWorldSpreads (
+  spreads: CrossWorldSpread[] | undefined,
+  digitalWorks: GalleryItem[],
+  photographyWorks: GalleryItem[]
+): ResolvedCrossWorldSpread[] {
+  if (!spreads || spreads.length === 0) return []
+  const out: ResolvedCrossWorldSpread[] = []
+  for (const s of spreads) {
+    const kai = buildLeaf(digitalWorks, s.kaiEvent, s.kaiCover)
+    const kage = buildLeaf(photographyWorks, s.kageEvent, s.kageCover)
+    if (!kai || !kage) continue
+    out.push({
+      id: s.id,
+      theme: s.theme,
+      themeRoman: s.themeRoman,
+      connector: s.connector,
+      kai,
+      kage
+    })
+  }
+  return out
+}
 
 export type EventLocationPoint = {
   name: string
