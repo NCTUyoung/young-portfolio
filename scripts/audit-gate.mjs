@@ -42,7 +42,10 @@ function getAudit () {
   }
 }
 
-const report = JSON.parse(getAudit().replace(/^﻿/, ''))
+// Strip a leading BOM (some shells/pipes prepend U+FEFF) without embedding the char in source.
+let raw = getAudit()
+if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1)
+const report = JSON.parse(raw)
 const vulns = report.vulnerabilities || {}
 
 /** Collect distinct high/critical advisories: { ghsa, pkg, severity, title }. */
