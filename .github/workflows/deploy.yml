@@ -43,10 +43,13 @@ jobs:
             ${{ runner.os }}-nuxt-
 
       # CVE gate：上游出 high/critical 立刻紅燈，逼我們升級或 npm audit fix。
-      # 目前（2026-04）0 high；若 advisory db 中 dev-only 出現 false positive，
-      # 可改為 `--omit=dev` 只掃 production deps。
-      - name: Audit dependencies (high+)
-        run: npm audit --audit-level=high
+      # 2026-06-21：本站為純靜態 SSG（nuxt generate → GitHub Pages，零 Node runtime），
+      # build/dev-only 工具鏈 CVE（esbuild/babel/ws/shell-quote/vite/nuxt）不進產出，
+      # 且升級會 cascade 出更嚴重 advisory（見 commit 史）。改用 audit-gate：
+      # 仍對「新出現／會進產出」的 high/critical 紅燈，僅 allowlist 已確認 dev/build-only 者
+      # （清單與理由見 scripts/audit-gate.mjs，上游修好即移除）。
+      - name: Audit dependencies (high+, dev/build-only allowlisted)
+        run: node scripts/audit-gate.mjs
 
       - name: Lint
         run: npm run lint
