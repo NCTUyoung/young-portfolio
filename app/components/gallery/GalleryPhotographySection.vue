@@ -27,7 +27,7 @@
           :event-key="item.eventName || 'no-event'"
           :show-event-control="!!item.eventName"
           :show-event-info="!!item.eventName"
-          :default-collapsed="true"
+          :default-collapsed="!isDefaultExpanded(item)"
           wide
         >
           <div
@@ -146,6 +146,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { GalleryItem, MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
 import GalleryTimelineItem from '~/components/GalleryTimelineItem.vue'
@@ -154,6 +155,18 @@ import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
 
 const galleryStore = useGalleryStore()
+
+/** 目前選中的事件（route 驅動）；用於「進入該事件預設展開」。 */
+const selectedEvent = computed(() => galleryStore.filterState.selectedEvent)
+
+/**
+ * 進入單一事件時，該事件章節預設展開（使用者：「事件點進去應該要預設展開」）。
+ * 以 route 的 selectedEvent 判定 → server / client 首繪一致，無 hydration mismatch；
+ * 使用者一旦手動 toggle，expandedGroups 的明確 state 接管（見 GalleryTimelineItem / 下方）。
+ */
+function isDefaultExpanded (item: MixedPhotoItem): boolean {
+  return !!item.eventName && item.eventName === selectedEvent.value
+}
 
 /** 給章封展開按鈕用 — 同 GalleryTimelineItem 的 toggleGroupExpansion */
 function toggleExpand (eventName: string) {
@@ -167,8 +180,8 @@ function toggleExpand (eventName: string) {
 function isMobileExpanded (item: MixedPhotoItem, _idx: number): boolean {
   if (!item.eventName) return true
   const state = galleryStore.expandedGroups[item.eventName]
-  // g1：全章預設摺合（idx 參數保留以相容呼叫端，已不參與預設判定）
-  if (state === undefined) return false
+  // 未手動 toggle 時：進入該事件（selectedEvent）預設展開，其餘摺合。
+  if (state === undefined) return isDefaultExpanded(item)
   return state
 }
 

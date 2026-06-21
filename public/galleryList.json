@@ -222,7 +222,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.8755
     },
     {
       "filename": "gallery/2018年電繪作品/fox.png",
@@ -234,7 +235,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.5881
     },
     {
       "filename": "gallery/2018年電繪作品/The_Great_Wave_off_Kanagawa.png",
@@ -250,7 +252,8 @@
       "series": [
         "featured"
       ],
-      "pairWith": "photography-photography/峨嵋湖風鈴木/DSC_1721-編輯-1"
+      "pairWith": "photography-photography/峨嵋湖風鈴木/DSC_1721-編輯-1",
+      "aspectRatio": 1.0994
     },
     {
       "filename": "gallery/2018年電繪作品/vectorpath.png",
@@ -262,7 +265,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1
     },
     {
       "filename": "gallery/2018年電繪作品/WireframePatterns.png",
@@ -274,7 +278,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.3607
     },
     {
       "filename": "gallery/2018年電繪作品/VectorSmokeEffect.png",
@@ -286,7 +291,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 2.9104
     },
     {
       "filename": "gallery/2018年電繪作品/AbstractGalaxyLogo.png",
@@ -298,7 +304,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1
     },
     {
       "filename": "gallery/2018年電繪作品/VectorFingerprintLogo.png",
@@ -310,7 +317,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.9917
     },
     {
       "filename": "gallery/2018年電繪作品/car.jpg",
@@ -322,7 +330,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.3333
     },
     {
       "filename": "gallery/2018年電繪作品/HalftoneHeartPattern.png",
@@ -334,7 +343,8 @@
         "name": "2018年電繪作品",
         "description": "2018年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.1634
     },
     {
       "filename": "gallery/2021年電繪作品/01-14.jpg",
@@ -346,7 +356,8 @@
         "name": "2021年電繪作品",
         "description": "2021年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/01-16.jpg",
@@ -358,7 +369,8 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2021年電繪作品/13.jpg",
@@ -370,7 +382,8 @@
         "name": "2021年電繪作品",
         "description": "2021年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2021年電繪作品/E-39.jpg",
@@ -382,7 +395,8 @@
         "name": "2021年電繪作品",
         "description": "2021年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/全身自創07-12.jpg",
@@ -397,7 +411,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/自創08-13.jpg",
@@ -409,7 +424,8 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/02-26.jpg",
@@ -421,7 +437,8 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/23.jpg",
@@ -433,7 +450,8 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2022年電繪作品/15.jpg",
@@ -445,7 +463,8 @@
         "name": "2022年電繪作品",
         "description": "2022年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1
     },
     {
       "filename": "gallery/2023年電繪作品/22.jpg",
@@ -458,7 +477,8 @@
         "description": "2023年創作的電繪作品集",
         "location": ""
       },
-      "pairWith": "photography-photography/WBC 2026/DSC_9991-編輯-1"
+      "pairWith": "photography-photography/WBC 2026/DSC_9991-編輯-1",
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2023年電繪作品/20.jpg",
@@ -470,7 +490,8 @@
         "name": "2023年電繪作品",
         "description": "2023年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1
     },
     {
       "filename": "gallery/2023年電繪作品/31.png",
@@ -482,7 +503,8 @@
         "name": "2023年電繪作品",
         "description": "2023年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2023年電繪作品/51.jpg",
@@ -497,7 +519,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 2.25
     },
     {
       "filename": "gallery/2024年電繪作品/55.jpg",
@@ -509,7 +532,8 @@
         "name": "2024年電繪作品",
         "description": "2024年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.7071
     },
     {
       "filename": "gallery/2024年電繪作品/23.jpg",
@@ -522,7 +546,8 @@
         "description": "2024年創作的電繪作品集",
         "location": ""
       },
-      "pairWith": "photography-photography/Annber 外拍/DSC_2702-編輯-1"
+      "pairWith": "photography-photography/Annber 外拍/DSC_2702-編輯-1",
+      "aspectRatio": 2.3929
     },
     {
       "filename": "gallery/2024年電繪作品/18-4.jpg",
@@ -534,7 +559,8 @@
         "name": "2024年電繪作品",
         "description": "2024年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.4139
     },
     {
       "filename": "gallery/2024年電繪作品/28-編輯-2.jpg",
@@ -546,7 +572,8 @@
         "name": "2024年電繪作品",
         "description": "2024年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2024年電繪作品/52-1.jpg",
@@ -558,7 +585,8 @@
         "name": "2024年電繪作品",
         "description": "2024年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2025年電繪作品/17.png",
@@ -566,13 +594,16 @@
       "title": "孤独が描く美学",
       "content": "",
       "color": "blue",
-      "series": ["hero"],
+      "series": [
+        "hero"
+      ],
       "event": {
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
       },
-      "pairWith": "photography-photography/春日街拍/DSC_7030-1"
+      "pairWith": "photography-photography/春日街拍/DSC_7030-1",
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2025年電繪作品/36-編輯-1.jpg",
@@ -584,7 +615,8 @@
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",
         "location": ""
-      }
+      },
+      "aspectRatio": 1.4954
     },
     {
       "filename": "gallery/2025年電繪作品/21-編輯.jpg",
@@ -599,7 +631,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2025年電繪作品/17-編輯.jpg",
@@ -614,7 +647,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 0.707
     },
     {
       "filename": "gallery/2025年電繪作品/test3-1.jpg",
@@ -629,7 +663,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 1
     },
     {
       "filename": "gallery/2026年電繪作品/7-編輯-2-1.jpg",
@@ -644,7 +679,8 @@
       },
       "series": [
         "featured"
-      ]
+      ],
+      "aspectRatio": 1.7778
     },
     {
       "filename": "gallery/2026年電繪作品/21-編輯-編輯-編輯-1.jpg",
@@ -660,7 +696,8 @@
       "series": [
         "featured"
       ],
-      "pairWith": "photography-photography/栗子外拍/DSC_5910-編輯-1"
+      "pairWith": "photography-photography/栗子外拍/DSC_5910-編輯-1",
+      "aspectRatio": 1
     }
   ],
   "trackManifesto": {

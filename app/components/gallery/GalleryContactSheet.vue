@@ -30,47 +30,57 @@
       <span class="contact-sheet__leader-loupe">ルーペ — 移動游標如閱讀負片</span>
     </div>
 
-    <ol ref="rootEl" class="contact-sheet__grid">
-      <li
-        v-for="(image, i) in items"
-        :key="image.filename"
-        :ref="el => setFrameRef(i, el)"
-        class="contact-sheet__cell"
-        :data-frame="i"
-        :class="[
-          isWideFrame(i) ? 'contact-sheet__cell--wide' : '',
-          { 'contact-sheet__cell--developed': developed[i], 'contact-sheet__cell--under-loupe': loupe.active && loupe.index === i }
-        ]"
+    <!--
+      g+（離線比例瀑布流）：欄式 masonry（Pinterest 式錯落）。
+      每格用離線預算的 aspectRatio 開 aspect-ratio box（零 CLS）；欄分配由純函式
+      computeMasonryColumns 依「最矮欄」貪婪填入（比例來自資料 → server/client 一致）。
+      欄數 SSR 固定 3、掛載後依容器寬調 4/3/2，避免 hydration mismatch（見 script）。
+    -->
+    <div ref="rootEl" class="contact-sheet__masonry">
+      <ol
+        v-for="(col, ci) in columns"
+        :key="ci"
+        class="contact-sheet__col"
       >
-        <span class="contact-sheet__sprockets" aria-hidden="true"/>
-        <span class="contact-sheet__no" aria-hidden="true">{{ frameNo(i) }}</span>
-        <button
-          type="button"
-          class="contact-sheet__btn group"
-          :aria-label="image.title || '攝影作品'"
-          @click="$emit('imageClick', image)"
+        <li
+          v-for="cell in col"
+          :key="cell.image.filename"
+          :ref="el => setFrameRef(cell.i, el)"
+          class="contact-sheet__cell"
+          :data-frame="cell.i"
+          :style="{ aspectRatio: aspectOf(cell.image) }"
+          :class="{ 'contact-sheet__cell--developed': developed[cell.i], 'contact-sheet__cell--under-loupe': loupe.active && loupe.index === cell.i }"
         >
-          <picture class="contents">
-            <source :srcset="getGridAvifSrcset(image.filename)" :sizes="cellSizes" type="image/avif">
-            <source :srcset="getGridImageSrcset(image.filename)" :sizes="cellSizes" type="image/webp">
-            <img
-              :src="getThumbPath(image.filename, 400)"
-              :srcset="getGridImageSrcset(image.filename)"
-              :sizes="cellSizes"
-              :alt="image.title"
-              class="contact-sheet__img"
-              :loading="i < 4 ? 'eager' : 'lazy'"
-              decoding="async"
-            >
-          </picture>
-          <!-- hover 浮出最小標籤（標題 + 焦段/光圈），避免常駐占高度 -->
-          <span class="contact-sheet__cap">
-            <span class="contact-sheet__cap-title font-jp">{{ image.title || '未命名' }}</span>
-            <span v-if="exifLine(image)" class="contact-sheet__cap-exif">{{ exifLine(image) }}</span>
-          </span>
-        </button>
-      </li>
-    </ol>
+          <span class="contact-sheet__sprockets" aria-hidden="true"/>
+          <span class="contact-sheet__no" aria-hidden="true">{{ frameNo(cell.i) }}</span>
+          <button
+            type="button"
+            class="contact-sheet__btn group"
+            :aria-label="cell.image.title || '攝影作品'"
+            @click="$emit('imageClick', cell.image)"
+          >
+            <picture class="contents">
+              <source :srcset="getGridAvifSrcset(cell.image.filename)" :sizes="cellSizes" type="image/avif">
+              <source :srcset="getGridImageSrcset(cell.image.filename)" :sizes="cellSizes" type="image/webp">
+              <img
+                :src="getThumbPath(cell.image.filename, 400)"
+                :srcset="getGridImageSrcset(cell.image.filename)"
+                :sizes="cellSizes"
+                :alt="cell.image.title"
+                class="contact-sheet__img"
+                :loading="cell.i < 4 ? 'eager' : 'lazy'"
+                decoding="async"
+              >
+            </picture>
+            <!-- hover 浮出最小標籤（標題 + 焦段/光圈），避免常駐占高度 -->
+            <span class="contact-sheet__cap">
+              <span class="contact-sheet__cap-title font-jp">{{ cell.image.title || '未命名' }}</span>
+              <span v-if="exifLine(cell.image)" class="contact-sheet__cap-exif">{{ exifLine(cell.image) }}</span>
+            </span>
+          </button>
+        </li>
+      </ol>
+    </div>
 
     <!--
       g+（影暗室 signature 互動）：游標放大鏡 (loupe / ルーペ)。
@@ -100,6 +110,8 @@
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useImagePath } from '~/composables/useImagePath'
 import { formatShutterSpeed } from '~/utils/formatters'
+import { computeMasonryColumns } from '~/utils/masonryColumns'
+import { DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
 import type { GalleryItem } from '~~/shared/types/gallery'
 
 const props = defineProps<{ items: GalleryItem[] }>()
@@ -107,17 +119,41 @@ defineEmits<{ imageClick: [item: GalleryItem] }>()
 
 const { getThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()
 
-const cellSizes = '(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 22vw'
+const cellSizes = '(max-width: 639px) 47vw, (max-width: 1023px) 31vw, 23vw'
+
+/* =========================================================
+   離線比例瀑布流（masonry）
+   比例 resolver 優先吃離線預算的 image.aspectRatio，缺才退 DEFAULT_ASPECT_RATIO（避免破版）。
+   ========================================================= */
+const ratioByFn = computed(() => {
+  const m = new Map<string, number>()
+  for (const it of props.items) {
+    m.set(it.filename, it.aspectRatio && it.aspectRatio > 0 ? it.aspectRatio : DEFAULT_ASPECT_RATIO)
+  }
+  return m
+})
+function ratioOf (fn: string): number { return ratioByFn.value.get(fn) ?? DEFAULT_ASPECT_RATIO }
+function aspectOf (img: GalleryItem): string { return String(ratioOf(img.filename)) }
 
 /**
- * 印樣節奏錨：每捲挑幾格跨 2 欄當大圖，讓密鋪格牆有起伏不死板。
- * photographyList.json 無寬高資料，故用確定性節奏（首格 + 之後每隔 5 格）。
- * 少於 4 張的短捲不挑寬格（避免單張霸版）。
+ * 欄數：SSR 與首次 hydration 固定 3——server 無從量容器寬，client 首繪須與 server 一致才不會
+ * hydration mismatch；掛載後再依容器寬調 4/3/2。比例來自資料（非 runtime 量測），故欄分配在
+ * server / client 同一份輸入下結果一致。
  */
-function isWideFrame (i: number): boolean {
-  if (props.items.length < 4) return false
-  return i === 0 || (i > 0 && i % 5 === 0)
+const SSR_COLUMNS = 3
+const columnCount = ref(SSR_COLUMNS)
+function colsForWidth (w: number): number {
+  if (w >= 1100) return 4
+  if (w >= 720) return 3
+  return 2
 }
+
+interface MasonryCell { image: GalleryItem; i: number }
+const columns = computed<MasonryCell[][]>(() => {
+  const idx = new Map(props.items.map((it, i) => [it.filename, i] as const))
+  return computeMasonryColumns(props.items, ratioOf, columnCount.value)
+    .map(col => col.items.map(image => ({ image, i: idx.get(image.filename)! })))
+})
 
 function exifLine (img: GalleryItem): string | null {
   const parts: string[] = []
@@ -233,10 +269,28 @@ function developAll () {
   props.items.forEach((_, i) => { developed[i] = true })
 }
 
+/* 欄數隨容器寬調整（掛載後）；ratio 來自資料故重分配只是把同一批 DOM 節點（keyed by
+   filename）reparent 到不同欄，IntersectionObserver/loupe 仍綁同一批 element node，不受影響。 */
+let colRo: ResizeObserver | null = null
+function measureColumns () {
+  const w = sheetEl.value?.clientWidth || 0
+  if (w) columnCount.value = colsForWidth(w)
+}
+
 onMounted(() => {
   if (typeof window === 'undefined') return
   // 桌機指標型裝置才開放放大鏡（hover 可用 + 細指標）；觸控降級為點擊開圖。
   isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
+  // 欄數量測須在 reduced-motion 早返之前（否則 reduce 使用者卡在 SSR 的 3 欄）。
+  measureColumns()
+  if (typeof ResizeObserver !== 'undefined' && sheetEl.value) {
+    colRo = new ResizeObserver((entries) => {
+      for (const e of entries) if (e.contentRect.width) columnCount.value = colsForWidth(e.contentRect.width)
+    })
+    colRo.observe(sheetEl.value)
+  }
+
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduce || typeof IntersectionObserver === 'undefined') {
     developAll()
@@ -263,6 +317,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   frameIo?.disconnect()
+  colRo?.disconnect()
+  colRo = null
   if (typeof window !== 'undefined') cancelAnimationFrame(loupeRaf)
 })
 </script>
@@ -313,27 +369,30 @@ onBeforeUnmount(() => {
   .contact-sheet__leader-loupe { display: none; }
 }
 
-/* 印樣格牆：桌機 ~4–5 欄，wide 圖跨 2 欄當節奏錨 */
-.contact-sheet__grid {
+/* 印樣瀑布流：等寬欄並排，欄內各格保留原比例垂直堆疊（Pinterest 式錯落） */
+.contact-sheet__masonry {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+.contact-sheet__col {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  grid-auto-flow: dense;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   gap: 0.55rem;
 }
-@media (max-width: 1023px) {
-  .contact-sheet__grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
 @media (max-width: 639px) {
-  .contact-sheet__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; }
+  .contact-sheet__masonry,
+  .contact-sheet__col { gap: 0.45rem; }
 }
 
 .contact-sheet__cell {
   position: relative;
-  /* 印樣格固定矮比例（4:3），讓整捲節奏一致、可掃描 */
-  aspect-ratio: 4 / 3;
+  /* aspect-ratio 由 inline style 依離線預算比例逐格設定（錯落、零 CLS） */
   /* 逐格顯影 */
   opacity: 0.45;
   filter: blur(3px) saturate(0.6) brightness(0.96);
@@ -349,14 +408,6 @@ onBeforeUnmount(() => {
   filter: blur(0) saturate(1) brightness(1);
   transform: translateY(0);
 }
-.contact-sheet__cell--wide {
-  grid-column: span 2;
-  aspect-ratio: 16 / 9;
-}
-@media (max-width: 639px) {
-  .contact-sheet__cell--wide { grid-column: span 2; aspect-ratio: 16 / 10; }
-}
-
 /* 左緣齒孔軌（每格保留膠卷邊） */
 .contact-sheet__sprockets {
   position: absolute;

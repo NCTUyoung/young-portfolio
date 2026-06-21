@@ -69,9 +69,14 @@ test.describe('Gallery /gallery/photography', () => {
     await expect(page.locator('#photo-statement-heading')).toHaveCount(0)
     await expect(page.locator('.em__masthead')).toHaveCount(0)
 
-    // 「展開全部」按鈕存在（hit zone CTA）
+    // 「展開全部」按鈕存在（hit zone CTA，捲到下方時間軸）
     await expect(
       page.getByRole('button', { name: /展開全部/ })
     ).toBeVisible()
+
+    // 進入事件預設展開（route 驅動）：接觸印樣瀑布流（masonry）直接可見，不需手動點展開。
+    const masonry = page.locator('.contact-sheet__masonry').first()
+    await masonry.scrollIntoViewIfNeeded()
+    await expect(masonry).toBeVisible({ timeout: 15_000 })
   })
 })

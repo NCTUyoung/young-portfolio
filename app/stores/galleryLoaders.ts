@@ -34,7 +34,8 @@ export function transformDigitalWork (img: DigitalArtItem, narratives?: Narrativ
       ? { series: [...((img as unknown as { series: string[] }).series)] }
       : {}),
     ...(eventName && narratives?.[eventName] ? { seriesNarrative: narratives[eventName] } : {}),
-    ...((img as { pairWith?: string }).pairWith ? { pairWith: (img as { pairWith?: string }).pairWith } : {})
+    ...((img as { pairWith?: string }).pairWith ? { pairWith: (img as { pairWith?: string }).pairWith } : {}),
+    ...(typeof img.aspectRatio === 'number' ? { aspectRatio: img.aspectRatio } : {})
   }
 }
 
@@ -60,7 +61,8 @@ export function transformPhotographyWork (img: PhotographyItem, narratives?: Nar
     ...(Array.isArray(img.series) ? { series: [...img.series] } : {}),
     ...(eventName && narratives?.[eventName] ? { seriesNarrative: narratives[eventName] } : {}),
     ...(img.note ? { note: img.note } : {}),
-    ...(img.pairWith ? { pairWith: img.pairWith } : {})
+    ...(img.pairWith ? { pairWith: img.pairWith } : {}),
+    ...(typeof img.aspectRatio === 'number' ? { aspectRatio: img.aspectRatio } : {})
   }
 }
 

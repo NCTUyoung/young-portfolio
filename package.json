@@ -25,6 +25,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "thumbs": "node scripts/generate-thumbs.mjs",
+    "ratios": "node scripts/compute-aspect-ratios.mjs",
     "lint:data": "node scripts/lint-gallery-data.mjs",
     "visual-diff": "node scripts/visual-diff.mjs",
     "shoot": "node tests/screenshots/shoot-fast.mjs",

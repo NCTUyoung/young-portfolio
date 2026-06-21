@@ -119,6 +119,12 @@ export interface GalleryItem {
   time: string
   tags?: string[]
   visible?: boolean
+  /**
+   * 原圖縱橫比（width / height）。由 `scripts/compute-aspect-ratios.mjs` 離線量測寫進
+   * JSON，loader passthrough 到此。讓 grid / 瀑布流不必 runtime `<img @load>` 量測，
+   * 消除首屏 layout shift（CLS）並使 SSG 版面可決定性。
+   */
+  aspectRatio?: number
   /** 系列敘事（由 loader 依 event.name 注入；可選） */
   seriesNarrative?: SeriesNarrative
   /** R26：image-level 個性化註記（單張單句；優先級高於 seriesNarrative.annotation） */
@@ -151,6 +157,8 @@ export interface DigitalArtItem extends BaseImageItem {
   series?: string[]
   /** R49：對軌配對 id */
   pairWith?: string
+  /** 原圖縱橫比 width/height（離線預算，見 GalleryItem.aspectRatio） */
+  aspectRatio?: number
 }
 
 // 攝影作品接口
@@ -169,6 +177,8 @@ export interface PhotographyItem extends BaseImageItem {
   note?: string
   /** R49：對軌配對 id */
   pairWith?: string
+  /** 原圖縱橫比 width/height（離線預算，見 GalleryItem.aspectRatio） */
+  aspectRatio?: number
 }
 
 // 事件分組接口

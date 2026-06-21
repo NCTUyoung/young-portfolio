@@ -353,16 +353,17 @@
           <!-- overview：編輯模組網格（特稿大圖 + 編號日期格 + banner，每 event 一塊）。
                取代舊橫向小圖膠卷光桌（使用者：圖太小、排版過時）。
                wiki: patterns/newspaper-masthead-module-grid.md -->
-          <GalleryEditorialModules
-            v-if="!filterState.selectedEvent"
-            :items="photographyEventItems"
-            class="world-enter world-enter-d2"
-            @image-click="(img) => openImageViewer(img, allPhotographyImages)"
-          >
-            <!-- 其の一「踏跡」地圖：作中段章節插曲（照片先於地圖） -->
-            <template #after-first>
+          <!-- overview：章節索引（主欄）+ 踏跡地圖（桌機 sticky 側欄 aside；平板/手機落下方作 colophon）。
+               地圖不再夾在事件之間打斷閱讀。wiki: 地圖放旁邊。 -->
+          <div v-if="!filterState.selectedEvent" class="kage-overview world-enter world-enter-d2">
+            <div class="kage-overview__main">
+              <GalleryEditorialModules :items="photographyEventItems" />
+            </div>
+            <aside
+              v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
+              class="kage-overview__aside"
+            >
               <section
-                v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
                 ref="mapSectionRef"
                 class="kage-safelight scroll-mt-24"
                 aria-labelledby="photo-map-heading"
@@ -375,9 +376,8 @@
                     class="kage-safelight__title font-jp"
                   >踏跡 <span class="kage-safelight__roman">Visited Places</span></h2>
                   <!--
-                    「停留放大」提示移到 header 余白（框外），不再壓在地圖 tile 上遮住 marker。
-                    只在地圖未展開時顯示；hover 展開後由 @expand-change 收起。
-                    wiki: inspirations/non-occluding-hint.md 方案 A。
+                    「停留放大」提示在 header 余白（框外），不壓 tile 遮 marker；
+                    地圖 hover 展開後由 @expand-change 收起。wiki: inspirations/non-occluding-hint.md 方案 A。
                   -->
                   <span
                     v-if="!mapExpanded"
@@ -404,8 +404,8 @@
                   <div v-else class="kage-safelight__plate-skeleton" aria-hidden="true"/>
                 </div>
               </section>
-            </template>
-          </GalleryEditorialModules>
+            </aside>
+          </div>
 
           <!-- Timeline：僅 event 沉浸模式渲染；扉頁的「展開全部」會 scroll 到此 -->
           <div v-if="filterState.selectedEvent" ref="eventTimelineRef" class="scroll-mt-24">
@@ -786,14 +786,6 @@ const photographyEventItems = computed(() => {
     item.images && item.images.some(img => img.category === 'photography')
   )
 })
-
-/**
- * i4：橫向膠卷光桌的 lightbox 來源 —— 攤平所有 event 群組成單一順序照片陣列，
- * 讓在光桌任一格開圖後，徑向導航能跨整卷前後翻（與 stacked timeline 同質）。
- */
-const allPhotographyImages = computed<GalleryItem[]>(() =>
-  photographyEventItems.value.flatMap(g => g.images || [])
-)
 
 /**
  * 進入 event path 時的扉頁來源 group。
@@ -1446,6 +1438,28 @@ useHead({
 }
 @media (prefers-reduced-motion: reduce) {
   .kage-safelight__lamp { animation: none; }
+}
+
+/* =========================================================
+   overview 2 欄：主欄章節索引 + 側欄踏跡地圖
+   桌機：地圖為 sticky 右側欄（「放旁邊」，不夾在事件之間打斷閱讀）。
+   平板/手機：塌為單欄，地圖落到索引下方拉開余白作收尾 colophon。
+   ========================================================= */
+.kage-overview { display: block; }
+@media (min-width: 1024px) {
+  .kage-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 340px);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+  .kage-overview__aside {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+@media (max-width: 1023px) {
+  .kage-overview__aside { margin-top: 3rem; }
 }
 
 /* =========================================================
