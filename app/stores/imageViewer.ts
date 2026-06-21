@@ -103,6 +103,9 @@ export const useImageViewerStore = defineStore('imageViewer', () => {
     currentImageIndex.value = Math.max(0, startIndex)
     isOpen.value = true
     document.body.style.overflow = 'hidden'
+    // 每次開啟都重置縮放／平移／fit 狀態，避免上一次（zoomToSelection / zoomIn）
+    // 留下的 scale>1 或 fitToScreen=false 漏進下一張，導致首次點開放大倍率不對。
+    resetTransform()
     initNavigatorPosition()
   }
 

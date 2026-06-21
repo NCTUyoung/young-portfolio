@@ -194,3 +194,40 @@ Mobile 因細節更多，米白罩要壓更厚（`/45` 而非 `/25`）。
 - 禁用亮色大 CTA 按鈕（§7）
 - 禁用縦書き 2 組以上堆疊（1 組為上限）
 - 禁用彩色 dot 列表；要點用墨點或不放（§7）
+
+---
+
+## 12. 全站放亮：暗室 → 光卓 + motif budget（2026-06-18 新增）
+
+四關鍵詞 **清新・日系・典雅・靈活** 的收束輪。本質方向＝**減法 + 放亮 + 增余白**，把堆疊裝飾削掉、把暗重塊放亮，讓版面重新呼吸，同時保留「繪／影 雙主線」核心 identity。
+
+### 12.1 影世界：暗室「近黑」→ 光卓「冷銀亮系」
+
+photography（影 / kage）世界 **light 模式預設** 不再用近黑膠卷底，全面改「光卓（light table）」冷銀亮系。dark 模式維持原暗室近黑（雙寫，`:global(.dark)` / `.dark` 還原）。
+
+| 角色 | light（光卓冷銀） | dark（暗室還原） |
+| --- | --- | --- |
+| 燈箱／暗條底 | `linear-gradient(168deg, #eef2f5, #e1e8ed)` | `#1a1f24 → #0e1114` |
+| 膠格框實底 | `#e7edf1` | `#0b0e11` |
+| 齒孔／穿孔點 | `rgba(82,100,122,0.42~0.5)`（冷 slate） | 反白 `rgba(238,241,243,0.55~0.85)` |
+| 標題文字 | `#2b3640` | `#eef1f3` |
+| 副標／說明 | `#56697e` | `rgba(190,200,212,0.78)` |
+| eyebrow | `#5b6b7e` | `#9aadc5` |
+| accent（冷） | `--accent:#52647a; --accent-ink:#3f4f63` | `--accent:#9aadc5; --accent-ink:#b6c6da` |
+
+涉及元件：`GalleryDarkroomBar` / `GalleryLightTable` / `GalleryPhotographySection` / `GalleryFacingEdge` / `GalleryPageFlip` / `GalleryContactSheet` 與 gallery page 的 `filmpanel-m` / `kage-safelight`。**例外**：壓在照片之上的 caption 漸層 scrim（為白字可讀性）保留深色，不放亮。
+
+### 12.2 兩世界辨識度：放亮後不靠「黑 vs 白」，靠四層持續信號
+
+暗室放亮後，影／繪的明度差從「黑 vs 白」縮成「冷銀 vs 暖米」中明度級。**兩世界一眼分得出** 仍是鐵律，靠這四層持續信號（非單一裝飾）守住：
+
+1. **色溫**：影＝冷銀偏藍灰（`#eef1f3`），繪＝暖象牙偏黃。
+2. **字族**：影＝Shippori Mincho 文人明體（濕、柔），繪＝Zen Kaku Gothic New 幾何 gothic（乾、硬）。整個世界 `--font-jp` 覆寫，捲進內文也不變。
+3. **質地**：影＝顯影顆粒 + 膠片齒孔，繪＝製圖方格紙。
+4. **內容本質**：影＝攝影寫實，繪＝插畫飽和。
+
+**mobile must-fix（critic 把關）**：窄屏（<1024px）收成單欄後，桌機承載膠片身份的 darkroom-bar / light-table 齒孔退到 masthead 一張卡、捲過即消失。解法：在 `.gallery-world[data-world='kage']::before`（fixed 質地層）補一條 **釘左緣、隨捲動恆在的縱向膠片穿孔軌 + 冷銀膜邊**，只在 mobile/tablet 生效，讓整個攝影捲動恆被「膠片邊」框住。新增影世界版面時，窄屏務必保留一個常駐的機械身份標記，不可只靠 masthead。
+
+### 12.3 motif budget：繪×影 字面 ≤ 2
+
+「繪×影 / 繪と影 / 在頁面秀對側世界大字」這類雙主線字面 motif，**全站出現次數 ≤ 2**（hero 留一處最強宣言，其餘改用版面語言＝色溫/字族/質地表達）。跨世界 teaser（如 facing-band 在 digital 頁尾秀「影」）保留導航功能，但巨幅暖色 motif 降為極淡 stone ghost（`opacity:0.4` + accent 僅 ~20% 混入），不得當第三個強 motif 與 hero／軌頭爭聲。呼應近期「drop cross-world mixing，兩房各自沉浸」方向。

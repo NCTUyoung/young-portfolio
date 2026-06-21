@@ -563,9 +563,10 @@
     {
       "filename": "gallery/2025年電繪作品/17.png",
       "time": "2025 Jan 24",
-      "title": "17",
+      "title": "孤独が描く美学",
       "content": "",
       "color": "blue",
+      "series": ["hero"],
       "event": {
         "name": "2025年電繪作品",
         "description": "2025年創作的電繪作品集",

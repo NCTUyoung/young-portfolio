@@ -153,6 +153,12 @@ const otherAriaLabel = computed(() =>
 .fe--kage .fe__link {
   right: 0;
   transform: translateY(-50%) translateX(calc(100% - 40px));
+  /* 光卓 light table 冷銀亮系：影側書口由近黑放亮為冷銀燈箱 */
+  background: linear-gradient(260deg, #eef2f5 0%, #e1e8ed 100%);
+  border-left: 1px solid rgba(82, 100, 122, 0.22);
+  box-shadow: -6px 0 22px rgba(82, 100, 122, 0.16);
+}
+:global(.dark) .fe--kage .fe__link {
   background: linear-gradient(260deg, #20262c 0%, #14181c 100%);
   border-left: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
   box-shadow: -6px 0 22px rgba(0, 0, 0, 0.4);
@@ -173,7 +179,8 @@ const otherAriaLabel = computed(() =>
   letter-spacing: 0.1em;
 }
 .fe--kai .fe__kana { color: color-mix(in srgb, var(--accent) 70%, rgb(68 64 60)); }
-.fe--kage .fe__kana { color: color-mix(in srgb, var(--accent) 50%, #e2e8ee); }
+.fe--kage .fe__kana { color: #2b3640; }
+:global(.dark) .fe--kage .fe__kana { color: color-mix(in srgb, var(--accent) 50%, #e2e8ee); }
 
 /* 頁口：縮圖疊成書側露出的頁緣 */
 .fe__leaves {
@@ -193,7 +200,8 @@ const otherAriaLabel = computed(() =>
   transition-delay: calc(var(--i) * 0.03s);
 }
 .fe--kai .fe__leaf { border: 1px solid rgba(120,113,108,0.28); }
-.fe--kage .fe__leaf { border: 1px solid rgba(154,173,197,0.22); }
+.fe--kage .fe__leaf { border: 1px solid rgba(82, 100, 122, 0.22); }
+:global(.dark) .fe--kage .fe__leaf { border: 1px solid rgba(154,173,197,0.22); }
 .fe__link:hover .fe__leaf,
 .fe__link:focus-visible .fe__leaf { opacity: 1; }
 .fe__leaf-img {
@@ -220,14 +228,16 @@ const otherAriaLabel = computed(() =>
   text-transform: uppercase;
 }
 .fe--kai .fe__plate-roman { color: var(--accent-700, #a3491f); }
-.fe--kage .fe__plate-roman { color: color-mix(in srgb, var(--accent) 70%, #9aadc5); }
+.fe--kage .fe__plate-roman { color: #5b6b7e; }
+:global(.dark) .fe--kage .fe__plate-roman { color: color-mix(in srgb, var(--accent) 70%, #9aadc5); }
 .fe__plate-count {
   font-family: 'Noto Serif JP', serif;
   font-size: 0.6rem;
   letter-spacing: 0.12em;
 }
 .fe--kai .fe__plate-count { color: rgb(87 83 78); }
-.fe--kage .fe__plate-count { color: rgba(206, 214, 224, 0.85); }
+.fe--kage .fe__plate-count { color: #56697e; }
+:global(.dark) .fe--kage .fe__plate-count { color: rgba(206, 214, 224, 0.85); }
 .fe__plate-flip {
   font-family: var(--world-mono, ui-monospace, monospace);
   font-size: 0.46rem;
@@ -237,7 +247,8 @@ const otherAriaLabel = computed(() =>
   transition: opacity 0.3s ease;
 }
 .fe--kai .fe__plate-flip { color: var(--accent-700, #a3491f); }
-.fe--kage .fe__plate-flip { color: color-mix(in srgb, var(--accent) 78%, #cbd5e1); }
+.fe--kage .fe__plate-flip { color: #3f4f63; }
+:global(.dark) .fe--kage .fe__plate-flip { color: color-mix(in srgb, var(--accent) 78%, #cbd5e1); }
 .fe__link:hover .fe__plate-flip,
 .fe__link:focus-visible .fe__plate-flip { opacity: 1; }
 

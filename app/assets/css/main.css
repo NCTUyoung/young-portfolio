@@ -953,6 +953,38 @@
     radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.30) 100%);
 }
 
+/* freshen-final+1（act-critic must-fix）：影世界 mobile 常駐左緣膠片穿孔軌。
+   桌機靠 darkroom-bar / light-table 的齒孔承載「膠片機械身份」；但 <1024px 收成單欄後，
+   齒孔退到 masthead 一張卡、捲過即消失 → 與繪 mobile 並列時辨識度流失（critic must-fix：
+   「窄屏一眼分不出哪個是影哪個是繪」）。解法：在 kage 世界 fixed ::before 質地層上補一條
+   釘在左緣、隨捲動恆在的縱向穿孔列 ＋ 一道冷銀膜邊，讓整個攝影捲動恆被「膠片邊」框住，
+   窄屏也一眼是影房。純裝飾、pointer-events-none、aria 無關；只在 mobile/tablet 生效，
+   桌機沿用原齒孔骨架。grain 三層原樣保留，僅前置 膜邊 + 穿孔列兩層。 */
+@media (max-width: 1023px) {
+  .gallery-world[data-world='kage']::before {
+    background-image:
+      linear-gradient(to right, rgba(82, 100, 122, 0.22) 0, rgba(82, 100, 122, 0.13) 16px, rgba(82, 100, 122, 0.05) 22px, transparent 28px),
+      radial-gradient(circle at center, rgba(58, 72, 90, 0.9) 0 2.1px, transparent 2.6px),
+      radial-gradient(rgba(82, 100, 122, 0.05) 0.5px, transparent 0.5px),
+      radial-gradient(rgba(82, 100, 122, 0.04) 0.5px, transparent 0.5px),
+      repeating-linear-gradient(to bottom, rgba(82, 100, 122, 0.018) 0px, rgba(82, 100, 122, 0.018) 1px, transparent 1px, transparent 4px);
+    background-size: 100% 100%, 11px 17px, 3px 3px, 5px 5px, 100% 4px;
+    background-position: 0 0, 8px 0, 0 0, 2px 2px, 0 0;
+    background-repeat: no-repeat, repeat-y, repeat, repeat, repeat;
+  }
+  .dark .gallery-world[data-world='kage']::before {
+    background-image:
+      linear-gradient(to right, rgba(154, 173, 197, 0.2) 0, rgba(154, 173, 197, 0.11) 16px, rgba(154, 173, 197, 0.045) 22px, transparent 28px),
+      radial-gradient(circle at center, rgba(195, 210, 226, 0.85) 0 2.1px, transparent 2.6px),
+      radial-gradient(rgba(154, 173, 197, 0.05) 0.5px, transparent 0.5px),
+      radial-gradient(rgba(154, 173, 197, 0.04) 0.5px, transparent 0.5px),
+      repeating-linear-gradient(to bottom, rgba(154, 173, 197, 0.016) 0px, rgba(154, 173, 197, 0.016) 1px, transparent 1px, transparent 4px);
+    background-size: 100% 100%, 11px 17px, 3px 3px, 5px 5px, 100% 4px;
+    background-position: 0 0, 8px 0, 0 0, 2px 2px, 0 0;
+    background-repeat: no-repeat, repeat-y, repeat, repeat, repeat;
+  }
+}
+
 /* --- accent 色溫分歧：影世界把 accent 由テラコッタ → 冷青 slate ---
    只在 kage 容器內 re-map 語意 token，jp-section-label / jp-eyebrow / hairline
    全部自動跟著轉冷，無需逐元件改 class。繪世界保留既有暖色（不動）。

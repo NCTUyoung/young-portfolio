@@ -68,7 +68,12 @@
       id="event-filter-mobile-list"
       :class="variant === 'rail'
         ? 'flex flex-col max-h-[44vh] overflow-y-auto -mx-2 px-2 hide-scrollbar'
-        : ['-mx-1 gap-x-1 gap-y-1 px-1 sm:flex-wrap sm:overflow-visible sm:pb-0', mobileExpanded ? 'flex flex-wrap pb-1' : 'hidden sm:flex']"
+        : [
+          '-mx-1 gap-x-1 gap-y-1 px-1',
+          // singleRow（桌機 photography overview）：收成單行可橫向捲動，不換行佔高
+          singleRow ? 'sm:flex-nowrap sm:overflow-x-auto sm:pb-1 hide-scrollbar' : 'sm:flex-wrap sm:overflow-visible sm:pb-0',
+          mobileExpanded ? 'flex flex-wrap pb-1' : 'hidden sm:flex'
+        ]"
     >
       <!-- 全部事件 -->
       <button
@@ -77,7 +82,7 @@
           'relative touch-manipulation font-light tracking-wide transition-all duration-300 group rounded-none',
           variant === 'rail'
             ? 'flex items-baseline justify-between gap-3 px-2 py-1.5 text-left'
-            : 'px-4 py-2.5',
+            : 'px-4 py-2.5 whitespace-nowrap shrink-0',
           filterState.selectedEvent === null
             ? 'text-stone-800 dark:text-stone-100'
             : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
@@ -137,7 +142,7 @@
             'relative touch-manipulation font-light tracking-wide transition-all duration-300 group rounded-none',
             variant === 'rail'
               ? 'flex items-baseline justify-between gap-3 px-2 py-1.5 text-left'
-              : 'px-4 py-2.5',
+              : 'px-4 py-2.5 whitespace-nowrap shrink-0',
             filterState.selectedEvent === event.name
               ? 'text-stone-800 dark:text-stone-100'
               : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
@@ -206,7 +211,9 @@ withDefaults(defineProps<{
    * rail: 桌機左側 rail 內垂直列（lg+ 專用，不渲染 mobile collapse）
    */
   variant?: 'default' | 'rail'
-}>(), { variant: 'default' })
+  /** 桌機收成單行可橫向捲動（避免 chips 換 2 行佔高，photography overview 用） */
+  singleRow?: boolean
+}>(), { variant: 'default', singleRow: false })
 
 const galleryStore = useGalleryStore()
 const {

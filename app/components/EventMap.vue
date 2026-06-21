@@ -18,7 +18,7 @@
       - `pointer-events: none` 不擋 Leaflet 互動
     -->
     <div
-      v-if="variant === 'compact' && !isExpanded"
+      v-if="variant === 'compact' && !isExpanded && showExpandHint"
       class="event-map-expand-hint"
       aria-hidden="true"
     >
@@ -116,12 +116,21 @@ const props = withDefaults(
      *     hover card 彈在地圖下方外而非內部右下，marker 縮小；用於常駐 summary bar
      */
     variant?: 'default' | 'compact'
+    /**
+     * 是否顯示框內「停留放大」提示 pill。預設 true（自洽）。
+     * 設 false 時提示交由宿主放在地圖框外的余白（header／hairline），避免 pill 壓在
+     * tile 上遮擋 marker——見 wiki inspirations/non-occluding-hint.md 方案 A。
+     * 此時宿主可改聽 `expand-change` 自行決定何時顯示／收起提示。
+     */
+    showExpandHint?: boolean
   }>(),
-  { selectedEventName: null, variant: 'default' }
+  { selectedEventName: null, variant: 'default', showExpandHint: true }
 )
 
 const emit = defineEmits<{
   (e: 'focus-event', name: string): void
+  /** compact 展開狀態變化：宿主可據此顯示／收起框外的「停留放大」提示 */
+  (e: 'expand-change', expanded: boolean): void
 }>()
 
 const mapContainer = ref<HTMLDivElement | null>(null)
@@ -155,6 +164,7 @@ function onWrapperEnter () {
   if (isExpanded.value) return
   expandTimer = setTimeout(() => {
     isExpanded.value = true
+    emit('expand-change', true)
     expandTimer = null
     setTimeout(() => runInvalidateWhenIdle(), MAP_RESIZE_AFTER_ANIM)
   }, HOVER_EXPAND_DELAY)
@@ -166,6 +176,7 @@ function onWrapperLeave () {
   if (!isExpanded.value) return
   collapseTimer = setTimeout(() => {
     isExpanded.value = false
+    emit('expand-change', false)
     collapseTimer = null
     setTimeout(() => runInvalidateWhenIdle(), MAP_RESIZE_AFTER_ANIM)
   }, HOVER_COLLAPSE_DELAY)

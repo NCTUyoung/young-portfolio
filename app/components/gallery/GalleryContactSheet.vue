@@ -394,6 +394,11 @@ onBeforeUnmount(() => {
   border: 0;
   cursor: pointer;
   overflow: hidden;
+  /* freshen「光卓」：膠格框實底改冷銀亮（light 模式） */
+  background: #e7edf1;
+  outline: 1px solid rgba(82, 100, 122, 0.18);
+}
+:global(.dark) .contact-sheet__btn {
   background: rgba(20, 24, 27, 0.08);
   outline: 1px solid color-mix(in srgb, var(--accent) 16%, transparent);
 }
@@ -459,15 +464,23 @@ onBeforeUnmount(() => {
   z-index: 30;
   pointer-events: none;
   border-radius: 50%;
-  /* 冷銀鏡緣 + 安全燈紅內環（暗室紅）；鏡身投影做出壓在燈桌上的厚度 */
+  /* freshen「光卓」：冷銀鏡緣 + 安全燈紅內環；light 模式鏡身改冷銀亮 */
+  box-shadow:
+    0 0 0 1px rgba(82, 100, 122, 0.5),
+    0 0 0 5px rgba(225, 232, 237, 0.95),
+    0 0 0 6px rgba(200, 60, 48, 0.55),
+    0 14px 38px -8px rgba(82, 100, 122, 0.4);
+  overflow: hidden;
+  /* rAF 設 transform；位置切換做極短平滑（reduced-motion 取消） */
+  transition: transform 0.08s linear;
+  background: #e7edf1;
+}
+:global(.dark) .contact-sheet__loupe {
   box-shadow:
     0 0 0 1px rgba(238, 241, 243, 0.65),
     0 0 0 5px rgba(20, 24, 27, 0.92),
     0 0 0 6px rgba(200, 60, 48, 0.55),
     0 14px 38px -8px rgba(0, 0, 0, 0.72);
-  overflow: hidden;
-  /* rAF 設 transform；位置切換做極短平滑（reduced-motion 取消） */
-  transition: transform 0.08s linear;
   background: #0b0e11;
 }
 .contact-sheet__loupe-glass {
@@ -491,20 +504,31 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   padding: 0.18rem 0.6rem;
   white-space: nowrap;
-  background: rgba(12, 15, 18, 0.86);
+  /* freshen「光卓」：鏡下讀數面板（框上文字，非照片上）→ 冷銀亮底 + 深 slate 文字 */
+  background: rgba(231, 237, 241, 0.92);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius: 2px;
+}
+:global(.dark) .contact-sheet__loupe-readout {
+  background: rgba(12, 15, 18, 0.86);
 }
 .contact-sheet__loupe-no {
   font-family: 'Noto Serif JP', serif;
   font-size: 0.58rem;
   letter-spacing: 0.14em;
+  color: #2b3640;
+}
+:global(.dark) .contact-sheet__loupe-no {
   color: rgba(238, 241, 243, 0.92);
 }
 .contact-sheet__loupe-exif {
   font-family: ui-monospace, monospace;
   font-size: 0.56rem;
   letter-spacing: 0.08em;
+  /* freshen「光卓」：讀數面板上的 EXIF → 深 slate（亮底可讀） */
+  color: #56697e;
+}
+:global(.dark) .contact-sheet__loupe-exif {
   color: color-mix(in srgb, var(--accent) 65%, #cbd5e1);
 }
 

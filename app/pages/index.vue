@@ -6,26 +6,9 @@
     -->
     <ChapterRail />
 
-    <!--
-      R8（CSS 動態效果 — scroll-driven，非 hero/entrance）：綴じ糸 — 全頁裝幀縫線進度。
-      一條極細縫線沿頁面左版心垂直貫穿，隨捲動「縫合」往下走（draw-down），縫頭一枚朱結
-      停在當前讀到的位置。把「翻一本和裝書」的裝幀隱喻做成全站唯一的 scroll-driven 動態：
-        - 縫線進度 = window scroll / scrollable height（rAF 節流，passive listener）。
-        - 縫頭朱結（knot）沿線下滑，到段落節點短暫「打結」感（純 CSS scale pulse via class）。
-      與 hero 對開帶（封面）呼應：封面翻開 → 內頁被一條裝幀線縫起。
-      鐵律守線：hairline-only 縫線（stone）+ accent 僅縫頭一點（非填面）；fixed、aria-hidden、
-      pointer-events-none，不擋互動；lg+ 才出現（窄屏版心無餘裕，避免壓內容）。
-      reduced-motion：保留靜態縫線與當前縫頭位置（仍 scroll-driven 但去除平滑過渡，見 main.css）。
-    -->
-    <div
-      class="home-binding"
-      aria-hidden="true"
-      :style="{ '--stitch': bindingProgress }"
-    >
-      <span class="home-binding__track"/>
-      <span class="home-binding__thread"/>
-      <span class="home-binding__knot"/>
-    </div>
+    <!-- freshen R2：砍掉全頁「綴じ糸」固定縫線 + 朱結（scroll-driven 裝飾過載，
+         與「清新」相悖；critic 點名 motif/裝飾通膨）。bindingProgress JS 保留，
+         僅供 Featured 暖→冷 sweep 使用。 -->
 
     <!-- =====================================================================
          Hero — 対開扉頁（R4 強硬大膽：對開帶升格為首屏 hero）
@@ -141,7 +124,7 @@
              合併後首訪由 hero → 一頁自序（序＋人）→ 步履，少一次整屏停頓。
              SEO：頁面唯一 <h1>序 保留於此（移進合併 section，層級不變）。
          ===================================================================== -->
-    <section class="relative pt-12 pb-16 lg:pt-16 lg:pb-24">
+    <section class="relative pt-10 pb-12 lg:pt-12 lg:pb-20">
       <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
         <!-- 序 — 開卷 masthead：章題 + 双軌起算 ledger + 入口（原 prologue band 內容） -->
         <div class="relative w-full max-w-xl lg:pr-12 mb-12 lg:mb-16">
@@ -298,43 +281,15 @@
            - mobile：維持單欄，chapter kanji 旁加小縦書き track tag（繪 / 影 / 共）
          守門：marker 不破 stone 系；縦書き只在 desktop 軌頭出現 1 次，不通膨
          ===================================================================== -->
-    <section id="journey" class="relative py-20 lg:py-28 scroll-mt-24">
+    <section id="journey" class="relative py-14 lg:py-20 scroll-mt-24">
       <!-- ChapterRail 的「対」錨點：併入 Journey 後，dialogue 錨點落在此 masthead 上緣 -->
       <span id="dialogue" class="absolute -top-24" aria-hidden="true"/>
       <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-        <!--
-          R6 併入的 対話 couplet masthead — 走時間軸前的雙主線宣言。
-          原 py-28 整屏縮成 Journey 開場一帶；左右對位縦書 + 中釘朱印「対」，
-          §1 不均整：左聯字距 0.4em、右聯字距 0.5em 刻意非對稱。
-          背景極淡縦書「対」承接朱印（opacity 耳語級）。
-        -->
-        <div class="reveal relative mb-14 lg:mb-20 overflow-hidden" aria-label="繪と影 — 対話">
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-            <span class="font-jp text-[clamp(7rem,18vw,14rem)] font-extralight text-stone-200/20 dark:text-stone-800/12 leading-none [writing-mode:vertical-rl] tracking-[0.1em]">対</span>
-          </div>
-          <div class="relative flex items-center justify-center gap-6 sm:gap-10 lg:gap-14 py-2">
-            <blockquote
-              class="writing-vertical font-jp text-xl sm:text-2xl lg:text-[1.7rem] font-extralight tracking-[0.4em] text-stone-800 dark:text-stone-100 leading-[2.1] flex-shrink-0"
-            >
-              繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>影<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>描く
-            </blockquote>
-            <div class="flex flex-col items-center gap-3 self-stretch py-2" aria-hidden="true">
-              <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-              <span class="jp-seal jp-seal--b text-[0.7rem] tracking-[0.2em] font-jp font-light shrink-0"><span class="jp-seal-ink">対</span></span>
-              <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-            </div>
-            <blockquote
-              class="writing-vertical font-jp text-xl sm:text-2xl lg:text-[1.7rem] font-extralight tracking-[0.5em] text-stone-800 dark:text-stone-100 leading-[2.1] flex-shrink-0"
-            >
-              影<span class="mx-1.5 text-stone-400 dark:text-stone-500">で</span>繪<span class="mx-1.5 text-stone-400 dark:text-stone-500">を</span>撮る
-            </blockquote>
-          </div>
-          <p class="relative mt-8 text-center text-[0.6rem] tracking-[0.5em] uppercase text-stone-400 dark:text-stone-500">
-            Two hands <span class="mx-2 opacity-60">·</span> One ink
-          </p>
-        </div>
+        <!-- freshen R2：砍掉「対話 couplet」（繪で影を描く／影で繪を撮る 縦書對聯 + 対 朱印
+             + 背景「対」ghost）。critic 點名 motif 通膨——書脊繪／影 已是 dual-track 唯一錨點，
+             此處重述第 4 次。id="dialogue" 錨點保留於上方 span，ChapterRail 不受影響。 -->
 
-        <header class="reveal mb-16 flex items-baseline justify-between flex-wrap gap-4">
+        <header class="reveal mb-12 flex items-baseline justify-between flex-wrap gap-4">
           <h2 class="jp-section-title text-3xl sm:text-4xl">步履
             <span class="jp-section-ruby">Journey</span>
           </h2>
@@ -581,7 +536,7 @@
                      兩個 medium 各自有書腰 + 橫卷，呼應「雙主線並行」首頁敘事；
                      手機由 HorizontalStripFeatured 內部 fallback 為 2-col grid。
          ===================================================================== -->
-    <section id="featured" class="relative py-20 lg:py-28 scroll-mt-24 overflow-hidden">
+    <section id="featured" class="relative py-14 lg:py-20 scroll-mt-24 overflow-hidden">
       <div class="jp-hairline absolute top-0 left-0 right-0"/>
       <!--
         R10 強硬大膽（首頁精簡 — 砍重複入口帶）：
@@ -658,7 +613,7 @@
          ===================================================================== -->
     <section
       id="epilogue"
-      class="relative py-32 lg:py-48 overflow-hidden bg-stone-100/30 dark:bg-stone-900/30 scroll-mt-24"
+      class="relative py-24 lg:py-32 overflow-hidden bg-stone-100/30 dark:bg-stone-900/30 scroll-mt-24"
       role="region"
       aria-roledescription="署名落款"
       aria-label="印 — Signature"
@@ -1133,72 +1088,8 @@ useHead({
 </script>
 
 <style scoped>
-/* =========================================================================
-   R8 — 綴じ糸（裝幀縫線）scroll-driven 進度
-   全頁左版心一條極細縫線，隨捲動 draw-down「縫合」內頁；縫頭朱結沿線下滑。
-   --stitch（0→1）由 JS scroll 進度驅動；hairline-only + accent 僅縫頭一點。
-   lg+ 才出現（窄屏版心無餘裕）；fixed / aria-hidden / pointer-events-none。
-   ========================================================================= */
-.home-binding {
-  display: none;
-}
-@media (min-width: 1024px) {
-  .home-binding {
-    display: block;
-    position: fixed;
-    /* 貼齊 max-w-5xl 版心左緣外側一指（與 ChapterRail 右側目次對位左右成書脊） */
-    left: max(1.5rem, calc((100vw - 64rem) / 2 - 1.75rem));
-    top: 14vh;
-    bottom: 10vh;
-    width: 14px;
-    z-index: 30;
-    pointer-events: none;
-  }
-}
-/* 縫線基底：整段極淡 dashed（尚未縫合的針腳預留孔） */
-.home-binding__track {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  transform: translateX(-50%);
-  border-left: 1px dashed rgb(168 162 158 / 0.28);
-}
-:global(.dark) .home-binding__track {
-  border-left-color: rgb(120 113 108 / 0.35);
-}
-/* 已縫合段：實線自上往下長到縫頭位置（scroll-driven draw-down） */
-.home-binding__thread {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 0;
-  transform: translateX(-50%);
-  height: calc(100% * var(--stitch, 0));
-  border-left: 1px solid rgb(120 113 108 / 0.5);
-  transition: height 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-:global(.dark) .home-binding__thread {
-  border-left-color: rgb(168 162 158 / 0.5);
-}
-/* 縫頭朱結：accent 小菱形結，停在當前縫合位置（唯一 accent 著色點） */
-.home-binding__knot {
-  position: absolute;
-  left: 50%;
-  top: calc(100% * var(--stitch, 0));
-  width: 6px;
-  height: 6px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  background: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
-  transition: top 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-@media (prefers-reduced-motion: reduce) {
-  /* 位置仍由 scroll 驅動（正確），但去掉平滑過渡避免動態暈眩 */
-  .home-binding__thread,
-  .home-binding__knot { transition: none; }
-}
+/* freshen R2：綴じ糸（.home-binding*）整組 CSS 已移除——裝飾過載，與清新相悖。
+   bindingProgress JS 保留，僅驅動 Featured 暖→冷 sweep。 */
 
 /* =========================================================================
    R4 — Hero 対開扉頁（左繪／右影對開，書脊縫導覽，reveal 從脊向外展開）
@@ -1252,10 +1143,10 @@ useHead({
 /* 繪半：暖製図桌底色 + 工程方格紙（first-paint 即見「攤在製圖桌」的繪世界拓樸縮影） */
 .hero-page--kai { --hp-base: #f3e9d6; }
 .hero-page--kai .hero-page__wash--kai {
-  /* R7：wash 大幅降透明（0.62→0.34），讓代表電繪暖暖透出，不再washed-to-white */
+  /* freshen R2：暖 wash 稍提（讓暗色電繪在暖世界裡讀得更柔、平衡右半放亮後的左重） */
   background:
-    linear-gradient(105deg, rgba(243,233,214,0.40) 0%, rgba(243,233,214,0.14) 46%, rgba(243,233,214,0.04) 100%),
-    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.24) 0%, transparent 72%);
+    linear-gradient(105deg, rgba(243,233,214,0.52) 0%, rgba(243,233,214,0.22) 46%, rgba(243,233,214,0.07) 100%),
+    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.20) 0%, transparent 72%);
 }
 .hero-page--kai .hero-page__texture {
   /* R7：粗 + 細雙層方格（製圖格牆縮影），底色上即可見的繪世界版面語彙 */
@@ -1274,16 +1165,35 @@ useHead({
     radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.18) 0%, transparent 72%);
 }
 
-/* 影半：暗室底色 + 顯影顆粒 + 膠卷齒孔縮影；明度刻意比繪半低（一眼分兩本書） */
-.hero-page--kage { --hp-base: #14181b; }
-.hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
+/* 影半（freshen 放亮）：light 模式改冷銀亮底、照片不再壓暗、wash/顆粒改冷淡；
+   dark 模式保留原暗室暗底配方。兩半皆亮 → 清新，仍靠暖/冷色溫 + 明朝/gothic 字族分世界。 */
+.hero-page--kage { --hp-base: #e8eef2; }
+.hero-page--kage .hero-page__img { filter: grayscale(0.08) contrast(1.01); }
 .hero-page--kage .hero-page__wash--kage {
+  /* 冷淡 wash，錨定右下角 plate 區托深墨字（與繪半暖 wash 鏡像） */
+  background:
+    linear-gradient(255deg, rgba(232,238,242,0.52) 0%, rgba(232,238,242,0.16) 48%, rgba(232,238,242,0.03) 100%),
+    radial-gradient(72% 62% at 90% 92%, rgba(154,173,197,0.20) 0%, transparent 70%);
+}
+.hero-page--kage .hero-page__texture {
+  /* 顯影顆粒 + 左緣縱向膠卷齒孔；改冷 slate，light 底上仍可辨、更 clean */
+  background-image:
+    radial-gradient(circle at center, rgba(82,100,122,0.28) 0 1.3px, transparent 1.6px),
+    radial-gradient(rgba(82,100,122,0.10) 0.6px, transparent 0.7px),
+    repeating-linear-gradient(to bottom, rgba(82,100,122,0.03) 0px, rgba(82,100,122,0.03) 1px, transparent 1px, transparent 5px);
+  background-size: 9px 17px, 4px 4px, 100% 5px;
+  background-position: 8px 0, 0 0, 0 0;
+  background-repeat: repeat-y, repeat, repeat;
+  opacity: 0.5;
+}
+:global(.dark) .hero-page--kage { --hp-base: #14181b; }
+:global(.dark) .hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
+:global(.dark) .hero-page--kage .hero-page__wash--kage {
   background:
     linear-gradient(255deg, rgba(15,18,21,0.66) 0%, rgba(15,18,21,0.3) 48%, rgba(15,18,21,0.12) 100%),
     radial-gradient(75% 65% at 90% 10%, rgba(154,173,197,0.16) 0%, transparent 66%);
 }
-.hero-page--kage .hero-page__texture {
-  /* R7：顯影顆粒 + 左緣縱向膠卷齒孔（影世界膠卷流拓樸縮影，first-paint 可見） */
+:global(.dark) .hero-page--kage .hero-page__texture {
   background-image:
     radial-gradient(circle at center, rgba(238,241,243,0.6) 0 1.5px, transparent 1.8px),
     radial-gradient(rgba(206,214,224,0.12) 0.6px, transparent 0.7px),
@@ -1302,8 +1212,13 @@ useHead({
 /* ---- hover lift：把選中那半的 plate 與圖略推前，另一半微暗 ---- */
 .hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
 .hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
-  filter: grayscale(0.5) brightness(0.6);
+  /* 未選半「退位」：light 模式用降透明 + 微去彩，不再壓暗（清新不破） */
+  filter: grayscale(0.4) brightness(1.01) opacity(0.55);
   transition: filter 0.5s ease;
+}
+:global(.dark) .hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
+:global(.dark) .hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
+  filter: grayscale(0.5) brightness(0.6);
 }
 .hero-spread--in .hero-page:hover .hero-page__plate { transform: translateY(-4px); }
 
@@ -1343,8 +1258,9 @@ useHead({
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   letter-spacing: 0.4em;
   text-transform: none;
-  color: #b9c6d6;
+  color: #56697e;
 }
+:global(.dark) .hero-page__eyebrow--serif { color: #b9c6d6; }
 .hero-page__title {
   font-size: clamp(2.6rem, 6vw, 4.4rem);
   line-height: 1;
@@ -1361,9 +1277,10 @@ useHead({
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: #eef1f3;
-  text-shadow: 0 2px 18px rgba(0,0,0,0.45);
+  color: #2b3640;
+  text-shadow: 0 1px 12px rgba(255,255,255,0.5);
 }
+:global(.dark) .hero-page__title--kage { color: #eef1f3; text-shadow: 0 2px 18px rgba(0,0,0,0.45); }
 .hero-page__note {
   font-size: 0.92rem;
   font-weight: 300;
@@ -1372,7 +1289,8 @@ useHead({
 }
 .hero-page__note--kai { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; color: #5a4b3c; }
 :global(.dark) .hero-page__note--kai { color: #c9b9a6; }
-.hero-page__note--kage { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; color: #c2cdda; }
+.hero-page__note--kage { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; color: #51616f; }
+:global(.dark) .hero-page__note--kage { color: #c2cdda; }
 
 .hero-page__enter {
   margin-top: 0.65rem;
@@ -1382,9 +1300,11 @@ useHead({
   color: #8a7a68;
   transition: color 0.4s ease, gap 0.4s ease;
 }
-.hero-page__enter--right { color: #9aadc5; }
+.hero-page__enter--right { color: #66788c; }
+:global(.dark) .hero-page__enter--right { color: #9aadc5; }
 .hero-page--kai:hover .hero-page__enter { color: #b9601f; }
-.hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
+.hero-page--kage:hover .hero-page__enter { color: #3f4f63; }
+:global(.dark) .hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
 .hero-page__enter-label { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; font-size: 1rem; letter-spacing: 0.2em; }
 .hero-page__enter-label--serif { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.24em; }
 .hero-page__enter-arrow { width: 1rem; height: 1rem; transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
@@ -1406,25 +1326,33 @@ useHead({
   justify-content: center;
   gap: 1.1rem;
   pointer-events: none;
+  /* freshen：書脊改淺色折縫（中央微亮、兩緣淡灰影），不再是暗縫 */
+  background: linear-gradient(to right, rgba(120,113,108,0.12), rgba(120,113,108,0.03) 35%, rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.03) 65%, rgba(120,113,108,0.12));
+}
+:global(.dark) .hero-spine {
   background: linear-gradient(to right, rgba(0,0,0,0.16), rgba(0,0,0,0.04) 35%, rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.04) 65%, rgba(0,0,0,0.16));
 }
-.hero-spine__rule { width: 1px; flex: 1; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
+.hero-spine__rule { width: 1px; flex: 1; background: linear-gradient(to bottom, transparent, rgba(120,113,108,0.4), transparent); }
+:global(.dark) .hero-spine__rule { background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
 .hero-spine__kana {
   writing-mode: vertical-rl;
   font-size: 1.25rem;
   font-weight: 300;
   letter-spacing: 0.3em;
-  color: rgba(255,255,255,0.92);
-  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  color: rgba(40,46,54,0.82);
+  text-shadow: 0 1px 8px rgba(255,255,255,0.4);
   line-height: 1.1;
 }
-.hero-spine__div { color: rgba(255,255,255,0.5); }
+:global(.dark) .hero-spine__kana { color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+.hero-spine__div { color: rgba(40,46,54,0.4); }
+:global(.dark) .hero-spine__div { color: rgba(255,255,255,0.5); }
 .hero-spine__era {
   writing-mode: vertical-rl;
   font-size: 0.6rem;
   letter-spacing: 0.42em;
-  color: rgba(255,255,255,0.6);
+  color: rgba(68,64,60,0.6);
 }
+:global(.dark) .hero-spine__era { color: rgba(255,255,255,0.6); }
 
 /* ---- 對開帶上方余白主題（極簡，居中上緣） ---- */
 .hero-spread__masthead {
@@ -1444,16 +1372,18 @@ useHead({
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 200;
   letter-spacing: 0.5em;
-  color: rgba(255,255,255,0.96);
-  text-shadow: 0 2px 14px rgba(0,0,0,0.45);
+  color: rgba(41,37,36,0.92);
+  text-shadow: 0 1px 12px rgba(255,255,255,0.55);
 }
+:global(.dark) .hero-spread__masthead-kanji { color: rgba(255,255,255,0.96); text-shadow: 0 2px 14px rgba(0,0,0,0.45); }
 .hero-spread__masthead-en {
   font-family: 'Inter', sans-serif;
   font-size: 0.58rem;
   letter-spacing: 0.46em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.72);
+  color: rgba(68,64,60,0.66);
 }
+:global(.dark) .hero-spread__masthead-en { color: rgba(255,255,255,0.72); }
 
 /* ---- mobile：對開頁改上下堆疊，書脊轉橫 ---- */
 @media (max-width: 1023px) {
@@ -1467,9 +1397,13 @@ useHead({
     transform: translateY(-50%);
     flex-direction: row;
     height: 2.2rem;
+    background: linear-gradient(to bottom, rgba(120,113,108,0.12), rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.12));
+  }
+  :global(.dark) .hero-spine {
     background: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.16));
   }
-  .hero-spine__rule { width: auto; height: 1px; flex: 1; background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
+  .hero-spine__rule { width: auto; height: 1px; flex: 1; background: linear-gradient(to right, transparent, rgba(120,113,108,0.4), transparent); }
+  :global(.dark) .hero-spine__rule { background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
   .hero-spine__kana, .hero-spine__era { writing-mode: horizontal-tb; }
   .hero-page__plate { max-width: 88%; }
 }

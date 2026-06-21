@@ -6,14 +6,14 @@
                      改 jp-section-title / hairline / 縦書き「文」收尾。
                      CTA 採 underline + → 箭頭，與 Home Hero 的「作品を見る」同 family。
          ===================================================================== -->
-    <section class="relative py-24 lg:py-36 overflow-hidden">
+    <section class="relative py-16 lg:py-24 overflow-hidden">
       <!-- 背景大字「文」（與侘寂段落同手法，淡水印） -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span class="font-jp text-[clamp(12rem,30vw,24rem)] font-extralight text-stone-200/40 dark:text-stone-800/35 leading-none tracking-wider">文</span>
+        <span class="font-jp text-[clamp(10rem,24vw,20rem)] font-extralight text-stone-200/25 dark:text-stone-800/22 leading-none tracking-wider">文</span>
       </div>
 
       <div class="relative max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-        <header class="reveal mb-14 lg:mb-20 flex items-baseline justify-between flex-wrap gap-4">
+        <header class="reveal mb-10 lg:mb-14 flex items-baseline justify-between flex-wrap gap-4">
           <h1 class="jp-section-title text-4xl sm:text-5xl">文章
             <span class="jp-section-ruby">Writings</span>
           </h1>
@@ -134,10 +134,10 @@
                      不再用圓角卡片 + 圖示色塊，回歸 stone + hairline + 余白。
          R30：每章帶 track 分類（繪 / 影 / 両），與 hero focus toggle 對位。
          ===================================================================== -->
-    <section class="relative py-24 lg:py-32 bg-stone-100/40 dark:bg-stone-800/25">
+    <section class="relative py-16 lg:py-24 bg-stone-100/40 dark:bg-stone-800/25">
       <div class="jp-hairline absolute top-0 left-0 right-0"/>
       <div class="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-        <header class="reveal mb-14 lg:mb-20 flex items-baseline justify-between flex-wrap gap-4">
+        <header class="reveal mb-10 lg:mb-14 flex items-baseline justify-between flex-wrap gap-4">
           <h2 class="jp-section-title text-3xl sm:text-4xl">目次
             <span class="jp-section-ruby">Index</span>
           </h2>
@@ -208,7 +208,7 @@
     <!-- =====================================================================
          引言（直書、極簡，與 Home 侘寂段落同 family）
          ===================================================================== -->
-    <section class="reveal relative py-24 lg:py-32 overflow-hidden">
+    <section class="reveal relative py-16 lg:py-24 overflow-hidden">
       <div class="relative max-w-3xl mx-auto px-6 flex items-center justify-center gap-12">
         <!-- 直書引言（桌機） -->
         <blockquote class="hidden md:flex writing-vertical font-jp text-2xl lg:text-3xl font-extralight tracking-[0.4em] text-stone-700 dark:text-stone-200 leading-[2.2]">
@@ -234,7 +234,7 @@
          R26 — site-wide 三段詞彙系統（卷頭語 / 對頁註 / 奥付）跨頁延伸到 article。
          書末出版資訊的編輯結尾，配 jp-seal 落款印 + accent 朱印小點。
          ===================================================================== -->
-    <section class="reveal py-16 lg:py-24 relative">
+    <section class="reveal py-14 lg:py-20 relative">
       <div class="max-w-2xl mx-auto px-6">
         <!-- 章節記號 — accent ink dot + gradient hairline -->
         <div class="article-colophon-divider" aria-hidden="true">

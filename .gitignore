@@ -71,3 +71,14 @@ __pycache__/
 
 # Wiki：由 wiki/.git 獨立追蹤（local-only），主 repo 不管
 wiki/
+
+# 視覺驗收 round 輸出（act-critic 各輪截圖，本機暫存；baseline/ 仍入庫）
+tests/screenshots/rounds/
+
+# 本機 AI 工具的暫存目錄（skills 鏡像 / 設定，非站台原始碼）
+.agents/
+.codex/
+
+# 大型本機素材與 profiling traces（勿入庫）
+/*.mp4
+Trace-*.json.gz

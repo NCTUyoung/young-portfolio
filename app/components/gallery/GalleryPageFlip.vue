@@ -295,7 +295,9 @@ defineExpose({ play })
   overflow: hidden;
 }
 .pff--kai { background: linear-gradient(150deg, #f3ede2 0%, #e8dfd0 100%); }
-.pff--kage { background: linear-gradient(150deg, #20262c 0%, #14181c 100%); }
+/* 影頁背面：光卓冷銀亮底（取代原近黑暗房底） */
+.pff--kage { background: linear-gradient(168deg, #eef2f5 0%, #e1e8ed 100%); }
+:global(.dark) .pff--kage { background: linear-gradient(150deg, #20262c 0%, #14181c 100%); }
 
 .pff__texture { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .pff--kai .pff__texture {
@@ -307,12 +309,17 @@ defineExpose({ play })
 }
 .pff--kage .pff__texture {
   background-image:
-    radial-gradient(120% 80% at 80% 16%, rgba(196,96,35,0.16) 0%, transparent 46%),
-    radial-gradient(circle at center, rgba(226,232,238,0.5) 0 1.6px, transparent 1.9px);
+    radial-gradient(120% 80% at 80% 16%, rgba(82,100,122,0.12) 0%, transparent 46%),
+    radial-gradient(circle at center, rgba(82,100,122,0.42) 0 1.6px, transparent 1.9px);
   background-size: 100% 100%, 11px 19px;
   background-repeat: no-repeat, repeat-y;
   background-position: center, right 8px top;
   opacity: 0.5;
+}
+:global(.dark) .pff--kage .pff__texture {
+  background-image:
+    radial-gradient(120% 80% at 80% 16%, rgba(196,96,35,0.16) 0%, transparent 46%),
+    radial-gradient(circle at center, rgba(226,232,238,0.5) 0 1.6px, transparent 1.9px);
 }
 
 /* 巨幅縱書世界字 */
@@ -330,7 +337,8 @@ defineExpose({ play })
   z-index: 1;
 }
 .pff--kai .pff__kana { color: rgba(196,96,35,0.2); }
-.pff--kage .pff__kana { color: rgba(226,232,238,0.14); right: 6%; left: auto; }
+.pff--kage .pff__kana { color: rgba(82,100,122,0.16); right: 6%; left: auto; }
+:global(.dark) .pff--kage .pff__kana { color: rgba(226,232,238,0.14); }
 
 /* 世界銘 copy */
 .pff__copy {
@@ -348,7 +356,8 @@ defineExpose({ play })
   text-transform: uppercase;
 }
 .pff--kai .pff__eyebrow { color: var(--accent-700, #a3491f); font-family: var(--world-mono, ui-monospace, monospace); }
-.pff--kage .pff__eyebrow { color: rgba(231,184,125,0.95); font-family: 'Noto Serif JP', serif; letter-spacing: 0.42em; }
+.pff--kage .pff__eyebrow { color: #5b6b7e; font-family: 'Noto Serif JP', serif; letter-spacing: 0.42em; }
+:global(.dark) .pff--kage .pff__eyebrow { color: rgba(231,184,125,0.95); }
 .pff__title {
   font-family: var(--world-display, 'Noto Serif JP', serif);
   font-size: clamp(2.4rem, 6vw, 4rem);
@@ -357,14 +366,16 @@ defineExpose({ play })
   letter-spacing: 0.1em;
 }
 .pff--kai .pff__title { color: rgb(41 37 36); }
-.pff--kage .pff__title { color: #f3f0eb; }
+.pff--kage .pff__title { color: #2b3640; }
+:global(.dark) .pff--kage .pff__title { color: #f3f0eb; }
 .pff__count {
   font-family: var(--world-mono, ui-monospace, monospace);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
 }
 .pff--kai .pff__count { color: rgb(120 113 108); }
-.pff--kage .pff__count { color: rgba(206,214,224,0.85); }
+.pff--kage .pff__count { color: #56697e; }
+:global(.dark) .pff--kage .pff__count { color: rgba(206,214,224,0.85); }
 
 /* 頁緣縮圖排（書側露出的頁口感） */
 .pff__leaves {
@@ -381,7 +392,8 @@ defineExpose({ play })
   overflow: hidden;
 }
 .pff--kai .pff__leaf { border: 1px solid rgba(120,113,108,0.3); }
-.pff--kage .pff__leaf { border: 1px solid rgba(154,173,197,0.22); }
+.pff--kage .pff__leaf { border: 1px solid rgba(82,100,122,0.20); }
+:global(.dark) .pff--kage .pff__leaf { border: 1px solid rgba(154,173,197,0.22); }
 .pff__leaf-img { width: 100%; height: 100%; object-fit: cover; }
 .pff--kai .pff__leaf-img { filter: saturate(0.92) contrast(1.02); }
 .pff--kage .pff__leaf-img { filter: saturate(0.85) contrast(1.04) brightness(0.92); }

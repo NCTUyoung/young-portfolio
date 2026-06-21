@@ -35,10 +35,10 @@ test.describe('首頁 /', () => {
 
     await expect(page).toHaveURL(/\/gallery(\/|$)/)
 
-    // galleryWorlds：影(kage) 世界頂部「暗房光桌橫條」(GalleryDarkroomBar) 的 masthead
-    // h1 為「暗室」(Darkroom)。
+    // 攝影 overview 改版：影(kage) 世界 desktop 主欄改報紙刊頭式編輯模組
+    // (GalleryEditorialModules)，扉頁刊頭 h2 為「写真記録」。
     await expect(
-      page.getByRole('heading', { level: 1, name: '暗室' })
+      page.getByRole('heading', { level: 2, name: '写真記録' })
     ).toBeVisible()
   })
 })

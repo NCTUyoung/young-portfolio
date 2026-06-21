@@ -131,7 +131,6 @@
               <span class="atl__draft-grid"/>
             </span>
             <span class="atl__seamline" aria-hidden="true"/>
-            <span class="atl__plate" aria-hidden="true">{{ plate(gi, ii) }}</span>
             <span class="atl__draft-tag" aria-hidden="true">下書き</span>
             <span class="atl__cap">
               <span class="atl__cap-title font-jp">{{ item.title || '未命名' }}</span>
@@ -172,11 +171,6 @@ const totalCount = computed(() => props.groups.reduce((s, g) => s + g.images.len
 
 const KANSUJI = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二']
 function kansuji (n: number): string { return KANSUJI[n] || String(n) }
-
-// 製圖座標格號：A01·02 …（年-序索引，等寬 mono、製圖標註語彙）
-function plate (gi: number, ii: number): string {
-  return `${String.fromCharCode(65 + (gi % 26))}${String(gi + 1).padStart(2, '0')}·${String(ii + 1).padStart(2, '0')}`
-}
 
 // ===== i8：下書き→完成 製図リビール（游標 X 驅動每格擦出完稿） =====
 /**
@@ -448,13 +442,13 @@ onBeforeUnmount(() => {
 /* ===== 製図台軌道 ===== */
 .atl__table {
   position: relative;
-  /* 藍圖製圖桌底紋：major + minor 網格（呼應 GridWall 的對齊牆語彙） */
+  /* 藍圖製圖桌底紋（freshen：格紋與上下邊更淡，留更多余白、減瑣碎） */
   background:
-    linear-gradient(to right, color-mix(in srgb, var(--accent) 5%, transparent) 1px, transparent 1px) 0 0 / 56px 100%,
-    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 3.5%, transparent) 1px, transparent 1px) 0 0 / 100% 56px,
-    var(--surface);
-  border-top: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 3%, transparent) 1px, transparent 1px) 0 0 / 72px 100%,
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 2%, transparent) 1px, transparent 1px) 0 0 / 100% 72px,
+    var(--bg);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .atl__table:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
@@ -485,7 +479,7 @@ onBeforeUnmount(() => {
   position: relative;
   scroll-snap-align: start;
   padding: 0 1.5rem;
-  border-left: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--accent) 7%, transparent);
   /* perf：把每年一欄設為 layout 邊界 —— 字體/圖片載入逐步 settle 時，
      原本每次都 relayout 整條 ~19000px 製図桌（mount 期 54 次 Layout、1553ms）；
      contain 後單次只重排該欄，進場大幅去卡。 */
@@ -496,7 +490,7 @@ onBeforeUnmount(() => {
 @media (min-width: 1024px) {
   .atl__col {
     flex: 0 0 auto;
-    width: clamp(280px, 26vw, 360px);
+    width: clamp(320px, 32vw, 440px);
     display: grid;
     grid-template-rows: auto 1fr;
   }
@@ -568,12 +562,12 @@ onBeforeUnmount(() => {
 }
 :global(.dark) .atl__spine-line { color: rgb(168 162 158); }
 
-/* 作品藍圖格直欄 */
+/* 作品藍圖格直欄（freshen：格間給余白取代 1px 密格線，去瑣碎、讓每張圖呼吸） */
 .atl__stack {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  gap: 0.55rem;
+  background: transparent;
   align-content: start;
 }
 @media (min-width: 1024px) {
@@ -706,24 +700,6 @@ onBeforeUnmount(() => {
   .atl__draft, .atl__seamline, .atl__draft-tag { display: none; }
 }
 
-.atl__plate {
-  position: absolute;
-  top: 0.35rem;
-  left: 0.4rem;
-  z-index: 2;
-  font-family: var(--world-mono, ui-monospace, monospace);
-  font-size: 0.48rem;
-  letter-spacing: 0.12em;
-  font-variant-numeric: tabular-nums;
-  color: #f5f5f4;
-  background: color-mix(in srgb, var(--accent) 78%, rgba(28, 25, 23, 0.55));
-  padding: 1px 4px;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
-}
-.atl__cell:hover .atl__plate,
-.atl__cell:focus-visible .atl__plate { opacity: 0.92; }
-
 .atl__cap {
   position: absolute;
   inset-inline: 0;
@@ -780,7 +756,7 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .atl__img, .atl__plate, .atl__cap,
+  .atl__img, .atl__cap,
   .atl__tick-mark { transition: none; }
   /* i8：減動偏好 → 不做擦出動畫，直接呈現完稿（隱藏線稿層與顯影縫） */
   .atl__draft, .atl__seamline, .atl__draft-tag { display: none; }

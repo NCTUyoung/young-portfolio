@@ -203,32 +203,10 @@ v-if="viewerImages.length > 1 && hasNext"
         <ImageNavigator />
 
         <!--
-          R50：對軌 PAIRED overlay — 當前 image 有 pairWith 時右下浮 thumb
-          首秒可見而非藏在 spread 第二屏（critic R49 ⚠）
+          R50 對軌 PAIRED overlay 已移除：那是「繪⇄影」跨世界跳轉浮層，與近期
+          「拆分兩間獨立沉浸室、去除跨世界混合」方向相牴觸（且首訪者不解其意）。
+          viewer 收斂為單一世界內的純粹翻閱。
         -->
-        <NuxtLink
-          v-if="pairedImageInViewer"
-          :to="`/gallery/${pairedImageInViewer.category}?image=${encodeURIComponent(pairedImageInViewer.id)}`"
-          class="viewer-paired-overlay group"
-          :aria-label="`跳轉至對軌作品 ${pairedImageInViewer.title}`"
-        >
-          <span class="viewer-paired-overlay__label">
-            <span class="viewer-paired-overlay__kana font-jp">対</span>
-            <span class="viewer-paired-overlay__en">PAIRED</span>
-          </span>
-          <div class="viewer-paired-overlay__thumb">
-            <img
-              :src="getThumbPath(pairedImageInViewer.filename, 400)"
-              :alt="`對軌 — ${pairedImageInViewer.title}`"
-              decoding="async"
-              loading="lazy"
-            >
-          </div>
-          <span class="viewer-paired-overlay__cta">
-            {{ pairedImageInViewer.category === 'digital' ? '繪' : '影' }}
-            <span aria-hidden="true">→</span>
-          </span>
-        </NuxtLink>
 
         <!--
           ▌軌道縦書（編輯感）— 左側 vertical caption strip
@@ -273,35 +251,10 @@ v-if="viewerImages.length > 1 && hasNext"
         </div>
 
         <!--
-          ▌底部 keyboard shortcut footer（編輯感）
-          ESC · ← → · 0 · I — 列出主要快捷鍵，jp-eyebrow tracking
+          底部 keyboard shortcut footer（ESC/←→/I/0 圖例）已移除：與頂部工具列按鈕
+          tooltip + 底部進度軌重疊，且讓底部與放射輪盤一起顯得「駕駛艙」般擁擠。
+          快捷鍵行為全數保留（鍵盤監聽未動），只是不再常駐顯示圖例 → 還底部余白。
         -->
-        <div
-          class="viewer-shortcut-footer pointer-events-none"
-          :style="progressRailInsetStyle"
-          aria-hidden="true"
-        >
-          <span class="viewer-shortcut-footer__group">
-            <kbd class="viewer-kbd">ESC</kbd>
-            <span>退出</span>
-          </span>
-          <span class="viewer-shortcut-footer__divider"/>
-          <span class="viewer-shortcut-footer__group">
-            <kbd class="viewer-kbd">←</kbd>
-            <kbd class="viewer-kbd">→</kbd>
-            <span>翻頁</span>
-          </span>
-          <span class="viewer-shortcut-footer__divider"/>
-          <span class="viewer-shortcut-footer__group">
-            <kbd class="viewer-kbd">I</kbd>
-            <span>資訊</span>
-          </span>
-          <span class="viewer-shortcut-footer__divider"/>
-          <span class="viewer-shortcut-footer__group">
-            <kbd class="viewer-kbd">0</kbd>
-            <span>重置</span>
-          </span>
-        </div>
       </div>
     </div>
 
@@ -414,6 +367,7 @@ const progressRailInsetStyle = computed(() => ({
 
 /** R50：對軌 PAIRED — 從 store 找配對作品給 viewer overlay 用 */
 const galleryStoreViewer = useGalleryStore()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- WIP：配對 overlay 尚未接線，先保留 computed
 const pairedImageInViewer = computed(() => {
   const pairId = (currentViewerImage.value as { pairWith?: string } | null)?.pairWith
   if (!pairId) return null
@@ -852,6 +806,18 @@ img {
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+/*
+  關鍵：<picture> 預設 display:inline 且無尺寸，會切斷 <img> 的 max-height:100%
+  百分比參照鏈——百分比高度只能對到 picture 自身的內容高（＝圖片本身高），等於沒有上限，
+  於是直幅（portrait）圖無法被視窗高度框住、開圖時過大；橫幅靠 max-width 反而正常。
+  用 display:contents 讓 picture 盒子消失，<img> 直接成為 .image-viewer-area 內
+  w-full h-full flex 容器的子元素，max-width/height:100% 才會對到真正的視窗框，
+  直/橫幅一致 fit。
+*/
+.image-viewer-area picture {
+  display: contents;
 }
 
 /* 拖拽時的樣式 */

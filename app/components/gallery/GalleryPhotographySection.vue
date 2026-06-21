@@ -332,17 +332,22 @@ defineExpose({ expandEvent })
   cursor: pointer;
   border: 0;
   padding: 0.95rem 1.1rem 0.85rem 1.6rem;
-  background: linear-gradient(165deg, #20262c 0%, #14181c 100%);
+  /* 光卓 light：冷銀亮燈箱底（取代原 near-black #20262c→#14181c 負片底） */
+  background: linear-gradient(168deg, #eef2f5 0%, #e1e8ed 100%);
   border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(82, 100, 122, 0.18);
   overflow: hidden;
 }
 :global(.dark) .lighttable-bar {
   background: linear-gradient(165deg, #1a1f24 0%, #0e1114 100%);
+  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.14);
 }
 .lighttable-bar:focus-visible {
-  outline: 1px solid rgba(154, 173, 197, 0.7);
+  outline: 1px solid rgba(82, 100, 122, 0.6);
   outline-offset: 3px;
+}
+:global(.dark) .lighttable-bar:focus-visible {
+  outline-color: rgba(154, 173, 197, 0.7);
 }
 /* 左緣齒孔軌 */
 .lighttable-bar__sprockets {
@@ -352,9 +357,14 @@ defineExpose({ expandEvent })
   left: 5px;
   width: 8px;
   pointer-events: none;
-  background-image: radial-gradient(circle at center, rgba(238, 241, 243, 0.8) 0 1.5px, transparent 1.8px);
+  /* 光卓 light：冷 slate 穿孔點（取代原反白亮孔 rgba(238,241,243,..)） */
+  background-image: radial-gradient(circle at center, rgba(82, 100, 122, 0.42) 0 1.5px, transparent 1.8px);
   background-size: 8px 14px;
   background-repeat: repeat-y;
+  opacity: 0.6;
+}
+:global(.dark) .lighttable-bar__sprockets {
+  background-image: radial-gradient(circle at center, rgba(238, 241, 243, 0.8) 0 1.5px, transparent 1.8px);
   opacity: 0.45;
 }
 .lighttable-bar__frameno {
@@ -362,8 +372,12 @@ defineExpose({ expandEvent })
   font-family: 'Noto Serif JP', serif;
   font-size: 0.54rem;
   letter-spacing: 0.28em;
-  color: rgba(154, 173, 197, 0.85);
+  /* 光卓 light：eyebrow 冷 slate 小標 */
+  color: #5b6b7e;
   margin-bottom: 0.35rem;
+}
+:global(.dark) .lighttable-bar__frameno {
+  color: rgba(154, 173, 197, 0.85);
 }
 .lighttable-bar__row {
   display: flex;
@@ -379,12 +393,20 @@ defineExpose({ expandEvent })
   font-size: 1.18rem;
   letter-spacing: 0.16em;
   line-height: 1.4;
+  /* 光卓 light：標題深 slate（取代原反白 #eef1f3） */
+  color: #2b3640;
+}
+:global(.dark) .lighttable-bar__title {
   color: #eef1f3;
 }
 .lighttable-bar__toggle {
   flex-shrink: 0;
   font-family: 'Noto Serif JP', serif;
   font-size: 1.05rem;
+  /* 光卓 light：冷 slate 序號/符號 */
+  color: #3f4f63;
+}
+:global(.dark) .lighttable-bar__toggle {
   color: rgba(154, 173, 197, 0.9);
 }
 .lighttable-bar__meta {
@@ -392,6 +414,10 @@ defineExpose({ expandEvent })
   font-family: 'Noto Serif JP', serif;
   font-size: 0.66rem;
   letter-spacing: 0.2em;
+  /* 光卓 light：副標冷 slate */
+  color: #56697e;
+}
+:global(.dark) .lighttable-bar__meta {
   color: rgba(190, 200, 212, 0.72);
 }
 .lighttable-bar__caption {
@@ -400,6 +426,10 @@ defineExpose({ expandEvent })
   font-size: 0.82rem;
   line-height: 1.85;
   letter-spacing: 0.04em;
+  /* 光卓 light：說明冷 slate */
+  color: #56697e;
+}
+:global(.dark) .lighttable-bar__caption {
   color: rgba(206, 214, 224, 0.8);
 }
 /* 底緣冷銀刻度尺（光桌標尺） */
@@ -410,6 +440,18 @@ defineExpose({ expandEvent })
   bottom: 0.4rem;
   height: 5px;
   pointer-events: none;
+  /* 光卓 light：冷 slate 刻度（亮底加深以維持可見度） */
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(82, 100, 122, 0.3) 0,
+    rgba(82, 100, 122, 0.3) 1px,
+    transparent 1px,
+    transparent 18px
+  );
+  background-position: bottom;
+  opacity: 0.7;
+}
+:global(.dark) .lighttable-bar__ticks {
   background-image: repeating-linear-gradient(
     to right,
     rgba(154, 173, 197, 0.32) 0,
@@ -417,7 +459,6 @@ defineExpose({ expandEvent })
     transparent 1px,
     transparent 18px
   );
-  background-position: bottom;
   opacity: 0.6;
 }
 </style>
