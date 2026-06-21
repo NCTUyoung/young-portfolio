@@ -35,10 +35,16 @@ test.describe('Gallery /gallery/photography', () => {
 
     // hydration race：SSR'd HTML 出來時連結已可見但 Vue listeners 還沒掛上，第一次點可能被吃掉。
     // 等到導航真正生效（URL 含 event path）才繼續。
+    // 只在「尚未導航」時才再點：成功但較慢的導航（CI dev route 首編譯可達數秒）會讓
+    // 連結消失，若無條件 re-click 會在 event 頁找不到 .em__enter 而 thrash。
+    // waitUntil:'commit'：本頁 'load' 事件不可靠（長載資源讓 load 遲遲不觸發），但 URL 一
+    // commit 即代表導航成功；真正「頁面渲染好」由下方 h2 可見性把關。
     await expect(async () => {
-      await enter.click()
-      await page.waitForURL(/\/gallery\/photography\/Annber/, { timeout: 1_000 })
-    }).toPass({ timeout: 15_000, intervals: [200, 500, 1000] })
+      if (!/\/gallery\/photography\/Annber/.test(page.url())) {
+        await enter.click({ timeout: 2_000 }).catch(() => {})
+      }
+      await page.waitForURL(/\/gallery\/photography\/Annber/, { timeout: 4_000, waitUntil: 'commit' })
+    }).toPass({ timeout: 25_000, intervals: [500, 1000, 2000] })
 
     // 進入後渲染該事件扉頁：h2 = event 名「Annber 外拍」。
     await expect(
