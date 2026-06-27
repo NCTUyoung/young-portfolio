@@ -74,6 +74,8 @@ wiki/
 
 # 視覺驗收 round 輸出（act-critic 各輪截圖，本機暫存；baseline/ 仍入庫）
 tests/screenshots/rounds/
+# 舊版逐輪截圖（round-08~50/），歷史已取消追蹤，本機保留勿入庫
+tests/screenshots/round-*/
 
 # 本機 AI 工具的暫存目錄（skills 鏡像 / 設定，非站台原始碼）
 .agents/
