@@ -20,7 +20,7 @@ function photo (overrides: Partial<PhotographyItem> = {}): PhotographyItem {
     title: 'Photo B',
     content: 'desc',
     tags: ['street'],
-    event: { name: '某事件' },
+    event: { name: '某事件', description: '', location: '' },
     camera: 'X-T5',
     model: 'XF35',
     focalLength: 35,
@@ -45,7 +45,7 @@ describe('galleryLoaders · transformDigitalWork', () => {
 
   it('event defaults to null when absent', () => {
     expect(transformDigitalWork(digital()).event).toBeNull()
-    const ev = { name: 'E' }
+    const ev = { name: 'E', description: '', location: '' }
     expect(transformDigitalWork(digital({ event: ev })).event).toEqual(ev)
   })
 
