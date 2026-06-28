@@ -1,5 +1,5 @@
 /**
- * WebP + AVIF thumbnails under public/images/_thumbs/{400w,800w}/ — 對齊 scripts/generate-thumbs.mjs。
+ * WebP + AVIF thumbnails under public/images/_thumbs/{400w,800w,1600w}/ — 對齊 scripts/generate-thumbs.mjs。
  *
  * 上傳成功後同步產兩種格式，避免前台 `<picture>` 第一順位（AVIF）404 落到 WebP 造成一次多餘請求。
  */
@@ -8,7 +8,9 @@ import { dirname, join, relative, resolve } from 'path'
 import { existsSync, unlinkSync } from 'fs'
 import sharp from 'sharp'
 
-const WIDTHS = [400, 800] as const
+// 與 scripts/generate-thumbs.mjs 對齊：400/800 給 grid，1600 給 lightbox + event cover。
+// 少了 1600 → 新上傳作品在燈箱／封面會 404（ImageViewer / GalleryEventCover 取 1600w）。
+const WIDTHS = [400, 800, 1600] as const
 const IMAGE_EXT = /\.(jpe?g|png|gif|webp)$/i
 
 /**
@@ -25,7 +27,7 @@ function publicImagesRoot (): string {
 }
 
 /**
- * Generate 400w + 800w WebP + AVIF thumbs for one file under public/images (skips _thumbs).
+ * Generate 400w + 800w + 1600w WebP + AVIF thumbs for one file under public/images (skips _thumbs).
  */
 export async function generateThumbsForPublicImage (sourcePath: string): Promise<void> {
   const full = resolve(process.cwd(), sourcePath)
