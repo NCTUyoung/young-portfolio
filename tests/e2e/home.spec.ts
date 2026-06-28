@@ -35,10 +35,10 @@ test.describe('首頁 /', () => {
 
     await expect(page).toHaveURL(/\/gallery(\/|$)/)
 
-    // 攝影 overview 改版：影(kage) 世界 desktop 主欄改報紙刊頭式編輯模組
-    // (GalleryEditorialModules)，扉頁刊頭 h2 為「写真記録」。
+    // 攝影 overview 改版：desktop 標題改由頁面層非對稱刊頭 .kage-masthead 承擔
+    // （h1 写真記録），元件自帶 .em__masthead 已全隱。
     await expect(
-      page.getByRole('heading', { level: 2, name: '写真記録' })
-    ).toBeVisible()
+      page.locator('.kage-masthead__title').filter({ hasText: '写真記録' })
+    ).toBeVisible({ timeout: 10_000 })
   })
 })
