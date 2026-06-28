@@ -41,7 +41,9 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000/young-portfolio/',
     reuseExistingServer: !process.env.CI,
-    timeout: 240_000,
+    // 冷啟動上限：依賴變動後 Vite 首次需 full dep pre-bundle，疊加 Nitro/Nuxt boot 可逼近 4 分鐘
+    // （實測 npm update 後 ~242s）。CI 有 node_modules/.cache/nuxt 快取通常更快，此處留 margin。
+    timeout: 300_000,
     stdout: 'ignore',
     stderr: 'pipe'
   }
