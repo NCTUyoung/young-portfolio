@@ -81,8 +81,9 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      # webServer 由 playwright.config.ts 負責（`reuseExistingServer: !CI`），
-      # CI 會自動 spawn `npm run dev` 並等 `/young-portfolio/` 通；timeout 120s。
+      # webServer 由 playwright.config.ts 負責（`reuseExistingServer: !CI`），CI 自動 spawn
+      # `npm run dev` 並等 `/young-portfolio/` 通（timeout 300s，給 Vite 冷 pre-bundle margin）。
+      # globalSetup 先序列暖機重路由再放平行 worker（CI workers:3），消除 dev on-demand 編譯競爭。
       # e2e 失敗會擋 deploy（保守策略），後續若 smoke 太 flaky 再 move to 非 blocking job。
       - name: Run Playwright e2e
         run: npm run test:e2e
