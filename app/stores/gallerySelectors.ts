@@ -178,7 +178,7 @@ export function buildMixedPhotoItems (currentWorks: GalleryItem[]): MixedPhotoIt
 
   currentWorks.forEach(work => {
     let groupKey = 'no-event'
-    let groupName: string | null = null
+    let groupName: string | null
     let eventInfo: PhotoEvent | undefined = undefined
 
     if (work.event) {

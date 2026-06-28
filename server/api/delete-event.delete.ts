@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
         const keep: ImgRecord[] = []
         const drop: ImgRecord[] = []
         typed.Img.forEach((img) => {
-          let imgEvent = ''
+          let imgEvent: string
           if (img.event?.name) {
             imgEvent = img.event.name
           } else if (category === 'gallery') {

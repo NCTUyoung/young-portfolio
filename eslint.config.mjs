@@ -7,6 +7,11 @@ const repoRoot = dirname(fileURLToPath(import.meta.url))
 
 export default withNuxt(
   {
+    // 全域忽略（僅含 ignores 的 config = flat-config global ignore）：.claude/ 下是 Claude Code
+    // 的 skill / agent 輔助腳本（vendored 工具，非專案 source），不應參與 lint gate。
+    ignores: ['.claude/**']
+  },
+  {
     name: 'typescript-eslint/consistent-type-imports',
     files: ['**/*.{ts,vue}'],
     ignores: [
