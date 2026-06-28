@@ -228,10 +228,23 @@ function onSheetPointerMove (e: PointerEvent) {
   const fx = Math.min(1, Math.max(0, (e.clientX - cellRect.left) / cellRect.width))
   const fy = Math.min(1, Math.max(0, (e.clientY - cellRect.top) / cellRect.height))
 
-  // 放大底圖：寬高 = 鏡片直徑 × 倍率；background-position 依比例對齊游標所指處
-  const bg = LOUPE_SIZE * LOUPE_ZOOM
+  // 放大底圖：保持原圖比例（避免方形 bgSize 把非方圖壓變形 → 變形而非放大），
+  // 並讓「較短邊」撐到鏡片直徑×倍率，使鏡片永遠被圖填滿（cover）。
+  // background-position 用百分比，與該格 object-fit:cover 的呈現對齊。
+  const baseDim = LOUPE_SIZE * LOUPE_ZOOM
+  const r = ratioOf(img.filename) // width / height
+  let bgW: number, bgH: number
+  if (r >= 1) {
+    // 橫幅：高為短邊 → 撐高到 baseDim，寬依比例放大
+    bgH = baseDim
+    bgW = baseDim * r
+  } else {
+    // 直幅：寬為短邊 → 撐寬到 baseDim，高依比例放大
+    bgW = baseDim
+    bgH = baseDim / r
+  }
   loupe.src = getThumbPath(img.filename, 800)
-  loupe.bgSize = `${bg}px ${bg}px`
+  loupe.bgSize = `${bgW}px ${bgH}px`
   loupe.bgPos = `${fx * 100}% ${fy * 100}%`
   loupe.frame = frameNo(i)
   loupe.exif = exifLine(img)
@@ -401,11 +414,14 @@ onBeforeUnmount(() => {
     opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     filter 0.7s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, filter, transform;
+  /* perf：移除常駐 will-change —— 它把【每一格】都升為獨立合成層（trace 46066 UpdateLayer
+     的主因之一）。顯影過場為一次性 IntersectionObserver 觸發，無 will-change 也順。 */
 }
 .contact-sheet__cell--developed {
   opacity: 1;
-  filter: blur(0) saturate(1) brightness(1);
+  /* 顯影完成後 filter 收成 none（非 blur(0)）——blur(0) 仍會讓該格保留一層合成層；
+     none 讓瀏覽器把層丟回主合成，省下逐格圖層。過場期間仍由上方 blur(3px)→ 動畫銜接。 */
+  filter: none;
   transform: translateY(0);
 }
 /* 左緣齒孔軌（每格保留膠卷邊） */

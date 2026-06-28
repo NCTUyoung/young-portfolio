@@ -12,7 +12,10 @@
           // g1/g2：所有章節預設摺合（綜覽→深入策展模型）。上方接觸印樣綜覽已給全局視覺目次，
           // timeline 在其下作「全量章索引」，每章一條極簡現像條；展開才現像接觸印樣格。
           // g2：摺合態改單行現像條後 intrinsic 估高由 150px → 64px，避免摺合章預留過量空間＝下半死白。
-          '[content-visibility:auto] [contain-intrinsic-size:auto_64px]',
+          // perf/jitter fix：content-visibility:auto 只給【摺合】章。展開章內含高接觸印樣格，
+          //   若仍 cv:auto，捲到視窗邊緣時 render 會 toggle、估高在 64px↔實高間跳，造成整條膠卷
+          //   垂直抖動（PixPin 抖動病灶）。展開＝使用者正在看的內容，直接正常排版不虛擬化。
+          isChapterExpanded(item) ? '' : '[content-visibility:auto] [contain-intrinsic-size:auto_64px]',
           'scroll-mt-24',
           'transition-colors duration-500',
           focusedEventName === item.eventName
@@ -98,7 +101,8 @@
         :class="[
           // R9：同 desktop — content-visibility:auto 只給預設摺合章（mIdx>=2），
           // 避免前 2 個展開章的高膠卷流在 fullPage 截圖被裁成空白佔位。
-          '[content-visibility:auto] [contain-intrinsic-size:auto_150px]',
+          // perf/jitter fix：同 desktop，展開章不虛擬化（避免接觸印樣格捲動垂直抖動）。
+          isMobileExpanded(item, mIdx) ? '' : '[content-visibility:auto] [contain-intrinsic-size:auto_150px]',
           'scroll-mt-24'
         ]"
       >
@@ -174,15 +178,22 @@ function toggleExpand (eventName: string) {
 }
 
 /**
+ * 章節目前是否展開（desktop / mobile 共用）：散圖恆展開；具名事件未手動 toggle 時
+ * 以 selectedEvent 決定預設，手動後 expandedGroups 接管。content-visibility 綁定靠它。
+ */
+function isChapterExpanded (item: MixedPhotoItem): boolean {
+  if (!item.eventName) return true
+  const state = galleryStore.expandedGroups[item.eventName]
+  if (state === undefined) return isDefaultExpanded(item)
+  return state
+}
+
+/**
  * Mobile timeline 預設摺合邏輯 — 與 desktop 對齊（前 2 個展開、其餘摺合）
  * 沒有 eventName 的散圖一律展開
  */
 function isMobileExpanded (item: MixedPhotoItem, _idx: number): boolean {
-  if (!item.eventName) return true
-  const state = galleryStore.expandedGroups[item.eventName]
-  // 未手動 toggle 時：進入該事件（selectedEvent）預設展開，其餘摺合。
-  if (state === undefined) return isDefaultExpanded(item)
-  return state
+  return isChapterExpanded(item)
 }
 
 /** 1~12 → 一/二/三/四/.../十二 漢數字 */

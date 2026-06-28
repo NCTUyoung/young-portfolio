@@ -26,14 +26,15 @@
     -->
     <GalleryFacingEdge v-if="isOverviewEntry" :current="worldId" />
 
-    <div class="lg:flex lg:gap-8 lg:items-start" :class="worldId === 'kage' ? 'lg:block' : ''">
-      <GalleryLeftRail
-        v-if="worldId === 'kai'"
-        :category-label="categoryLabel"
-        :category-count="categoryCount"
-        class="hidden lg:block"
-      />
-      <div class="lg:flex-1 lg:min-w-0">
+    <!--
+      two-rooms 收斂（製図室大改）：繪/影 兩房改用同一 chrome 拓樸——頂部細 hairline 控制列
+      + 全幅內容。移除繪世界的左 rail（GalleryLeftRail）：它與 full-bleed 製図台相撞
+      （rail 不透明底蓋住年尺最左刻度、製図室 masthead 與製図台 seam 雙標牌、rail EventFilter
+      年份索引與年尺雙導航）。繪改用下方 .kai-ctrl 細列（對位影 .kage-ctrl），
+      製図台 seam 成為單一標牌 + 年尺單一導航。wiki: chrome-budget-rule / gallery-left-rail（rail 勿成第二導航）。
+    -->
+    <div class="lg:block">
+      <div class="lg:min-w-0">
         <!--
           j5：移除 GalleryWorldGate 3D 立體書台（互動卡頓根源——翻頁重排 ~700 物件 preserve-3d 子樹）。
           two-rooms-r1：跨世界對開帳（GalleryDiptychLedger）亦已移除——雙主線不再靠「同頁混兩世界」，
@@ -49,21 +50,65 @@
              GalleryEditorialModules 自帶的扉頁 nameplate。 -->
         <div v-if="worldId === 'kage'" class="hidden lg:block container mx-auto px-4 sm:px-6 pt-8">
           <div class="max-w-7xl mx-auto" data-world="kage">
-            <div class="kage-ctrl">
+            <!--
+              呆版大改（de-rigid / 太多欄位）：把舊「控制列 hairline + EventFilter chips hairline
+              + 元件內 写真記録 masthead hairline」三條等寬橫帶，併成「一條非對稱刊頭」。
+                左頁芯：影 — Photography eyebrow + 写真記録 巨標（接管原 em__masthead 標題，
+                        故 GalleryEditorialModules 的 .em__masthead 桌機改全隱）。
+                右側溝：繪/影 燈位 + 検索/年次 + 080 枚 計數，靠右堆成安靜的控制溝。
+              並「刪掉桌機 EventFilter chips 帶」——章節索引卡本身即 event 目次（點卡進 event），
+              chips 與卡同指向 /gallery/photography/<event> 為重複導航（newspaper-masthead-module-grid：
+              masthead 統領 + 模組即索引；chapter-card-home-editorial：figure+標+連結卡即 wayfinding）。
+              手機/平板（<lg）的 EventFilter 與 mini-bar 不動，event 導航各斷點仍可達。
+              wiki: quiet-asymmetric-portfolio / japanese-editorial-cover / gallery-control-density-reduction。
+            -->
+            <header v-if="!filterState.selectedEvent" class="kage-masthead">
+              <div class="kage-masthead__plate">
+                <p class="kage-masthead__eyebrow">影 — Photography</p>
+                <h1 class="kage-masthead__title font-jp">写真記録</h1>
+              </div>
+              <div class="kage-masthead__aside">
+                <div class="kage-masthead__ctrl">
+                  <GalleryTabBar variant="rail" />
+                  <GalleryFilterToolbar variant="rail" />
+                </div>
+                <p class="kage-masthead__count">
+                  <span class="kage-masthead__count-num">{{ String(categoryCount).padStart(3, '0') }}</span>
+                  <span class="kage-masthead__count-unit">枚 · frames</span>
+                </p>
+              </div>
+            </header>
+
+            <!--
+              進入單一 event 後：保留輕量控制列 + chips（在此可就地切換鄰近 event，
+              不必退回 overview）。overview 才走上方非對稱刊頭。
+            -->
+            <template v-else>
+              <div class="kage-ctrl">
+                <GalleryTabBar variant="rail" />
+                <div class="kage-ctrl__filter">
+                  <GalleryFilterToolbar variant="rail" />
+                </div>
+              </div>
+              <div class="kage-event-index">
+                <EventFilter />
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!--
+          繪世界 desktop 控制列（取代 GalleryLeftRail；對位影的 .kage-ctrl）。
+          僅 繪/影 燈位切換 + 検索/年次 —— 事件/年份 wayfinding 交給製図台 seam 的年尺
+          （digital 的「事件」即年份群組，年尺已完整涵蓋），不再放 EventFilter（與年尺重複）。
+        -->
+        <div v-if="worldId === 'kai'" class="hidden lg:block container mx-auto px-4 sm:px-6 pt-8">
+          <div class="max-w-7xl mx-auto" data-world="kai">
+            <div class="kai-ctrl">
               <GalleryTabBar variant="rail" />
-              <div class="kage-ctrl__filter">
+              <div class="kai-ctrl__filter">
                 <GalleryFilterToolbar variant="rail" />
               </div>
-            </div>
-            <!--
-              影世界 desktop 事件索引（修復「event 系統消失、只能往下滾」）：
-              桌機 photography 過去只有 TabBar + 搜尋/年份，沒有任何 event 跳轉入口，
-              GalleryLeftRail（唯一桌機 EventFilter 宿主）又被 v-if=kai 鎖在繪世界。
-              這裡補回橫向 EventFilter（與手機同元件），讓影世界 overview 能直接跳各 event。
-              wiki: inspirations/gallery-left-rail.md（rail 範圍本含 photography）+ chrome-budget（復原導航，非疊裝飾）。
-            -->
-            <div class="kage-event-index">
-              <EventFilter single-row />
             </div>
           </div>
         </div>
@@ -542,7 +587,6 @@ import GalleryEditorialModules from '~/components/gallery/GalleryEditorialModule
 import GalleryFacingEdge from '~/components/gallery/GalleryFacingEdge.vue'
 import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
-import GalleryLeftRail from '~/components/gallery/GalleryLeftRail.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
@@ -690,10 +734,7 @@ watch(worldId, () => {
 
 // Gallery header dynamic info
 // 2026-05-09：移除 'all'，labels 收斂為雙主線
-const categoryLabel = computed(() => {
-  const labels: Record<FilterState['selectedCategory'], string> = { digital: 'Digital Art', photography: 'Photography' }
-  return labels[currentCategory.value]
-})
+// （categoryLabel 已隨 GalleryLeftRail 移除而刪除——其唯一消費者是左 rail）
 const categoryCount = computed(() => {
   if (currentCategory.value === 'digital') return digitalArtItems.value.length
   return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
@@ -1237,6 +1278,19 @@ useHead({
   letter-spacing: 0.2em;
 }
 
+/* ===== 繪世界 desktop 控制列（取代左 rail；對位影 .kage-ctrl，沿用預設暖 terracotta accent） ===== */
+.kai-ctrl {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  /* 繪不覆寫 --accent：沿用預設暖 terracotta，與影世界冷 slate 分家 */
+}
+.kai-ctrl__filter { flex: 0 1 auto; min-width: 0; }
+
 /* ===== 影世界 desktop 控制列（取代光卓 bar；輕量 hairline，非銀盒） ===== */
 .kage-ctrl {
   display: flex;
@@ -1260,6 +1314,72 @@ useHead({
 
 /* 影世界 desktop 事件索引：與控制列拉開一段余白；EventFilter 自帶底 hairline，不再加框 */
 .kage-event-index { margin-top: 1.6rem; }
+
+/* =========================================================
+   影 overview 非對稱刊頭（呆版大改）：左頁芯巨標 + 右側溝控制/計數，
+   一條 hairline 統攝（取代舊三條等寬橫帶）。冷 slate accent 由 rail variant 沿用。
+   ========================================================= */
+.kage-masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(290px, 30%, 380px);
+  align-items: end;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border);
+  /* 影世界冷 slate accent（rail variant / eyebrow 沿用 token） */
+  --accent: #52647a;
+  --accent-ink: #3f4f63;
+  --accent-soft: #9aadc5;
+}
+:global(.dark) .kage-masthead {
+  --accent: #9aadc5;
+  --accent-ink: #b6c6da;
+  --accent-soft: #52647a;
+}
+.kage-masthead__eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.42em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.kage-masthead__title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  color: var(--fg-2);
+}
+.kage-masthead__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.95rem;
+}
+.kage-masthead__ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.7rem;
+  width: 100%;
+}
+.kage-masthead__count {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+.kage-masthead__count-num {
+  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--fg-2);
+}
+.kage-masthead__count-unit { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--fg-muted); }
 
 /* ===== R8：mobile 影世界暗室負片膠捲面板（齒孔 + 反白） ===== */
 .gallery-filmpanel-m {
@@ -1319,27 +1439,30 @@ useHead({
    把過去打斷暗室的 cream leaflet 區塊收進 sumi 底盤 + 紅安全燈，
    tile 反相＋紅化 → 像暗房紅光下定位的一張負片地圖。
    ========================================================= */
+/* 突破框架（溶框負片）：拆掉「燈箱底 + inset 邊框 + overflow 裁切」三層矩形封閉框，
+   只留無界的冷光暈作柔邊基底，地圖直接坐在頁面余白上（見 .kage-safelight__plate 的羽化）。 */
 .kage-safelight {
   position: relative;
-  padding: 1.5rem clamp(1rem, 3vw, 2rem) 1.7rem;
-  /* freshen 光卓：冷銀亮燈箱底取代 sumi 暗底（light） */
-  background: linear-gradient(168deg, #eef2f5 0%, #e1e8ed 100%);
-  border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(82, 100, 122, 0.14);
+  padding: 0 0 1.2rem;
+  background: none;
+  box-shadow: none;
+  /* clip：光暈負 inset 不外溢造成水平捲動（破框效果由 plate mask 羽化 + 右側出血承擔，非光暈外溢）。
+     plate 的 mask 羽化在 plate 盒內，不受此 clip 影響。 */
   overflow: hidden;
 }
 :global(.dark) .kage-safelight {
-  background: linear-gradient(168deg, #15191e 0%, #0c0f12 100%);
-  box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.1);
+  background: none;
+  box-shadow: none;
 }
-/* 燈箱冷光暈：light 模式改右上冷藍光散開（取代暗房紅安全燈）；dark 保留紅燈 */
+/* 無界冷光暈：溢出地圖、後方無矩形邊界，讓羽化邊有柔光承接（light 冷藍 / dark 暗房紅） */
 .kage-safelight__lamp {
   position: absolute;
-  inset: 0;
+  inset: -14% -24% -10% -8%;
+  z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(38% 50% at 92% 0%, rgba(120, 150, 184, 0.18) 0%, transparent 70%),
-    radial-gradient(60% 70% at 50% 120%, rgba(140, 165, 190, 0.1) 0%, transparent 60%);
+    radial-gradient(46% 56% at 86% 6%, rgba(120, 150, 184, 0.28) 0%, transparent 72%),
+    radial-gradient(66% 74% at 46% 116%, rgba(140, 165, 190, 0.16) 0%, transparent 62%);
 }
 :global(.dark) .kage-safelight__lamp {
   background:
@@ -1348,6 +1471,7 @@ useHead({
 }
 .kage-safelight__head {
   position: relative;
+  z-index: 1;
   margin-bottom: 1.1rem;
 }
 .kage-safelight__eyebrow {
@@ -1409,22 +1533,80 @@ useHead({
    leaflet 互動（hover card / marker）由內層元件控制，filter 僅作用於 tile pane。 */
 /* 地圖延後掛載前的佔位骨架：高度貼齊 compact 地圖（160px），避免地圖進場時版面跳動 */
 .kage-safelight__plate-skeleton {
-  height: 160px;
+  /* 對齊側欄地圖的靜止高度（見下方 plate :deep 覆蓋），地圖延後掛載時不跳版 */
+  height: clamp(340px, 40vh, 400px);
   background: linear-gradient(180deg, rgba(82, 100, 122, 0.05), rgba(82, 100, 122, 0.02));
 }
 :global(.dark) .kage-safelight__plate-skeleton {
   background: linear-gradient(180deg, rgba(13, 16, 20, 0.6), rgba(13, 16, 20, 0.35));
 }
+/* 溶框負片：plate 不再是封閉矩形——上＋右緣以 mask 羽化淡入余白（地圖「溢出框」），
+   左＋下緣留一道 L 形 hairline 當版面錨點（非對稱半框；hairline over border）。 */
 .kage-safelight__plate {
   position: relative;
-  border: 1px solid rgba(82, 100, 122, 0.22);
-  border-radius: 2px;
-  overflow: hidden;
+  z-index: 1;
+  /* 羽化保守化：右緣 84%／上緣 91% 才開始淡出（原 70/88 太早、把日本 marker 也溶掉）。
+     保留破框溶入余白的氣口，但主體地圖＋marker 維持實體可讀。 */
+  -webkit-mask-image:
+    linear-gradient(to right, #000 84%, transparent 100%),
+    linear-gradient(to top, #000 91%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, #000 84%, transparent 100%),
+    linear-gradient(to top, #000 91%, transparent 100%);
+  mask-composite: intersect;
 }
-:global(.dark) .kage-safelight__plate { border-color: rgba(176, 58, 46, 0.22); }
+/* light 模式微提地圖對比，海岸線／地名／marker 更易讀（避免溶框後變鬼影）；dark 已有反相紅化負片 */
+.kage-safelight__plate :deep(.leaflet-tile-pane) {
+  filter: contrast(1.07) saturate(0.9) brightness(0.985);
+}
+/* L 形 hairline（左＋下，與羽化的上＋右對位）：light 冷 slate / dark 暗房紅 */
+.kage-safelight__plate::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 6%;
+  right: 22%;
+  border-left: 1px solid rgba(82, 100, 122, 0.55);
+  border-bottom: 1px solid rgba(82, 100, 122, 0.55);
+  pointer-events: none;
+  z-index: 2;
+}
+:global(.dark) .kage-safelight__plate::after { border-color: rgba(176, 58, 46, 0.4); }
+/* 中和 EventMap 自身的第三層框（rounded-xl + border + 底色）：光暈當底，地圖直接坐余白上 */
+.kage-safelight__plate :deep(.event-map-wrapper) {
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
 /* light 光卓：地圖正常顯示（燈箱上的一張定位圖）；dark 暗房保留反相紅化負片 */
 .kage-safelight__plate :deep(.event-map-container) {
   background: #e7edf1;
+}
+/* compact hover card 移到未羽化的左下實角（避開上＋右羽化區，維持可讀） */
+.kage-safelight__plate :deep(.event-map-hover-card--compact) {
+  right: auto;
+  left: 0.6rem;
+  top: auto;
+  bottom: 0.7rem;
+}
+/* 收掉 EventMap compact 自帶的左右 cream 漸層側遮罩：邊緣柔化改由本方案的 mask 羽化承擔，
+   避免 cream 色帶疊在頁面余白上形成假接縫。 */
+.kage-safelight__plate :deep(.event-map-wrapper--compact > [class*='bg-gradient-to']) {
+  display: none;
+}
+/* 踏跡 plate：給地圖「真正的嵌入定位版」比例，而非 EventMap compact 預設的 160px 橫帶。
+   160px 是為全幅橫向 band 設計，放進 ~340px sticky 側欄就成狹長薄片（使用者回饋）。
+   抬到近正方／微縱（呼應台灣南北向島形 + 日本外點的緯度跨度），讓地理脈絡呼吸。
+   3-class / 4-class 選擇器壓過 EventMap scoped 規則，無需 !important；
+   hover 展開 lean-in、框外非遮擋提示、transition / reduced-motion 由元件沿用。 */
+.kage-safelight__plate :deep(.event-map-wrapper--compact .event-map-container) {
+  height: clamp(340px, 40vh, 400px);
+}
+.kage-safelight__plate :deep(.event-map-wrapper--compact.event-map-wrapper--expanded .event-map-container) {
+  height: clamp(480px, 58vh, 560px);
 }
 :global(.dark) .kage-safelight__plate :deep(.leaflet-tile-pane) {
   filter: invert(0.92) hue-rotate(150deg) saturate(0.7) brightness(0.82) sepia(0.35);
@@ -1449,13 +1631,16 @@ useHead({
 @media (min-width: 1024px) {
   .kage-overview {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 340px);
+    /* 略放寬側欄（was 280/24vw/340），讓踏跡地圖版不再被擠成狹長薄帶 */
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 360px);
     gap: clamp(2rem, 4vw, 4rem);
     align-items: start;
   }
   .kage-overview__aside {
     position: sticky;
     top: 5.5rem;
+    /* 非對稱出血：羽化右緣朝頁緣余白淡出（有界，≤ container px，不致水平捲動） */
+    margin-right: calc(-1 * clamp(0.5rem, 1.5vw, 1.5rem));
   }
 }
 @media (max-width: 1023px) {

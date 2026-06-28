@@ -70,8 +70,8 @@
         ? 'flex flex-col max-h-[44vh] overflow-y-auto -mx-2 px-2 hide-scrollbar'
         : [
           '-mx-1 gap-x-1 gap-y-1 px-1',
-          // singleRow（桌機 photography overview）：收成單行可橫向捲動，不換行佔高
-          singleRow ? 'sm:flex-nowrap sm:overflow-x-auto sm:pb-1 hide-scrollbar' : 'sm:flex-wrap sm:overflow-visible sm:pb-0',
+          // 桌機一律 wrap（chips 換行、不橫向捲動）；手機展開亦 wrap
+          'sm:flex-wrap sm:overflow-visible sm:pb-0',
           mobileExpanded ? 'flex flex-wrap pb-1' : 'hidden sm:flex'
         ]"
     >
@@ -211,9 +211,7 @@ withDefaults(defineProps<{
    * rail: 桌機左側 rail 內垂直列（lg+ 專用，不渲染 mobile collapse）
    */
   variant?: 'default' | 'rail'
-  /** 桌機收成單行可橫向捲動（避免 chips 換 2 行佔高，photography overview 用） */
-  singleRow?: boolean
-}>(), { variant: 'default', singleRow: false })
+}>(), { variant: 'default' })
 
 const galleryStore = useGalleryStore()
 const {

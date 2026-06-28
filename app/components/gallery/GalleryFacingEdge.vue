@@ -189,7 +189,13 @@ const otherAriaLabel = computed(() =>
   gap: 3px;
   width: 100%;
   padding: 0 6px;
+  /* museum-r1 critic：靜止態只露 40px 書脊時，置中縮圖會被裁半 → 讀作溢位 bug。
+     改為靜止隱藏頁口縮圖（書脊只見世界名＋標牌＝乾淨），hover/focus 滑入才現縮圖。 */
+  opacity: 0;
+  transition: opacity 0.45s ease;
 }
+.fe__link:hover .fe__leaves,
+.fe__link:focus-visible .fe__leaves { opacity: 1; }
 .fe__leaf {
   position: relative;
   width: 100%;

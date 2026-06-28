@@ -1,4 +1,12 @@
 <template>
+  <!--
+    Teleport 到 <body>：lightbox 被渲染在 gallery 頁的 `.gallery-world` 內，而該容器
+    `isolation: isolate` 會開新 stacking context，把這裡的 z-[9999] 鎖在其內 →
+    固定導覽列（layout 的 z-[1100]，root context）反而蓋在 lightbox 上方，頂部工具列
+    被導覽列遮住、整條導覽列從半透明墨底透出（使用者回饋「功能表與按鈕都不見了」）。
+    Teleport 讓 lightbox 掛到 body root context，z-[9999] 才真正蓋過所有 chrome。
+  -->
+  <Teleport to="body">
     <!-- 圖片檢視器 — 墨色背景（stone），延續全站 palette -->
   <div
     v-if="isOpen"
@@ -261,6 +269,7 @@ v-if="viewerImages.length > 1 && hasNext"
     <!-- 右側資訊面板 -->
     <ImageInfoPanel />
   </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

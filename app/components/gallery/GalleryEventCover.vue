@@ -21,6 +21,7 @@
           :src="getImagePath(coverImage.filename)"
           :alt="`${eventName} 扉頁 — ${coverImage.title || ''}`"
           class="w-full h-full object-cover"
+          :style="coverFocalStyle"
           loading="eager"
           fetchpriority="high"
           decoding="async"
@@ -142,6 +143,17 @@ const images = computed(() => props.group.images ?? [])
 const timeRange = computed(() => props.group.timeRange ?? '')
 
 const coverImage = computed(() => images.value[0] ?? null)
+
+/**
+ * 88vh 扉頁 hero 的 object-position：吃離線 focal 預算讓主體入鏡（直幅人像不切頭/不切錯）；
+ * 無 focal 時退回 50% 30%。與 GalleryEditorialModules.focalStyle 同一份焦點資料。
+ */
+const coverFocalStyle = computed<Record<string, string>>(() => {
+  const i = coverImage.value
+  return (i && typeof i.focalX === 'number' && typeof i.focalY === 'number')
+    ? { objectPosition: `${(i.focalX * 100).toFixed(1)}% ${(i.focalY * 100).toFixed(1)}%` }
+    : { objectPosition: '50% 30%' }
+})
 
 /**
  * 卷頭語 prologue — R25 起優先讀 prologue，fallback 到 legacy narrative。

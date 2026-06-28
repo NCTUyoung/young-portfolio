@@ -1,5 +1,5 @@
 {
-  "totalNumber": "35",
+  "totalNumber": "36",
   "crossWorldSpreads": [
     {
       "id": "machi-no-hito",
@@ -223,7 +223,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.8755
+      "aspectRatio": 0.8755,
+      "focalX": 0.5,
+      "focalY": 0.672
     },
     {
       "filename": "gallery/2018年電繪作品/fox.png",
@@ -236,7 +238,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.5881
+      "aspectRatio": 1.5881,
+      "focalX": 0.471,
+      "focalY": 0.498
     },
     {
       "filename": "gallery/2018年電繪作品/The_Great_Wave_off_Kanagawa.png",
@@ -253,7 +257,9 @@
         "featured"
       ],
       "pairWith": "photography-photography/峨嵋湖風鈴木/DSC_1721-編輯-1",
-      "aspectRatio": 1.0994
+      "aspectRatio": 1.0994,
+      "focalX": 0.499,
+      "focalY": 0.555
     },
     {
       "filename": "gallery/2018年電繪作品/vectorpath.png",
@@ -266,7 +272,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.312
     },
     {
       "filename": "gallery/2018年電繪作品/WireframePatterns.png",
@@ -279,7 +287,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.3607
+      "aspectRatio": 1.3607,
+      "focalX": 0.499,
+      "focalY": 0.094
     },
     {
       "filename": "gallery/2018年電繪作品/VectorSmokeEffect.png",
@@ -292,7 +302,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 2.9104
+      "aspectRatio": 2.9104,
+      "focalX": 0.654,
+      "focalY": 0.498
     },
     {
       "filename": "gallery/2018年電繪作品/AbstractGalaxyLogo.png",
@@ -305,7 +317,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.249
     },
     {
       "filename": "gallery/2018年電繪作品/VectorFingerprintLogo.png",
@@ -318,7 +332,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.9917
+      "aspectRatio": 0.9917,
+      "focalX": 0.5,
+      "focalY": 0.669
     },
     {
       "filename": "gallery/2018年電繪作品/car.jpg",
@@ -331,7 +347,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.3333
+      "aspectRatio": 1.3333,
+      "focalX": 0.499,
+      "focalY": 0.093
     },
     {
       "filename": "gallery/2018年電繪作品/HalftoneHeartPattern.png",
@@ -344,7 +362,9 @@
         "description": "2018年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.1634
+      "aspectRatio": 1.1634,
+      "focalX": 0.498,
+      "focalY": 0.385
     },
     {
       "filename": "gallery/2021年電繪作品/01-14.jpg",
@@ -357,7 +377,9 @@
         "description": "2021年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.137
     },
     {
       "filename": "gallery/2022年電繪作品/01-16.jpg",
@@ -370,7 +392,9 @@
         "description": "2022年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.137
     },
     {
       "filename": "gallery/2021年電繪作品/13.jpg",
@@ -383,7 +407,9 @@
         "description": "2021年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2021年電繪作品/E-39.jpg",
@@ -396,7 +422,9 @@
         "description": "2021年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2022年電繪作品/全身自創07-12.jpg",
@@ -412,7 +440,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2022年電繪作品/自創08-13.jpg",
@@ -425,7 +455,9 @@
         "description": "2022年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.721
     },
     {
       "filename": "gallery/2022年電繪作品/02-26.jpg",
@@ -438,7 +470,9 @@
         "description": "2022年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.034
     },
     {
       "filename": "gallery/2022年電繪作品/23.jpg",
@@ -451,7 +485,9 @@
         "description": "2022年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.034
     },
     {
       "filename": "gallery/2022年電繪作品/15.jpg",
@@ -464,7 +500,9 @@
         "description": "2022年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.562
     },
     {
       "filename": "gallery/2023年電繪作品/22.jpg",
@@ -478,7 +516,9 @@
         "location": ""
       },
       "pairWith": "photography-photography/WBC 2026/DSC_9991-編輯-1",
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2023年電繪作品/20.jpg",
@@ -491,7 +531,9 @@
         "description": "2023年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "gallery/2023年電繪作品/31.png",
@@ -504,7 +546,9 @@
         "description": "2023年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.235
     },
     {
       "filename": "gallery/2023年電繪作品/51.jpg",
@@ -520,7 +564,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 2.25
+      "aspectRatio": 2.25,
+      "focalX": 0.416,
+      "focalY": 0.5
     },
     {
       "filename": "gallery/2024年電繪作品/55.jpg",
@@ -533,7 +579,9 @@
         "description": "2024年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.7071
+      "aspectRatio": 0.7071,
+      "focalX": 0.5,
+      "focalY": 0.307
     },
     {
       "filename": "gallery/2024年電繪作品/23.jpg",
@@ -547,7 +595,9 @@
         "location": ""
       },
       "pairWith": "photography-photography/Annber 外拍/DSC_2702-編輯-1",
-      "aspectRatio": 2.3929
+      "aspectRatio": 2.3929,
+      "focalX": 0.325,
+      "focalY": 0.498
     },
     {
       "filename": "gallery/2024年電繪作品/18-4.jpg",
@@ -560,7 +610,9 @@
         "description": "2024年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.4139
+      "aspectRatio": 1.4139,
+      "focalX": 0.499,
+      "focalY": 0.471
     },
     {
       "filename": "gallery/2024年電繪作品/28-編輯-2.jpg",
@@ -573,7 +625,9 @@
         "description": "2024年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2024年電繪作品/52-1.jpg",
@@ -586,7 +640,9 @@
         "description": "2024年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.235
     },
     {
       "filename": "gallery/2025年電繪作品/17.png",
@@ -603,7 +659,9 @@
         "location": ""
       },
       "pairWith": "photography-photography/春日街拍/DSC_7030-1",
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.765
     },
     {
       "filename": "gallery/2025年電繪作品/36-編輯-1.jpg",
@@ -616,7 +674,9 @@
         "description": "2025年創作的電繪作品集",
         "location": ""
       },
-      "aspectRatio": 1.4954
+      "aspectRatio": 1.4954,
+      "focalX": 0.499,
+      "focalY": 0.498
     },
     {
       "filename": "gallery/2025年電繪作品/21-編輯.jpg",
@@ -632,7 +692,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.137
     },
     {
       "filename": "gallery/2025年電繪作品/17-編輯.jpg",
@@ -648,7 +710,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.707
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.235
     },
     {
       "filename": "gallery/2025年電繪作品/test3-1.jpg",
@@ -664,7 +728,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.562
     },
     {
       "filename": "gallery/2026年電繪作品/7-編輯-2-1.jpg",
@@ -680,7 +746,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 1.7778
+      "aspectRatio": 1.7778,
+      "focalX": 0.563,
+      "focalY": 0.5
     },
     {
       "filename": "gallery/2026年電繪作品/21-編輯-編輯-編輯-1.jpg",
@@ -697,7 +765,24 @@
         "featured"
       ],
       "pairWith": "photography-photography/栗子外拍/DSC_5910-編輯-1",
-      "aspectRatio": 1
+      "aspectRatio": 1,
+      "focalX": 0.5,
+      "focalY": 0.332
+    },
+    {
+      "filename": "gallery/2026年電繪作品/16-編輯-1.jpg",
+      "time": "2026 Jun 14",
+      "title": "Mika Nakashima",
+      "content": "中島美嘉2026北流演唱會 像流星一樣的燈",
+      "color": "red",
+      "event": {
+        "name": "2026年電繪作品",
+        "description": "2026年創作的電繪作品集",
+        "location": ""
+      },
+      "aspectRatio": 0.7365,
+      "focalX": 0.5,
+      "focalY": 0.244
     }
   ],
   "trackManifesto": {

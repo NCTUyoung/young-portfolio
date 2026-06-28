@@ -38,6 +38,7 @@
                 :sizes="cardSizes"
                 :alt="m.featured.title"
                 class="em__img"
+                :style="focalStyle(m.featured)"
                 :loading="mi === 0 ? 'eager' : 'lazy'"
                 :fetchpriority="mi === 0 ? 'high' : undefined"
                 decoding="async"
@@ -124,6 +125,16 @@ function frameNo (img: GalleryItem): string {
   const n = m?.[1]
   return n ? `${n}A` : '01A'
 }
+
+/**
+ * 固定 3:2 索引縮圖的 object-position：吃離線 focal 預算（內容感知主體焦點），
+ * 讓直幅人像在統一比例框內主體入鏡；無 focal 時退回舊行為 50% 30%。
+ */
+function focalStyle (img: GalleryItem): Record<string, string> {
+  return (typeof img.focalX === 'number' && typeof img.focalY === 'number')
+    ? { objectPosition: `${(img.focalX * 100).toFixed(1)}% ${(img.focalY * 100).toFixed(1)}%` }
+    : { objectPosition: '50% 30%' }
+}
 </script>
 
 <style scoped>
@@ -207,6 +218,8 @@ function frameNo (img: GalleryItem): string {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* object-position 由 focalStyle() 逐張綁定（離線 focal 預算）。
+     固定 3:2 cover 時讓主體入鏡，取代寫死的 50% 30%（對主體偏低構圖會切錯）。 */
   display: block;
   transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1), filter 0.6s ease;
   filter: saturate(0.94);
@@ -294,10 +307,20 @@ function frameNo (img: GalleryItem): string {
 .em__enter-arrow { font-family: var(--em-mono); transition: transform 0.25s ease; }
 .group:hover .em__enter-arrow { transform: translateX(2px); }
 
-/* ── mobile/tablet ── */
-@media (max-width: 1023px) {
-  /* mobile/tablet 保留頁面既有 filmpanel-m 房間標牌 → 隱藏本元件扉頁 nameplate 避免雙標牌 */
-  .em__masthead { display: none; }
+/* 扉頁 nameplate 全隱：写真記録 標題改由頁面非對稱刊頭 .kage-masthead 統一承擔
+   （桌機）／filmpanel-m 房間標牌承擔（手機），避免雙標牌。markup/totalCount 保留。 */
+.em__masthead { display: none; }
+
+/* ── 桌機 hero 首章：首張卡放大（寬圖欄 + 大漢字），其餘維持安靜目次列，
+   形成 hero→quieter-rows 節奏（間／非對稱），破「N 列等高呆版」。 ── */
+@media (min-width: 1024px) {
+  .em__card:first-child .em__card-link {
+    grid-template-columns: minmax(0, 56%) 1fr;
+    gap: clamp(2rem, 4vw, 3.4rem);
+    align-items: end;
+  }
+  .em__card:first-child .em__card-fig { aspect-ratio: 16 / 10; }
+  .em__card:first-child .em__card-name { font-size: clamp(1.9rem, 3vw, 2.6rem); }
 }
 /* 真手機才上下堆疊；平板維持左右卡（縮圖固定 3:2 不會脹大、目次仍緊湊） */
 @media (max-width: 639px) {

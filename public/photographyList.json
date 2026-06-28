@@ -346,7 +346,9 @@
       "shutterSpeed": 0.002,
       "note": "紅扇的角度幾乎跟旗袍領子平行——這不是擺出來的，是她剛要展開扇子的前一格。",
       "pairWith": "digital-gallery/2025年電繪作品/17",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.625
     },
     {
       "filename": "photography/春日街拍/DSC_7033-1.jpg",
@@ -371,7 +373,9 @@
       "iso": 100,
       "shutterSpeed": 0.001,
       "note": "1/1000 街上沒人察覺我按了快門。她轉頭的瞬間，淺景深替我把整條街的雜訊收乾淨。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.031
     },
     {
       "filename": "photography/春日街拍/DSC_7069-編輯-1.jpg",
@@ -396,7 +400,9 @@
       "aperture": 2.5,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.721
     },
     {
       "filename": "photography/春日街拍/DSC_7556-編輯-1.jpg",
@@ -423,7 +429,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/春日街拍/DSC_7561-編輯-編輯-1.jpg",
@@ -448,7 +456,9 @@
       "aperture": 2.8,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg",
@@ -474,7 +484,9 @@
         "featured"
       ],
       "note": "看燈飾後面的天空——還沒完全暗，是 18:15 左右的「藍調時刻」，最後一抹深藍墊底。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.498
     },
     {
       "filename": "photography/2024新北耶誕城/DSC_4379-NEF_DxO_DeepPRIMEXD-1.jpg",
@@ -497,7 +509,9 @@
       "aperture": 4.5,
       "iso": 1000,
       "shutterSpeed": 0.0015625,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.498
     },
     {
       "filename": "photography/2024新北耶誕城/DSC_4396-NEF_DxO_DeepPRIMEXD-1.jpg",
@@ -519,7 +533,9 @@
       "aperture": 3.5,
       "iso": 1250,
       "shutterSpeed": 0.00625,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.498
     },
     {
       "filename": "photography/2024新北耶誕城/DSC_4426-NEF_DxO_DeepPRIMEXD-1.jpg",
@@ -541,7 +557,9 @@
       "aperture": 3.5,
       "iso": 200,
       "shutterSpeed": 0.03333333333333333,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.062
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6516-1.jpg",
@@ -564,7 +582,9 @@
       "iso": 2500,
       "shutterSpeed": 0.004,
       "note": "球員的左手已經舉到肩線——這是揮棒準備的最後一格。下一張快門落下，球可能已經出去。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6487-1.jpg",
@@ -586,7 +606,9 @@
       "aperture": 6.3,
       "iso": 2500,
       "shutterSpeed": 0.008,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.031
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6178-編輯-1.jpg",
@@ -609,7 +631,9 @@
       "aperture": 6,
       "iso": 2000,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6392-1.jpg",
@@ -631,7 +655,9 @@
       "aperture": 4.5,
       "iso": 2000,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/2025 桃園三本柱/DSC_6293-1.jpg",
@@ -654,7 +680,9 @@
       "aperture": 4.8,
       "iso": 3200,
       "shutterSpeed": 0.0005,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_4810-編輯-1.jpg",
@@ -681,7 +709,9 @@
         "featured"
       ],
       "note": "木紋背景把人從現代街景剝出來。她回頭那一下，把肩頸的線條交給左上的窗光描了一遍。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_5758-編輯-1.jpg",
@@ -704,7 +734,9 @@
       "aperture": 4.5,
       "iso": 200,
       "shutterSpeed": 0.008,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_4825-1.jpg",
@@ -728,7 +760,9 @@
       "iso": 100,
       "shutterSpeed": 0.004,
       "note": "101mm f/2.7 從人群外圍偷一張。米倉的鐵皮反光當了側補光——沒帶燈，光自己來了。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.281
     },
     {
       "filename": "photography/攝影社 米倉團拍/DSC_5124-1.jpg",
@@ -750,7 +784,9 @@
       "aperture": 2.8,
       "iso": 320,
       "shutterSpeed": 0.004,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/調色測試/DSC_3889-編輯-1.jpg",
@@ -776,7 +812,9 @@
       "iso": 100,
       "shutterSpeed": 0.00025,
       "note": "這張是「練習簿」裡的第三種曲線——綠色被往上拉了 10%，畫面就從「下午」變成「初春」。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/調色測試/DSC_3474-編輯-1.jpg",
@@ -799,7 +837,9 @@
       "aperture": 5.3,
       "iso": 100,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/調色測試/DSC_3761-1.jpg",
@@ -821,7 +861,9 @@
       "aperture": 5.6,
       "iso": 2000,
       "shutterSpeed": 0.008,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/交大外拍/DSC_3051-編輯-1.jpg",
@@ -846,7 +888,9 @@
       "iso": 100,
       "shutterSpeed": 0.004,
       "note": "紅磚的反光顏色，跟她裙子的橘紅是巧合也是收成——這條街我們走了四遍才找到對的光。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/交大外拍/DSC_3218-1.jpg",
@@ -871,7 +915,9 @@
       "iso": 100,
       "shutterSpeed": 0.002,
       "note": "f/2.5 把背後的紅磚牆全化開。對焦點只給了睫毛——後面那道走廊只是顏色，不是地點。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/交大外拍/DSC_3312-1.jpg",
@@ -894,7 +940,9 @@
       "aperture": 2.8,
       "iso": 100,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.221
     },
     {
       "filename": "photography/交大外拍/DSC_3342-編輯.jpg",
@@ -915,7 +963,9 @@
       "aperture": 0,
       "iso": 0,
       "shutterSpeed": 0,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/交大外拍/DSC_3368-1.jpg",
@@ -937,7 +987,9 @@
       "aperture": 6.3,
       "iso": 100,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.25
     },
     {
       "filename": "photography/2025 聖誕台北/DSC_6432-編輯-1.jpg",
@@ -962,7 +1014,9 @@
       "iso": 200,
       "shutterSpeed": 0.002,
       "note": "路面金光只在這幾步寬有，再走兩步就被建築陰影吃掉了。攝影是場跟光速賽跑的散步。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/2025 聖誕台北/DSC_6418-編輯-編輯-1.jpg",
@@ -985,7 +1039,9 @@
       "aperture": 4.5,
       "iso": 2000,
       "shutterSpeed": 0.004,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/2025 聖誕台北/DSC_6428-編輯-1.jpg",
@@ -1009,7 +1065,9 @@
       "aperture": 3.5,
       "iso": 200,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.7
     },
     {
       "filename": "photography/2025 聖誕台北/DSC_6424-編輯-1.jpg",
@@ -1033,7 +1091,9 @@
       "aperture": 1.9,
       "iso": 200,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1721-編輯-1.jpg",
@@ -1059,7 +1119,9 @@
       "shutterSpeed": 0.002,
       "note": "黃花本身飽和度不到 60%，但天空陰沉成 wabi 灰，反而把它的暖色推到前面。",
       "pairWith": "digital-gallery/2018年電繪作品/The_Great_Wave_off_Kanagawa",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.156
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1377-編輯-1.jpg",
@@ -1083,7 +1145,9 @@
       "iso": 100,
       "shutterSpeed": 0.004,
       "note": "35mm 把整排風鈴木壓進一個畫面——黃花不是重點，是它們把湖面對岸的山稜一段段切開的節奏。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1398-編輯-1.jpg",
@@ -1108,7 +1172,9 @@
       "iso": 100,
       "shutterSpeed": 0.002,
       "note": "150mm 抽出單一株。1/500 凝住風裡的花，但你看最末端那幾朵還是糊的——風比快門快了一格。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1437-編輯-1.jpg",
@@ -1136,7 +1202,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.742
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1367-編輯-2-1.jpg",
@@ -1159,7 +1227,9 @@
       "aperture": 5,
       "iso": 100,
       "shutterSpeed": 0.004,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1483-編輯-1.jpg",
@@ -1183,7 +1253,9 @@
       "aperture": 3.5,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.281
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1389-編輯-2-1.jpg",
@@ -1207,7 +1279,9 @@
       "aperture": 5,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.187
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1749-編輯-1.jpg",
@@ -1230,7 +1304,9 @@
       "aperture": 4.5,
       "iso": 100,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.469
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1685-編輯-1.jpg",
@@ -1254,7 +1330,9 @@
       "aperture": 5.6,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.187
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1823-編輯-1.jpg",
@@ -1278,7 +1356,9 @@
       "aperture": 5.6,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.344
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_2030-編輯-1.jpg",
@@ -1305,7 +1385,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.375
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1960-編輯-1.jpg",
@@ -1329,7 +1411,9 @@
       "aperture": 3.5,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.656
     },
     {
       "filename": "photography/峨嵋湖風鈴木/DSC_1383-編輯-1.jpg",
@@ -1353,7 +1437,9 @@
       "aperture": 5,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.25
     },
     {
       "filename": "photography/WBC 2026/DSC_9991-編輯-1.jpg",
@@ -1377,7 +1463,9 @@
       "shutterSpeed": 0.016666666666666666,
       "note": "畫面右下角有 1/12 被切到——那是教練的手肘。整張在說「鏡頭沒對到比賽，但對到準備」。",
       "pairWith": "digital-gallery/2023年電繪作品/22",
-      "aspectRatio": 0.6666
+      "aspectRatio": 0.6666,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/WBC 2026/DSC_9996-編輯-1.jpg",
@@ -1400,7 +1488,9 @@
       "iso": 400,
       "shutterSpeed": 0.008,
       "note": "300mm 隔著全場找到他。1/125 在這個距離其實不夠快，賭的是他出手前那半秒的靜止。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.313
     },
     {
       "filename": "photography/WBC 2026/DSC_0582-編輯-1.jpg",
@@ -1425,7 +1515,9 @@
       "iso": 2000,
       "shutterSpeed": 0.001,
       "note": "ISO 2000、巨蛋頂光很髒。但 1/1000 把汗珠釘在空中，雜訊反而像看台的熱氣。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_0483-編輯-1.jpg",
@@ -1448,7 +1540,9 @@
       "aperture": 6.3,
       "iso": 800,
       "shutterSpeed": 0.008,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_9964-編輯-1.jpg",
@@ -1472,7 +1566,9 @@
       "aperture": 4.5,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.219
     },
     {
       "filename": "photography/WBC 2026/DSC_9968-1.jpg",
@@ -1494,7 +1590,9 @@
       "aperture": 4.5,
       "iso": 100,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_9960-編輯-1.jpg",
@@ -1518,7 +1616,9 @@
       "aperture": 4.5,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.313
     },
     {
       "filename": "photography/WBC 2026/DSC_0466-編輯-1.jpg",
@@ -1541,7 +1641,9 @@
       "aperture": 5,
       "iso": 800,
       "shutterSpeed": 0.004,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_9971-1.jpg",
@@ -1562,7 +1664,9 @@
       "aperture": 6.3,
       "iso": 400,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_0542-編輯-1.jpg",
@@ -1585,7 +1689,9 @@
       "aperture": 4.5,
       "iso": 800,
       "shutterSpeed": 0.008,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_9971-編輯-1.jpg",
@@ -1607,7 +1713,9 @@
       "aperture": 6.3,
       "iso": 400,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC 2026/DSC_9966-編輯-1.jpg",
@@ -1631,7 +1739,9 @@
       "aperture": 5.3,
       "iso": 100,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.742
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9872-編輯-1.jpg",
@@ -1658,7 +1768,9 @@
       "iso": 200,
       "shutterSpeed": 0.001,
       "note": "第一鳥居的木紋已經被風雨啃過——這是 13 世紀以來的同一根柱子，攝影的本質是「目擊」。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.187
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9864-編輯-1.jpg",
@@ -1683,7 +1795,9 @@
       "aperture": 5,
       "iso": 200,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.125
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9885-編輯-1.jpg",
@@ -1708,7 +1822,9 @@
       "aperture": 4.8,
       "iso": 100,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.594
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9939-編輯-1.jpg",
@@ -1734,7 +1850,9 @@
       "aperture": 5,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9863-編輯-1.jpg",
@@ -1759,7 +1877,9 @@
       "aperture": 5,
       "iso": 200,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.7
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9865-編輯-1.jpg",
@@ -1785,7 +1905,9 @@
       "aperture": 5,
       "iso": 200,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.25
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9941-編輯-1.jpg",
@@ -1811,7 +1933,9 @@
       "aperture": 4.5,
       "iso": 100,
       "shutterSpeed": 0.001,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
     },
     {
       "filename": "photography/WBC東京 台澳/DSC_9877-編輯-1.jpg",
@@ -1841,7 +1965,9 @@
         "featured",
         "hero"
       ],
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/Annber 外拍/DSC_2702-編輯-1.jpg",
@@ -1873,7 +1999,9 @@
       ],
       "note": "她笑出來的那一刻肩膀微微鬆下，光線剛好接住下垂的耳邊髮——這是「沒在拍」的第二秒。",
       "pairWith": "digital-gallery/2024年電繪作品/23",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.344
     },
     {
       "filename": "photography/Annber 外拍/DSC_2216-編輯-1.jpg",
@@ -1899,7 +2027,9 @@
       "iso": 100,
       "shutterSpeed": 0.016666666666666666,
       "note": "紫藤是借景。前景手的伸出方向跟藤蔓的下垂方向交織成 X 型，重心剛好落在她抬頭的下巴。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.156
     },
     {
       "filename": "photography/Annber 外拍/DSC_2187-編輯-1.jpg",
@@ -1927,7 +2057,9 @@
       "series": [
         "featured"
       ],
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/Annber 外拍/DSC_2502-編輯-1.jpg",
@@ -1954,7 +2086,9 @@
       "aperture": 2.5,
       "iso": 200,
       "shutterSpeed": 0.00025,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/Annber 外拍/DSC_2533-編輯-1.jpg",
@@ -1981,7 +2115,9 @@
       "aperture": 2.5,
       "iso": 200,
       "shutterSpeed": 0.00025,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/Annber 外拍/DSC_2937-編輯-1.jpg",
@@ -2007,7 +2143,9 @@
       "aperture": 2.8,
       "iso": 200,
       "shutterSpeed": 0.004,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.187
     },
     {
       "filename": "photography/Annber 外拍/DSC_2792-編輯-2-1.jpg",
@@ -2034,7 +2172,9 @@
       "aperture": 2.8,
       "iso": 125,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.281
     },
     {
       "filename": "photography/Annber 外拍/DSC_2817-編輯-1.jpg",
@@ -2061,7 +2201,9 @@
       "aperture": 2.8,
       "iso": 125,
       "shutterSpeed": 0.002,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.375
     },
     {
       "filename": "photography/Annber 外拍/DSC_2980-編輯-1.jpg",
@@ -2088,7 +2230,9 @@
       "aperture": 2.5,
       "iso": 200,
       "shutterSpeed": 0.002,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/栗子外拍/DSC_6289-編輯-1.jpg",
@@ -2115,7 +2259,9 @@
       "iso": 1250,
       "shutterSpeed": 0.008,
       "note": "泡沫散開的軌跡在她唇邊停留了 1/250 秒。再快快門會凍住、再慢會糊掉——這是 1/250 的特權。",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.742
     },
     {
       "filename": "photography/栗子外拍/DSC_5910-編輯-1.jpg",
@@ -2143,7 +2289,9 @@
       "shutterSpeed": 0.008,
       "note": "暗紅織紋只佔畫面 1/4，但顏色重量已經夠把整張平衡。剩下 3/4 留給她側躺的鬆弛。",
       "pairWith": "digital-gallery/2026年電繪作品/21-編輯-編輯-編輯-1",
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.375
     },
     {
       "filename": "photography/栗子外拍/DSC_5532-編輯-編輯-1.jpg",
@@ -2170,7 +2318,9 @@
       "iso": 1000,
       "shutterSpeed": 0.004,
       "note": "花瓣牆的密度像背景音樂——聲量大但訊息少。她那條紅色高跟才是這張的主旋律。",
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/栗子外拍/DSC_5958-編輯-1.jpg",
@@ -2196,7 +2346,9 @@
       "aperture": 2.2,
       "iso": 1000,
       "shutterSpeed": 0.004,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/栗子外拍/DSC_5636-編輯-1.jpg",
@@ -2222,7 +2374,9 @@
       "aperture": 3.5,
       "iso": 500,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 1.5
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
     },
     {
       "filename": "photography/栗子外拍/DSC_6128-編輯-1.jpg",
@@ -2248,7 +2402,9 @@
       "aperture": 2,
       "iso": 1000,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.438
     },
     {
       "filename": "photography/栗子外拍/DSC_5771-編輯-1.jpg",
@@ -2274,7 +2430,9 @@
       "aperture": 3.5,
       "iso": 400,
       "shutterSpeed": 0.016666666666666666,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.031
     },
     {
       "filename": "photography/栗子外拍/DSC_6037-編輯-1.jpg",
@@ -2300,7 +2458,9 @@
       "aperture": 2.2,
       "iso": 1000,
       "shutterSpeed": 0.03333333333333333,
-      "aspectRatio": 0.6667
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.281
     }
   ],
   "trackManifesto": {

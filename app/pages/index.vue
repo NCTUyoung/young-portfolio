@@ -1,10 +1,11 @@
 <template>
   <div ref="pageRef">
     <!--
-      Round 15：縦書「目次」chapter rail（lg+ only fixed 右側）
-      編輯化目次：序 / 領 / 対 / 步 / 選 / 印 — 把首頁敘事擬書目
+      freshen R3（首頁精簡）：移除固定右側縦書「目次」chapter rail。
+      使用者反饋首頁排版雜亂、資訊太多——這條常駐右緣的縦向 rail（序/領/対/步/選/印）
+      在每一屏都疊一條裝飾縦書訊號，與內容無互動價值，是「雜亂」的來源之一。
+      敘事順序已由各 section 章題承載；移除 rail 把右緣余白還給內容。
     -->
-    <ChapterRail />
 
     <!-- freshen R2：砍掉全頁「綴じ糸」固定縫線 + 朱結（scroll-driven 裝飾過載，
          與「清新」相悖；critic 點名 motif/裝飾通膨）。bindingProgress JS 保留，
@@ -133,44 +134,22 @@
           </h1>
 
           <!--
-            R48：「双軌起算 ledger」— 把 2018 vs 2024 的六年時間差量化成一條起算尺
-            （左 繪・二〇一八、右 影・二〇二四、中央 badge 寫先行年數），首訪可讀。
-            data 來源：digitalManifesto / photographyManifesto store getter。
-            R8：原 prologue band 整段移入此合併 section，內容與行為不變。
+            freshen R3（首頁精簡）：原「双軌起算 ledger」三件套（節點×2 + 尺身 gauge + 宣言×2）
+            資訊密度過高、是使用者點名的「太多資訊」之一。收為單行安靜 caption：
+            繪 二〇一八 ／ 影 二〇二四 — 六年先行。同一筆 trackLedger 資料，敘事不丟、噪音大減。
           -->
-          <div class="reveal reveal-delay-2 track-ledger" aria-label="双軌起算：繪自二〇一八、影自二〇二四，影軌晚六年">
-            <p class="track-ledger__eyebrow">起算 · Since</p>
-            <div class="track-ledger__rail">
-              <!-- 左端：繪軌起點 -->
-              <div class="track-ledger__node track-ledger__node--kai">
-                <span class="track-ledger__kana font-jp" :style="{ color: trackLedger.kai.ink }" aria-hidden="true">{{ trackLedger.kai.kana }}</span>
-                <span class="track-ledger__year jp-kansuji">{{ trackLedger.kai.startKansuji }}</span>
-                <span class="track-ledger__roman">{{ trackLedger.kai.roman }}</span>
-              </div>
-
-              <!-- 中段尺身：實線（繪已走）+ dashed（影尚未存在）+ 量距 badge -->
-              <div class="track-ledger__span" aria-hidden="true">
-                <span class="track-ledger__span-solid"/>
-                <span class="track-ledger__gauge">
-                  <span class="track-ledger__gauge-num jp-kansuji">{{ trackLedger.gapKansuji }}</span>
-                  <span class="track-ledger__gauge-unit font-jp">年先行</span>
-                </span>
-                <span class="track-ledger__span-dashed"/>
-              </div>
-
-              <!-- 右端：影軌起點 -->
-              <div class="track-ledger__node track-ledger__node--kage">
-                <span class="track-ledger__kana font-jp" :style="{ color: trackLedger.kage.ink }" aria-hidden="true">{{ trackLedger.kage.kana }}</span>
-                <span class="track-ledger__year jp-kansuji">{{ trackLedger.kage.startKansuji }}</span>
-                <span class="track-ledger__roman">{{ trackLedger.kage.roman }}</span>
-              </div>
-            </div>
-            <!-- 兩軌宣言並置（與 plate 同層，3 秒可讀） -->
-            <div class="track-ledger__declarations">
-              <p class="track-ledger__decl track-ledger__decl--kai font-jp">{{ trackLedger.kai.declaration }}</p>
-              <p class="track-ledger__decl track-ledger__decl--kage font-jp">{{ trackLedger.kage.declaration }}</p>
-            </div>
-          </div>
+          <p
+            class="reveal reveal-delay-2 mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm tracking-[0.12em] text-stone-500 dark:text-stone-400"
+            aria-label="繪自二〇一八、影自二〇二四，影軌晚六年"
+          >
+            <span class="font-jp" :style="{ color: trackLedger.kai.ink }">繪</span>
+            <span class="jp-kansuji">{{ trackLedger.kai.startKansuji }}</span>
+            <span class="opacity-40" aria-hidden="true">／</span>
+            <span class="font-jp" :style="{ color: trackLedger.kage.ink }">影</span>
+            <span class="jp-kansuji">{{ trackLedger.kage.startKansuji }}</span>
+            <span class="mx-1 text-stone-300 dark:text-stone-600" aria-hidden="true">—</span>
+            <span class="font-jp"><span class="jp-kansuji">{{ trackLedger.gapKansuji }}</span>年先行</span>
+          </p>
 
           <!-- 入口：低調文字 + 箭頭 -->
           <div class="reveal reveal-delay-1 mt-10 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -346,16 +325,7 @@
                 aria-hidden="true"
               />
               <template v-if="m.track === 'both'">
-                <!-- V 形匯入線（desktop only）：左右兩條 hairline 從上方斜匯入中央 marker -->
-                <svg
-                  class="hidden md:block absolute left-1/2 -translate-x-1/2 -top-12 w-44 h-14 pointer-events-none"
-                  viewBox="0 0 176 56"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <line x1="0" y1="0" x2="86" y2="54" stroke="currentColor" stroke-width="1" class="text-stone-300 dark:text-stone-600 opacity-80"/>
-                  <line x1="176" y1="0" x2="90" y2="54" stroke="currentColor" stroke-width="1" class="text-stone-300 dark:text-stone-600 opacity-80"/>
-                </svg>
+                <!-- freshen R3：移除「V 形匯入線」SVG（裝飾過載；合流大菱形已足夠標示匯流）。 -->
                 <!--
                   合流大菱形（Round 12 升級：scroll-driven pulse）
                   - 加 .confluence-marker class：view-timeline 抵達中段時 scale 1 → 1.4 → 1
@@ -430,49 +400,18 @@
                 <p class="jp-body text-[0.95rem]" :class="m.track === 'both' ? 'mx-auto max-w-md' : ''">{{ m.description }}</p>
 
                 <!--
-                  Round 16：合流節點 click → case-study reveal
-                  critic Round 15 提：「合流大菱形可點擊進 case-study」
-                  改法：用 native <details>/<summary> 做可展開合流物語，無 modal、無 JS state
-                  展開後雙欄：繪 軸（2018-2024 鍛鍊）+ 影 軸（2024 起步）+ 一句總結
-                  繞過 wabi-sabi 三鍵：(a) summary 看不像 button，hairline-only；(b) 內容雙欄對位呼應対話；(c) accent 僅章題與 hairline
+                  freshen R3（首頁精簡）：移除「合流の物語」可展開 case-study（雙欄 article + 朱印 + 收束句）。
+                  那是首頁資訊密度最高的次級區塊；合流節點的敘事已由上方 milestone 描述承載，
+                  細部六年鍛鍊／一年出發的物語留給 gallery 章節，首頁不再背負。收束句保留為單行。
                 -->
-                <details v-if="m.track === 'both'" class="confluence-story group mt-7 lg:mt-9 mx-auto max-w-2xl text-center">
-                  <summary
-                    class="cursor-pointer list-none inline-flex items-center gap-3 text-[0.62rem] tracking-[0.5em] uppercase text-stone-500 dark:text-stone-400 group-hover:text-accent-600 dark:group-hover:text-accent-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-500/60 rounded-sm transition-colors duration-300"
-                  >
-                    <span class="inline-block w-6 h-px bg-stone-300 dark:bg-stone-600 group-hover:bg-accent-500/70 group-hover:w-9 transition-all duration-300" aria-hidden="true"/>
-                    <span class="font-jp tracking-[0.45em]">合流の物語</span>
-                    <span class="text-stone-400 dark:text-stone-500 transition-transform duration-300 group-open:rotate-180" aria-hidden="true">⌄</span>
-                  </summary>
-                  <div class="mt-8 lg:mt-10 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 items-start">
-                    <!-- 繪 軸：六年鍛鍊 -->
-                    <article class="md:text-right">
-                      <p class="jp-eyebrow justify-center md:justify-end text-stone-500 mb-2"><span>Digital · 繪</span></p>
-                      <h4 class="font-jp text-base font-extralight tracking-[0.35em] text-stone-700 dark:text-stone-200">六年の鍛錬</h4>
-                      <p class="jp-body text-[0.9rem] mt-3 max-w-xs md:ml-auto">
-                        二〇一八幾何插畫、二〇二〇人物角色、二〇二四技法精進——筆觸從規矩走到自由的六年。
-                      </p>
-                    </article>
-                    <!-- 中釘 hairline-v + 朱印「合」 -->
-                    <div class="hidden md:flex flex-col items-center self-stretch py-1" aria-hidden="true">
-                      <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-                      <span class="jp-seal !w-9 !h-9 !text-sm shrink-0 my-1"><span class="jp-seal-ink">合</span></span>
-                      <span class="w-px flex-1 bg-gradient-to-b from-transparent via-stone-300/70 dark:via-stone-600/60 to-transparent"/>
-                    </div>
-                    <!-- 影 軸：一年起步 -->
-                    <article class="md:text-left">
-                      <p class="jp-eyebrow justify-center md:justify-start text-stone-500 mb-2"><span>Photography · 影</span></p>
-                      <h4 class="font-jp text-base font-extralight tracking-[0.35em] text-stone-700 dark:text-stone-200">一年の出発</h4>
-                      <p class="jp-body text-[0.9rem] mt-3 max-w-xs">
-                        二〇二四 Nikon Z f 入手——從零開始、夜景、街拍、淺景深，與電繪筆觸互相滋養。
-                      </p>
-                    </article>
-                  </div>
-                  <!-- 收束句：合流的真意 -->
-                  <blockquote class="mt-8 lg:mt-10 font-jp text-sm lg:text-base font-extralight tracking-[0.35em] text-stone-600 dark:text-stone-300 leading-[2] text-center">
-                    繪は影を学び、<span class="mx-2 text-stone-400">影は繪を学ぶ。</span>
+                <!-- freshen R3：步履軌尾的收束視覺落點——一枚「合」朱印 + 對位收束句，
+                     給雙軌匯流一個安靜的視覺終點（取代被砍的長案例，但不回到資訊過載）。 -->
+                <div v-if="m.track === 'both'" class="mt-7 lg:mt-9 flex flex-col items-center gap-4 text-center">
+                  <span class="jp-seal !w-9 !h-9 !text-sm" aria-hidden="true"><span class="jp-seal-ink">合</span></span>
+                  <blockquote class="font-jp text-sm font-extralight tracking-[0.3em] text-stone-500 dark:text-stone-400 leading-[2]">
+                    繪は影を学び、<span class="mx-2 text-stone-400 dark:text-stone-500">影は繪を学ぶ。</span>
                   </blockquote>
-                </details>
+                </div>
               </div>
 
               <!--
@@ -494,38 +433,10 @@
           </ol>
 
           <!--
-            影軌墓誌（desktop only · Round 2 升級為貫穿軌道）
-            critic Round 1 指出：原本 absolute top-0 + 單塊「未だ無し」讓 photo 軌看起來像
-            「斷掉的單點」而非「空白的軌道」，視覺重量 5:1 失衡。
-            改法：dashed 虛線縱貫帶 + 4 字分散沿線（未 / だ / 無 / し），
-            讓 2018-2024 的影軌空白本身有結構，把「留白也是一條軌」做實。
-            高度延伸到 photo 軌第一個 milestone（2024 撮）之前 ~75% 高度。
+            freshen R3（首頁精簡）：移除「影軌墓誌（未だ無し 虛線貫穿軌 + 4 字 + Not yet）」。
+            這條 desktop-only 右半裝飾帶是使用者點名「排版雜亂」的視覺噪音之一；影軌 2024 才起步
+            的敘事已由 milestone 與軌頭表達，空白本身即留白，不需再鋪一條裝飾性墓誌軌。
           -->
-          <!--
-            NOT YET 貫穿軌（Round 3 微調）：
-            - 高度 75% → 58%，在 photo 軌啟動點（2024 撮 ~ 60% 位置）前自然收束，不再壓到 2024 撮 eyebrow
-            - 4 字 padding 加大讓字距更詩意（不再像 placeholder）
-            - NOT YET caption 改放在虛線下方留 12px gap，與虛線形成完整收尾
-          -->
-          <aside
-            class="hidden md:block absolute top-0 right-0 w-1/2 pl-12 h-[58%] pointer-events-none select-none"
-            aria-hidden="true"
-          >
-            <div class="relative h-full flex flex-col items-start text-stone-400 dark:text-stone-500">
-              <!-- 虛線縱貫線：在虛線終點處再加一個短橫線收筆 -->
-              <span class="absolute left-0 top-2 bottom-6 border-l border-dashed border-stone-300 dark:border-stone-600/70"/>
-              <span class="absolute -left-1 bottom-6 w-2 h-px bg-stone-300 dark:bg-stone-600/70"/>
-              <!-- 4 字沿線分散：加大字距讓墓誌更有呼吸 -->
-              <div class="ml-3 flex flex-col justify-between h-[calc(100%-2rem)] py-3">
-                <span class="font-jp text-[0.85rem] tracking-[0.5em] font-extralight leading-none opacity-70">未</span>
-                <span class="font-jp text-[0.85rem] tracking-[0.5em] font-extralight leading-none opacity-70">だ</span>
-                <span class="font-jp text-[0.85rem] tracking-[0.5em] font-extralight leading-none opacity-70">無</span>
-                <span class="font-jp text-[0.85rem] tracking-[0.5em] font-extralight leading-none opacity-70">し</span>
-              </div>
-              <!-- 軌尾 latin caption，貼虛線收筆後 12px -->
-              <span class="absolute left-3 bottom-0 text-[0.55rem] tracking-[0.4em] uppercase opacity-50">Not yet</span>
-            </div>
-          </aside>
         </div>
       </div>
     </section>
@@ -725,7 +636,6 @@ import {
 import { useGalleryStore } from '~/stores/gallery'
 import { fetchPhotographyWorks, fetchDigitalWorks } from '~/stores/galleryLoaders'
 import FeaturedYearRuler from '~/components/gallery/FeaturedYearRuler.vue'
-import ChapterRail from '~/components/ChapterRail.vue'
 
 const { getThumbPath } = useImagePath()
 const { observeAll } = useScrollReveal()
