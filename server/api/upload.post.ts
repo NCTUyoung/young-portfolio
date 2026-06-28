@@ -1,6 +1,6 @@
 ﻿import { mkdirSync, existsSync } from 'fs'
 import { unlink } from 'fs/promises'
-import { extname, join } from 'path'
+import { extname, join, resolve } from 'path'
 import { formidable } from 'formidable'
 import exifr from 'exifr'
 import {
@@ -14,6 +14,7 @@ import { inferEventFromTime } from '~/utils/eventUtils'
 import type { PhotographyData, GalleryData } from '~~/shared/types/gallery'
 import { generateThumbsForPublicImage } from '../utils/thumbFromSource'
 import { readGalleryData, updateGalleryData } from '../utils/galleryDataStore'
+import { ratioOf, focalOf } from '../utils/imageGeometry.mjs'
 
 /**
  * 本機 admin 上傳的防呆白名單：只允許可被瀏覽器顯示的靜態影像格式。
@@ -32,6 +33,20 @@ function isAcceptableImage (mimetype: string | null | undefined, filename: strin
   const mimeOk = !!mimetype && ALLOWED_MIME.has(mimetype.toLowerCase())
   const extOk = ALLOWED_EXT.has(extname(filename).toLowerCase())
   return mimeOk && extOk
+}
+
+/**
+ * 上傳即算幾何：縱橫比 + 內容感知焦點，與批次 `npm run ratios` 共用 server/utils/imageGeometry。
+ * 在此寫入後，新作品落地即帶 aspectRatio/focalX/focalY，前台不再 fallback 到 DEFAULT_ASPECT_RATIO
+ * 而把直幅塞進寬框裁掉頭。量不到（解析失敗）就略過該欄，元件端維持既有 fallback。
+ */
+async function geometryOf (sourcePath: string): Promise<{ aspectRatio?: number, focalX?: number, focalY?: number }> {
+  const abs = resolve(process.cwd(), sourcePath)
+  const [aspectRatio, focal] = await Promise.all([ratioOf(abs), focalOf(abs)])
+  return {
+    ...(aspectRatio !== null ? { aspectRatio } : {}),
+    ...(focal ? { focalX: focal.focalX, focalY: focal.focalY } : {})
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -170,6 +185,9 @@ export default defineEventHandler(async (event) => {
             console.warn(`縮圖產生失敗（仍保留原圖）: ${newPath}`, e)
           }
 
+          // 上傳即算幾何（縱橫比 + 焦點），免事後手動 npm run ratios
+          const geometry = await geometryOf(newPath)
+
           // 生成標題和描述
           const { title: autoTitle, description: autoDescription } = generateTitleAndDescription(originalName)
 
@@ -189,7 +207,8 @@ export default defineEventHandler(async (event) => {
             focalLength: exifData.FocalLength ?? 0,
             aperture: exifData.FNumber ?? 0,
             iso: exifData.ISO ?? 0,
-            shutterSpeed: exifData.ExposureTime ?? 0
+            shutterSpeed: exifData.ExposureTime ?? 0,
+            ...geometry
           })
         } else {
           // 繪圖作品：優先使用用戶指定的創作日期，否則嘗試 EXIF
@@ -252,13 +271,17 @@ export default defineEventHandler(async (event) => {
             console.warn(`縮圖產生失敗（仍保留原圖）: ${newPath}`, e)
           }
 
+          // 上傳即算幾何（縱橫比 + 焦點），免事後手動 npm run ratios
+          const geometry = await geometryOf(newPath)
+
           uploadedFiles.push({
             filename: `${category}/${eventInfo.name}/${originalName}`,
             time: formatDateFull(captureTime),
             title: fields[`title_${originalName}`]?.[0] || (originalName.split('.')[0] ?? originalName),
             content: fields[`content_${originalName}`]?.[0] || '',
             color: fields[`color_${originalName}`]?.[0] || 'blue',
-            event: eventInfo
+            event: eventInfo,
+            ...geometry
           })
         }
       }

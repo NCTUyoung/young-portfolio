@@ -15,10 +15,10 @@
  *   npm run ratios                 量所有缺值（已有 aspectRatio 仍會以最新值覆寫）
  *   npm run ratios -- --check      只檢查、不寫檔（CI / 確認用），有缺漏則 exit 1
  */
-import sharp from 'sharp'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ratioOf as ratioOfAbs, focalOf as focalOfAbs } from '../server/utils/imageGeometry.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, '..', 'public')
@@ -28,18 +28,10 @@ const FILES = ['photographyList.json', 'galleryList.json']
 const args = new Set(process.argv.slice(2))
 const CHECK_ONLY = args.has('--check')
 
-/** 量單張原圖比例；找不到檔或無尺寸回 null（呼叫端跳過、保留缺值）。 */
-async function ratioOf (filename) {
-  const abs = path.join(IMAGES_ROOT, filename)
-  try {
-    const meta = await sharp(abs).metadata()
-    if (!meta.width || !meta.height) return null
-    // 不做 orientation 交換：對齊 generate-thumbs（未 .rotate()）的縮圖實際比例。
-    return Math.round((meta.width / meta.height) * 10000) / 10000
-  } catch {
-    return null
-  }
-}
+// 幾何量測（ratioOf / focalOf）抽至 ../server/utils/imageGeometry.mjs，與本機上傳端共用同一份邏輯
+// （避免 focal「保頭天花板」兩處漂移）。此處薄包一層：把 JSON 的相對 filename 解析為絕對路徑。
+const ratioOf = (filename) => ratioOfAbs(path.join(IMAGES_ROOT, filename))
+const focalOf = (filename) => focalOfAbs(path.join(IMAGES_ROOT, filename))
 
 async function processFile (file) {
   const jsonPath = path.join(ROOT, file)
@@ -54,6 +46,7 @@ async function processFile (file) {
   const imgs = Array.isArray(data.Img) ? data.Img : []
 
   let updated = 0
+  let focalUpdated = 0
   let missing = 0
   const missingNames = []
   for (const img of imgs) {
@@ -66,6 +59,14 @@ async function processFile (file) {
     }
     if (img.aspectRatio !== r) updated++
     img.aspectRatio = r
+
+    // 焦點預算（與比例同一道 pass）：量不到就保留缺值，元件端 fallback 50% 30%。
+    const f = await focalOf(img.filename)
+    if (f) {
+      if (img.focalX !== f.focalX || img.focalY !== f.focalY) focalUpdated++
+      img.focalX = f.focalX
+      img.focalY = f.focalY
+    }
   }
 
   if (missingNames.length) {
@@ -79,7 +80,7 @@ async function processFile (file) {
     await fs.writeFile(jsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8')
   }
 
-  return { file, total: imgs.length, updated, missing }
+  return { file, total: imgs.length, updated, focalUpdated, missing }
 }
 
 async function main () {
@@ -87,7 +88,7 @@ async function main () {
   let anyMissing = false
   for (const file of FILES) {
     const r = await processFile(file)
-    console.log(`  ${file}: ${r.total} images · ${r.updated} aspectRatio ${CHECK_ONLY ? 'would change' : 'written/updated'} · ${r.missing} unresolved`)
+    console.log(`  ${file}: ${r.total} images · ${r.updated} aspectRatio · ${r.focalUpdated} focal ${CHECK_ONLY ? 'would change' : 'written/updated'} · ${r.missing} unresolved`)
     if (r.missing > 0) anyMissing = true
   }
   if (CHECK_ONLY && anyMissing) {

@@ -125,6 +125,13 @@ export interface GalleryItem {
    * 消除首屏 layout shift（CLS）並使 SSG 版面可決定性。
    */
   aspectRatio?: number
+  /**
+   * 內容感知焦點（focalX / focalY，0..1，原圖正規化）。離線預算（smartcrop）寫入 JSON，
+   * loader passthrough 到此。驅動固定比例裁切框（索引卡 3:2 / event hero 88vh）的
+   * object-position，讓主體入鏡，取代寫死的 50% 30%。缺值時元件 fallback 50% 30%。
+   */
+  focalX?: number
+  focalY?: number
   /** 系列敘事（由 loader 依 event.name 注入；可選） */
   seriesNarrative?: SeriesNarrative
   /** R26：image-level 個性化註記（單張單句；優先級高於 seriesNarrative.annotation） */
@@ -159,6 +166,9 @@ export interface DigitalArtItem extends BaseImageItem {
   pairWith?: string
   /** 原圖縱橫比 width/height（離線預算，見 GalleryItem.aspectRatio） */
   aspectRatio?: number
+  /** 內容感知焦點（離線預算，見 GalleryItem.focalX/focalY） */
+  focalX?: number
+  focalY?: number
 }
 
 // 攝影作品接口
@@ -179,6 +189,9 @@ export interface PhotographyItem extends BaseImageItem {
   pairWith?: string
   /** 原圖縱橫比 width/height（離線預算，見 GalleryItem.aspectRatio） */
   aspectRatio?: number
+  /** 內容感知焦點（離線預算，見 GalleryItem.focalX/focalY） */
+  focalX?: number
+  focalY?: number
 }
 
 // 事件分組接口
