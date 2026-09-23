@@ -237,20 +237,14 @@ const debouncedInvalidateMapSize = useDebounceFn(() => {
   runInvalidateWhenIdle()
 }, 120)
 
-const TILE_URLS = {
-  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-}
+const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 
-const setTileLayer = async (dark: boolean) => {
-  if (!map || !import.meta.client) return
+const setTileLayer = async () => {
+  if (!map || tileLayer || !import.meta.client) return
   const L = await import('leaflet')
-  const url = dark ? TILE_URLS.dark : TILE_URLS.light
-  if (tileLayer) {
-    map.removeLayer(tileLayer)
-  }
-  tileLayer = L.tileLayer(url, {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  tileLayer = L.tileLayer(TILE_URL, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
   }).addTo(map)
 }
 
@@ -278,10 +272,10 @@ const initMap = async () => {
       zoomControl: false,
       scrollWheelZoom: isCompact ? 'center' : true,
       keyboard: !isCompact,
-      attributionControl: !isCompact
+      attributionControl: true
     })
 
-    await setTileLayer(isDark.value)
+    await setTileLayer()
 
     await nextTick()
     invalidateMapSize()
@@ -462,9 +456,8 @@ watch(
   }
 )
 
-watch(isDark, async (dark) => {
+watch(isDark, async () => {
   if (!import.meta.client || !map) return
-  await setTileLayer(dark)
   const L = await import('leaflet')
   renderMarkers(L)
 })
@@ -609,25 +602,25 @@ onBeforeUnmount(() => {
   color: rgb(228 150 74);
 }
 
-/* 淺色模式：微灰階與對比；深色模式：地圖已是深色，僅微調 */
+/* OSM 單一瓦片來源：只在 tile pane 調色，不重新請求整張地圖。 */
 .event-map-container :deep(.leaflet-tile-pane) {
   filter: grayscale(0.9) contrast(1.05);
 }
 .dark .event-map-container :deep(.leaflet-tile-pane) {
-  filter: grayscale(0.6) contrast(1.02);
+  filter: grayscale(1) invert(0.9) contrast(1.08) brightness(0.7);
 }
 
 /* 不在 SVG 上使用 filter：flyTo 平移時部分瀏覽器會出現路徑重影，誤以為多一顆標記 */
 
 .event-map-container :deep(.leaflet-control-attribution) {
   font-size: 0.6rem;
-  opacity: 0.45;
+  opacity: 0.85;
 }
 .dark .event-map-container :deep(.leaflet-control-attribution) {
-  opacity: 0.35;
+  opacity: 0.9;
 }
 .dark .event-map-container :deep(.leaflet-control-attribution a) {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .event-map-hover-card {
@@ -755,4 +748,3 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-
