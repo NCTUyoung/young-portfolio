@@ -278,7 +278,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, watch, computed, ref, nextTick, type ComponentPublicInstance } from 'vue'
+import { onMounted, onBeforeUnmount, watch, computed, ref, nextTick, defineAsyncComponent, type ComponentPublicInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import { fetchDigitalWorks, fetchPhotographyWorks } from '~/stores/galleryLoaders'
@@ -294,15 +294,16 @@ import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGlobalToast } from '~/composables/useToast'
 
 // ===== 組件引入 =====
-import GalleryAtelierTimeline from '~/components/gallery/GalleryAtelierTimeline.vue'
-import GalleryPhotographySection from '~/components/gallery/GalleryPhotographySection.vue'
-import GalleryEventCover from '~/components/gallery/GalleryEventCover.vue'
 import GalleryEditorialModules from '~/components/gallery/GalleryEditorialModules.vue'
-import GalleryDigitalIntro from '~/components/gallery/GalleryDigitalIntro.vue'
 import GalleryArchiveControls from '~/components/gallery/GalleryArchiveControls.vue'
 import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vue'
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
+
+const GalleryAtelierTimeline = defineAsyncComponent(() => import('~/components/gallery/GalleryAtelierTimeline.vue'))
+const GalleryPhotographySection = defineAsyncComponent(() => import('~/components/gallery/GalleryPhotographySection.vue'))
+const GalleryEventCover = defineAsyncComponent(() => import('~/components/gallery/GalleryEventCover.vue'))
+const GalleryDigitalIntro = defineAsyncComponent(() => import('~/components/gallery/GalleryDigitalIntro.vue'))
 
 // ===== Store 和 Composables =====
 const galleryStore = useGalleryStore()
