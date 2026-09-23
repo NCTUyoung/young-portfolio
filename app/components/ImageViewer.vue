@@ -168,6 +168,8 @@ v-if="viewerImages.length > 1 && hasNext"
               loading="eager"
               fetchpriority="high"
               decoding="async"
+              @load="handleViewerImageLoad"
+              @error="handleViewerImageError"
               @click.stop
               @mousedown="handleMouseDown"
               @touchstart="handleTouchStart"
@@ -176,10 +178,10 @@ v-if="viewerImages.length > 1 && hasNext"
           </picture>
 
           <!-- 載入中 -->
-          <div v-if="!currentViewerImage" class="absolute inset-0 flex items-center justify-center">
+          <div v-if="!currentViewerImage || !imageReady" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
             <div class="text-stone-200 text-center font-light">
-              <div class="animate-spin rounded-full h-10 w-10 border border-stone-500 border-t-stone-200 mx-auto mb-4"/>
-              <p class="tracking-[0.3em] text-xs">LOADING</p>
+              <div v-if="!imageLoadError || !currentViewerImage" class="animate-spin rounded-full h-10 w-10 border border-stone-500 border-t-stone-200 mx-auto mb-4"/>
+              <p class="tracking-[0.3em] text-xs">{{ imageLoadError ? 'IMAGE UNAVAILABLE' : 'LOADING' }}</p>
             </div>
           </div>
         </div>
@@ -394,6 +396,38 @@ const formatIndex = (n: number) => {
 }
 
 const imageElement = ref<HTMLImageElement>()
+const imageReady = ref(false)
+const imageLoadError = ref(false)
+
+watch(() => currentViewerImage.value?.filename, () => {
+  imageReady.value = false
+  imageLoadError.value = false
+}, { flush: 'sync' })
+
+async function handleViewerImageLoad (event: Event) {
+  const image = event.currentTarget as HTMLImageElement
+  if (image !== imageElement.value) return
+  const filename = currentViewerImage.value?.filename
+
+  try {
+    await image.decode()
+  } catch {
+    if (image !== imageElement.value || filename !== currentViewerImage.value?.filename) return
+    imageReady.value = false
+    imageLoadError.value = true
+    return
+  }
+
+  if (image !== imageElement.value || filename !== currentViewerImage.value?.filename) return
+  imageReady.value = image.complete && image.naturalWidth > 0
+  imageLoadError.value = !imageReady.value
+}
+
+function handleViewerImageError (event: Event) {
+  if (event.currentTarget !== imageElement.value) return
+  imageReady.value = false
+  imageLoadError.value = true
+}
 const lightboxRoot = ref<HTMLElement>()
 
 /**
@@ -641,6 +675,8 @@ onUnmounted(() => {
 
 // 隨 store 的 isOpen 啟／停 focus trap
 watch(isOpen, (open) => {
+  imageReady.value = false
+  imageLoadError.value = false
   if (open) activateTrap()
   else releaseTrap()
 })

@@ -49,7 +49,7 @@
           class="contact-sheet__cell"
           :data-frame="cell.i"
           :style="{ aspectRatio: aspectOf(cell.image) }"
-          :class="{ 'contact-sheet__cell--developed': developed[cell.i], 'contact-sheet__cell--under-loupe': loupe.active && loupe.index === cell.i }"
+          :class="{ 'contact-sheet__cell--developed': cell.i === 0 || developed[cell.i], 'contact-sheet__cell--under-loupe': loupe.active && loupe.index === cell.i }"
         >
           <span class="contact-sheet__sprockets" aria-hidden="true"/>
           <span class="contact-sheet__no" aria-hidden="true">{{ frameNo(cell.i) }}</span>
@@ -69,6 +69,7 @@
                 :alt="cell.image.title"
                 class="contact-sheet__img"
                 :loading="cell.i < 4 ? 'eager' : 'lazy'"
+                :fetchpriority="cell.i === 0 ? 'high' : 'auto'"
                 decoding="async"
               >
             </picture>
