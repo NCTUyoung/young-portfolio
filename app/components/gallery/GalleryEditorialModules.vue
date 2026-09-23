@@ -307,8 +307,7 @@ function focalStyle (img: GalleryItem): Record<string, string> {
 .em__enter-arrow { font-family: var(--em-mono); transition: transform 0.25s ease; }
 .group:hover .em__enter-arrow { transform: translateX(2px); }
 
-/* 扉頁 nameplate 全隱：写真記録 標題改由頁面非對稱刊頭 .kage-masthead 統一承擔
-   （桌機）／filmpanel-m 房間標牌承擔（手機），避免雙標牌。markup/totalCount 保留。 */
+/* Archive identity is owned by GalleryArchiveControls; cards begin directly with content. */
 .em__masthead { display: none; }
 
 /* ── 桌機 hero 首章：首張卡放大（寬圖欄 + 大漢字），其餘維持安靜目次列，

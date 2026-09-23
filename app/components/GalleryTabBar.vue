@@ -1,5 +1,5 @@
 <template>
-  <div class="relative -mx-1 mb-8">
+  <div class="gallery-tabs relative -mx-1 mb-8">
     <!--
       右側漸層提示：手機（< sm）若 tab row 超出容器，提供視覺暗示有東西可滑。
       設計鐵律 §3：hairline 風格，不用實線截斷，故用 gradient 從透明→bg。
@@ -11,14 +11,14 @@
     />
     <div
       ref="scrollerRef"
-      class="flex items-center gap-0 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] md:overflow-visible md:px-0"
+      class="gallery-tabs__list flex items-center gap-0 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] md:overflow-visible md:px-0"
       @scroll.passive="onScroll"
     >
       <template v-for="(tab, index) in tabs" :key="tab.key">
         <!-- 標籤連結：與 /gallery/:category 同步 -->
         <NuxtLink
           :to="{ path: `/gallery/${tab.key}`, query: route.query }"
-          class="flex-shrink-0 touch-manipulation"
+          class="gallery-tabs__link flex-shrink-0 touch-manipulation"
           :class="[
             'relative px-5 py-2.5 font-light tracking-wide transition-all duration-300 group',
             isActive(tab.key)
@@ -57,7 +57,7 @@
             <span v-if="props.variant !== 'rail'" class="text-[0.62rem] tracking-[0.3em] uppercase opacity-80 whitespace-nowrap">{{ tab.latin }}</span>
             <span
               :class="[
-                'text-xs transition-colors duration-300 whitespace-nowrap',
+                'gallery-tabs__count text-xs transition-colors duration-300 whitespace-nowrap',
                 isActive(tab.key)
                   ? 'text-accent-500/80 dark:text-accent-400/80'
                   : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-400 dark:group-hover:text-stone-500'
@@ -69,7 +69,7 @@
         <!-- 豎向分隔線（非最後一個） -->
         <div
           v-if="index < tabs.length - 1"
-          class="w-px h-4 bg-stone-200/70 dark:bg-stone-700/50 mx-1"
+          class="gallery-tabs__divider w-px h-4 bg-stone-200/70 dark:bg-stone-700/50 mx-1"
         />
       </template>
     </div>

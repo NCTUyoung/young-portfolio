@@ -35,10 +35,7 @@ test.describe('首頁 /', () => {
 
     await expect(page).toHaveURL(/\/gallery(\/|$)/)
 
-    // 攝影 overview 改版：desktop 標題改由頁面層非對稱刊頭 .kage-masthead 承擔
-    // （h1 写真記録），元件自帶 .em__masthead 已全隱。
-    await expect(
-      page.locator('.kage-masthead__title').filter({ hasText: '写真記録' })
-    ).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('gallery-archive-controls')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByRole('heading', { level: 1, name: '写真記録' })).toBeVisible()
   })
 })

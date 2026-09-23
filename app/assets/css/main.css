@@ -230,9 +230,8 @@
 
 /* ===== 導航列滾動效果 ===== */
 .nav-scrolled {
-  --tw-bg-opacity: 0.92;
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* ===== 水平滾動條隱藏（用於 article scroll strip） ===== */
@@ -1082,9 +1081,3 @@
     animation: none !important;
   }
 }
-
-/* ============================================================
-   two-rooms-r1：移除「世界幕」(world-curtain) 轉場樣式。
-   跨世界已收斂為單一書口門檻（GalleryFacingEdge / 手機翻面帶），
-   切 track 不再額外掛滿版幕，故 .world-curtain 全套樣式與 keyframe 一併刪除。
-   ============================================================ */

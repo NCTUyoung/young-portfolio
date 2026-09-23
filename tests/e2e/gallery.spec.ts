@@ -1,26 +1,20 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Gallery /gallery/photography', () => {
-  // 攝影 overview 改版（呆版大改 / quiet-asymmetric）：影(kage) overview 主欄 = 報紙刊頭式
-  //   編輯模組 (GalleryEditorialModules, .em)。每個 event 一塊「特稿大圖 + 編號支援照 + 全N枚入口」。
-  //   舊「暗房光桌橫條」與橫向膠卷光桌已移除。元件自帶的 .em__masthead（h2 写真記録 + .em__count）
-  //   現全隱（display:none）：桌機標題/計數改由「頁面層非對稱刊頭」.kage-masthead 統一承擔
-  //   （h1 写真記録 + .kage-masthead__count），手機由 filmpanel-m 房間標牌承擔。
-  //   Playwright 預設 Desktop Chrome viewport 1280×720 屬 lg+，.kage-masthead 可見。
+  // Fresh Dynamic pilot：桌機與手機共用一個 Archive Controls 狀態模型；
+  // 世界識別、張數、分類與 filter disclosure 都由同一個 control surface 承擔。
 
   test('載入後顯示攝影編輯模組與張數', async ({ page }) => {
     await page.goto('/gallery/photography')
 
-    // 頁面層非對稱刊頭 .kage-masthead 主標 h1 =「写真記録」（lg+；mobile 由 filmpanel-m 標牌承擔）。
-    await expect(
-      page.locator('.kage-masthead__title').filter({ hasText: '写真記録' })
-    ).toBeVisible({ timeout: 10_000 })
+    const archive = page.getByTestId('gallery-archive-controls')
+
+    await expect(archive).toBeVisible({ timeout: 10_000 })
+    await expect(archive.getByRole('heading', { level: 1, name: '写真記録' })).toBeVisible()
 
     // 張數摘要：`<span>080</span><span>枚 · frames</span>`（補零三位）。
     // 含「枚 · frames」單位 + 雙位數，避免把 0 當通過。
-    await expect(
-      page.locator('.kage-masthead__count').filter({ hasText: /\d{2,}\s*枚\s*·\s*frames/ })
-    ).toBeVisible({ timeout: 10_000 })
+    await expect(archive.locator('.archive-controls__count')).toContainText(/\d{2,}\s*枚\s*·\s*frames/i)
 
     // 至少一個事件模組的「全 N 枚を見る」入口可見 → 代表資料已進畫面。
     await expect(page.locator('.em__enter').first()).toBeVisible({ timeout: 10_000 })

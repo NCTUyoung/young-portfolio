@@ -311,25 +311,9 @@ export const useGalleryStore = defineStore('gallery', () => {
     clearCache(['mixedItems', 'filteredItems'])
   }, 300)
 
-  /**
-   * R9：軌道切換轉場觸發器。
-   * setSelectedCategory 偵測到「類別真的變了」時，在 client 端 bump 一個 tick，
-   * 記下「從哪軌切到哪軌」。GalleryTrackTransition（掛在 app.vue，跨路由常駐）watch
-   * 此 tick 播放「起算尺」overlay。放在 store 而非元件內 watch 的原因：
-   * 切 tab 會走 router param 變更，page 元件在某些情況下會被 transition 卸載，
-   * 元件內 watch 的 prev 會丟失；store 是全站單例，trigger 不會因路由卸載而消失。
-   */
-  const trackTransitionTick = ref(0)
-  const trackTransitionTo = ref<'digital' | 'photography'>('photography')
-
   const setSelectedCategory = (category: 'digital' | 'photography') => {
-    const prev = filterState.value.selectedCategory
     filterState.value.selectedCategory = category
     clearCache(['mixedItems'])
-    if (import.meta.client && prev && prev !== category) {
-      trackTransitionTo.value = category
-      trackTransitionTick.value += 1
-    }
   }
 
   const setSelectedEvent = (event: string | null) => {
@@ -427,8 +411,6 @@ export const useGalleryStore = defineStore('gallery', () => {
     photographyManifesto,
     featuredChronology,
     crossWorldSpreads,
-    trackTransitionTick,
-    trackTransitionTo,
     expandedGroups,
     isLoading,
     filterState,

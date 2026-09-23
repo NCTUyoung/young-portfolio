@@ -9,8 +9,8 @@
       :class="[
         'fixed top-0 left-0 right-0 z-[1100] pt-[env(safe-area-inset-top,0px)] transition-all duration-500',
         isScrolled
-          ? 'bg-white/92 dark:bg-stone-900/92 nav-scrolled'
-          : 'bg-white/55 dark:bg-stone-900/50 backdrop-blur-md'
+          ? 'bg-stone-50 dark:bg-stone-900 nav-scrolled'
+          : 'bg-stone-50/92 dark:bg-stone-900/86 backdrop-blur-md'
       ]"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
