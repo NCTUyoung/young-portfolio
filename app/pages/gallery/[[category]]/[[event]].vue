@@ -300,9 +300,12 @@ import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vu
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
-const GalleryAtelierTimeline = defineAsyncComponent(() => import('~/components/gallery/GalleryAtelierTimeline.vue'))
-const GalleryPhotographySection = defineAsyncComponent(() => import('~/components/gallery/GalleryPhotographySection.vue'))
-const GalleryEventCover = defineAsyncComponent(() => import('~/components/gallery/GalleryEventCover.vue'))
+const loadGalleryAtelierTimeline = () => import('~/components/gallery/GalleryAtelierTimeline.vue')
+const loadGalleryPhotographySection = () => import('~/components/gallery/GalleryPhotographySection.vue')
+const loadGalleryEventCover = () => import('~/components/gallery/GalleryEventCover.vue')
+const GalleryAtelierTimeline = defineAsyncComponent(loadGalleryAtelierTimeline)
+const GalleryPhotographySection = defineAsyncComponent(loadGalleryPhotographySection)
+const GalleryEventCover = defineAsyncComponent(loadGalleryEventCover)
 const GalleryDigitalIntro = defineAsyncComponent(() => import('~/components/gallery/GalleryDigitalIntro.vue'))
 
 // ===== Store 和 Composables =====
@@ -317,6 +320,7 @@ const {
   filterState,
   digitalWorks,
   photographyWorks,
+  galleryDataReady,
   filteredItems,
 } = storeToRefs(galleryStore)
 
@@ -326,11 +330,23 @@ const {
   setSelectedEvent,
   setSearchQuery,
   setYearFilter,
+  getHydrationPayload,
 } = galleryStore
 
 const { getImagePath, getThumbPath } = useImagePath()
 
+let galleryPayloadReusesStore = false
 const { data: galleryPayload, pending: galleryPending, error: galleryPayloadError, refresh: refreshGalleryPayload } = await useAsyncData('gallery-works', async () => {
+  // 首頁已載入並 hydrate 兩類作品時，沿用 Pinia 資料，避免 SPA 進圖片庫又下載、解析同兩份 JSON。
+  const hasReusableGalleryData = galleryDataReady.value &&
+    digitalWorks.value.length > 0 &&
+    photographyWorks.value.length > 0
+  if (hasReusableGalleryData) {
+    galleryPayloadReusesStore = true
+    return getHydrationPayload()
+  }
+  galleryPayloadReusesStore = false
+
   // Key 必須叫 `photography` 才能對上 `hydrateFromPayload` 的 destructure；
   // 早期版本誤命名為 `photo`，導致 SSR 只灌到 digital，攝影仍為空，要靠 onMounted 補抓
   // (見下方 `if (digitalWorks.length === 0 || photographyWorks.length === 0) loadAllWorks()`)。
@@ -340,7 +356,7 @@ const { data: galleryPayload, pending: galleryPending, error: galleryPayloadErro
 })
 
 watch(galleryPayload, (v) => {
-  if (v) hydrateFromPayload(v)
+  if (v && !galleryPayloadReusesStore) hydrateFromPayload(v)
 }, { immediate: true })
 
 const isGalleryLoading = computed(() => galleryPending.value || isLoading.value)
@@ -358,9 +374,9 @@ const retryGalleryLoad = async () => {
   isGalleryRetrying.value = true
   try {
     await refreshGalleryPayload()
-    if (galleryPayload.value) {
+    if (galleryPayload.value && !galleryPayloadReusesStore) {
       hydrateFromPayload(galleryPayload.value)
-    } else {
+    } else if (!galleryPayload.value) {
       await loadAllWorks()
     }
   } finally {
@@ -718,6 +734,17 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 
 // ===== 生命週期 =====
 onMounted(async () => {
+  // 攝影總覽的主要下一步是打開事件。提早暖載事件封面與印樣格元件，
+  // 讓使用者進事件時不必再等 async component chunk 載入。
+  if (currentCategory.value === 'photography' && !filterState.value.selectedEvent) {
+    void Promise.all([
+      loadGalleryEventCover(),
+      loadGalleryPhotographySection()
+    ]).catch((error) => {
+      console.warn('Unable to preload photography event components', error)
+    })
+  }
+
   // 防禦性 fallback：useAsyncData 走完 hydrate 後若仍有任一邊為空（過去因 payload key
   // 不對齊導致 SSR 只灌數位的 bug 觸發過；現已修正），補抓一次保 UX 正常。
   try {

@@ -306,6 +306,11 @@ export const useGalleryStore = defineStore('gallery', () => {
     galleryDataReady.value = true
   }
 
+  const getHydrationPayload = () => ({
+    digital: digitalData.value,
+    photography: photographyData.value
+  })
+
   const debouncedSetSearchQuery = useDebounceFn((query: string) => {
     filterState.value.searchQuery = query
     clearCache(['mixedItems', 'filteredItems'])
@@ -428,6 +433,7 @@ export const useGalleryStore = defineStore('gallery', () => {
 
     loadAllWorks,
     hydrateFromPayload,
+    getHydrationPayload,
     loadDigitalWorks,
     loadPhotographyWorks,
     setSelectedCategory,

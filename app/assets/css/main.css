@@ -192,7 +192,7 @@
 /* ===== 頁面轉場 ===== */
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .page-enter-from {
   opacity: 0;
@@ -201,6 +201,13 @@
 .page-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: none !important;
+  }
 }
 
 /* ===== 日式裝飾性元素 ===== */
@@ -1063,7 +1070,7 @@
 }
 .gallery-world[data-world='kage'] .world-enter {
   opacity: 0;
-  animation: world-develop-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: world-develop-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 /* 進場階梯（章節依序） */
 .world-enter-d1 { animation-delay: 0.05s; }

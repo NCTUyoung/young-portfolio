@@ -9,13 +9,17 @@ v-if="showInfoPanel && currentViewerImage && imageInfo"
 
       <!-- 左頁：影像（desktop only） -->
       <div class="info-spread__leaf info-spread__leaf--image" aria-hidden="true">
-        <img
-          :src="getImagePath(currentViewerImage.filename)"
-          :alt="imageInfo.title"
-          class="info-spread__image"
-          decoding="async"
-          loading="eager"
-        >
+        <picture v-if="isDesktopInfoLayout">
+          <source type="image/avif" :srcset="getAvifThumbPath(currentViewerImage.filename, 1600)">
+          <source type="image/webp" :srcset="getThumbPath(currentViewerImage.filename, 1600)">
+          <img
+            :src="getImagePath(currentViewerImage.filename)"
+            :alt="imageInfo.title"
+            class="info-spread__image"
+            decoding="async"
+            loading="eager"
+          >
+        </picture>
         <!-- 跨頁中縫朱印 -->
         <span class="info-spread__seam" aria-hidden="true"/>
         <!-- 左頁腳：縦書 event eyebrow（編輯感標頭） -->
@@ -154,7 +158,7 @@ import { nonBoilerplateOrEmpty } from '~/utils/descriptionFilters'
 const ImageHistogram = defineAsyncComponent(() => import('./ImageHistogram.vue'))
 
 const imageViewerStore = useImageViewerStore()
-const { getThumbPath, getImagePath } = useImagePath()
+const { getThumbPath, getAvifThumbPath, getImagePath } = useImagePath()
 const {
   showInfoPanel,
   infoPanelWidth,
@@ -466,6 +470,9 @@ const formatDate = (date: Date | null) => {
   align-items: center;
   justify-content: center;
   padding: 3.5rem 2.5rem 4rem;
+}
+.info-spread__leaf--image picture {
+  display: contents;
 }
 @media (min-width: 768px) {
   .info-spread__leaf--image {

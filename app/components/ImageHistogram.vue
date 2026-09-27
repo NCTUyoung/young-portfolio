@@ -35,7 +35,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 
 const imageViewerStore = useImageViewerStore()
-const { getThumbPath } = useImagePath()
+const { getThumbPath, getAvifThumbPath } = useImagePath()
 const { currentViewerImage, showInfoPanel, infoPanelWidth } = storeToRefs(imageViewerStore)
 const isDesktopHistogramLayout = useMediaQuery('(min-width: 768px)')
 
@@ -63,12 +63,23 @@ const generateHistogram = async () => {
     // 創建隱藏的圖片元素來分析顏色
     const img = new Image()
     img.crossOrigin = 'anonymous'
+    const filename = currentViewerImage.value.filename
+    const sampleSize = isDesktopHistogramLayout.value ? 1600 : 400
+    const avifPath = getAvifThumbPath(filename, sampleSize)
+    let usedWebpFallback = false
 
-    await new Promise((resolve, reject) => {
-      img.onload = resolve
-      img.onerror = reject
-      // 直方圖 sample 後縮成 200×200 canvas，1600w WebP 已綽綽有餘；複用 lightbox 已快取的同一來源避免重撈原圖。
-      img.src = getThumbPath(currentViewerImage.value!.filename, 1600)
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve()
+      img.onerror = () => {
+        if (usedWebpFallback) {
+          reject(new Error('Unable to load image thumbnail'))
+          return
+        }
+        usedWebpFallback = true
+        img.src = getThumbPath(filename, 1600)
+      }
+      // 直方圖 sample 最後縮成 200×200；桌機複用資訊對頁的 1600，手機沿用列表已載入的 400。
+      img.src = avifPath
     })
 
     // 創建 canvas 來分析圖片

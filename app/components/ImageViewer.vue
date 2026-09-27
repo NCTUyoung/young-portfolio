@@ -20,8 +20,23 @@
     <!-- 背景點擊關閉 -->
     <div class="absolute inset-0" @click="closeImageViewer"/>
 
+    <!-- The close action is available before the full toolbar mounts. -->
+    <button
+      v-if="!viewerChromeReady"
+      type="button"
+      class="viewer-btn viewer-btn-close absolute top-2.5 right-3 z-20 sm:top-5 sm:right-5"
+      aria-label="關閉圖片檢視器"
+      title="關閉 (Esc)"
+      @click="closeImageViewer"
+    >
+      <svg class="viewer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 6L18 18" />
+        <path d="M18 6L6 18" />
+      </svg>
+    </button>
+
     <!-- 主要內容 -->
-    <div class="relative w-full h-full flex">
+    <div v-if="viewerContentReady" class="relative w-full h-full flex">
       <!-- 圖片檢視區域 — info spread takeover 開啟時整塊隱去（spread 自己接管畫面） -->
       <div
 class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 transition-all duration-300"
@@ -36,6 +51,7 @@ class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 tran
 
         <!-- 頂部：標題（左）+ 工具列（右）— 無框浮空，遵循「余白・細線」原則 -->
         <div
+v-if="viewerChromeReady"
 class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 flex items-start justify-between gap-3 sm:top-5 sm:left-5 sm:right-5"
              :style="toolbarInsetStyle">
 
@@ -125,7 +141,7 @@ class="viewer-btn viewer-btn-close"
           讓出，避免覆蓋 image drag-to-pan
         -->
         <button
-v-if="viewerImages.length > 1 && hasPrevious"
+v-if="viewerChromeReady && viewerImages.length > 1 && hasPrevious"
                 type="button"
                 tabindex="-1"
                 aria-hidden="true"
@@ -133,7 +149,7 @@ v-if="viewerImages.length > 1 && hasPrevious"
                 :class="{ 'viewer-hit-zone--inactive': viewerScale > 1 }"
                 @click="goToPreviousImage"/>
         <button
-v-if="viewerImages.length > 1 && hasNext"
+v-if="viewerChromeReady && viewerImages.length > 1 && hasNext"
                 type="button"
                 tabindex="-1"
                 aria-hidden="true"
@@ -145,15 +161,12 @@ v-if="viewerImages.length > 1 && hasNext"
                 <!-- 主要圖片區域 -->
         <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
           <!--
-            Lightbox 圖片來源優先序（`<picture>` 由瀏覽器選第一個能用的 source）：
-              1) AVIF 1600w（2026 主流瀏覽器全支援，最小）
-              2) WebP 1600w（fallback）
-              3) 原圖（僅古早瀏覽器或 thumb 缺檔時兜底）
-            放大到 >1x 仍是同一張 1600w，視覺上夠用；要原解析度可走 ImageInfoPanel 的「下載原圖」（後續再加）。
+            Lightbox 優先用符合目前顯示尺寸的 800/1600 AVIF；不支援時用同尺寸 WebP，
+            縮圖缺檔或格式都不支援時才退回原圖。放大會升至 1600，原始下載仍可另行取得。
           -->
           <picture v-if="currentViewerImage">
-            <source type="image/avif" :srcset="getAvifThumbPath(currentViewerImage.filename, 1600)">
-            <source type="image/webp" :srcset="getThumbPath(currentViewerImage.filename, 1600)">
+            <source type="image/avif" :srcset="getAvifThumbPath(currentViewerImage.filename, viewerImageThumbWidth)">
+            <source type="image/webp" :srcset="getThumbPath(currentViewerImage.filename, viewerImageThumbWidth)">
             <img
               ref="imageElement"
               :src="getImagePath(currentViewerImage.filename)"
@@ -188,7 +201,7 @@ v-if="viewerImages.length > 1 && hasNext"
 
         <!-- 導航按鈕（保留為 a11y fallback；z-10 蓋過 hit-zone z-5） -->
         <button
-v-if="viewerImages.length > 1 && hasPrevious"
+v-if="viewerChromeReady && viewerImages.length > 1 && hasPrevious"
                 class="viewer-nav-btn absolute left-2 top-1/2 sm:left-4 z-10 transform -translate-y-1/2"
                 title="上一張 (←)"
                 aria-label="上一張"
@@ -197,7 +210,7 @@ v-if="viewerImages.length > 1 && hasPrevious"
         </button>
 
         <button
-v-if="viewerImages.length > 1 && hasNext"
+v-if="viewerChromeReady && viewerImages.length > 1 && hasNext"
                 class="viewer-nav-btn absolute top-1/2 z-10 transform -translate-y-1/2"
                 :style="nextNavButtonStyle"
                 title="下一張 (→)"
@@ -207,10 +220,10 @@ v-if="viewerImages.length > 1 && hasNext"
         </button>
 
         <!-- 放射型輪盤縮圖導航 -->
-        <RadialNavigation />
+        <RadialNavigation v-if="viewerChromeReady && radialNavigationReady" />
 
         <!-- 導覽器 -->
-        <ImageNavigator />
+        <ImageNavigator v-if="viewerChromeReady && showNavigator" />
 
         <!--
           R50 對軌 PAIRED overlay 已移除：那是「繪⇄影」跨世界跳轉浮層，與近期
@@ -226,7 +239,7 @@ v-if="viewerImages.length > 1 && hasNext"
           - 與右邊 InfoPanel 的「資訊」是兩種對讀層次（rail = 詩意 / panel = 數據）
         -->
         <aside
-          v-if="currentViewerImage"
+          v-if="viewerChromeReady && currentViewerImage"
           class="viewer-track-rail pointer-events-none"
           :class="trackRailVariantClass"
           aria-hidden="true"
@@ -248,7 +261,7 @@ v-if="viewerImages.length > 1 && hasNext"
           首訪 3 秒可見，與全站 hairline motif 對位
         -->
         <div
-          v-if="viewerImages.length > 1"
+          v-if="viewerChromeReady && viewerImages.length > 1"
           class="viewer-progress-rail pointer-events-none"
           :style="progressRailInsetStyle"
           aria-hidden="true"
@@ -268,8 +281,20 @@ v-if="viewerImages.length > 1 && hasNext"
       </div>
     </div>
 
+    <div
+      v-else
+      class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="text-stone-200 text-center font-light">
+        <div class="animate-spin rounded-full h-10 w-10 border border-stone-500 border-t-stone-200 mx-auto mb-4"/>
+        <p class="tracking-[0.3em] text-xs">LOADING</p>
+      </div>
+    </div>
+
     <!-- 右側資訊面板 -->
-    <ImageInfoPanel />
+    <ImageInfoPanel v-if="viewerChromeReady && showInfoPanel" />
   </div>
   </Teleport>
 </template>
@@ -277,12 +302,11 @@ v-if="viewerImages.length > 1 && hasNext"
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComponent } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useMediaQuery } from '@vueuse/core'
+import { useMediaQuery, useWindowSize } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
 
-// 非關鍵子元件採 lazy 載入：使用者打開 lightbox 當下不一定會開資訊面板／縮圖盤，
-// 拆出去可以省首屏 JS 體積，首次點開圖片時再按需載入。
+// 非關鍵子元件採 lazy 載入；資訊對頁與放大導覽器在真正需要時才掛載。
 const ImageInfoPanel = defineAsyncComponent(() => import('./ImageInfoPanel.vue'))
 const ImageNavigator = defineAsyncComponent(() => import('./ImageNavigator.vue'))
 const RadialNavigation = defineAsyncComponent(() => import('./RadialNavigation.vue'))
@@ -306,6 +330,7 @@ const {
   canZoomOut,
   hasPrevious,
   hasNext,
+  showNavigator,
   imageStyle
 } = storeToRefs(imageViewerStore)
 
@@ -322,6 +347,27 @@ const {
 } = imageViewerStore
 
 const isDesktopViewerLayout = useMediaQuery('(min-width: 768px)')
+const { width: viewportWidth, height: viewportHeight } = useWindowSize()
+const devicePixelRatio = ref(1)
+
+/**
+ * 選擇足以支撐目前檢視尺寸的最小既有縮圖。
+ * 縮圖目錄標的是最長邊上限，不是固定寬度；以實際顯示長邊 × DPR 推算，
+ * 直幅、高 DPR、放大檢視都保留 1600，手機上能以 800 清晰顯示的照片才降流量。
+ */
+const viewerImageThumbWidth = computed(() => {
+  const image = currentViewerImage.value
+  const aspectRatio = image?.aspectRatio
+  if (!image || !aspectRatio || viewportWidth.value <= 0 || viewportHeight.value <= 0) return 1600
+
+  const padding = viewportWidth.value < 640 ? 16 : 32
+  const availableWidth = Math.max(1, viewportWidth.value - padding)
+  const availableHeight = Math.max(1, viewportHeight.value - padding)
+  const fittedHeight = Math.min(availableHeight, availableWidth / aspectRatio)
+  const requiredLongEdge = fittedHeight * Math.max(1, aspectRatio) * devicePixelRatio.value * Math.max(1, viewerScale.value)
+
+  return requiredLongEdge <= 800 ? 800 : 1600
+})
 
 /**
  * spread takeover 模式：InfoPanel 是 fixed inset-0 全屏，所以主圖不再需要 marginRight。
@@ -398,8 +444,50 @@ const formatIndex = (n: number) => {
 const imageElement = ref<HTMLImageElement>()
 const imageReady = ref(false)
 const imageLoadError = ref(false)
+const radialNavigationReady = ref(false)
+const viewerContentReady = ref(false)
+const viewerChromeReady = ref(false)
+let viewerContentFirstFrame = 0
+let viewerContentSecondFrame = 0
+let viewerChromeFirstFrame = 0
+let viewerChromeSecondFrame = 0
 
-watch(() => currentViewerImage.value?.filename, () => {
+function cancelViewerContentReveal () {
+  if (viewerContentFirstFrame) window.cancelAnimationFrame(viewerContentFirstFrame)
+  if (viewerContentSecondFrame) window.cancelAnimationFrame(viewerContentSecondFrame)
+  if (viewerChromeFirstFrame) window.cancelAnimationFrame(viewerChromeFirstFrame)
+  if (viewerChromeSecondFrame) window.cancelAnimationFrame(viewerChromeSecondFrame)
+  viewerContentFirstFrame = 0
+  viewerContentSecondFrame = 0
+  viewerChromeFirstFrame = 0
+  viewerChromeSecondFrame = 0
+}
+
+function scheduleViewerContentReveal () {
+  cancelViewerContentReveal()
+  viewerContentFirstFrame = window.requestAnimationFrame(() => {
+    viewerContentFirstFrame = 0
+    viewerContentSecondFrame = window.requestAnimationFrame(() => {
+      viewerContentSecondFrame = 0
+      if (isOpen.value) viewerContentReady.value = true
+    })
+  })
+}
+
+function scheduleViewerChromeReveal () {
+  if (viewerChromeReady.value) return
+  if (viewerChromeFirstFrame) window.cancelAnimationFrame(viewerChromeFirstFrame)
+  if (viewerChromeSecondFrame) window.cancelAnimationFrame(viewerChromeSecondFrame)
+  viewerChromeFirstFrame = window.requestAnimationFrame(() => {
+    viewerChromeFirstFrame = 0
+    viewerChromeSecondFrame = window.requestAnimationFrame(() => {
+      viewerChromeSecondFrame = 0
+      if (isOpen.value) viewerChromeReady.value = true
+    })
+  })
+}
+
+watch(() => [currentViewerImage.value?.filename, viewerImageThumbWidth.value], () => {
   imageReady.value = false
   imageLoadError.value = false
 }, { flush: 'sync' })
@@ -408,25 +496,34 @@ async function handleViewerImageLoad (event: Event) {
   const image = event.currentTarget as HTMLImageElement
   if (image !== imageElement.value) return
   const filename = currentViewerImage.value?.filename
+  const source = image.currentSrc
 
   try {
     await image.decode()
   } catch {
-    if (image !== imageElement.value || filename !== currentViewerImage.value?.filename) return
+    if (image !== imageElement.value || filename !== currentViewerImage.value?.filename || source !== image.currentSrc) return
     imageReady.value = false
     imageLoadError.value = true
+    radialNavigationReady.value = true
+    scheduleViewerChromeReveal()
     return
   }
 
-  if (image !== imageElement.value || filename !== currentViewerImage.value?.filename) return
+  if (image !== imageElement.value || filename !== currentViewerImage.value?.filename || source !== image.currentSrc) return
   imageReady.value = image.complete && image.naturalWidth > 0
   imageLoadError.value = !imageReady.value
+  if (imageReady.value) {
+    radialNavigationReady.value = true
+    scheduleViewerChromeReveal()
+  }
 }
 
 function handleViewerImageError (event: Event) {
   if (event.currentTarget !== imageElement.value) return
   imageReady.value = false
   imageLoadError.value = true
+  radialNavigationReady.value = true
+  scheduleViewerChromeReveal()
 }
 const lightboxRoot = ref<HTMLElement>()
 
@@ -461,13 +558,18 @@ const getFocusable = (): HTMLElement[] => {
 const activateTrap = async () => {
   previouslyFocused = (document.activeElement as HTMLElement) ?? null
   await nextTick()
-  const [first] = getFocusable()
-  ;(first ?? lightboxRoot.value)?.focus()
+  await new Promise<void>((resolve) => {
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()))
+  })
+  if (!isOpen.value) return
+  // 聚焦 dialog 本身，不在點圖的同步路徑逐一讀取 offsetParent。
+  // 開啟時 body overflow 剛鎖定，這類可見性讀取會強制瀏覽器先重排整頁。
+  lightboxRoot.value?.focus({ preventScroll: true })
 }
 
 const releaseTrap = () => {
   if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-    previouslyFocused.focus()
+    previouslyFocused.focus({ preventScroll: true })
   }
   previouslyFocused = null
 }
@@ -477,7 +579,7 @@ const handleTabKey = (event: KeyboardEvent) => {
   const items = getFocusable()
   if (items.length === 0) {
     event.preventDefault()
-    lightboxRoot.value.focus()
+    lightboxRoot.value.focus({ preventScroll: true })
     return
   }
   const first = items[0]
@@ -486,13 +588,13 @@ const handleTabKey = (event: KeyboardEvent) => {
   const active = document.activeElement as HTMLElement | null
 
   if (event.shiftKey) {
-    if (active === first || !lightboxRoot.value.contains(active)) {
+    if (active === first || active === lightboxRoot.value || !lightboxRoot.value.contains(active)) {
       event.preventDefault()
-      last.focus()
+      last.focus({ preventScroll: true })
     }
   } else if (active === last) {
     event.preventDefault()
-    first.focus()
+    first.focus({ preventScroll: true })
   }
 }
 
@@ -661,13 +763,18 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 // 生命週期
 onMounted(() => {
+  devicePixelRatio.value = window.devicePixelRatio || 1
   initNavigatorPosition()
   document.addEventListener('keydown', handleKeydown)
   document.addEventListener('keydown', handleTabKey, true)
-  if (isOpen.value) activateTrap()
+  if (isOpen.value) {
+    scheduleViewerContentReveal()
+    activateTrap()
+  }
 })
 
 onUnmounted(() => {
+  cancelViewerContentReveal()
   document.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('keydown', handleTabKey, true)
   releaseTrap()
@@ -677,8 +784,17 @@ onUnmounted(() => {
 watch(isOpen, (open) => {
   imageReady.value = false
   imageLoadError.value = false
-  if (open) activateTrap()
-  else releaseTrap()
+  radialNavigationReady.value = false
+  viewerChromeReady.value = false
+  if (open) {
+    scheduleViewerContentReveal()
+    activateTrap()
+  } else {
+    cancelViewerContentReveal()
+    viewerContentReady.value = false
+    viewerChromeReady.value = false
+    releaseTrap()
+  }
 })
 </script>
 
