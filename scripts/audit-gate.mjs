@@ -29,7 +29,9 @@ const ALLOWLIST = {
   'GHSA-58qx-3vcg-4xpx': 'ws uninitialized memory — HMR dev socket only',
   'GHSA-96hv-2xvq-fx4p': 'ws fragment DoS — HMR dev socket only',
   'GHSA-fx2h-pf6j-xcff': 'vite dev-server advisory — dev only, not in SSG output',
-  'GHSA-mm7m-92g8-7m47': 'nuxt build/SSR advisory — no Node runtime in static deploy'
+  'GHSA-f88m-g3jw-g9cj': 'sharp/libvips CVEs — local Nuxt upload and offline image scripts only; GitHub Pages ships static output without a Node image-processing endpoint',
+  'GHSA-mm7m-92g8-7m47': 'nuxt build/SSR advisory — no Node runtime in static deploy',
+  'GHSA-rgj7-g3m4-5g8c': 'sharp/libheif CVEs — local Nuxt upload and offline image scripts only; GitHub Pages ships static output without a Node image-processing endpoint'
 }
 
 function getAudit () {
