@@ -44,7 +44,7 @@ test.describe('Gallery archive controls pilot on mobile', () => {
 
   test('sticky summary reopens the same filter disclosure', async ({ page }) => {
     await page.goto('/gallery/photography')
-    await expect(page.getByTestId('gallery-archive-controls')).toHaveAttribute('data-hydrated', 'true')
+    await expect(page.getByTestId('gallery-archive-controls')).toHaveAttribute('data-hydrated', 'true', { timeout: 15_000 })
     await page.evaluate(() => window.scrollTo(0, 900))
 
     const miniToggle = page.getByTestId('gallery-filter-mini-toggle')

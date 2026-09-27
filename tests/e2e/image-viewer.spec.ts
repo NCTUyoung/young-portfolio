@@ -15,12 +15,12 @@ const EVENT_PATH = '/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D'
 
 test.describe('ImageViewer 鍵盤操作', () => {
   test('same image reopen resets failed decode state', async ({ page }) => {
-    let failViewerLoad = true
+    let failViewerLoad = false
     await page.route('**/images/**', async (route) => {
       const url = route.request().url()
-      const isLargeThumbnail = url.includes('/_thumbs/1600w/')
+      const isViewerThumbnail = /\/_thumbs\/(?:800|1600)w\//.test(url)
       const isOriginalImage = url.includes('/images/photography/') && !url.includes('/_thumbs/')
-      if (failViewerLoad && (isLargeThumbnail || isOriginalImage)) {
+      if (failViewerLoad && (isViewerThumbnail || isOriginalImage)) {
         await route.abort()
         return
       }
@@ -32,6 +32,7 @@ test.describe('ImageViewer 鍵盤操作', () => {
     const firstCell = page.locator('.contact-sheet__btn').first()
     await firstCell.waitFor({ state: 'visible', timeout: 15_000 })
 
+    failViewerLoad = true
     await firstCell.click({ force: true })
     const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
     const viewerImage = dialog.locator('.image-viewer-area picture img')
