@@ -24,11 +24,17 @@ const ROUTES = [
 ]
 
 export default async function globalSetup (config: FullConfig) {
+  if (process.env.PLAYWRIGHT_SKIP_GLOBAL_WARMUP === '1') {
+    console.log('[e2e warmup] skipped by focused runner; tests will compile routes on demand')
+    return
+  }
+
   const base = config.projects[0]?.use?.baseURL ?? 'http://localhost:3000/young-portfolio/'
   const browser = await chromium.launch()
   const page = await browser.newPage({ baseURL: base })
   const t0 = Date.now()
   for (const route of ROUTES) {
+    const routeStartedAt = Date.now()
     try {
       await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90_000 })
       if (route === '/gallery/photography') {
@@ -40,6 +46,8 @@ export default async function globalSetup (config: FullConfig) {
       }
     } catch (e) {
       console.warn(`[e2e warmup] ${route} 暖機未完成（不致命）：${(e as Error).message}`)
+    } finally {
+      console.log(`[e2e warmup] ${route}: ${((Date.now() - routeStartedAt) / 1000).toFixed(1)}s`)
     }
   }
   await browser.close()

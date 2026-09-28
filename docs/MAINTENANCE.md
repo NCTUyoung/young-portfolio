@@ -107,7 +107,17 @@ npm run preview
 npm run thumbs        # 掃描 public/images 產生 _thumbs/400w、800w WebP（新增照片後建議執行）
 npm run test          # Vitest 單次
 npm run test:watch    # 監聽模式
+npm run test:e2e      # 完整 Playwright 套件（含路由暖機）
+npm run test:e2e:focused -- tests/e2e/gallery.spec.ts  # 指定 E2E，單 worker，不暖機全站
 ```
+
+本機只驗一個 E2E spec 或 title 時用 `test:e2e:focused`，可再加 Playwright 參數，例如：
+
+```bash
+npm run test:e2e:focused -- tests/e2e/gallery.spec.ts --grep "already loaded visible photos"
+```
+
+Focused runner 固定使用單一 worker 並略過全站路由暖機，避免一次性檢查也等待首頁、繪圖頁與後台編譯；指定路由會由測試本身首次造訪並等待必要 UI。完整套件仍使用原本的 `test:e2e`，保留 CI 平行執行與冷啟動暖機保護。
 
 ## 故障排除
 
