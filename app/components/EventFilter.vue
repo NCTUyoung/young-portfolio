@@ -16,7 +16,7 @@
       <button
         v-if="hasMultipleEvents"
         type="button"
-        class="sm:hidden inline-flex items-center gap-2 text-[0.65rem] tracking-[0.32em] uppercase text-stone-500 dark:text-stone-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors py-1"
+        class="sm:hidden inline-flex min-h-11 items-center gap-2 text-sm tracking-[0.12em] uppercase text-stone-600 dark:text-stone-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors py-1"
         :aria-expanded="mobileExpanded"
         aria-controls="event-filter-mobile-list"
         @click="mobileExpanded = !mobileExpanded"
@@ -85,7 +85,7 @@
             : 'px-4 py-2.5 whitespace-nowrap shrink-0',
           filterState.selectedEvent === null
             ? 'text-stone-800 dark:text-stone-100'
-            : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+            : 'text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100'
         ]"
         @click="onSelectEvent(null)"
       >
@@ -116,7 +116,7 @@
           Rail 版本（Path B）：count 永遠 stone-400 + 小一級，去掉 accent badge 感；
           選中態僅由左側 1px accent 細線承擔，與 Rinko/McGinley 純文字 link 列同氣。
         -->
-        <span class="text-xs truncate">全部事件</span>
+        <span class="text-sm truncate">全部事件</span>
         <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
         <span
           class="tabular-nums shrink-0"
@@ -145,7 +145,7 @@
               : 'px-4 py-2.5 whitespace-nowrap shrink-0',
             filterState.selectedEvent === event.name
               ? 'text-stone-800 dark:text-stone-100'
-              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+              : 'text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100'
           ]"
           @click="onSelectEvent(event.name)"
         >
@@ -169,7 +169,7 @@
             ]"
           />
           <!-- 計數格式 name · n（rail 同上：count 永遠 stone-400，選中態靠左側細線） -->
-          <span class="text-xs truncate">{{ event.name }}</span>
+          <span class="text-sm truncate">{{ event.name }}</span>
           <span v-if="variant !== 'rail'" class="mx-1.5 text-stone-300 dark:text-stone-700 text-xs">·</span>
           <span
             class="tabular-nums shrink-0"

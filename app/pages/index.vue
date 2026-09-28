@@ -41,7 +41,7 @@
         <NuxtLink
           to="/gallery/digital"
           class="hero-page hero-page--kai group"
-          aria-label="進入繪世界 — 製図室 Digital Gallery"
+          aria-label="進入繪世界 — 製図室繪作"
           @mouseenter="setHoverFocus('kai')"
           @mouseleave="setHoverFocus(null)"
         >
@@ -61,7 +61,7 @@
             <span class="hero-page__title hero-page__title--kai">製図室</span>
             <span class="hero-page__note hero-page__note--kai">幾何から角色へ、規矩から自由へ。</span>
             <span class="hero-page__enter">
-              <span class="hero-page__enter-label">繪を見る</span>
+              <span class="hero-page__enter-label">觀看繪作</span>
               <svg class="hero-page__enter-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </span>
           </span>
@@ -79,7 +79,7 @@
         <NuxtLink
           to="/gallery/photography"
           class="hero-page hero-page--kage group"
-          aria-label="進入影世界 — 暗室 Photography Gallery"
+          aria-label="開啟影世界攝影地圖"
           @mouseenter="setHoverFocus('kage')"
           @mouseleave="setHoverFocus(null)"
         >
@@ -101,7 +101,7 @@
             <span class="hero-page__note hero-page__note--kage">光と影を、現像する。</span>
             <span class="hero-page__enter hero-page__enter--right">
               <svg class="hero-page__enter-arrow hero-page__enter-arrow--left" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 8l-4 4m0 0l4 4m-4-4h18"/></svg>
-              <span class="hero-page__enter-label hero-page__enter-label--serif">影を見る</span>
+              <span class="hero-page__enter-label hero-page__enter-label--serif">開啟攝影地圖</span>
             </span>
           </span>
         </NuxtLink>
@@ -1008,7 +1008,7 @@ useHead({
 .hero-spread {
   background: #fdfaf4; /* 繪半暖底兜底（影半自有暗底） */
 }
-:global(.dark) .hero-spread { background: #1a1714; }
+.dark .hero-spread { background: #1a1714; }
 
 .hero-spread__pages {
   position: absolute;
@@ -1068,8 +1068,8 @@ useHead({
   background-size: 46px 46px, 46px 46px, 9.2px 9.2px, 9.2px 9.2px;
   opacity: 0.7;
 }
-:global(.dark) .hero-page--kai { --hp-base: #1a1714; }
-:global(.dark) .hero-page--kai .hero-page__wash--kai {
+.dark .hero-page--kai { --hp-base: #1a1714; }
+.dark .hero-page--kai .hero-page__wash--kai {
   background:
     linear-gradient(105deg, rgba(26,23,20,0.42) 0%, rgba(26,23,20,0.16) 46%, rgba(26,23,20,0.05) 100%),
     radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.18) 0%, transparent 72%);
@@ -1096,14 +1096,14 @@ useHead({
   background-repeat: repeat-y, repeat, repeat;
   opacity: 0.5;
 }
-:global(.dark) .hero-page--kage { --hp-base: #14181b; }
-:global(.dark) .hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
-:global(.dark) .hero-page--kage .hero-page__wash--kage {
+.dark .hero-page--kage { --hp-base: #14181b; }
+.dark .hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
+.dark .hero-page--kage .hero-page__wash--kage {
   background:
     linear-gradient(255deg, rgba(15,18,21,0.66) 0%, rgba(15,18,21,0.3) 48%, rgba(15,18,21,0.12) 100%),
     radial-gradient(75% 65% at 90% 10%, rgba(154,173,197,0.16) 0%, transparent 66%);
 }
-:global(.dark) .hero-page--kage .hero-page__texture {
+.dark .hero-page--kage .hero-page__texture {
   background-image:
     radial-gradient(circle at center, rgba(238,241,243,0.6) 0 1.5px, transparent 1.8px),
     radial-gradient(rgba(206,214,224,0.12) 0.6px, transparent 0.7px),
@@ -1126,8 +1126,8 @@ useHead({
   filter: grayscale(0.4) brightness(1.01) opacity(0.55);
   transition: filter 0.5s ease;
 }
-:global(.dark) .hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
-:global(.dark) .hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
+.dark .hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
+.dark .hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
   filter: grayscale(0.5) brightness(0.6);
 }
 .hero-spread--in .hero-page:hover .hero-page__plate { transform: translateY(-4px); }
@@ -1146,12 +1146,25 @@ useHead({
   align-items: flex-start;
   gap: 0.55rem;
   max-width: 80%;
+  padding: 0.9rem 1.1rem 1rem;
+  background: rgba(250, 246, 238, 0.91);
+  box-shadow: 0 0 0 1px rgba(92, 74, 57, 0.16);
 }
 .hero-page__plate--right {
   left: auto;
   right: clamp(1.4rem, 4vw, 4rem);
   align-items: flex-end;
   text-align: right;
+  background: rgba(239, 243, 246, 0.92);
+  box-shadow: 0 0 0 1px rgba(70, 87, 105, 0.18);
+}
+.dark .hero-page--kai .hero-page__plate {
+  background: rgba(31, 27, 24, 0.9);
+  box-shadow: 0 0 0 1px rgba(231, 184, 125, 0.2);
+}
+.dark .hero-page--kage .hero-page__plate {
+  background: rgba(24, 29, 34, 0.91);
+  box-shadow: 0 0 0 1px rgba(154, 173, 197, 0.25);
 }
 .hero-page__eyebrow {
   font-size: 0.66rem;
@@ -1163,14 +1176,14 @@ useHead({
   color: #b9601f;
 }
 .hero-page__eyebrow--mono span { opacity: 0.55; }
-:global(.dark) .hero-page__eyebrow--mono { color: #e7b87d; }
+.dark .hero-page__eyebrow--mono { color: #e7b87d; }
 .hero-page__eyebrow--serif {
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   letter-spacing: 0.4em;
   text-transform: none;
   color: #56697e;
 }
-:global(.dark) .hero-page__eyebrow--serif { color: #b9c6d6; }
+.dark .hero-page__eyebrow--serif { color: #b9c6d6; }
 .hero-page__title {
   font-size: clamp(2.6rem, 6vw, 4.4rem);
   line-height: 1;
@@ -1182,7 +1195,7 @@ useHead({
   letter-spacing: 0.1em;
   color: #2b2017;
 }
-:global(.dark) .hero-page__title--kai { color: #f7efe4; }
+.dark .hero-page__title--kai { color: #f7efe4; }
 .hero-page__title--kage {
   font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
   font-weight: 600;
@@ -1190,7 +1203,7 @@ useHead({
   color: #2b3640;
   text-shadow: 0 1px 12px rgba(255,255,255,0.5);
 }
-:global(.dark) .hero-page__title--kage { color: #eef1f3; text-shadow: 0 2px 18px rgba(0,0,0,0.45); }
+.dark .hero-page__title--kage { color: #eef1f3; text-shadow: 0 2px 18px rgba(0,0,0,0.45); }
 .hero-page__note {
   font-size: 0.92rem;
   font-weight: 300;
@@ -1198,25 +1211,27 @@ useHead({
   letter-spacing: 0.08em;
 }
 .hero-page__note--kai { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; color: #5a4b3c; }
-:global(.dark) .hero-page__note--kai { color: #c9b9a6; }
+.dark .hero-page__note--kai { color: #c9b9a6; }
 .hero-page__note--kage { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; color: #51616f; }
-:global(.dark) .hero-page__note--kage { color: #c2cdda; }
+.dark .hero-page__note--kage { color: #c2cdda; }
 
 .hero-page__enter {
   margin-top: 0.65rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #8a7a68;
+  color: #44382e;
   transition: color 0.4s ease, gap 0.4s ease;
 }
-.hero-page__enter--right { color: #66788c; }
-:global(.dark) .hero-page__enter--right { color: #9aadc5; }
+.hero-page__enter--right { color: #34475b; }
+.dark .hero-page__enter { color: #e7b87d; }
+.dark .hero-page__enter--right { color: #c2d0df; }
 .hero-page--kai:hover .hero-page__enter { color: #b9601f; }
+.dark .hero-page--kai:hover .hero-page__enter { color: #e7b87d; }
 .hero-page--kage:hover .hero-page__enter { color: #3f4f63; }
-:global(.dark) .hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
-.hero-page__enter-label { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; font-size: 1rem; letter-spacing: 0.2em; }
-.hero-page__enter-label--serif { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.24em; }
+.dark .hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
+.hero-page__enter-label { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; font-size: 1.05rem; font-weight: 500; letter-spacing: 0.12em; }
+.hero-page__enter-label--serif { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; }
 .hero-page__enter-arrow { width: 1rem; height: 1rem; transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
 .hero-page--kai:hover .hero-page__enter-arrow { transform: translateX(0.4rem); }
 .hero-page--kage:hover .hero-page__enter-arrow--left { transform: translateX(-0.4rem); }
@@ -1239,11 +1254,11 @@ useHead({
   /* freshen：書脊改淺色折縫（中央微亮、兩緣淡灰影），不再是暗縫 */
   background: linear-gradient(to right, rgba(120,113,108,0.12), rgba(120,113,108,0.03) 35%, rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.03) 65%, rgba(120,113,108,0.12));
 }
-:global(.dark) .hero-spine {
+.dark .hero-spine {
   background: linear-gradient(to right, rgba(0,0,0,0.16), rgba(0,0,0,0.04) 35%, rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.04) 65%, rgba(0,0,0,0.16));
 }
 .hero-spine__rule { width: 1px; flex: 1; background: linear-gradient(to bottom, transparent, rgba(120,113,108,0.4), transparent); }
-:global(.dark) .hero-spine__rule { background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
+.dark .hero-spine__rule { background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
 .hero-spine__kana {
   writing-mode: vertical-rl;
   font-size: 1.25rem;
@@ -1253,16 +1268,16 @@ useHead({
   text-shadow: 0 1px 8px rgba(255,255,255,0.4);
   line-height: 1.1;
 }
-:global(.dark) .hero-spine__kana { color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+.dark .hero-spine__kana { color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
 .hero-spine__div { color: rgba(40,46,54,0.4); }
-:global(.dark) .hero-spine__div { color: rgba(255,255,255,0.5); }
+.dark .hero-spine__div { color: rgba(255,255,255,0.5); }
 .hero-spine__era {
   writing-mode: vertical-rl;
   font-size: 0.6rem;
   letter-spacing: 0.42em;
   color: rgba(68,64,60,0.6);
 }
-:global(.dark) .hero-spine__era { color: rgba(255,255,255,0.6); }
+.dark .hero-spine__era { color: rgba(255,255,255,0.6); }
 
 /* ---- 對開帶上方余白主題（極簡，居中上緣） ---- */
 .hero-spread__masthead {
@@ -1279,21 +1294,21 @@ useHead({
   text-align: center;
 }
 .hero-spread__masthead-kanji {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-weight: 200;
   letter-spacing: 0.5em;
-  color: rgba(41,37,36,0.92);
-  text-shadow: 0 1px 12px rgba(255,255,255,0.55);
+  color: rgba(41,37,36,0.44);
+  text-shadow: 0 1px 12px rgba(255,255,255,0.45);
 }
-:global(.dark) .hero-spread__masthead-kanji { color: rgba(255,255,255,0.96); text-shadow: 0 2px 14px rgba(0,0,0,0.45); }
+.dark .hero-spread__masthead-kanji { color: rgba(255,255,255,0.48); text-shadow: 0 2px 14px rgba(0,0,0,0.35); }
 .hero-spread__masthead-en {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', 'Noto Sans TC', sans-serif;
   font-size: 0.58rem;
   letter-spacing: 0.46em;
   text-transform: uppercase;
-  color: rgba(68,64,60,0.66);
+  color: rgba(68,64,60,0.46);
 }
-:global(.dark) .hero-spread__masthead-en { color: rgba(255,255,255,0.72); }
+.dark .hero-spread__masthead-en { color: rgba(255,255,255,0.48); }
 
 /* ---- mobile：對開頁改上下堆疊，書脊轉橫 ---- */
 @media (max-width: 1023px) {
@@ -1309,11 +1324,11 @@ useHead({
     height: 2.2rem;
     background: linear-gradient(to bottom, rgba(120,113,108,0.12), rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.12));
   }
-  :global(.dark) .hero-spine {
+  .dark .hero-spine {
     background: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.16));
   }
   .hero-spine__rule { width: auto; height: 1px; flex: 1; background: linear-gradient(to right, transparent, rgba(120,113,108,0.4), transparent); }
-  :global(.dark) .hero-spine__rule { background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
+  .dark .hero-spine__rule { background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
   .hero-spine__kana, .hero-spine__era { writing-mode: horizontal-tb; }
   .hero-page__plate { max-width: 88%; }
 }
@@ -1367,11 +1382,11 @@ useHead({
   opacity: 1;
   color: rgb(217 123 46);
 }
-:global(.dark) .hero-toggle:hover::before,
-:global(.dark) .hero-toggle--active::before {
+.dark .hero-toggle:hover::before,
+.dark .hero-toggle--active::before {
   color: rgb(231 184 125);
 }
-:global(.dark) .hero-toggle {
+.dark .hero-toggle {
   color: rgb(214 211 209);
   border-bottom-color: rgb(120 113 108 / 0.42);
 }
@@ -1384,7 +1399,7 @@ useHead({
   border-bottom-color: rgb(217 123 46 / 0.85);
   background: rgb(217 123 46 / 0.06);
 }
-:global(.dark) .hero-toggle--active {
+.dark .hero-toggle--active {
   color: rgb(231 184 125);
   border-bottom-color: rgb(231 184 125 / 0.75);
   background: rgb(231 184 125 / 0.08);
@@ -1562,8 +1577,8 @@ useHead({
 }
 .hero-title-subline--kai .hero-title-subline__kana { color: rgb(217 123 46); }
 .hero-title-subline--kage .hero-title-subline__kana { color: rgb(46 70 102); }
-:global(.dark) .hero-title-subline--kai .hero-title-subline__kana { color: rgb(231 184 125); }
-:global(.dark) .hero-title-subline--kage .hero-title-subline__kana { color: rgb(154 173 197); }
+.dark .hero-title-subline--kai .hero-title-subline__kana { color: rgb(231 184 125); }
+.dark .hero-title-subline--kage .hero-title-subline__kana { color: rgb(154 173 197); }
 .hero-title-subline__en {
   font-family: 'Inter', sans-serif;
   font-size: 0.66rem;
@@ -1571,7 +1586,7 @@ useHead({
   text-transform: uppercase;
   color: rgb(120 113 108);
 }
-:global(.dark) .hero-title-subline__en { color: rgb(168 162 158); }
+.dark .hero-title-subline__en { color: rgb(168 162 158); }
 
 .hero-subtitle-fade-enter-active,
 .hero-subtitle-fade-leave-active {

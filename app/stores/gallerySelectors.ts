@@ -79,6 +79,7 @@ export type EventLocationPoint = {
   name: string
   lat: number
   lng: number
+  locationAccuracy: 'event' | 'regional'
   coverFilename: string
   timeRange: string
   count: number
@@ -257,7 +258,10 @@ export function buildEventLocations (
     const timeRange = calculateTimeRange(imagesSorted)
 
     const info = group.eventInfo
-    const coordFromEvent = info?.lat !== undefined && info?.lng !== undefined
+    const coordFromEvent = typeof info?.lat === 'number' &&
+      typeof info.lng === 'number' &&
+      Number.isFinite(info.lat) &&
+      Number.isFinite(info.lng)
       ? { lat: info.lat, lng: info.lng }
       : undefined
     const coord = coordFromEvent || coordsFallback[name]
@@ -270,6 +274,7 @@ export function buildEventLocations (
       name,
       lat: coord.lat,
       lng: coord.lng,
+      locationAccuracy: coordFromEvent ? 'event' : 'regional',
       coverFilename: cover.filename,
       timeRange,
       count: imagesSorted.length,

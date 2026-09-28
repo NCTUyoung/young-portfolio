@@ -6,7 +6,11 @@
     :class="{ 'gallery-world--ready': worldReady }"
   >
     <!-- Fresh Dynamic pilot：同一個 Archive Controls 負責世界識別、分類與篩選狀態。 -->
-    <div ref="controlsSectionRef" class="container mx-auto px-4 sm:px-6">
+    <div
+      v-if="currentCategory !== 'photography'"
+      ref="controlsSectionRef"
+      class="container mx-auto px-4 sm:px-6"
+    >
       <GalleryArchiveControls
         ref="archiveControlsRef"
         :world="worldId"
@@ -74,6 +78,48 @@
         >
           {{ isGalleryRetrying ? 'Retrying…' : 'Retry' }}
         </button>
+      </div>
+
+      <section
+        v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent && eventLocations.length"
+        ref="mapSectionRef"
+        class="photo-map-entry scroll-mt-24"
+        aria-labelledby="photo-map-heading"
+      >
+        <div class="photo-map-entry__map">
+          <EventMap
+            v-if="mapShouldMount"
+            :events="eventLocations"
+            :initial-view="restoredPhotoMapView"
+            :selected-event-name="photoMapView.focusedEventName"
+            @focus-event="handleFocusEvent"
+            @viewport-change="savePhotoMapView"
+          />
+          <div v-else class="photo-map-entry__skeleton" aria-hidden="true" />
+        </div>
+        <div class="photo-map-entry__caption">
+          <div>
+            <p class="jp-eyebrow">其の一 · Footsteps</p>
+            <h2 id="photo-map-heading" class="jp-section-title">
+              踏跡<span class="jp-section-ruby">Photographs, Placed</span>
+            </h2>
+          </div>
+          <p class="photo-map-entry__hint">拖曳地圖，放大探索附近的照片</p>
+        </div>
+      </section>
+
+      <div
+        v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent"
+        ref="controlsSectionRef"
+        class="container mx-auto px-4 sm:px-6"
+      >
+        <GalleryArchiveControls
+          ref="archiveControlsRef"
+          :world="worldId"
+          :count="categoryCount"
+          :selected-event="filterState.selectedEvent"
+          @open-change="archiveControlsOpen = $event"
+        />
       </div>
 
       <!--
@@ -169,38 +215,6 @@
             章節索引主欄改回全寬，接在扉頁之後。
           -->
           <div v-if="!filterState.selectedEvent" class="kage-overview world-enter world-enter-d2">
-            <section
-              v-if="!galleryLoadFailed && eventLocations && eventLocations.length && currentCategory === 'photography'"
-              ref="mapSectionRef"
-              class="kage-plate scroll-mt-24"
-              aria-labelledby="photo-map-heading"
-            >
-              <div class="kage-plate__verso">
-                <EventMap
-                  v-if="mapShouldMount"
-                  :events="eventLocations"
-                  :selected-event-name="filterState.selectedEvent"
-                  @focus-event="handleFocusEvent"
-                />
-                <!-- 掛載前佔位：預留近似高度避免地圖一進來時捲動跳動 -->
-                <div v-else class="kage-plate__verso-skeleton" aria-hidden="true"/>
-              </div>
-              <div class="kage-plate__recto">
-                <div class="kage-plate__head">
-                  <p class="jp-eyebrow">其の一 · Footsteps</p>
-                  <span class="jp-seal kage-plate__seal" aria-hidden="true"><span class="jp-seal-ink">跡</span></span>
-                </div>
-                <h2
-                  id="photo-map-heading"
-                  class="jp-section-title kage-plate__title"
-                >踏跡<span class="jp-section-ruby">Visited Places</span></h2>
-                <p class="kage-plate__stats">
-                  <span class="kage-plate__stats-num">{{ eventLocations.length }}</span>
-                  <span class="kage-plate__stats-unit">處足跡</span>
-                </p>
-                <p class="kage-plate__quote jp-body">所到之處，皆成影像的座標。</p>
-              </div>
-            </section>
             <div class="kage-overview__main">
               <GalleryEditorialModules :items="photographyEventItems" />
             </div>
@@ -327,13 +341,29 @@ const {
 const {
   loadAllWorks,
   hydrateFromPayload,
-  setSelectedEvent,
   setSearchQuery,
   setYearFilter,
   getHydrationPayload,
 } = galleryStore
 
 const { getImagePath, getThumbPath } = useImagePath()
+
+type PhotoMapState = {
+  center: [number, number] | null
+  zoom: number | null
+  focusedEventName: string | null
+}
+
+const photoMapView = useState<PhotoMapState>('photo-map-view', () => ({
+  center: null,
+  zoom: null,
+  focusedEventName: null
+}))
+const restoredPhotoMapView = computed(() => {
+  const { center, zoom } = photoMapView.value
+  return center && zoom !== null ? { center, zoom } : null
+})
+const router = useRouter()
 
 let galleryPayloadReusesStore = false
 const { data: galleryPayload, pending: galleryPending, error: galleryPayloadError, refresh: refreshGalleryPayload } = await useAsyncData('gallery-works', async () => {
@@ -600,28 +630,14 @@ const setEventRef = (name: string | null, el: Element | ComponentPublicInstance 
   eventRefs.value[name] = target
 }
 
-const handleFocusEvent = async (eventName: string) => {
-  let target = eventRefs.value[eventName]
+const savePhotoMapView = (view: { center: [number, number], zoom: number }) => {
+  photoMapView.value.center = view.center
+  photoMapView.value.zoom = view.zoom
+}
 
-  // 若目標事件被篩選掉、不在 DOM 中，先切換到該事件再捲動
-  if (!target && filterState.value.selectedEvent !== eventName) {
-    setSelectedEvent(eventName)
-    await nextTick()
-    await nextTick() // 再等一幀，確保 ref 已設定
-    target = eventRefs.value[eventName]
-  }
-
-  if (!target) return
-
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-
-  focusedEventName.value = eventName
-  if (focusTimer !== null) {
-    window.clearTimeout(focusTimer)
-  }
-  focusTimer = window.setTimeout(() => {
-    focusedEventName.value = null
-  }, 900)
+const handleFocusEvent = (eventName: string) => {
+  photoMapView.value.focusedEventName = eventName
+  void router.push({ path: `/gallery/photography/${encodeURIComponent(eventName)}` })
 }
 
 const handleScroll = () => {
@@ -734,6 +750,11 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 
 // ===== 生命週期 =====
 onMounted(async () => {
+  // 攝影 overview 首屏即以互動地圖為主，避免等作品清單的防禦性補抓才掛載。
+  if (currentCategory.value === 'photography' && !filterState.value.selectedEvent) {
+    mapShouldMount.value = true
+  }
+
   // 攝影總覽的主要下一步是打開事件。提早暖載事件封面與印樣格元件，
   // 讓使用者進事件時不必再等 async component chunk 載入。
   if (currentCategory.value === 'photography' && !filterState.value.selectedEvent) {
@@ -761,11 +782,6 @@ onMounted(async () => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     armWorld()
-    // 首屏繪製完成後再掛 Leaflet 地圖，避免瓦片/flyTo 卡住第一屏
-    const mountMap = () => { mapShouldMount.value = true }
-    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback
-    if (typeof ric === 'function') ric(mountMap, { timeout: 1500 })
-    else window.setTimeout(mountMap, 600)
   }
 })
 
@@ -948,102 +964,87 @@ useHead({
   gap: 0.5rem;
 }
 
-/* =========================================================
-   book-spread-chapter-plate（wiki: patterns/book-spread-chapter-plate.md）
-   踏跡「其の一」從側欄地圖 widget 升格為書頁對開扉頁：左頁（verso）地圖全出血
-   無邊框無卡片，右頁（recto）印記＋數字＋標題＋引言，桌機書溝 hairline 居中分隔，
-   手機疊成上圖下文（書溝消失、改用水平 hairline）。
-   ========================================================= */
-.kage-plate {
-  display: grid;
-  grid-template-columns: 1fr;
-  margin-bottom: clamp(3rem, 6vw, 5rem);
-}
-@media (min-width: 1024px) {
-  .kage-plate {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    min-height: clamp(420px, 50vh, 560px);
-  }
+.photo-map-entry {
+  margin: 1rem auto clamp(3rem, 6vw, 5rem);
 }
 
-/* 明確 height（非 min-height/百分比鏈）：避免 grid 拉伸高度不確定時，
-   EventMap 內部 ResizeObserver 與版面互相觸發重排（曾造成 dev server 卡死重繪迴圈）。 */
-.kage-plate__verso {
-  position: relative;
-  height: clamp(280px, 46vw, 420px);
+.photo-map-entry__map {
+  height: clamp(460px, 65svh, 720px);
   overflow: hidden;
-  background: var(--surface);
+  background: rgb(245 245 244);
 }
-@media (min-width: 1024px) {
-  .kage-plate__verso { height: clamp(420px, 50vh, 560px); }
-}
-/* 中和 EventMap 自身的卡片外框（rounded-xl + border + shadow）：地圖直接坐頁面上，無框無圓角 */
-.kage-plate__verso :deep(.event-map-wrapper) {
-  border: none;
-  border-radius: 0;
+
+.photo-map-entry__map :deep(.event-map-wrapper) {
+  height: 100%;
+  border: 0;
+  border-radius: 0.2rem;
   box-shadow: none;
+}
+
+.photo-map-entry__map :deep(.event-map-container),
+.photo-map-entry__skeleton {
   height: 100%;
 }
-.kage-plate__verso :deep(.event-map-container) { height: 100%; }
-.kage-plate__verso-skeleton {
-  /* 對齊地圖靜止高度，延後掛載時不跳版 */
-  height: clamp(280px, 46vw, 420px);
-  background: linear-gradient(180deg, var(--surface), transparent);
-}
-@media (min-width: 1024px) {
-  .kage-plate__verso-skeleton { height: 100%; }
+
+.photo-map-entry__skeleton {
+  background: linear-gradient(135deg, rgb(231 229 228), rgb(245 245 244) 58%, rgb(231 229 228));
 }
 
-.kage-plate__recto {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.85rem;
-  padding: 2.25rem clamp(1.25rem, 4vw, 3rem) 2.5rem;
-  border-top: 1px solid var(--border);
+.dark .photo-map-entry__map,
+.dark .photo-map-entry__skeleton {
+  background: rgb(41 37 36);
 }
-@media (min-width: 1024px) {
-  .kage-plate__recto {
-    border-top: none;
-    border-left: 1px solid var(--border);
-  }
+
+.dark .photo-map-entry__skeleton {
+  background: linear-gradient(135deg, rgb(41 37 36), rgb(28 25 23) 58%, rgb(41 37 36));
 }
-.kage-plate__head {
+
+.photo-map-entry__caption {
   display: flex;
-  align-items: flex-start;
+  align-items: end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 1.3rem clamp(0.25rem, 1.5vw, 1rem) 0;
 }
-.kage-plate__seal {
-  flex-shrink: 0;
-  margin-top: -0.4rem;
+
+.photo-map-entry__caption .jp-eyebrow {
+  margin: 0 0 0.35rem;
 }
-.kage-plate__title {
-  margin: 0.2rem 0 0;
-  font-size: clamp(2rem, 4vw, 2.6rem);
+
+.photo-map-entry__caption .jp-section-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
 }
-.kage-plate__stats {
-  margin: 0.3rem 0 0;
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
-}
-.kage-plate__stats-num {
-  font-size: 1.05rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.03em;
-  color: var(--fg-2);
-}
-.kage-plate__stats-unit {
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  color: var(--fg-muted);
-}
-.kage-plate__quote {
-  margin: 0.4rem 0 0;
+
+.photo-map-entry__hint {
+  margin: 0 0 0.4rem;
+  color: rgb(87 83 78);
   font-size: 0.85rem;
-  max-width: 26ch;
+  letter-spacing: 0.08em;
+}
+
+.dark .photo-map-entry__hint {
+  color: rgb(214 211 209);
+}
+
+@media (max-width: 767px) {
+  .photo-map-entry {
+    margin-top: 0;
+  }
+
+  .photo-map-entry__map {
+    height: clamp(400px, 59svh, 560px);
+  }
+
+  .photo-map-entry__caption {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .photo-map-entry__hint {
+    font-size: 0.8rem;
+  }
 }
 
 /* =========================================================

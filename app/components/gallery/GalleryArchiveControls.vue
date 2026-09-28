@@ -294,23 +294,23 @@ defineExpose({ open })
   align-items: baseline;
   gap: 0.45rem;
   color: var(--archive-accent);
-  font-size: 0.63rem;
-  letter-spacing: 0.24em;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .archive-controls__summary {
   min-width: 0;
   overflow: hidden;
-  color: rgb(120 113 108);
-  font-size: 0.72rem;
+  color: rgb(87 83 78);
+  font-size: 0.75rem;
   font-weight: 300;
   letter-spacing: 0.08em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-:global(.dark .archive-controls__summary) { color: rgb(168 162 158); }
+:global(.dark .archive-controls__summary) { color: rgb(214 211 209); }
 
 .archive-controls__chevron {
   width: 0.9rem;

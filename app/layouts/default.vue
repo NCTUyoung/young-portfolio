@@ -75,6 +75,13 @@
               <span class="font-jp text-[0.65rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 font-extralight">栞</span>
             </span>
 
+            <NuxtLink
+              to="/admin"
+              class="text-xs tracking-wide text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-500"
+            >
+              後台
+            </NuxtLink>
+
             <!--
               Dark Mode Toggle — editorial 化（撤 rounded-xl + border 工具列感）
               改為 bare 圖示，hover 才出現 hairline underline，與 nav 連結同 family。
@@ -158,6 +165,18 @@
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <div class="jp-hairline my-2"/>
+                    <HeadlessMenuItem v-slot="{ active }">
+                      <NuxtLink
+                        to="/admin"
+                        :class="[
+                          active ? 'bg-stone-100/70 dark:bg-stone-800/70 text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-300',
+                          'flex items-center justify-between px-3 py-3 text-sm font-light tracking-wide transition-colors duration-200'
+                        ]"
+                      >
+                        <span>後台管理</span>
+                        <span class="text-xs tracking-[0.2em] text-stone-400 dark:text-stone-500">Admin</span>
+                      </NuxtLink>
+                    </HeadlessMenuItem>
                     <HeadlessMenuItem v-slot="{ active }">
                       <ClientOnly>
                         <button
@@ -277,7 +296,6 @@ const navLinks = [
   { to: '/', label: '首頁' },
   { to: '/gallery', label: '圖片庫' },
   { to: '/article', label: '文章' },
-  { to: '/admin', label: '後台管理' },
 ]
 
 // 漢數字章碼（手機版選單編號用）— 與 article 目次同 family

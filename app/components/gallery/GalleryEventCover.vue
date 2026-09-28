@@ -37,13 +37,24 @@
 
     <!-- Cover meta + expand CTA：editorial 風格、置中、無 box -->
     <div class="event-cover-meta max-w-3xl mx-auto px-6 py-12 md:py-16 text-center">
+      <NuxtLink
+        to="/gallery/photography"
+        replace
+        class="event-cover-map-return"
+        data-testid="event-cover-return-map"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path d="M19 12H5m0 0 6 6m-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+        </svg>
+        <span>返回地圖</span>
+      </NuxtLink>
       <p class="jp-section-label">扉頁 · Cover</p>
-      <h2
+      <h1
         id="event-cover-heading"
         class="font-jp text-3xl md:text-4xl font-extralight tracking-[0.2em] text-stone-800 dark:text-stone-100 mt-4"
       >
         {{ eventName }}
-      </h2>
+      </h1>
       <span aria-hidden="true" class="jp-hairline mx-auto my-6 block w-24"/>
 
       <p class="event-cover-meta-line text-[0.7rem] tracking-[0.4em] text-stone-500 dark:text-stone-400 uppercase flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
@@ -180,6 +191,54 @@ const axisRows = computed<{ label: string; values: string[] }[]>(() => {
 </script>
 
 <style scoped>
+.event-cover-map-return {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  margin: 0 0 1.5rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid rgb(168 162 158 / 0.5);
+  color: rgb(87 83 78);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.event-cover-map-return:hover {
+  border-color: rgb(164 92 48 / 0.8);
+  color: rgb(164 92 48);
+}
+
+.event-cover-map-return:focus-visible {
+  outline: 2px solid rgb(164 92 48);
+  outline-offset: 3px;
+}
+
+.event-cover-map-return svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+:global(.dark) .event-cover-map-return {
+  border-color: rgb(120 113 108 / 0.7);
+  color: rgb(214 211 209);
+}
+
+:global(.dark) .event-cover-map-return:hover {
+  border-color: rgb(231 184 125 / 0.9);
+  color: rgb(231 184 125);
+}
+
+:global(.dark) .event-cover-map-return:focus-visible {
+  outline-color: rgb(231 184 125);
+}
+
+.event-cover-map-return + .jp-section-label {
+  margin-top: 0;
+}
+
 .cover-arrow {
   animation: cover-bounce 2.4s ease-in-out infinite;
 }

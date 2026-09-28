@@ -27,14 +27,14 @@
         :value="filterState.searchQuery"
         type="search"
         :placeholder="searchPlaceholder"
-        class="w-full bg-transparent py-2 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-600 placeholder:font-light focus:outline-none"
+        class="w-full bg-transparent py-2 text-sm font-light tracking-wide text-stone-700 dark:text-stone-200 placeholder:text-stone-500 dark:placeholder:text-stone-400 placeholder:font-light focus:outline-none"
         :aria-label="searchPlaceholder"
         @input="onSearchInput"
       >
       <button
         v-if="filterState.searchQuery"
         type="button"
-        class="p-1 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+        class="flex h-11 w-11 flex-none items-center justify-center text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors"
         aria-label="清除搜尋"
         @click="clearSearch"
       >
@@ -44,7 +44,7 @@
 
     <!-- 年份：純文字底線選單，展開時顯示年度與數量 -->
     <div v-if="availableYears.length > 1" :class="variant === 'rail' ? 'flex items-center justify-between gap-3' : 'flex items-center gap-2 whitespace-nowrap'">
-      <span class="jp-section-label !text-[0.6rem]">Year</span>
+      <span class="jp-section-label !text-xs !text-stone-600 dark:!text-stone-300">Year</span>
       <select
         :value="filterState.yearFilter ?? ''"
         :class="[

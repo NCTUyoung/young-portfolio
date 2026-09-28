@@ -8,7 +8,88 @@
     @mouseenter="onWrapperEnter"
     @mouseleave="onWrapperLeave"
   >
-    <div ref="mapContainer" class="event-map-container" />
+    <div
+      ref="mapContainer"
+      class="event-map-container"
+      role="region"
+      aria-label="影的互動拍攝地圖"
+    />
+
+    <div v-if="variant !== 'compact'" class="event-map-zoom-controls" aria-label="地圖縮放控制">
+      <button
+        type="button"
+        class="event-map-zoom-button"
+        aria-label="放大地圖並靠近照片位置"
+        title="放大地圖並靠近照片位置"
+        :disabled="mapZoom !== null && mapZoom >= maximumZoom"
+        @click="zoomMap(1)"
+      >+</button>
+      <button
+        type="button"
+        class="event-map-zoom-button"
+        aria-label="縮小地圖"
+        title="縮小地圖"
+        :disabled="mapZoom !== null && mapZoom <= minimumZoom"
+        @click="zoomMap(-1)"
+      >−</button>
+    </div>
+
+    <svg
+      v-if="photoCards.length"
+      class="event-map-connectors"
+      :viewBox="`0 0 ${photoMapSize.width} ${photoMapSize.height}`"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <line
+        v-for="card in photoCards"
+        :key="`line-${card.name}`"
+        :x1="card.anchorX"
+        :y1="card.anchorY"
+        :x2="card.edgeX"
+        :y2="card.edgeY"
+        class="event-map-connector"
+      />
+      <circle
+        v-for="card in photoCards"
+        :key="`anchor-${card.name}`"
+        :cx="card.anchorX"
+        :cy="card.anchorY"
+        r="3.5"
+        class="event-map-anchor"
+      />
+    </svg>
+
+    <TransitionGroup
+      tag="div"
+      name="map-photo"
+      class="event-map-photo-layer"
+      role="group"
+      aria-label="地圖上的活動照片；放大或移動地圖可探索更多"
+    >
+      <button
+        v-for="(card, index) in photoCards"
+        :key="card.name"
+        type="button"
+        class="event-map-photo-card"
+        :class="{ 'event-map-photo-card--focused': card.name === selectedEventName }"
+        :style="{ left: `${card.left}px`, top: `${card.top}px`, '--reveal-delay': `${index * 45}ms` }"
+        :aria-label="`進入「${card.name}」組圖，共 ${card.count} 張；${card.locationAccuracy === 'event' ? '活動座標' : '約略地區'}`"
+        @click="emit('focus-event', card.name)"
+      >
+        <img
+          :src="getThumbPath(card.coverFilename, 400)"
+          :alt="`${card.name} 代表照片`"
+          loading="eager"
+          decoding="async"
+        >
+        <span class="event-map-photo-title">{{ card.name }}</span>
+        <span class="event-map-photo-location">
+          <span>{{ card.locationAccuracy === 'event' ? '活動座標' : '約略地區' }}</span>
+          <span v-if="card.location">{{ card.location }}</span>
+        </span>
+      </button>
+    </TransitionGroup>
 
     <!--
       compact 未展開時顯示「停留展開」hint：
@@ -45,35 +126,6 @@
       />
     </template>
 
-    <transition name="event-map-hover">
-      <div
-        v-if="hoveredEvent"
-        class="event-map-hover-card"
-        :class="{ 'event-map-hover-card--compact': variant === 'compact' }"
-      >
-        <img
-          :src="getThumbPath(hoveredEvent.coverFilename, 400)"
-          :alt="hoveredEvent.name"
-          class="event-map-hover-image"
-          loading="lazy"
-          decoding="async"
-        >
-        <div class="event-map-hover-text">
-          <p class="event-map-hover-title">
-            {{ hoveredEvent.name }}
-          </p>
-          <p class="event-map-hover-sub">
-            {{ hoveredEvent.timeRange }}
-          </p>
-          <p v-if="hoveredEvent.location" class="event-map-hover-meta">
-            {{ hoveredEvent.location }}
-          </p>
-          <p class="event-map-hover-meta">
-            {{ hoveredEvent.count }} 張作品
-          </p>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -102,6 +154,21 @@ interface EventLocation {
   timeRange: string
   count: number
   location?: string
+  locationAccuracy: 'event' | 'regional'
+}
+
+interface MapViewSnapshot {
+  center: [number, number]
+  zoom: number
+}
+
+interface PositionedEvent extends EventLocation {
+  left: number
+  top: number
+  anchorX: number
+  anchorY: number
+  edgeX: number
+  edgeY: number
 }
 
 const props = withDefaults(
@@ -109,6 +176,7 @@ const props = withDefaults(
     events: EventLocation[]
     /** 與 Event 篩選同步：選中時地圖飛到該點並強調標記；null 時縮放至全部範圍 */
     selectedEventName?: string | null
+    initialView?: MapViewSnapshot | null
     /**
      * 版型變體：
      *   - `default`：420px 高（手機 260px），wheel zoom、鍵盤導覽開啟——適合專頁或詳細模式
@@ -124,17 +192,22 @@ const props = withDefaults(
      */
     showExpandHint?: boolean
   }>(),
-  { selectedEventName: null, variant: 'default', showExpandHint: true }
+  { selectedEventName: null, initialView: null, variant: 'default', showExpandHint: true }
 )
 
 const emit = defineEmits<{
   (e: 'focus-event', name: string): void
+  (e: 'viewport-change', view: MapViewSnapshot): void
   /** compact 展開狀態變化：宿主可據此顯示／收起框外的「停留放大」提示 */
   (e: 'expand-change', expanded: boolean): void
 }>()
 
 const mapContainer = ref<HTMLDivElement | null>(null)
-const hoveredEvent = ref<EventLocation | null>(null)
+const photoCards = ref<PositionedEvent[]>([])
+const photoMapSize = ref({ width: 0, height: 0 })
+const mapZoom = ref<number | null>(null)
+const minimumZoom = 0
+const maximumZoom = 19
 const isDark = useDark()
 
 /**
@@ -196,20 +269,167 @@ const markerByName = new Map<string, CircleMarker>()
 
 /** 僅在資料變更時重畫標記，避免 deep watch 過度觸發 */
 const eventsSignature = computed(() =>
-  props.events.map(e => `${e.name}:${e.lat}:${e.lng}`).join('|')
+  props.events.map(e => `${e.name}:${e.lat}:${e.lng}:${e.locationAccuracy}:${e.coverFilename}:${e.count}`).join('|')
 )
+
+const openingEvents = computed(() => [...props.events]
+  .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+  .slice(0, 3))
+
+let layoutFrame = 0
+
+function rectanglesOverlap (
+  a: { left: number, top: number, right: number, bottom: number },
+  b: { left: number, top: number, right: number, bottom: number }
+): boolean {
+  return a.left < b.right + 10 && a.right + 10 > b.left && a.top < b.bottom + 10 && a.bottom + 10 > b.top
+}
+
+function cardEdge (x: number, y: number, left: number, top: number, width: number, height: number) {
+  const edgeX = Math.max(left, Math.min(x, left + width))
+  const edgeY = Math.max(top, Math.min(y, top + height))
+  if (edgeX === x && edgeY === y) return { x: left + width / 2, y: top + height }
+  return { x: edgeX, y: edgeY }
+}
+
+function updatePhotoCards () {
+  if (!map || props.variant === 'compact') return
+
+  const size = map.getSize()
+  photoMapSize.value = { width: size.x, height: size.y }
+
+  const openingNames = new Set(openingEvents.value.map(event => event.name))
+  const inView = props.events.filter(event => map!.getBounds().contains([event.lat, event.lng]))
+  const candidates = map.getZoom() < 7
+    ? inView.filter(event => openingNames.has(event.name))
+    : inView.sort((a, b) => {
+        const featuredDelta = Number(openingNames.has(b.name)) - Number(openingNames.has(a.name))
+        if (featuredDelta) return featuredDelta
+        const center = map!.getCenter()
+        return map!.distance(center, [a.lat, a.lng]) - map!.distance(center, [b.lat, b.lng])
+      })
+
+  const maxCards = window.matchMedia('(max-width: 640px)').matches ? 4 : 5
+  const width = window.matchMedia('(max-width: 640px)').matches ? 132 : 152
+  const height = 138
+  const placed: PositionedEvent[] = []
+  const reserved: Array<{ left: number, top: number, right: number, bottom: number }> = [
+    { left: 0, top: 0, right: 50, bottom: 82 },
+    { left: size.x - 126, top: size.y - 30, right: size.x, bottom: size.y }
+  ]
+
+  candidates.slice(0, maxCards).forEach(event => {
+    const point = map!.latLngToContainerPoint([event.lat, event.lng])
+    const positions = [
+      { left: point.x + 18, top: point.y - height - 14 },
+      { left: point.x - width - 18, top: point.y - height - 14 },
+      { left: point.x + 18, top: point.y + 14 },
+      { left: point.x - width - 18, top: point.y + 14 },
+      { left: point.x - width / 2, top: point.y - height - 22 },
+      { left: point.x - width / 2, top: point.y + 22 }
+    ]
+
+    let best: { left: number, top: number, right: number, bottom: number } | null = null
+    let bestConflicts = Number.POSITIVE_INFINITY
+    for (const position of positions) {
+      const left = Math.max(8, Math.min(size.x - width - 8, position.left))
+      const top = Math.max(8, Math.min(size.y - height - 30, position.top))
+      const rect = { left, top, right: left + width, bottom: top + height }
+      const conflicts = reserved.filter(other => rectanglesOverlap(rect, other)).length
+      if (conflicts < bestConflicts) {
+        best = rect
+        bestConflicts = conflicts
+      }
+      if (!conflicts) break
+    }
+    if (!best || bestConflicts > 0) {
+      const columns = size.x >= width * 2 + 24
+        ? [8, Math.round((size.x - width) / 2), size.x - width - 8]
+        : [8, size.x - width - 8]
+      const rows = [8, Math.max(8, Math.round((size.y - height) / 2)), Math.max(8, size.y - height - 30)]
+      const fallback = rows.flatMap(top => columns.map(left => ({
+        left,
+        top,
+        right: left + width,
+        bottom: top + height
+      })))
+        .filter(rect => rect.left >= 0 && rect.top >= 0 && rect.right <= size.x && rect.bottom <= size.y)
+        .filter(rect => reserved.every(other => !rectanglesOverlap(rect, other)))
+        .sort((a, b) => {
+          const distanceToAnchor = (rect: typeof a) => Math.hypot(
+            rect.left + width / 2 - point.x,
+            rect.top + height / 2 - point.y
+          )
+          return distanceToAnchor(a) - distanceToAnchor(b)
+        })[0]
+
+      const maxConnectorDistance = Math.max(width, height) * 2
+      if (!fallback || Math.hypot(
+        fallback.left + width / 2 - point.x,
+        fallback.top + height / 2 - point.y
+      ) > maxConnectorDistance) return
+      best = fallback
+    }
+
+    reserved.push(best)
+    const edge = cardEdge(point.x, point.y, best.left, best.top, width, height)
+    placed.push({
+      ...event,
+      left: best.left,
+      top: best.top,
+      anchorX: point.x,
+      anchorY: point.y,
+      edgeX: edge.x,
+      edgeY: edge.y
+    })
+  })
+
+  photoCards.value = placed
+}
+
+function schedulePhotoCardLayout () {
+  if (layoutFrame) cancelAnimationFrame(layoutFrame)
+  layoutFrame = requestAnimationFrame(() => {
+    layoutFrame = 0
+    updatePhotoCards()
+  })
+}
+
+function reportViewportChange () {
+  if (!map) return
+  mapZoom.value = map.getZoom()
+  const { lat, lng } = map.getCenter()
+  emit('viewport-change', { center: [lat, lng], zoom: map.getZoom() })
+  schedulePhotoCardLayout()
+}
+
+function zoomMap (delta: -1 | 1) {
+  if (!map) return
+
+  const nextZoom = Math.max(minimumZoom, Math.min(maximumZoom, map.getZoom() + delta))
+  if (nextZoom === map.getZoom()) return
+
+  const selectedEvent = props.events.find(event => event.name === props.selectedEventName)
+  const nearestEvent = selectedEvent ?? props.events.reduce<EventLocation | undefined>((closest, event) => {
+    if (!closest) return event
+    const center = map!.getCenter()
+    return map!.distance(center, [event.lat, event.lng]) < map!.distance(center, [closest.lat, closest.lng])
+      ? event
+      : closest
+  }, undefined)
+  const center = map.getCenter()
+  const anchor: LatLngTuple = nearestEvent ? [nearestEvent.lat, nearestEvent.lng] : [center.lat, center.lng]
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  map.setZoomAround(anchor, nextZoom, { animate: !reduceMotion })
+}
 
 function invalidateMapSize () {
   if (!map) return
   map.invalidateSize({ animate: false })
 }
 
-/** flyTo 完成後 Leaflet 不會清 _flyToFrame，不可用內部 RAF 判斷；改由程式標記 */
-let programmaticFlyActive = false
-let flyToOpId = 0
-
 function isMapInMotion (mapInstance: LeafletMap): boolean {
-  if (programmaticFlyActive) return true
   const m = mapInstance as LeafletMapWithInternals
   if (m._animatingZoom) return true
   if (m._panAnim?._inProgress) return true
@@ -266,9 +486,10 @@ const initMap = async () => {
     //   - keyboard: false → tiny map 的 `+/-` 鍵讓給 strip / timeline 鍵盤導覽。
     //   - 仍保留 dragging / touchZoom / doubleClickZoom 讓使用者可探索。
     const isCompact = props.variant === 'compact'
+    const savedView = props.initialView
     map = L.map(mapContainer.value, {
-      center: [23.7, 121],
-      zoom: isCompact ? 6 : 7,
+      center: savedView?.center ?? [23.7, 121],
+      zoom: savedView?.zoom ?? (isCompact ? 6 : 5),
       zoomControl: false,
       scrollWheelZoom: isCompact ? 'center' : true,
       keyboard: !isCompact,
@@ -282,6 +503,9 @@ const initMap = async () => {
 
     markersLayer = L.layerGroup().addTo(map)
     renderMarkers(L)
+    map.on('moveend zoomend', reportViewportChange)
+    if (!savedView) fitInitialMapView(L)
+    mapZoom.value = map.getZoom()
 
     await nextTick()
     runInvalidateWhenIdle()
@@ -338,45 +562,21 @@ const styleForEvent = (eventName: string, dark: boolean) => {
   return props.selectedEventName === eventName ? selected : base
 }
 
-const applyMapViewForSelection = (L: LeafletModule) => {
+const fitInitialMapView = (L: LeafletModule) => {
   const mapInstance = map
   if (!mapInstance || !props.events.length) return
 
-  const name = props.selectedEventName
-  const flyDuration = 1.15
-
-  const runFly = (fn: () => void) => {
-    programmaticFlyActive = true
-    const op = ++flyToOpId
-    mapInstance.once('moveend', () => {
-      if (op === flyToOpId) programmaticFlyActive = false
-    })
-    fn()
-  }
-
-  if (name) {
-    const ev = props.events.find(e => e.name === name)
-    if (ev) {
-      // compact 版中飛到單一 event 不要 zoom 到 12（太近看不出地理脈絡），停 9
-      const focusZoom = props.variant === 'compact' ? 9 : 12
-      runFly(() => mapInstance.flyTo([ev.lat, ev.lng], focusZoom, { duration: flyDuration }))
-      return
-    }
-  }
-
   const bounds = props.events.map(e => [e.lat, e.lng] as LatLngTuple)
-  // compact 版 padding 拉大（避免 marker 貼邊切掉），maxZoom 限得更小
-  // 讓「台灣全島 + 日本」等跨區域資料能同框展示而不被強制 zoom-in。
   const isCompact = props.variant === 'compact'
   const fitPadding: [number, number] = isCompact ? [32, 48] : [36, 36]
-  const fitMaxZoom = isCompact ? 6 : 12
+  const fitMaxZoom = 6
   const singleZoom = isCompact ? 7 : 10
   if (bounds.length === 1 && bounds[0]) {
     const only = bounds[0]
-    runFly(() => mapInstance.flyTo(only, singleZoom, { duration: flyDuration }))
+    mapInstance.setView(only, singleZoom, { animate: false })
   } else if (bounds.length > 1) {
     const b = L.latLngBounds(bounds)
-    runFly(() => mapInstance.flyToBounds(b, { padding: fitPadding, duration: flyDuration, maxZoom: fitMaxZoom }))
+    mapInstance.fitBounds(b, { padding: fitPadding, maxZoom: fitMaxZoom, animate: false })
   }
 }
 
@@ -390,37 +590,11 @@ const renderMarkers = (L: LeafletModule) => {
   if (!props.events.length) return
 
   const dark = isDark.value
-  const { base, selected } = getMarkerStyles(dark)
 
   props.events.forEach(event => {
     const initialStyle = styleForEvent(event.name, dark)
     const marker = L.circleMarker([event.lat, event.lng], initialStyle)
     markerByName.set(event.name, marker)
-
-    marker.on('mouseover', () => {
-      hoveredEvent.value = event
-      const isSel = props.selectedEventName === event.name
-      if (isSel) {
-        marker.setStyle({
-          ...selected,
-          radius: 10,
-          weight: 2.25,
-          fillOpacity: 1
-        })
-      } else {
-        marker.setStyle({
-          ...base,
-          radius: 8,
-          weight: 2,
-          fillOpacity: dark ? 0.98 : 1
-        })
-      }
-    })
-
-    marker.on('mouseout', () => {
-      hoveredEvent.value = null
-      marker.setStyle(styleForEvent(event.name, dark))
-    })
 
     marker.on('click', () => {
       emit('focus-event', event.name)
@@ -429,7 +603,7 @@ const renderMarkers = (L: LeafletModule) => {
     marker.addTo(markers)
   })
 
-  applyMapViewForSelection(L)
+  schedulePhotoCardLayout()
 }
 
 onMounted(async () => {
@@ -437,6 +611,7 @@ onMounted(async () => {
   if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(() => {
       debouncedInvalidateMapSize()
+      schedulePhotoCardLayout()
     })
     resizeObserver.observe(mapContainer.value)
   }
@@ -464,14 +639,13 @@ watch(isDark, async () => {
 
 watch(
   () => props.selectedEventName,
-  async () => {
+  () => {
     if (!import.meta.client || !map || !props.events.length || markerByName.size === 0) return
-    const L = await import('leaflet')
     const dark = isDark.value
     markerByName.forEach((marker, eventName) => {
       marker.setStyle(styleForEvent(eventName, dark))
     })
-    applyMapViewForSelection(L)
+    schedulePhotoCardLayout()
   }
 )
 
@@ -485,9 +659,14 @@ onBeforeUnmount(() => {
     resizeObserver = null
   }
   if (map) {
+    map.off('moveend zoomend', reportViewportChange)
     map.remove()
     map = null
     markersLayer = null
+  }
+  if (layoutFrame) {
+    cancelAnimationFrame(layoutFrame)
+    layoutFrame = 0
   }
 })
 </script>
@@ -593,6 +772,79 @@ onBeforeUnmount(() => {
   color: rgb(196 96 35);
   opacity: 0.8;
 }
+
+.event-map-zoom-controls {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgb(214 211 209 / 0.95);
+  border-radius: 0.3rem;
+  background: rgb(250 250 249 / 0.96);
+  box-shadow: 0 1px 5px rgb(41 37 36 / 0.2);
+}
+
+.event-map-zoom-button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: rgb(41 37 36);
+  font-family: Arial, sans-serif;
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.event-map-zoom-button + .event-map-zoom-button {
+  border-top: 1px solid rgb(214 211 209 / 0.95);
+}
+
+.event-map-zoom-button:hover:not(:disabled) {
+  background: rgb(231 229 228 / 0.8);
+}
+
+.event-map-zoom-button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid rgb(164 92 48);
+  outline-offset: -3px;
+}
+
+.event-map-zoom-button:disabled {
+  color: rgb(168 162 158);
+  cursor: default;
+}
+
+.dark .event-map-zoom-controls {
+  border-color: rgb(87 83 78 / 0.95);
+  background: rgb(41 37 36 / 0.96);
+}
+
+.dark .event-map-zoom-button {
+  color: rgb(245 245 244);
+}
+
+.dark .event-map-zoom-button + .event-map-zoom-button {
+  border-color: rgb(87 83 78 / 0.95);
+}
+
+.dark .event-map-zoom-button:hover:not(:disabled) {
+  background: rgb(68 64 60 / 0.9);
+}
+
+.dark .event-map-zoom-button:focus-visible {
+  outline-color: rgb(231 184 125);
+}
+
+.dark .event-map-zoom-button:disabled {
+  color: rgb(120 113 108);
+}
+
 .dark .event-map-expand-hint {
   background: rgba(28, 25, 23, 0.82);
   border-color: rgba(228, 150, 74, 0.2);
@@ -600,6 +852,188 @@ onBeforeUnmount(() => {
 }
 .dark .event-map-expand-icon {
   color: rgb(228 150 74);
+}
+
+.event-map-connectors,
+.event-map-photo-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.event-map-connectors {
+  z-index: 650;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.event-map-connector {
+  stroke: rgb(164 92 48 / 0.9);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.event-map-anchor {
+  fill: rgb(164 92 48);
+  stroke: rgb(250 250 249);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.dark .event-map-connector {
+  stroke: rgb(231 184 125 / 0.95);
+}
+
+.dark .event-map-anchor {
+  fill: rgb(231 184 125);
+  stroke: rgb(41 37 36);
+}
+
+.event-map-photo-layer {
+  z-index: 700;
+  pointer-events: none;
+}
+
+.event-map-photo-card {
+  position: absolute;
+  display: grid;
+  grid-template-rows: 66px 1fr auto;
+  gap: 0;
+  width: 152px;
+  height: 138px;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgb(214 211 209 / 0.9);
+  border-radius: 0.35rem;
+  background: rgb(250 250 249 / 0.97);
+  color: rgb(41 37 36);
+  text-align: left;
+  box-shadow: 0 3px 12px rgb(41 37 36 / 0.13);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.event-map-photo-card:hover,
+.event-map-photo-card--focused {
+  border-color: rgb(164 92 48 / 0.85);
+  box-shadow: 0 5px 18px rgb(41 37 36 / 0.22);
+}
+
+.event-map-photo-card:focus-visible {
+  outline: 2px solid rgb(164 92 48);
+  outline-offset: 3px;
+  z-index: 1;
+}
+
+.event-map-photo-card img {
+  width: 100%;
+  height: 66px;
+  object-fit: cover;
+  background: rgb(231 229 228);
+}
+
+.event-map-photo-title {
+  align-self: center;
+  min-width: 0;
+  padding: 0.1rem 0.5rem 0;
+  overflow: hidden;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-map-photo-location {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  min-width: 0;
+  padding: 0 0.5rem 0.35rem;
+  color: rgb(87 83 78);
+  font-size: 0.72rem;
+  line-height: 1.05rem;
+  white-space: nowrap;
+}
+
+.event-map-photo-location span:first-child {
+  flex: none;
+  color: rgb(164 92 48);
+}
+
+.event-map-photo-location span:last-child {
+  max-width: 100%;
+  font-size: 0.68rem;
+  overflow: hidden;
+  color: rgb(87 83 78);
+  text-overflow: ellipsis;
+}
+
+.dark .event-map-photo-card {
+  border-color: rgb(87 83 78 / 0.9);
+  background: rgb(41 37 36 / 0.97);
+  color: rgb(245 245 244);
+  box-shadow: 0 3px 14px rgb(0 0 0 / 0.42);
+}
+
+.dark .event-map-photo-card:hover,
+.dark .event-map-photo-card--focused {
+  border-color: rgb(231 184 125 / 0.9);
+}
+
+.dark .event-map-photo-card:focus-visible {
+  outline-color: rgb(231 184 125);
+}
+
+.dark .event-map-photo-card img {
+  background: rgb(68 64 60);
+}
+
+.dark .event-map-photo-location,
+.dark .event-map-photo-location span:last-child {
+  color: rgb(214 211 209);
+}
+
+.dark .event-map-photo-location span:first-child {
+  color: rgb(231 184 125);
+}
+
+.map-photo-enter-active {
+  transition: opacity 220ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.map-photo-enter-from {
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+}
+
+.map-photo-leave-active {
+  transition: opacity 120ms ease;
+}
+
+.map-photo-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .event-map-photo-card {
+    width: 132px;
+  }
+
+  .event-map-photo-card img {
+    height: 66px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-photo-enter-active,
+  .map-photo-leave-active,
+  .event-map-photo-card {
+    transition: none;
+  }
 }
 
 /* OSM 單一瓦片來源：只在 tile pane 調色，不重新請求整張地圖。 */
@@ -623,128 +1057,4 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.event-map-hover-card {
-  position: absolute;
-  right: 1.25rem;
-  bottom: 2.4rem; /* 往上移一點，避免和 attribution 重疊變形 */
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.9rem;
-  border-radius: 1rem;
-  background: rgba(253, 248, 240, 0.94);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(41, 37, 36, 0.1), 0 2px 8px rgba(196, 96, 35, 0.06);
-  border: 1px solid rgba(196, 96, 35, 0.2);
-  z-index: 1000;
-  pointer-events: none;
-  max-width: 260px;
-}
-/**
- * compact 版 hover card：
- * 容器本身僅 160px 高，放原尺寸（60px 圖 + 3 行文）會佔滿全高；
- * 改貼右上角、縮小圖至 40px、限 max-width 220px，
- * 並移除 attribution（compact 時 attributionControl:false）不必留空間，
- * bottom/left 都留 0.4rem padding 呈現輕盈浮貼感。
- */
-.event-map-hover-card--compact {
-  right: 0.55rem;
-  bottom: auto;
-  top: 0.55rem;
-  padding: 0.35rem 0.55rem;
-  gap: 0.55rem;
-  border-radius: 0.65rem;
-  max-width: 220px;
-}
-.event-map-hover-card--compact .event-map-hover-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 0.5rem;
-}
-.event-map-hover-card--compact .event-map-hover-title {
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  margin-bottom: 0;
-}
-.event-map-hover-card--compact .event-map-hover-sub,
-.event-map-hover-card--compact .event-map-hover-meta {
-  font-size: 0.6rem;
-  line-height: 1.35;
-}
-.dark .event-map-hover-card {
-  background: rgba(28, 25, 23, 0.94);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(228, 150, 74, 0.22);
-}
-
-.event-map-hover-image {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 0.75rem;
-  border: none;
-  background: transparent;
-}
-
-.event-map-hover-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-
-.event-map-hover-title {
-  font-family: 'Noto Serif JP', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  margin-bottom: 0.12rem;
-  color: rgb(41 37 36);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.dark .event-map-hover-title {
-  color: rgb(245 245 244);
-}
-
-.event-map-hover-sub {
-  font-size: 0.7rem;
-  color: rgb(120 113 108);
-  margin-bottom: 0.08rem;
-}
-.dark .event-map-hover-sub {
-  color: rgb(168 162 158);
-}
-
-.event-map-hover-meta {
-  font-size: 0.65rem;
-  color: rgb(168 162 158);
-}
-.dark .event-map-hover-meta {
-  color: rgb(120 113 108);
-}
-
-.event-map-hover-enter-active,
-.event-map-hover-leave-active {
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-}
-.event-map-hover-enter-from,
-.event-map-hover-leave-to {
-  opacity: 0;
-  transform: translateY(6px);
-}
-
-@media (max-width: 768px) {
-  .event-map-hover-card {
-    right: 0.9rem;
-    bottom: 2.1rem;
-    padding: 0.5rem 0.75rem;
-    max-width: 220px;
-  }
-
-  .event-map-hover-image {
-    width: 50px;
-    height: 50px;
-  }
-}
 </style>

@@ -4,7 +4,8 @@ import {
   combineAndSortAllWorks,
   getCurrentWorks,
   applySearchAndYearFilter,
-  buildAvailableYears
+  buildAvailableYears,
+  buildEventLocations
 } from './gallerySelectors'
 
 function item (overrides: Partial<GalleryItem>): GalleryItem {
@@ -63,5 +64,32 @@ describe('gallerySelectors', () => {
       item({ date: '2024-01-01' })
     ]
     expect(buildAvailableYears(works)).toEqual(['2024', '2023'])
+  })
+
+  it('marks event coordinates and regional fallback coordinates distinctly', () => {
+    const works = [
+      item({
+        filename: 'recorded.jpg',
+        event: { name: 'Recorded', description: '', location: '公園', lat: 25, lng: 121 }
+      }),
+      item({
+        filename: 'regional.jpg',
+        event: { name: 'Regional', description: '', location: '新竹' }
+      }),
+      item({
+        filename: 'unmapped.jpg',
+        event: { name: 'Unmapped', description: '', location: '' }
+      })
+    ]
+
+    const locations = buildEventLocations(works, {
+      Regional: { lat: 24.8, lng: 121 }
+    })
+
+    expect(locations.map(({ name, locationAccuracy }) => [name, locationAccuracy])).toEqual([
+      ['Recorded', 'event'],
+      ['Regional', 'regional']
+    ])
+    expect(locations[1]).toMatchObject({ lat: 24.8, lng: 121 })
   })
 })
