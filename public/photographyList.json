@@ -1,5 +1,5 @@
 {
-  "totalNumber": "80",
+  "totalNumber": "87",
   "category": "photography",
   "crossWorldSpreads": [
     {
@@ -2461,6 +2461,180 @@
       "aspectRatio": 0.6667,
       "focalX": 0.5,
       "focalY": 0.281
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3459-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "花與白傘",
+      "content": "人物在林蔭步道間展開雙臂，白花與白傘映出動勢。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 73,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3408-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "花影側顏",
+      "content": "黑白近景裡，長髮與白花映著人物的側顏。",
+      "tags": [
+        "廣角",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.68
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3489-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "抬頭望林",
+      "content": "人物仰望樹梢，白傘斜垂在深綠樹影間。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 113,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.016666666666666666,
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3423-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "傘下凝望",
+      "content": "黑白畫面中，人物手捧白花，白傘沿上緣延展。",
+      "tags": [
+        "廣角",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.656
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3418-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "花前微笑",
+      "content": "白花貼近人物臉龐，左側留出一片柔和的綠。",
+      "tags": [
+        "人像",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 82,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 1.5,
+      "focalX": 0.5,
+      "focalY": 0.5
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3432-1.jpg",
+      "time": "2026 May 10",
+      "title": "林間行步",
+      "content": "白傘伴著人物走過林蔭步道，樹列向遠處收束。",
+      "tags": [
+        "廣角",
+        "淺景深"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.406
+    },
+    {
+      "filename": "photography/清大外拍 - 阿存/DSC_3452-編輯-1.jpg",
+      "time": "2026 May 10",
+      "title": "樹道奔影",
+      "content": "高聳樹列框住步道，白傘下的身影向前奔行。",
+      "tags": [
+        "廣角",
+        "淺景深",
+        "後製"
+      ],
+      "event": {
+        "name": "清大外拍 - 阿存",
+        "description": "清華大學校園人像外拍，記錄林蔭步道間的白花與白傘。",
+        "location": "清華大學"
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 35,
+      "aperture": 2.8,
+      "iso": 640,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 0.6667,
+      "focalX": 0.5,
+      "focalY": 0.221
     }
   ],
   "trackManifesto": {
