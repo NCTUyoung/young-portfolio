@@ -71,6 +71,8 @@
                 :loading="cell.i < 4 ? 'eager' : 'lazy'"
                 :fetchpriority="cell.i === 0 ? 'high' : 'auto'"
                 decoding="async"
+                @load="onImageLoad(cell.i, $event)"
+                @error="developFrame(cell.i)"
               >
             </picture>
             <!-- hover 浮出最小標籤（標題 + 焦段/光圈），避免常駐占高度 -->
@@ -271,13 +273,38 @@ function onSheetPointerLeave () {
 const rootEl = ref<HTMLElement | null>(null)
 const developed = reactive<Record<number, boolean>>({})
 const frameEls: (HTMLElement | null)[] = []
-function setFrameRef (i: number, el: Element | { $el: Element } | null) {
-  if (!el) { frameEls[i] = null; return }
-  frameEls[i] = ('$el' in el ? el.$el : el) as HTMLElement
-}
-
 let frameIo: IntersectionObserver | null = null
 const idxByEl = new WeakMap<Element, number>()
+
+function setFrameRef (i: number, el: Element | { $el: Element } | null) {
+  const nextEl = el ? (('$el' in el ? el.$el : el) as HTMLElement) : null
+  const previousEl = frameEls[i]
+  if (previousEl === nextEl) return
+  if (previousEl) frameIo?.unobserve(previousEl)
+  frameEls[i] = nextEl
+  if (nextEl) {
+    idxByEl.set(nextEl, i)
+    frameIo?.observe(nextEl)
+  }
+}
+
+function developFrame (i: number) {
+  developed[i] = true
+  const el = frameEls[i]
+  if (el) frameIo?.unobserve(el)
+}
+
+function isFrameInViewport (el: HTMLElement | null | undefined) {
+  if (!el || typeof window === 'undefined') return false
+  const rect = el.getBoundingClientRect()
+  return rect.bottom > 0 && rect.top < window.innerHeight
+    && rect.right > 0 && rect.left < window.innerWidth
+}
+
+function onImageLoad (i: number, event: Event) {
+  const img = event.currentTarget as HTMLImageElement | null
+  if (img?.complete && img.naturalWidth > 0 && isFrameInViewport(frameEls[i])) developFrame(i)
+}
 
 function developAll () {
   props.items.forEach((_, i) => { developed[i] = true })
@@ -315,8 +342,7 @@ onMounted(() => {
       if (!e.isIntersecting) continue
       const i = idxByEl.get(e.target)
       if (i === undefined || developed[i]) continue
-      developed[i] = true
-      frameIo?.unobserve(e.target)
+      developFrame(i)
     }
   }, { rootMargin: '0px 0px -4% 0px', threshold: 0 })
 
@@ -325,6 +351,13 @@ onMounted(() => {
       if (!el) return
       idxByEl.set(el, i)
       frameIo?.observe(el)
+    })
+
+    rootEl.value?.querySelectorAll<HTMLImageElement>('.contact-sheet__img').forEach((img) => {
+      if (!img.complete || img.naturalWidth === 0) return
+      const cell = img.closest<HTMLElement>('.contact-sheet__cell')
+      const i = Number(cell?.dataset.frame)
+      if (Number.isInteger(i) && isFrameInViewport(cell)) developFrame(i)
     })
   })
 })

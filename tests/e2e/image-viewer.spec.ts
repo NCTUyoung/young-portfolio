@@ -4,7 +4,7 @@ import { test, expect, type Page } from '@playwright/test'
  * 針對 `app/components/ImageViewer.vue`：點開→ESC 關閉→方向鍵切換。
  * 對應程式：`handleKeydown` / `handleTabKey`（document 層 keydown）。
  *
- * lightbox 入口：先進入事件扉頁，按「展開全部」再從接觸印樣瀑布流點格開圖。
+ * lightbox 入口：事件扉頁預設顯示系列照片，再從接觸印樣瀑布流點格開圖。
  *
  * 使用 `force: true`：hover caption 會在 pointer enter 瞬間套 pointer-events 攔掉 img
  * click 的 actionability 檢查；實際使用者點得進去（事件 bubble 到 button），force click 表達真實行為。
@@ -15,12 +15,10 @@ async function openEventSeries (page: Page) {
   await page.goto(EVENT_PATH)
   await expect(page.locator('#event-cover-heading')).toHaveText('Annber 外拍')
   await page.waitForLoadState('networkidle')
-  const expandSeries = page.getByRole('button', { name: /展開全部/ })
-  await expect(expandSeries).toBeVisible()
-  await expect(expandSeries).toHaveAttribute('data-hydrated', 'true')
-  await expandSeries.click()
-  await expect(expandSeries).toHaveAttribute('aria-expanded', 'true')
-  await expect(page.locator('.contact-sheet__masonry').first()).toBeVisible({ timeout: 15_000 })
+  const seriesShortcut = page.getByRole('button', { name: /前往系列照片/ })
+  await expect(seriesShortcut).toBeVisible()
+  await expect(seriesShortcut).toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('.contact-sheet__masonry:visible').first()).toBeVisible({ timeout: 15_000 })
 }
 
 test.describe('ImageViewer 鍵盤操作', () => {

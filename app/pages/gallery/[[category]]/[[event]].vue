@@ -604,10 +604,10 @@ const currentEventGroup = computed(() => {
 
 const eventTimelineRef = ref<HTMLDivElement | null>(null)
 const photographySectionRef = ref<{ expandEvent: (name: string) => void } | null>(null)
-const isEventSeriesExpanded = ref(false)
+const isEventSeriesExpanded = ref(true)
 
 watch(() => filterState.value.selectedEvent, () => {
-  isEventSeriesExpanded.value = false
+  isEventSeriesExpanded.value = true
 })
 
 /** The cover's expand action reveals the series, then scrolls to it. */

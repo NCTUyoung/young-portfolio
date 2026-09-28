@@ -120,7 +120,7 @@
         :data-hydrated="hydrated"
         @click="$emit('expand')"
       >
-        <span class="text-xs tracking-[0.4em] uppercase">展開全部</span>
+        <span class="text-xs tracking-[0.4em] uppercase">{{ seriesExpanded ? '前往系列照片' : '展開全部' }}</span>
         <span aria-hidden="true" class="block w-12 h-px bg-stone-400/60 dark:bg-stone-500/60 group-hover:bg-accent-500 dark:group-hover:bg-accent-400 transition-colors"/>
         <span aria-hidden="true" class="cover-arrow block text-stone-400 dark:text-stone-500 motion-reduce:animate-none">↓</span>
       </button>
