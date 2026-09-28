@@ -117,6 +117,7 @@
         class="cover-expand mt-10 inline-flex items-center gap-3 text-stone-600 dark:text-stone-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60 focus-visible:ring-offset-4 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950 rounded-sm"
         aria-controls="event-photo-series"
         :aria-expanded="seriesExpanded"
+        :data-hydrated="hydrated"
         @click="$emit('expand')"
       >
         <span class="text-xs tracking-[0.4em] uppercase">展開全部</span>
@@ -128,13 +129,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
 
 const props = defineProps<{
   group: MixedPhotoItem
   seriesExpanded: boolean
 }>()
+
+const hydrated = ref(false)
+onMounted(() => {
+  hydrated.value = true
+})
 
 const emit = defineEmits<{
   expand: []

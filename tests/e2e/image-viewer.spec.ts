@@ -1,17 +1,27 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * 針對 `app/components/ImageViewer.vue`：點開→ESC 關閉→方向鍵切換。
  * 對應程式：`handleKeydown` / `handleTabKey`（document 層 keydown）。
  *
- * lightbox 入口：自「進入單一事件後的接觸印樣瀑布流」(GalleryContactSheet) 點格開圖。
- * （overview 已改章節索引，點卡是導航到事件頁、不再開 lightbox；故改由 event 頁進入。）
- * 事件頁預設展開該事件，瀑布流直接可見。
+ * lightbox 入口：先進入事件扉頁，按「展開全部」再從接觸印樣瀑布流點格開圖。
  *
  * 使用 `force: true`：hover caption 會在 pointer enter 瞬間套 pointer-events 攔掉 img
  * click 的 actionability 檢查；實際使用者點得進去（事件 bubble 到 button），force click 表達真實行為。
  */
 const EVENT_PATH = '/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D'
+
+async function openEventSeries (page: Page) {
+  await page.goto(EVENT_PATH)
+  await expect(page.locator('#event-cover-heading')).toHaveText('Annber 外拍')
+  await page.waitForLoadState('networkidle')
+  const expandSeries = page.getByRole('button', { name: /展開全部/ })
+  await expect(expandSeries).toBeVisible()
+  await expect(expandSeries).toHaveAttribute('data-hydrated', 'true')
+  await expandSeries.click()
+  await expect(expandSeries).toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('.contact-sheet__masonry').first()).toBeVisible({ timeout: 15_000 })
+}
 
 test.describe('ImageViewer 鍵盤操作', () => {
   test('same image reopen resets failed decode state', async ({ page }) => {
@@ -27,8 +37,7 @@ test.describe('ImageViewer 鍵盤操作', () => {
       await route.continue()
     })
 
-    await page.goto(EVENT_PATH)
-    await page.waitForLoadState('networkidle')
+    await openEventSeries(page)
     const firstCell = page.locator('.contact-sheet__btn').first()
     await firstCell.waitFor({ state: 'visible', timeout: 15_000 })
 
@@ -49,9 +58,7 @@ test.describe('ImageViewer 鍵盤操作', () => {
   })
 
   test('點圖開啟 → ESC 關閉', async ({ page }) => {
-    await page.goto(EVENT_PATH)
-    // 等 hydration 完成再 click，否則 button @click handler 可能尚未綁定
-    await page.waitForLoadState('networkidle')
+    await openEventSeries(page)
 
     // 進入事件預設展開 → 接觸印樣瀑布流可見；點第一格開 lightbox
     const firstCell = page.locator('.contact-sheet__btn').first()
@@ -73,8 +80,7 @@ test.describe('ImageViewer 鍵盤操作', () => {
   })
 
   test('方向鍵切換下一張（index 1/N → 2/N）', async ({ page }) => {
-    await page.goto(EVENT_PATH)
-    await page.waitForLoadState('networkidle')
+    await openEventSeries(page)
 
     const firstCell = page.locator('.contact-sheet__btn').first()
     await firstCell.waitFor({ state: 'visible', timeout: 15_000 })

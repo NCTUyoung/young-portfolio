@@ -18,7 +18,7 @@ test.describe('首頁 /', () => {
       page.getByRole('link', { name: /進入繪世界/ })
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: /進入影世界/ })
+      page.getByRole('link', { name: /開啟影世界攝影地圖/ })
     ).toBeVisible()
 
     // 「領域 Domains」段落已於改版移除（與 Hero/対話 重複）；改驗仍存在的「自己紹介 About」段。
@@ -30,12 +30,11 @@ test.describe('首頁 /', () => {
   test('可從首頁導到 Gallery 並看見作品清單', async ({ page }) => {
     await page.goto('/')
 
-    // Hero 對開右半 = 影世界入口（→ /gallery/photography）。
-    await page.getByRole('link', { name: /進入影世界/ }).first().click()
+    // Hero 對開右半直接進入攝影地圖（→ /gallery/photography）。
+    await page.getByRole('link', { name: /開啟影世界攝影地圖/ }).click()
 
     await expect(page).toHaveURL(/\/gallery(\/|$)/)
-
-    await expect(page.getByTestId('gallery-archive-controls')).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByRole('heading', { level: 1, name: '写真記録' })).toBeVisible()
+    await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByRole('button', { name: /組圖，共 \d+ 張/ }).first()).toBeVisible()
   })
 })
