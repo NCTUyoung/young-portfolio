@@ -134,6 +134,8 @@ import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
 import { useDark, useDebounceFn } from '@vueuse/core'
 import type * as LeafletNS from 'leaflet'
 import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple, CircleMarker } from 'leaflet'
+import { cardEdge, rectanglesOverlap, type LayoutRect } from '~/utils/photoMapCardLayout'
+import { PHOTO_MAP_OPENING_EVENTS } from '~/stores/galleryConstants'
 // Leaflet CSS 在元件層 import，避開 Vite 7 + Windows 處理 node_modules CSS
 // 的 @fs 絕對路徑 MIME 異常；同時享有 code-splitting（非地圖頁不載入）。
 import 'leaflet/dist/leaflet.css'
@@ -272,25 +274,21 @@ const eventsSignature = computed(() =>
   props.events.map(e => `${e.name}:${e.lat}:${e.lng}:${e.locationAccuracy}:${e.coverFilename}:${e.count}`).join('|')
 )
 
-const openingEvents = computed(() => [...props.events]
-  .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
-  .slice(0, 3))
+const openingEvents = computed(() => {
+  const availableByName = new Map(props.events.map(event => [event.name, event]))
+  const curated = PHOTO_MAP_OPENING_EVENTS.flatMap(name => {
+    const event = availableByName.get(name)
+    return event ? [event] : []
+  })
+  const curatedNames = new Set(curated.map(event => event.name))
+  const remaining = props.events
+    .filter(event => !curatedNames.has(event.name))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+
+  return [...curated, ...remaining].slice(0, 3)
+})
 
 let layoutFrame = 0
-
-function rectanglesOverlap (
-  a: { left: number, top: number, right: number, bottom: number },
-  b: { left: number, top: number, right: number, bottom: number }
-): boolean {
-  return a.left < b.right + 10 && a.right + 10 > b.left && a.top < b.bottom + 10 && a.bottom + 10 > b.top
-}
-
-function cardEdge (x: number, y: number, left: number, top: number, width: number, height: number) {
-  const edgeX = Math.max(left, Math.min(x, left + width))
-  const edgeY = Math.max(top, Math.min(y, top + height))
-  if (edgeX === x && edgeY === y) return { x: left + width / 2, y: top + height }
-  return { x: edgeX, y: edgeY }
-}
 
 function updatePhotoCards () {
   if (!map || props.variant === 'compact') return
@@ -313,7 +311,7 @@ function updatePhotoCards () {
   const width = window.matchMedia('(max-width: 640px)').matches ? 132 : 152
   const height = 138
   const placed: PositionedEvent[] = []
-  const reserved: Array<{ left: number, top: number, right: number, bottom: number }> = [
+  const reserved: LayoutRect[] = [
     { left: 0, top: 0, right: 50, bottom: 82 },
     { left: size.x - 126, top: size.y - 30, right: size.x, bottom: size.y }
   ]

@@ -115,6 +115,8 @@
       <button
         type="button"
         class="cover-expand mt-10 inline-flex items-center gap-3 text-stone-600 dark:text-stone-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60 focus-visible:ring-offset-4 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950 rounded-sm"
+        aria-controls="event-photo-series"
+        :aria-expanded="seriesExpanded"
         @click="$emit('expand')"
       >
         <span class="text-xs tracking-[0.4em] uppercase">展開全部</span>
@@ -131,6 +133,7 @@ import type { MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
 
 const props = defineProps<{
   group: MixedPhotoItem
+  seriesExpanded: boolean
 }>()
 
 const emit = defineEmits<{
@@ -221,17 +224,17 @@ const axisRows = computed<{ label: string; values: string[] }[]>(() => {
   flex: none;
 }
 
-:global(.dark) .event-cover-map-return {
+.dark .event-cover-map-return {
   border-color: rgb(120 113 108 / 0.7);
   color: rgb(214 211 209);
 }
 
-:global(.dark) .event-cover-map-return:hover {
+.dark .event-cover-map-return:hover {
   border-color: rgb(231 184 125 / 0.9);
   color: rgb(231 184 125);
 }
 
-:global(.dark) .event-cover-map-return:focus-visible {
+.dark .event-cover-map-return:focus-visible {
   outline-color: rgb(231 184 125);
 }
 

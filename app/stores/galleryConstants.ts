@@ -15,3 +15,10 @@ export const GALLERY_EVENT_COORDS_FALLBACK: Record<string, { lat: number, lng: n
   'Annber 外拍': { lat: 24.7867, lng: 120.9975 },
   '栗子外拍': { lat: 24.76355, lng: 120.95555 }
 }
+
+/** Opening map selections, ordered to show landscape, sport, and portrait photography. */
+export const PHOTO_MAP_OPENING_EVENTS = [
+  '峨嵋湖風鈴木',
+  'WBC 2026',
+  'Annber 外拍'
+] as const

@@ -191,6 +191,7 @@
           <GalleryEventCover
             v-if="filterState.selectedEvent && currentEventGroup"
             :group="currentEventGroup"
+            :series-expanded="isEventSeriesExpanded"
             @expand="scrollToEventTimeline"
           />
 
@@ -220,9 +221,16 @@
             </div>
           </div>
 
-          <!-- Timeline：僅 event 沉浸模式渲染；扉頁的「展開全部」會 scroll 到此 -->
-          <div v-if="filterState.selectedEvent" ref="eventTimelineRef" class="scroll-mt-24">
+          <!-- The event cover is the first step; mount the photo series only after an explicit expand. -->
+          <div
+            v-if="filterState.selectedEvent"
+            id="event-photo-series"
+            ref="eventTimelineRef"
+            class="scroll-mt-24"
+            :hidden="!isEventSeriesExpanded"
+          >
             <GalleryPhotographySection
+              v-if="isEventSeriesExpanded"
               ref="photographySectionRef"
               :items="photographyEventItems"
               :focused-event-name="focusedEventName"
@@ -596,9 +604,16 @@ const currentEventGroup = computed(() => {
 
 const eventTimelineRef = ref<HTMLDivElement | null>(null)
 const photographySectionRef = ref<{ expandEvent: (name: string) => void } | null>(null)
+const isEventSeriesExpanded = ref(false)
 
-/** 扉頁「展開全部」→ 平滑捲到 timeline；prefers-reduced-motion 改為瞬移 */
-const scrollToEventTimeline = () => {
+watch(() => filterState.value.selectedEvent, () => {
+  isEventSeriesExpanded.value = false
+})
+
+/** The cover's expand action reveals the series, then scrolls to it. */
+const scrollToEventTimeline = async () => {
+  isEventSeriesExpanded.value = true
+  await nextTick()
   if (!eventTimelineRef.value) return
   const prefersReducedMotion = typeof window !== 'undefined'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
