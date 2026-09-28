@@ -31,8 +31,13 @@ export default async function globalSetup (config: FullConfig) {
   for (const route of ROUTES) {
     try {
       await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90_000 })
-      // 給 client chunk 起手請求一點時間，讓 Vite 把該頁前端模組也編出來。
-      await page.waitForTimeout(400)
+      if (route === '/gallery/photography') {
+        // 地圖使用 async Leaflet import；只等 DOMContentLoaded 會在卡片佈局完成前就關閉暖機頁。
+        await page.locator('.event-map-photo-card').first().waitFor({ state: 'visible', timeout: 60_000 })
+      } else {
+        // 給 client chunk 起手請求一點時間，讓 Vite 把該頁前端模組也編出來。
+        await page.waitForTimeout(400)
+      }
     } catch (e) {
       console.warn(`[e2e warmup] ${route} 暖機未完成（不致命）：${(e as Error).message}`)
     }
