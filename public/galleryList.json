@@ -1,5 +1,5 @@
 {
-  "totalNumber": "36",
+  "totalNumber": "37",
   "crossWorldSpreads": [
     {
       "id": "machi-no-hito",
@@ -47,7 +47,8 @@
       "themeRoman": "What I Make Now",
       "kaiEvent": "2026年電繪作品",
       "kageEvent": "WBC 2026",
-      "connector": "此刻的繪是一台保時捷 356，此刻的影是 WBC 的球場——兩條主線推進到的現在"
+      "connector": "繪是柑橘樹影下的洛琪希，影是 WBC 球場；兩條主線都走到此刻",
+      "kaiCover": "gallery/2026年電繪作品/23-編輯-4-1.jpg"
     }
   ],
   "seriesNarratives": {
@@ -783,6 +784,21 @@
       "aspectRatio": 0.7365,
       "focalX": 0.5,
       "focalY": 0.244
+    },
+    {
+      "filename": "gallery/2026年電繪作品/23-編輯-4-1.jpg",
+      "time": "2026 Sep 06",
+      "title": "唯一真神",
+      "content": "洛琪希置身柑橘枝葉間，陽光與葉影落在她的藍髮與服裝上；畫面題字「ロキシーだって本気です」。",
+      "color": "blue",
+      "event": {
+        "name": "2026年電繪作品",
+        "description": "2026 年電繪創作，含載具習作與角色／同人稿等",
+        "location": ""
+      },
+      "aspectRatio": 0.707,
+      "focalX": 0.5,
+      "focalY": 0.42
     }
   ],
   "trackManifesto": {

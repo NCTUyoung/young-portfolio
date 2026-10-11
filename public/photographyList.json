@@ -48,7 +48,8 @@
       "themeRoman": "What I Make Now",
       "kaiEvent": "2026年電繪作品",
       "kageEvent": "WBC 2026",
-      "connector": "此刻的繪是一台保時捷 356，此刻的影是 WBC 的球場——兩條主線推進到的現在"
+      "connector": "繪是柑橘樹影下的洛琪希，影是 WBC 球場；兩條主線都走到此刻",
+      "kaiCover": "gallery/2026年電繪作品/23-編輯-4-1.jpg"
     }
   ],
   "seriesNarratives": {
@@ -2637,6 +2638,35 @@
       "focalY": 0.221
     },
     {
+      "filename": "photography/2026雙十/DSC_7807-編輯-1.jpg",
+      "time": "2026 Oct 10",
+      "title": "迎風的國旗",
+      "content": "密集旗海沿著街道延伸，為雙十活動鋪開醒目的開場。",
+      "tags": [
+        "標準",
+        "日光",
+        "國旗",
+        "街景",
+        "後製"
+      ],
+      "event": {
+        "name": "2026雙十",
+        "description": "新竹市雙十國慶升旗與音樂活動，從迎風旗海、舞台演出到領取紀念品的人潮。",
+        "location": "新竹 金城一路",
+        "lat": 24.79457,
+        "lng": 121.002856
+      },
+      "camera": "NIKON CORPORATION",
+      "model": "NIKON Z f",
+      "focalLength": 40,
+      "aperture": 2,
+      "iso": 100,
+      "shutterSpeed": 0.004,
+      "aspectRatio": 1.5001,
+      "focalX": 0.499,
+      "focalY": 0.498
+    },
+    {
       "filename": "photography/2026雙十/DSC_7980-編輯-11.jpg",
       "time": "2026 Oct 10",
       "title": "小國旗與徽章",
@@ -2831,35 +2861,6 @@
       "aspectRatio": 1.5,
       "focalX": 0.5,
       "focalY": 0.5
-    },
-    {
-      "filename": "photography/2026雙十/DSC_7807-編輯-1.jpg",
-      "time": "2026 Oct 10",
-      "title": "迎風的國旗",
-      "content": "密集旗海沿著街道延伸，為雙十活動鋪開醒目的開場。",
-      "tags": [
-        "標準",
-        "日光",
-        "國旗",
-        "街景",
-        "後製"
-      ],
-      "event": {
-        "name": "2026雙十",
-        "description": "新竹市雙十國慶升旗與音樂活動，從迎風旗海、舞台演出到領取紀念品的人潮。",
-        "location": "新竹 金城一路",
-        "lat": 24.79457,
-        "lng": 121.002856
-      },
-      "camera": "NIKON CORPORATION",
-      "model": "NIKON Z f",
-      "focalLength": 40,
-      "aperture": 2,
-      "iso": 100,
-      "shutterSpeed": 0.004,
-      "aspectRatio": 1.5001,
-      "focalX": 0.499,
-      "focalY": 0.498
     },
     {
       "filename": "photography/2026雙十/DSC_7856-編輯-3.jpg",
