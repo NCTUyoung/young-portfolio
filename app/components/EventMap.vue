@@ -7,6 +7,7 @@
     }"
     @mouseenter="onWrapperEnter"
     @mouseleave="onWrapperLeave"
+    @wheel="handleMapWheel"
   >
     <div
       ref="mapContainer"
@@ -15,12 +16,31 @@
       aria-label="影的互動拍攝地圖"
     />
 
-    <div v-if="variant !== 'compact'" class="event-map-zoom-controls" aria-label="地圖縮放控制">
+    <div
+      v-if="variant !== 'compact'"
+      class="event-map-zoom-controls"
+      role="group"
+      aria-label="地圖控制"
+    >
+      <button
+        type="button"
+        class="event-map-overview-button"
+        aria-label="顯示全部活動"
+        title="顯示全部活動"
+        :disabled="events.length === 0"
+        @click="fitAllEvents"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 3H4a1 1 0 0 0-1 1v3m10-4h3a1 1 0 0 1 1 1v3M3 13v3a1 1 0 0 0 1 1h3m10-4v3a1 1 0 0 1-1 1h-3" />
+          <circle cx="10" cy="10" r="3" />
+        </svg>
+        <span>全覽</span>
+      </button>
       <button
         type="button"
         class="event-map-zoom-button"
-        aria-label="放大地圖並靠近照片位置"
-        title="放大地圖並靠近照片位置"
+        aria-label="放大地圖並靠近活動位置"
+        title="放大地圖並靠近活動位置"
         :disabled="mapZoom !== null && mapZoom >= maximumZoom"
         @click="zoomMap(1)"
       >+</button>
@@ -312,7 +332,7 @@ function updatePhotoCards () {
   const height = 138
   const placed: PositionedEvent[] = []
   const reserved: LayoutRect[] = [
-    { left: 0, top: 0, right: 50, bottom: 82 },
+    { left: 0, top: 0, right: 80, bottom: 150 },
     { left: size.x - 126, top: size.y - 30, right: size.x, bottom: size.y }
   ]
 
@@ -422,6 +442,29 @@ function zoomMap (delta: -1 | 1) {
   map.setZoomAround(anchor, nextZoom, { animate: !reduceMotion })
 }
 
+function handleMapWheel (event: WheelEvent) {
+  if (!map || props.variant === 'compact' || !event.ctrlKey) return
+
+  // Leave ordinary wheel scrolling to the page; Ctrl + wheel is an intentional map zoom.
+  event.preventDefault()
+  const nextZoom = Math.max(
+    minimumZoom,
+    Math.min(maximumZoom, map.getZoom() + (event.deltaY < 0 ? 1 : -1))
+  )
+  if (nextZoom === map.getZoom()) return
+
+  const point = map.mouseEventToContainerPoint(event)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  map.setZoomAround(point, nextZoom, { animate: !reduceMotion })
+}
+
+async function fitAllEvents () {
+  if (!map || !props.events.length) return
+  const L = await import('leaflet')
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  fitInitialMapView(L, !reduceMotion)
+}
+
 function invalidateMapSize () {
   if (!map) return
   map.invalidateSize({ animate: false })
@@ -489,7 +532,7 @@ const initMap = async () => {
       center: savedView?.center ?? [23.7, 121],
       zoom: savedView?.zoom ?? (isCompact ? 6 : 5),
       zoomControl: false,
-      scrollWheelZoom: isCompact ? 'center' : true,
+      scrollWheelZoom: isCompact ? 'center' : false,
       keyboard: !isCompact,
       attributionControl: true
     })
@@ -560,7 +603,7 @@ const styleForEvent = (eventName: string, dark: boolean) => {
   return props.selectedEventName === eventName ? selected : base
 }
 
-const fitInitialMapView = (L: LeafletModule) => {
+const fitInitialMapView = (L: LeafletModule, animate = false) => {
   const mapInstance = map
   if (!mapInstance || !props.events.length) return
 
@@ -571,10 +614,10 @@ const fitInitialMapView = (L: LeafletModule) => {
   const singleZoom = isCompact ? 7 : 10
   if (bounds.length === 1 && bounds[0]) {
     const only = bounds[0]
-    mapInstance.setView(only, singleZoom, { animate: false })
+    mapInstance.setView(only, singleZoom, { animate })
   } else if (bounds.length > 1) {
     const b = L.latLngBounds(bounds)
-    mapInstance.fitBounds(b, { padding: fitPadding, maxZoom: fitMaxZoom, animate: false })
+    mapInstance.fitBounds(b, { padding: fitPadding, maxZoom: fitMaxZoom, animate })
   }
 }
 
@@ -787,8 +830,8 @@ onBeforeUnmount(() => {
 
 .event-map-zoom-button {
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 64px;
+  height: 44px;
   place-items: center;
   color: rgb(41 37 36);
   font-family: Arial, sans-serif;
@@ -798,14 +841,36 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
+.event-map-overview-button {
+  display: flex;
+  width: 64px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  color: rgb(41 37 36);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.event-map-overview-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.event-map-overview-button + .event-map-zoom-button,
 .event-map-zoom-button + .event-map-zoom-button {
   border-top: 1px solid rgb(214 211 209 / 0.95);
 }
 
+.event-map-overview-button:hover:not(:disabled),
 .event-map-zoom-button:hover:not(:disabled) {
   background: rgb(231 229 228 / 0.8);
 }
 
+.event-map-overview-button:focus-visible,
 .event-map-zoom-button:focus-visible {
   position: relative;
   z-index: 1;
@@ -813,6 +878,7 @@ onBeforeUnmount(() => {
   outline-offset: -3px;
 }
 
+.event-map-overview-button:disabled,
 .event-map-zoom-button:disabled {
   color: rgb(168 162 158);
   cursor: default;
@@ -827,18 +893,26 @@ onBeforeUnmount(() => {
   color: rgb(245 245 244);
 }
 
+.dark .event-map-overview-button {
+  color: rgb(245 245 244);
+}
+
+.dark .event-map-overview-button + .event-map-zoom-button,
 .dark .event-map-zoom-button + .event-map-zoom-button {
   border-color: rgb(87 83 78 / 0.95);
 }
 
+.dark .event-map-overview-button:hover:not(:disabled),
 .dark .event-map-zoom-button:hover:not(:disabled) {
   background: rgb(68 64 60 / 0.9);
 }
 
+.dark .event-map-overview-button:focus-visible,
 .dark .event-map-zoom-button:focus-visible {
   outline-color: rgb(231 184 125);
 }
 
+.dark .event-map-overview-button:disabled,
 .dark .event-map-zoom-button:disabled {
   color: rgb(120 113 108);
 }

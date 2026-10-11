@@ -104,7 +104,10 @@
               踏跡<span class="jp-section-ruby">Photographs, Placed</span>
             </h2>
           </div>
-          <p class="photo-map-entry__hint">拖曳地圖，放大探索附近的照片</p>
+          <p class="photo-map-entry__hint">
+            <span class="photo-map-entry__hint--desktop">拖曳平移・Ctrl＋滾輪縮放；點照片看活動</span>
+            <span class="photo-map-entry__hint--touch">拖曳平移・雙指縮放；點照片看活動</span>
+          </p>
         </div>
       </section>
 
@@ -1038,6 +1041,10 @@ useHead({
   letter-spacing: 0.08em;
 }
 
+.photo-map-entry__hint--touch {
+  display: none;
+}
+
 .dark .photo-map-entry__hint {
   color: rgb(214 211 209);
 }
@@ -1059,6 +1066,14 @@ useHead({
 
   .photo-map-entry__hint {
     font-size: 0.8rem;
+  }
+
+  .photo-map-entry__hint--desktop {
+    display: none;
+  }
+
+  .photo-map-entry__hint--touch {
+    display: inline;
   }
 }
 
