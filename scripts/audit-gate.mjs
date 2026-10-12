@@ -24,14 +24,18 @@ import { execSync } from 'node:child_process'
 /** GHSA id → why it is build/dev-only and safe for a static deploy. Revisit on upgrades. */
 const ALLOWLIST = {
   'GHSA-4x5r-pxfx-6jf8': '@babel/core source-map arbitrary file read — build-time transform only',
+  'GHSA-858h-whjf-mvg5': '@nuxt/devtools 3.4.2 pins simple-git 3.x; patched 4.x is outside its supported range, and devtools is not shipped in static Pages',
+  'GHSA-86w9-cpqp-85rv': 'node-forge via listhen in Nitro build/dev tooling; no patched npm release is available, and no Node runtime is shipped',
   'GHSA-g7r4-m6w7-qqqr': 'esbuild dev-server file read (Windows) — dev only, not in SSG output',
+  'GHSA-g4wm-2vf7-vfgr': '@nuxt/devtools 3.4.2 pins simple-git 3.x; patched 4.x is outside its supported range, and devtools is not shipped in static Pages',
   'GHSA-w7jw-789q-3m8p': 'shell-quote newline escaping — build tooling only',
   'GHSA-58qx-3vcg-4xpx': 'ws uninitialized memory — HMR dev socket only',
   'GHSA-96hv-2xvq-fx4p': 'ws fragment DoS — HMR dev socket only',
   'GHSA-fx2h-pf6j-xcff': 'vite dev-server advisory — dev only, not in SSG output',
-  'GHSA-f88m-g3jw-g9cj': 'sharp/libvips CVEs — local Nuxt upload and offline image scripts only; GitHub Pages ships static output without a Node image-processing endpoint',
   'GHSA-mm7m-92g8-7m47': 'nuxt build/SSR advisory — no Node runtime in static deploy',
-  'GHSA-rgj7-g3m4-5g8c': 'sharp/libheif CVEs — local Nuxt upload and offline image scripts only; GitHub Pages ships static output without a Node image-processing endpoint'
+  'GHSA-v5rq-49vh-5v5c': '@nuxt/devtools 3.4.2 pins simple-git 3.x and argv-parser 1.x; patched 4.x is outside its supported range, and devtools is not shipped in static Pages',
+  'GHSA-vfj7-8cjw-p6xm': 'braces 3.0.3 via Tailwind CSS 3 file scanning; no patched release is available, and this build-time tool is not shipped in static Pages',
+  'GHSA-x6jw-m9v5-85vh': '@nuxt/devtools 3.4.2 pins simple-git 3.x; patched 4.x is outside its supported range, and devtools is not shipped in static Pages'
 }
 
 function getAudit () {
