@@ -18,6 +18,9 @@ async function openEventSeries (page: Page) {
   const seriesShortcut = page.getByRole('button', { name: /前往系列照片/ })
   await expect(seriesShortcut).toBeVisible()
   await expect(seriesShortcut).toHaveAttribute('aria-expanded', 'true')
+  // The server renders the expanded series before Vue has attached its click handlers.
+  // Wait for the cover's onMounted marker so subsequent forced cell clicks are interactive.
+  await expect(seriesShortcut).toHaveAttribute('data-hydrated', 'true', { timeout: 15_000 })
   await expect(page.locator('.contact-sheet__masonry:visible').first()).toBeVisible({ timeout: 15_000 })
 }
 
