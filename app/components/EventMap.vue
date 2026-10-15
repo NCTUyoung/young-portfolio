@@ -3,21 +3,16 @@
     class="event-map-wrapper"
     :class="{
       'event-map-wrapper--compact': variant === 'compact',
-      'event-map-wrapper--expanded': isExpanded
+      'event-map-wrapper--expanded': isExpanded,
+      'event-map-inset': variant === 'inset'
     }"
-    @mouseenter="onWrapperEnter"
-    @mouseleave="onWrapperLeave"
-    @wheel="handleMapWheel"
+    :data-map-zoom="mapZoom"
+    :data-event-count="events.length"
   >
+    <div class="event-map-stage" @mouseenter="onWrapperEnter" @mouseleave="onWrapperLeave" @wheel="handleMapWheel">
+      <div ref="mapContainer" class="event-map-container" role="region" :aria-label="variant === 'inset' ? '其他地點的拍攝地圖' : '影的互動拍攝地圖'" />
     <div
-      ref="mapContainer"
-      class="event-map-container"
-      role="region"
-      aria-label="影的互動拍攝地圖"
-    />
-
-    <div
-      v-if="variant !== 'compact'"
+      v-if="variant === 'default'"
       class="event-map-zoom-controls"
       role="group"
       aria-label="地圖控制"
@@ -34,7 +29,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M7 3H4a1 1 0 0 0-1 1v3m10-4h3a1 1 0 0 1 1 1v3M3 13v3a1 1 0 0 0 1 1h3m10-4v3a1 1 0 0 1-1 1h-3" />
           <circle cx="10" cy="10" r="3" />
         </svg>
-        <span>全覽</span>
+        <span class="sr-only">全覽</span>
       </button>
       <button
         type="button"
@@ -52,65 +47,46 @@
         :disabled="mapZoom !== null && mapZoom <= minimumZoom"
         @click="zoomMap(-1)"
       >−</button>
+      <button v-if="showAllLocations" type="button" class="event-map-overview-button" aria-label="回到主要拍攝區域" title="回到主要拍攝區域" @click="fitNearbyEvents">近景</button>
     </div>
 
-    <svg
-      v-if="photoCards.length"
-      class="event-map-connectors"
-      :viewBox="`0 0 ${photoMapSize.width} ${photoMapSize.height}`"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <line
-        v-for="card in photoCards"
-        :key="`line-${card.name}`"
-        :x1="card.anchorX"
-        :y1="card.anchorY"
-        :x2="card.edgeX"
-        :y2="card.edgeY"
-        class="event-map-connector"
-      />
-      <circle
-        v-for="card in photoCards"
-        :key="`anchor-${card.name}`"
-        :cx="card.anchorX"
-        :cy="card.anchorY"
-        r="3.5"
-        class="event-map-anchor"
-      />
-    </svg>
 
-    <TransitionGroup
-      tag="div"
-      name="map-photo"
-      class="event-map-photo-layer"
-      role="group"
-      aria-label="地圖上的活動照片；放大或移動地圖可探索更多"
-    >
-      <button
-        v-for="(card, index) in photoCards"
-        :key="card.name"
-        type="button"
-        class="event-map-photo-card"
-        :class="{ 'event-map-photo-card--focused': card.name === selectedEventName }"
-        :style="{ left: `${card.left}px`, top: `${card.top}px`, '--reveal-delay': `${index * 45}ms` }"
-        :aria-label="`進入「${card.name}」組圖，共 ${card.count} 張；${card.locationAccuracy === 'event' ? '活動座標' : '約略地區'}`"
-        @click="emit('focus-event', card.name)"
-      >
-        <img
-          :src="getThumbPath(card.coverFilename, 400)"
-          :alt="`${card.name} 代表照片`"
-          loading="eager"
-          decoding="async"
+      <svg v-if="photoCards.length" v-show="!isZooming" class="event-map-connectors" :viewBox="`0 0 ${mapSize.width} ${mapSize.height}`" aria-hidden="true">
+        <line v-for="card in photoCards.filter(item => item.anchorVisible)" :key="card.name" :data-event-name="card.name" :x1="card.anchorX" :y1="card.anchorY" :x2="card.x" :y2="card.y" />
+      </svg>
+      <div v-if="photoCards.length" class="event-map-photos" role="group" :aria-label="variant === 'inset' ? '其他地點的活動照片' : '地圖上的活動照片'">
+        <button
+          v-for="(card, index) in photoCards"
+          :key="card.name"
+          type="button"
+          class="event-map-photo-card"
+          :class="{ 'event-map-photo-card--focused': card.name === selectedEvent?.name, 'event-map-photo-card--left': card.x < 90, 'event-map-photo-card--right': card.x > mapSize.width - 90, 'event-map-photo-card--bottom': card.y > mapSize.height - 70 }"
+          :data-event-name="card.name"
+          :style="{ left: `${card.x - card.diameter / 2}px`, top: `${card.y - card.diameter / 2}px`, width: `${card.diameter}px`, height: `${card.diameter}px` }"
+          :aria-label="`預覽「${card.name}」`"
+          :aria-pressed="card.name === selectedEvent?.name"
+          :tabindex="index === circleTabIndex ? 0 : -1"
+          :title="`${card.name} · ${card.locationAccuracy === 'regional' ? '約略地區' : '活動所在地'}`"
+          @click="selectEvent(card.name)"
+          @keydown="onCircleKeydown($event, index)"
         >
-        <span class="event-map-photo-title">{{ card.name }}</span>
-        <span class="event-map-photo-location">
-          <span>{{ card.locationAccuracy === 'event' ? '活動座標' : '約略地區' }}</span>
-          <span v-if="card.location">{{ card.location }}</span>
-        </span>
-      </button>
-    </TransitionGroup>
+          <img class="event-map-photo-image" :src="getThumbPath(card.coverFilename, 400)" :style="{ objectPosition: (card.coverAspectRatio ?? 1) < 1 ? '50% 28%' : '50% 50%' }" alt="" loading="eager" decoding="async">
+          <span class="event-map-photo-label">{{ card.name }}</span>
+        </button>
+      </div>
+      <aside v-if="hasInset" class="event-map-inset-frame" aria-label="其他拍攝地點" @wheel.stop>
+        <p>其他地點</p>
+        <EventMap variant="inset" :events="remoteEvents" :selected-event-name="selectedEvent?.name" @select-event="selectEvent" />
+      </aside>
 
+      <div v-if="variant === 'default'" class="event-map-instruction">
+        <span class="event-map-instruction--pointer">拖曳探索 · Ctrl＋滾輪縮放</span>
+        <span class="event-map-instruction--touch">拖曳探索 · 雙指縮放</span>
+      </div>
+      <div v-if="tilesUnavailable" class="event-map-tile-status" role="status">
+        <p>{{ variant === 'inset' ? '地圖暫時無法載入' : '地圖暫時無法載入，仍可選看活動照片。' }}</p>
+        <button type="button" @click="retryTiles">重試載入地圖</button>
+      </div>
     <!--
       compact 未展開時顯示「停留展開」hint：
       - 位於地圖中下緣，小、半透明，不搶視覺
@@ -146,6 +122,18 @@
       />
     </template>
 
+    </div>
+
+
+    <button v-if="variant === 'default' && selectedEvent" type="button" class="event-map-selection" :aria-label="`進入「${selectedEvent.name}」組圖，共 ${selectedEvent.count} 張`" @click="openSelectedEvent">
+      <img :src="getThumbPath(selectedEvent.coverFilename, 400)" :style="{ objectPosition: (selectedEvent.coverAspectRatio ?? 1) < 1 ? '50% 28%' : '50% 50%' }" alt="" decoding="async">
+      <span class="event-map-selection__caption">
+        <span class="event-map-photo-title">{{ selectedEvent.name }}</span>
+        <span class="event-map-photo-location">{{ selectedEvent.location || '活動所在地' }}<span v-if="selectedEvent.locationAccuracy === 'regional'"> · 約略地區</span></span>
+        <span class="event-map-photo-date">{{ selectedEvent.timeRange }} · {{ selectedEvent.count }} 張</span>
+      </span>
+      <span class="event-map-selection__open">看這組照片<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" /></svg></span>
+    </button>
   </div>
 </template>
 
@@ -154,7 +142,7 @@ import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
 import { useDark, useDebounceFn } from '@vueuse/core'
 import type * as LeafletNS from 'leaflet'
 import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple, CircleMarker } from 'leaflet'
-import { cardEdge, rectanglesOverlap, type LayoutRect } from '~/utils/photoMapCardLayout'
+import { layoutPhotoMapCircles, type PhotoMapCircle } from '~/utils/photoMapCircleLayout'
 import { PHOTO_MAP_OPENING_EVENTS } from '~/stores/galleryConstants'
 // Leaflet CSS 在元件層 import，避開 Vite 7 + Windows 處理 node_modules CSS
 // 的 @fs 絕對路徑 MIME 異常；同時享有 code-splitting（非地圖頁不載入）。
@@ -173,6 +161,7 @@ interface EventLocation {
   lat: number
   lng: number
   coverFilename: string
+  coverAspectRatio?: number
   timeRange: string
   count: number
   location?: string
@@ -182,30 +171,17 @@ interface EventLocation {
 interface MapViewSnapshot {
   center: [number, number]
   zoom: number
-}
-
-interface PositionedEvent extends EventLocation {
-  left: number
-  top: number
-  anchorX: number
-  anchorY: number
-  edgeX: number
-  edgeY: number
+  allLocations?: boolean
 }
 
 const props = withDefaults(
   defineProps<{
     events: EventLocation[]
-    /** 與 Event 篩選同步：選中時地圖飛到該點並強調標記；null 時縮放至全部範圍 */
+    /** Restore the locally previewed activity when returning from its gallery. */
     selectedEventName?: string | null
     initialView?: MapViewSnapshot | null
-    /**
-     * 版型變體：
-     *   - `default`：420px 高（手機 260px），wheel zoom、鍵盤導覽開啟——適合專頁或詳細模式
-     *   - `compact`：160px 高（手機 120px），停用 wheel zoom 與鍵盤（避免與頁面捲動、strip 的鍵盤導覽打架），
-     *     hover card 彈在地圖下方外而非內部右下，marker 縮小；用於常駐 summary bar
-     */
-    variant?: 'default' | 'compact'
+    /** Default is the circle map; inset is a remote-region map; compact retains the map band. */
+    variant?: 'default' | 'compact' | 'inset'
     /**
      * 是否顯示框內「停留放大」提示 pill。預設 true（自洽）。
      * 設 false 時提示交由宿主放在地圖框外的余白（header／hairline），避免 pill 壓在
@@ -218,19 +194,27 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'focus-event', name: string): void
+  (e: 'focus-event' | 'select-event', name: string): void
   (e: 'viewport-change', view: MapViewSnapshot): void
   /** compact 展開狀態變化：宿主可據此顯示／收起框外的「停留放大」提示 */
   (e: 'expand-change', expanded: boolean): void
 }>()
 
+type MapPrint = EventLocation & PhotoMapCircle
+const mapSize = ref({ width: 0, height: 0 })
+const photoCards = ref<MapPrint[]>([])
+let layoutFrame = 0
 const mapContainer = ref<HTMLDivElement | null>(null)
-const photoCards = ref<PositionedEvent[]>([])
-const photoMapSize = ref({ width: 0, height: 0 })
+const previewName = ref(props.selectedEventName)
+const tilesUnavailable = ref(false)
+const isZooming = ref(false)
+const hideConnectors = () => { isZooming.value = true }
+const showConnectors = () => { isZooming.value = false }
 const mapZoom = ref<number | null>(null)
 const minimumZoom = 0
 const maximumZoom = 19
 const isDark = useDark()
+const showAllLocations = ref(props.initialView?.allLocations ?? false)
 
 /**
  * compact 變體的 hover 展開狀態：
@@ -286,139 +270,122 @@ let resizeObserver: ResizeObserver | null = null
 /** 防止 onMounted 與 watch 並發各建一張圖、重疊標記 */
 let mapInitPromise: Promise<void> | null = null
 
-/** 事件名稱 → 圓點（每事件名唯一），供篩選同步時改樣式與 flyTo */
-const markerByName = new Map<string, CircleMarker>()
+/** Activities sharing coordinates have one marker and an accessible chooser. */
+const markerGroups = new Map<CircleMarker, EventLocation[]>()
 
 /** 僅在資料變更時重畫標記，避免 deep watch 過度觸發 */
 const eventsSignature = computed(() =>
   props.events.map(e => `${e.name}:${e.lat}:${e.lng}:${e.locationAccuracy}:${e.coverFilename}:${e.count}`).join('|')
 )
 
-const openingEvents = computed(() => {
-  const availableByName = new Map(props.events.map(event => [event.name, event]))
-  const curated = PHOTO_MAP_OPENING_EVENTS.flatMap(name => {
-    const event = availableByName.get(name)
-    return event ? [event] : []
-  })
-  const curatedNames = new Set(curated.map(event => event.name))
-  const remaining = props.events
-    .filter(event => !curatedNames.has(event.name))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
-
-  return [...curated, ...remaining].slice(0, 3)
+const selectedEvent = computed(() => {
+  const selected = props.events.find(event => event.name === (props.variant === 'inset' ? props.selectedEventName : previewName.value))
+  if (props.variant === 'inset') return selected
+  return selected ?? props.events.find(event => event.name === PHOTO_MAP_OPENING_EVENTS[0]) ?? props.events[0]
 })
 
-let layoutFrame = 0
+function distanceKm (a: EventLocation, b: EventLocation) {
+  const rad = Math.PI / 180
+  const latitude = (b.lat - a.lat) * rad
+  const longitude = (b.lng - a.lng) * rad
+  const h = Math.sin(latitude / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(longitude / 2) ** 2
+  return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0, 1 - h)))
+}
+
+// Prefer the established opening region; otherwise choose the largest nearby group.
+const homeEvent = computed(() => props.events.find(event => event.name === PHOTO_MAP_OPENING_EVENTS[0])
+  ?? [...props.events].sort((a, b) =>
+    props.events.filter(event => distanceKm(b, event) < 800).length
+    - props.events.filter(event => distanceKm(a, event) < 800).length
+    || a.name.localeCompare(b.name)
+  )[0])
+const nearbyEvents = computed(() => props.events.filter(event => !homeEvent.value || distanceKm(homeEvent.value, event) < 800))
+const remoteEvents = computed(() => props.events.filter(event => homeEvent.value && distanceKm(homeEvent.value, event) >= 800))
+const displayedEvents = computed(() => props.variant === 'default' && !showAllLocations.value ? nearbyEvents.value : props.events)
+const hasInset = computed(() => props.variant === 'default' && !showAllLocations.value && remoteEvents.value.length > 0)
+const circleTabIndex = computed(() => Math.max(0, displayedEvents.value.findIndex(event => event.name === selectedEvent.value?.name)))
 
 function updatePhotoCards () {
   if (!map || props.variant === 'compact') return
-
   const size = map.getSize()
-  photoMapSize.value = { width: size.x, height: size.y }
-
-  const openingNames = new Set(openingEvents.value.map(event => event.name))
-  const inView = props.events.filter(event => map!.getBounds().contains([event.lat, event.lng]))
-  const candidates = map.getZoom() < 7
-    ? inView.filter(event => openingNames.has(event.name))
-    : inView.sort((a, b) => {
-        const featuredDelta = Number(openingNames.has(b.name)) - Number(openingNames.has(a.name))
-        if (featuredDelta) return featuredDelta
-        const center = map!.getCenter()
-        return map!.distance(center, [a.lat, a.lng]) - map!.distance(center, [b.lat, b.lng])
-      })
-
-  const maxCards = window.matchMedia('(max-width: 640px)').matches ? 4 : 5
-  const width = window.matchMedia('(max-width: 640px)').matches ? 132 : 152
-  const height = 138
-  const placed: PositionedEvent[] = []
-  const reserved: LayoutRect[] = [
-    { left: 0, top: 0, right: 80, bottom: 150 },
-    { left: size.x - 126, top: size.y - 30, right: size.x, bottom: size.y }
-  ]
-
-  candidates.slice(0, maxCards).forEach(event => {
+  mapSize.value = { width: size.x, height: size.y }
+  const reserved = hasInset.value ? [{ left: size.x - (size.x < 640 ? 152 : 224), top: 0, right: size.x, bottom: size.x < 640 ? 190 : 230 }] : []
+  const circles = layoutPhotoMapCircles(displayedEvents.value.map(event => {
     const point = map!.latLngToContainerPoint([event.lat, event.lng])
-    const positions = [
-      { left: point.x + 18, top: point.y - height - 14 },
-      { left: point.x - width - 18, top: point.y - height - 14 },
-      { left: point.x + 18, top: point.y + 14 },
-      { left: point.x - width - 18, top: point.y + 14 },
-      { left: point.x - width / 2, top: point.y - height - 22 },
-      { left: point.x - width / 2, top: point.y + 22 }
-    ]
-
-    let best: { left: number, top: number, right: number, bottom: number } | null = null
-    let bestConflicts = Number.POSITIVE_INFINITY
-    for (const position of positions) {
-      const left = Math.max(8, Math.min(size.x - width - 8, position.left))
-      const top = Math.max(8, Math.min(size.y - height - 30, position.top))
-      const rect = { left, top, right: left + width, bottom: top + height }
-      const conflicts = reserved.filter(other => rectanglesOverlap(rect, other)).length
-      if (conflicts < bestConflicts) {
-        best = rect
-        bestConflicts = conflicts
-      }
-      if (!conflicts) break
-    }
-    if (!best || bestConflicts > 0) {
-      const columns = size.x >= width * 2 + 24
-        ? [8, Math.round((size.x - width) / 2), size.x - width - 8]
-        : [8, size.x - width - 8]
-      const rows = [8, Math.max(8, Math.round((size.y - height) / 2)), Math.max(8, size.y - height - 30)]
-      const fallback = rows.flatMap(top => columns.map(left => ({
-        left,
-        top,
-        right: left + width,
-        bottom: top + height
-      })))
-        .filter(rect => rect.left >= 0 && rect.top >= 0 && rect.right <= size.x && rect.bottom <= size.y)
-        .filter(rect => reserved.every(other => !rectanglesOverlap(rect, other)))
-        .sort((a, b) => {
-          const distanceToAnchor = (rect: typeof a) => Math.hypot(
-            rect.left + width / 2 - point.x,
-            rect.top + height / 2 - point.y
-          )
-          return distanceToAnchor(a) - distanceToAnchor(b)
-        })[0]
-
-      const maxConnectorDistance = Math.max(width, height) * 2
-      if (!fallback || Math.hypot(
-        fallback.left + width / 2 - point.x,
-        fallback.top + height / 2 - point.y
-      ) > maxConnectorDistance) return
-      best = fallback
-    }
-
-    reserved.push(best)
-    const edge = cardEdge(point.x, point.y, best.left, best.top, width, height)
-    placed.push({
-      ...event,
-      left: best.left,
-      top: best.top,
-      anchorX: point.x,
-      anchorY: point.y,
-      edgeX: edge.x,
-      edgeY: edge.y
-    })
-  })
-
-  photoCards.value = placed
+    return { name: event.name, x: point.x, y: point.y, selected: event.name === selectedEvent.value?.name }
+  }), size.x, size.y, { inset: props.variant === 'inset', reserved })
+  const eventsByName = new Map(displayedEvents.value.map(event => [event.name, event]))
+  photoCards.value = circles.map(circle => ({ ...eventsByName.get(circle.name)!, ...circle }))
 }
 
-function schedulePhotoCardLayout () {
-  if (layoutFrame) cancelAnimationFrame(layoutFrame)
+function schedulePhotoCards () {
+  if (layoutFrame) return
   layoutFrame = requestAnimationFrame(() => {
     layoutFrame = 0
     updatePhotoCards()
   })
 }
 
+function refreshMarkerStyles () {
+  markerGroups.forEach((events, marker) => {
+    const selected = events.some(event => event.name === selectedEvent.value?.name)
+    const styles = getMarkerStyles(isDark.value)
+    marker.setStyle(selected ? styles.selected : styles.base)
+    marker.setRadius(props.variant === 'compact' ? (selected ? 7 : 4) : 3)
+    marker.getElement()?.classList.toggle('event-map-marker--selected', selected)
+  })
+}
+
+function selectEvent (name: string) {
+  const event = props.events.find(item => item.name === name)
+  if (!event) return
+  previewName.value = name
+  emit('select-event', name)
+  refreshMarkerStyles()
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (map && displayedEvents.value.some(item => item.name === name)) {
+    const point = map.latLngToContainerPoint([event.lat, event.lng])
+    const size = map.getSize()
+    if (point.x < size.x * .35 || point.x > size.x * .65 || point.y < 36 || point.y > size.y - 48) {
+      map.panTo([event.lat, event.lng], { animate: !reduceMotion })
+    }
+  }
+  schedulePhotoCards()
+}
+
+function onCircleKeydown (event: KeyboardEvent, index: number) {
+  const count = displayedEvents.value.length
+  const nextIndex = event.key === 'ArrowRight' ? (index + 1) % count
+    : event.key === 'ArrowLeft' ? (index - 1 + count) % count
+      : event.key === 'Home' ? 0 : event.key === 'End' ? count - 1 : null
+  if (nextIndex === null) return
+  event.preventDefault()
+  const activity = displayedEvents.value[nextIndex]
+  if (!activity) return
+  selectEvent(activity.name)
+  const button = event.currentTarget as HTMLButtonElement
+  button.parentElement?.querySelectorAll<HTMLButtonElement>('button')[nextIndex]?.focus()
+}
+
+function openSelectedEvent () {
+  if (!selectedEvent.value) return
+  // Capture the visible frame even when navigation interrupts a map animation.
+  map?.stop()
+  reportViewportChange()
+  emit('focus-event', selectedEvent.value.name)
+}
+
+function retryTiles () {
+  tilesUnavailable.value = false
+  tileLayer?.redraw()
+}
+
 function reportViewportChange () {
   if (!map) return
   mapZoom.value = map.getZoom()
   const { lat, lng } = map.getCenter()
-  emit('viewport-change', { center: [lat, lng], zoom: map.getZoom() })
-  schedulePhotoCardLayout()
+  emit('viewport-change', { center: [lat, lng], zoom: map.getZoom(), allLocations: showAllLocations.value })
+  schedulePhotoCards()
 }
 
 function zoomMap (delta: -1 | 1) {
@@ -427,8 +394,7 @@ function zoomMap (delta: -1 | 1) {
   const nextZoom = Math.max(minimumZoom, Math.min(maximumZoom, map.getZoom() + delta))
   if (nextZoom === map.getZoom()) return
 
-  const selectedEvent = props.events.find(event => event.name === props.selectedEventName)
-  const nearestEvent = selectedEvent ?? props.events.reduce<EventLocation | undefined>((closest, event) => {
+  const nearestEvent = displayedEvents.value.find(event => event.name === selectedEvent.value?.name) ?? displayedEvents.value.reduce<EventLocation | undefined>((closest, event) => {
     if (!closest) return event
     const center = map!.getCenter()
     return map!.distance(center, [event.lat, event.lng]) < map!.distance(center, [closest.lat, closest.lng])
@@ -443,7 +409,7 @@ function zoomMap (delta: -1 | 1) {
 }
 
 function handleMapWheel (event: WheelEvent) {
-  if (!map || props.variant === 'compact' || !event.ctrlKey) return
+  if (!map || props.variant !== 'default' || !event.ctrlKey) return
 
   // Leave ordinary wheel scrolling to the page; Ctrl + wheel is an intentional map zoom.
   event.preventDefault()
@@ -462,12 +428,27 @@ async function fitAllEvents () {
   if (!map || !props.events.length) return
   const L = await import('leaflet')
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  showAllLocations.value = true
+  reportViewportChange()
+  await nextTick()
+  renderMarkers(L)
   fitInitialMapView(L, !reduceMotion)
+}
+
+async function fitNearbyEvents () {
+  if (!map) return
+  const L = await import('leaflet')
+  showAllLocations.value = false
+  reportViewportChange()
+  await nextTick()
+  renderMarkers(L)
+  fitInitialMapView(L, !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 }
 
 function invalidateMapSize () {
   if (!map) return
   map.invalidateSize({ animate: false })
+  schedulePhotoCards()
 }
 
 function isMapInMotion (mapInstance: LeafletMap): boolean {
@@ -506,7 +487,12 @@ const setTileLayer = async () => {
   tileLayer = L.tileLayer(TILE_URL, {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
-  }).addTo(map)
+  })
+  tileLayer.on('load', () => {
+    const tiles = mapContainer.value?.querySelectorAll<HTMLImageElement>('.leaflet-tile')
+    tilesUnavailable.value = !!tiles?.length && !Array.from(tiles).some(tile => tile.complete && tile.naturalWidth > 0)
+  })
+  tileLayer.addTo(map)
 }
 
 const initMap = async () => {
@@ -533,19 +519,25 @@ const initMap = async () => {
       zoom: savedView?.zoom ?? (isCompact ? 6 : 5),
       zoomControl: false,
       scrollWheelZoom: isCompact ? 'center' : false,
-      keyboard: !isCompact,
-      attributionControl: true
+      keyboard: props.variant === 'default',
+      attributionControl: props.variant !== 'inset',
+      zoomSnap: isCompact ? 1 : .5
     })
 
     await setTileLayer()
 
     await nextTick()
+    if (!map || !mapContainer.value) return
     invalidateMapSize()
 
     markersLayer = L.layerGroup().addTo(map)
     renderMarkers(L)
     map.on('moveend zoomend', reportViewportChange)
+    map.on('move zoom', schedulePhotoCards)
+    map.on('zoomstart', hideConnectors)
+    map.on('zoomend', showConnectors)
     if (!savedView) fitInitialMapView(L)
+
     mapZoom.value = map.getZoom()
 
     await nextTick()
@@ -564,61 +556,29 @@ const initMap = async () => {
  * 與 tailwind.config accent（赤陶／琥珀）+ stone 主題一致：細邊、低飽和填色，避免螢光黃橘
  * @see tailwind.config.js colors.accent
  */
-const getMarkerStyles = (dark: boolean) => {
-  const base = dark
-    ? {
-        radius: 6,
-        color: '#e4964a',
-        weight: 1.5,
-        fillColor: '#292524',
-        fillOpacity: 0.94
-      }
-    : {
-        radius: 6,
-        color: '#c46023',
-        weight: 1.5,
-        fillColor: '#fdf8f0',
-        fillOpacity: 0.98
-      }
-  const selected = dark
-    ? {
-        radius: 9,
-        color: '#f4d5b0',
-        weight: 2,
-        fillColor: '#db7b2e',
-        fillOpacity: 0.96
-      }
-    : {
-        radius: 9,
-        color: '#a3491f',
-        weight: 2,
-        fillColor: '#faecd9',
-        fillOpacity: 1
-      }
-  return { base, selected }
-}
+const getMarkerStyles = (dark: boolean) => ({
+  base: { radius: 5, color: dark ? '#bac5cb' : '#52647a', weight: 1.5,
+    fillColor: dark ? '#14181b' : '#eef1f3', fillOpacity: 1 },
+  selected: { radius: 9, color: dark ? '#ece8df' : '#faf7ef', weight: 2,
+    fillColor: dark ? '#9aadc5' : '#39434a', fillOpacity: 1 }
+})
 
 const styleForEvent = (eventName: string, dark: boolean) => {
   const { base, selected } = getMarkerStyles(dark)
-  return props.selectedEventName === eventName ? selected : base
+  return selectedEvent.value?.name === eventName ? selected : base
 }
 
 const fitInitialMapView = (L: LeafletModule, animate = false) => {
   const mapInstance = map
   if (!mapInstance || !props.events.length) return
 
-  const bounds = props.events.map(e => [e.lat, e.lng] as LatLngTuple)
+  const bounds = displayedEvents.value.map(event => [event.lat, event.lng] as LatLngTuple)
   const isCompact = props.variant === 'compact'
-  const fitPadding: [number, number] = isCompact ? [32, 48] : [36, 36]
-  const fitMaxZoom = 6
-  const singleZoom = isCompact ? 7 : 10
-  if (bounds.length === 1 && bounds[0]) {
-    const only = bounds[0]
-    mapInstance.setView(only, singleZoom, { animate })
-  } else if (bounds.length > 1) {
-    const b = L.latLngBounds(bounds)
-    mapInstance.fitBounds(b, { padding: fitPadding, maxZoom: fitMaxZoom, animate })
-  }
+  const isInset = props.variant === 'inset'
+  const padding: [number, number] = isCompact ? [32, 48] : isInset ? [30, 30] : mapInstance.getSize().x < 640 ? [32, 70] : [100, 100]
+  const maximum = isCompact || showAllLocations.value ? 6 : isInset ? 8 : 10
+  if (bounds.length === 1 && bounds[0]) mapInstance.setView(bounds[0], isCompact ? 7 : 8, { animate })
+  else if (bounds.length > 1) mapInstance.fitBounds(L.latLngBounds(bounds), { padding, maxZoom: maximum, animate })
 }
 
 const renderMarkers = (L: LeafletModule) => {
@@ -626,25 +586,60 @@ const renderMarkers = (L: LeafletModule) => {
   const markers = markersLayer
   if (!mapInstance || !markers) return
   markers.clearLayers()
-  markerByName.clear()
+  markerGroups.clear()
 
   if (!props.events.length) return
 
   const dark = isDark.value
 
-  props.events.forEach(event => {
-    const initialStyle = styleForEvent(event.name, dark)
-    const marker = L.circleMarker([event.lat, event.lng], initialStyle)
-    markerByName.set(event.name, marker)
-
-    marker.on('click', () => {
-      emit('focus-event', event.name)
-    })
-
-    marker.addTo(markers)
+  const locations = new Map<string, EventLocation[]>()
+  displayedEvents.value.forEach(event => {
+    const key = `${event.lat}:${event.lng}`
+    locations.set(key, [...(locations.get(key) ?? []), event])
   })
 
-  schedulePhotoCardLayout()
+  locations.forEach(events => {
+    const event = events[0]!
+    const initialStyle = styleForEvent(event.name, dark)
+    const marker = L.circleMarker([event.lat, event.lng], {
+      ...initialStyle,
+      radius: props.variant === 'compact' ? initialStyle.radius : 3,
+      interactive: props.variant === 'compact',
+      className: 'event-map-marker',
+      dashArray: event.locationAccuracy === 'regional' ? '2 2' : undefined
+    })
+    const label = document.createElement('span')
+    label.textContent = events.length > 1
+      ? `${event.location ?? event.name} · ${events.length} 組活動`
+      : `${event.name} · ${event.locationAccuracy === 'event' ? '活動所在地' : '約略地區'}`
+    marker.bindTooltip(label, { direction: 'top', offset: [0, -8], opacity: 1 })
+    markerGroups.set(marker, events)
+
+    if (props.variant === 'compact') marker.on('click', () => emit('focus-event', event.name))
+
+    marker.addTo(markers)
+    const element = marker.getElement()
+    if (props.variant === 'compact') {
+      element?.setAttribute('tabindex', '0')
+      element?.setAttribute('role', 'button')
+      element?.setAttribute('aria-label', label.textContent ?? event.name)
+      element?.addEventListener('keydown', (key) => {
+        const keyboard = key as KeyboardEvent
+        if (keyboard.key === 'Enter' || keyboard.key === ' ') {
+          key.preventDefault()
+          emit('focus-event', event.name)
+        }
+      })
+    } else {
+      // Accessible photo buttons own selection; coordinate dots are decoration.
+      element?.setAttribute('tabindex', '-1')
+      element?.setAttribute('focusable', 'false')
+      element?.setAttribute('aria-hidden', 'true')
+    }
+
+  })
+  refreshMarkerStyles()
+  schedulePhotoCards()
 }
 
 onMounted(async () => {
@@ -652,7 +647,7 @@ onMounted(async () => {
   if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(() => {
       debouncedInvalidateMapSize()
-      schedulePhotoCardLayout()
+      schedulePhotoCards()
     })
     resizeObserver.observe(mapContainer.value)
   }
@@ -678,19 +673,14 @@ watch(isDark, async () => {
   renderMarkers(L)
 })
 
-watch(
-  () => props.selectedEventName,
-  () => {
-    if (!import.meta.client || !map || !props.events.length || markerByName.size === 0) return
-    const dark = isDark.value
-    markerByName.forEach((marker, eventName) => {
-      marker.setStyle(styleForEvent(eventName, dark))
-    })
-    schedulePhotoCardLayout()
-  }
-)
+watch(() => props.selectedEventName, (name) => {
+  previewName.value = name
+  refreshMarkerStyles()
+  schedulePhotoCards()
+})
 
 onBeforeUnmount(() => {
+  if (layoutFrame) cancelAnimationFrame(layoutFrame)
   clearHoverTimers()
   if (resizeObserver) {
     if (mapContainer.value) {
@@ -701,25 +691,70 @@ onBeforeUnmount(() => {
   }
   if (map) {
     map.off('moveend zoomend', reportViewportChange)
+    map.off('move zoom', schedulePhotoCards)
+    map.off('zoomstart', hideConnectors)
+    map.off('zoomend', showConnectors)
     map.remove()
     map = null
     markersLayer = null
-  }
-  if (layoutFrame) {
-    cancelAnimationFrame(layoutFrame)
-    layoutFrame = 0
   }
 })
 </script>
 
 <style scoped>
 .event-map-wrapper {
-  @apply w-full min-w-0 rounded-2xl border border-stone-200/80 dark:border-stone-700/70 overflow-hidden bg-stone-50/60 dark:bg-stone-900/40 relative;
-  /* Isolate Leaflet panes (z-index up to ~1000) so they cannot stack above the fixed navbar */
-  isolation: isolate;
-  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.1), 0 1px 3px rgba(168, 162, 158, 0.05);
+  --map-ink: #39434a;
+  --map-muted: #58656d;
+  --map-line: #bbc4c8;
+  --map-surface: #e6ecef;
+  --map-paper: #faf7ef;
+  display: block;
+  color: var(--map-ink);
+  min-width: 0;
 }
-
+.dark .event-map-wrapper {
+  --map-ink: #ece8df;
+  --map-muted: #bac5cb;
+  --map-line: #64717a;
+  --map-surface: #1d252a;
+  --map-paper: #302e28;
+}
+.event-map-stage { position: relative; min-width: 0; isolation: isolate; background: var(--map-surface); }
+.event-map-container { width: 100%; height: 600px; background: var(--map-surface); }
+.event-map-photos, .event-map-connectors { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.event-map-photos { z-index: 650; }
+.event-map-connectors { z-index: 600; overflow: hidden; }
+.event-map-connectors line { stroke: var(--map-muted); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.event-map-photo-card { position: absolute; display: block; padding: 2px; border-radius: 50%; background: var(--map-paper); box-shadow: 1px 3px 7px rgb(36 42 43 / .25); color: var(--map-ink); cursor: pointer; pointer-events: auto; }
+.event-map-photo-card--focused { z-index: 2; outline: 2px solid var(--map-ink); outline-offset: 2px; }
+.event-map-photo-image { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.event-map-photo-label { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 6px; background: var(--map-paper); color: var(--map-ink); font-size: .72rem; pointer-events: none; opacity: 0; }
+.event-map-photo-card:hover .event-map-photo-label, .event-map-photo-card:focus-visible .event-map-photo-label { opacity: 1; }
+.event-map-photo-card--left .event-map-photo-label { left: 0; transform: none; }
+.event-map-photo-card--right .event-map-photo-label { left: auto; right: 0; transform: none; }
+.event-map-photo-card--bottom .event-map-photo-label { top: auto; bottom: calc(100% + 8px); }
+.event-map-photo-card:hover { z-index: 3; }
+.event-map-photo-card:focus-visible, .event-map-selection:focus-visible { outline: 2px solid var(--map-ink); outline-offset: 4px; }
+.event-map-inset-frame { position: absolute; z-index: 750; top: 12px; right: 12px; width: 200px; border: 1px solid var(--map-line); background: var(--map-surface); }
+.event-map-inset-frame > p { height: 24px; margin: 0; padding: 4px 8px; color: var(--map-muted); font-size: .68rem; }
+.event-map-inset .event-map-container { height: 180px; }
+.event-map-inset .event-map-photo-label { display: none; }
+.event-map-inset .event-map-tile-status { top: -24px; left: 0; right: 0; height: 24px; padding: 0 4px; font-size: .6rem; }
+.event-map-inset .event-map-tile-status p { display: none; }
+.event-map-inset .event-map-tile-status button { min-height: 24px; margin: 0; }
+.event-map-selection { display: flex; align-items: center; gap: 1rem; width: 100%; min-height: 88px; margin-top: 1rem; padding: .75rem 1rem; text-align: left; background: var(--map-paper); color: var(--map-ink); }
+.event-map-selection > img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex: none; }
+.event-map-selection__caption { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.event-map-photo-title { font-family: var(--font-jp, 'Shippori Mincho', serif); font-size: 1rem; line-height: 1.6; }
+.event-map-photo-date, .event-map-photo-location { color: var(--map-muted); font-size: .72rem; line-height: 1.6; }
+.event-map-selection__open { display: inline-flex; align-items: center; gap: .75rem; flex: none; font-size: .8rem; }
+.event-map-selection__open svg { width: 20px; height: 20px; }
+.event-map-instruction { position: absolute; z-index: 700; bottom: 1.6rem; left: 1rem; padding: .3rem .5rem; background: var(--map-paper); color: var(--map-ink); font-size: .68rem; pointer-events: none; }
+.event-map-instruction--touch { display: none; }
+.event-map-tile-status { position: absolute; z-index: 800; left: 4.5rem; right: 1rem; top: 1rem; padding: 1rem; background: var(--map-paper); color: var(--map-ink); font-size: .8rem; }
+.event-map-tile-status button { margin-top: .5rem; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+.event-map-container :deep(.leaflet-tooltip) { border: 0; border-radius: 2px; background: var(--map-paper); color: var(--map-ink); box-shadow: none; font-family: inherit; font-size: .75rem; }
+.event-map-wrapper--compact { display: block; }
 /**
  * compact 版的外框改得更「帶狀」：
  * 圓角縮小、shadow 取消（band 式不需要卡片感）、邊框淡化。
@@ -728,12 +763,6 @@ onBeforeUnmount(() => {
 .event-map-wrapper--compact {
   @apply rounded-xl border-stone-200/60 dark:border-stone-700/40;
   box-shadow: none;
-}
-
-.event-map-container {
-  width: 100%;
-  min-width: 0;
-  height: 420px;
 }
 
 /*
@@ -752,9 +781,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 768px) {
-  .event-map-container {
-    height: 260px;
-  }
   .event-map-wrapper--compact .event-map-container {
     height: 120px;
   }
@@ -775,7 +801,7 @@ onBeforeUnmount(() => {
  * 展開狀態下左右漸層遮罩要淡化——遮罩是為了 160px 窄帶的硬邊軟化，
  * 480px 時再蓋會無端遮蔽內容。
  */
-.event-map-wrapper--compact.event-map-wrapper--expanded > [class*="bg-gradient-to"] {
+.event-map-wrapper--compact.event-map-wrapper--expanded .event-map-stage > [class*="bg-gradient-to"] {
   opacity: 0;
   transition: opacity 0.2s ease-out;
 }
@@ -816,25 +842,25 @@ onBeforeUnmount(() => {
 
 .event-map-zoom-controls {
   position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
+  top: 1rem;
+  left: 1rem;
   z-index: 1001;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid rgb(214 211 209 / 0.95);
-  border-radius: 0.3rem;
+  border-radius: 2px;
   background: rgb(250 250 249 / 0.96);
-  box-shadow: 0 1px 5px rgb(41 37 36 / 0.2);
+  box-shadow: none;
 }
 
 .event-map-zoom-button {
   display: grid;
-  width: 64px;
+  width: 44px;
   height: 44px;
   place-items: center;
   color: rgb(41 37 36);
-  font-family: Arial, sans-serif;
+  font-family: inherit;
   font-size: 1.55rem;
   font-weight: 500;
   line-height: 1;
@@ -843,7 +869,7 @@ onBeforeUnmount(() => {
 
 .event-map-overview-button {
   display: flex;
-  width: 64px;
+  width: 44px;
   height: 44px;
   align-items: center;
   justify-content: center;
@@ -926,194 +952,14 @@ onBeforeUnmount(() => {
   color: rgb(228 150 74);
 }
 
-.event-map-connectors,
-.event-map-photo-layer {
-  position: absolute;
-  inset: 0;
-}
-
-.event-map-connectors {
-  z-index: 650;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.event-map-connector {
-  stroke: rgb(164 92 48 / 0.9);
-  stroke-width: 1.6;
-  vector-effect: non-scaling-stroke;
-}
-
-.event-map-anchor {
-  fill: rgb(164 92 48);
-  stroke: rgb(250 250 249);
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.dark .event-map-connector {
-  stroke: rgb(231 184 125 / 0.95);
-}
-
-.dark .event-map-anchor {
-  fill: rgb(231 184 125);
-  stroke: rgb(41 37 36);
-}
-
-.event-map-photo-layer {
-  z-index: 700;
-  pointer-events: none;
-}
-
-.event-map-photo-card {
-  position: absolute;
-  display: grid;
-  grid-template-rows: 66px 1fr auto;
-  gap: 0;
-  width: 152px;
-  height: 138px;
-  overflow: hidden;
-  padding: 0;
-  border: 1px solid rgb(214 211 209 / 0.9);
-  border-radius: 0.35rem;
-  background: rgb(250 250 249 / 0.97);
-  color: rgb(41 37 36);
-  text-align: left;
-  box-shadow: 0 3px 12px rgb(41 37 36 / 0.13);
-  cursor: pointer;
-  pointer-events: auto;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-}
-
-.event-map-photo-card:hover,
-.event-map-photo-card--focused {
-  border-color: rgb(164 92 48 / 0.85);
-  box-shadow: 0 5px 18px rgb(41 37 36 / 0.22);
-}
-
-.event-map-photo-card:focus-visible {
-  outline: 2px solid rgb(164 92 48);
-  outline-offset: 3px;
-  z-index: 1;
-}
-
-.event-map-photo-card img {
-  width: 100%;
-  height: 66px;
-  object-fit: cover;
-  background: rgb(231 229 228);
-}
-
-.event-map-photo-title {
-  align-self: center;
-  min-width: 0;
-  padding: 0.1rem 0.5rem 0;
-  overflow: hidden;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 0.8rem;
-  line-height: 1.25rem;
-  letter-spacing: 0.08em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.event-map-photo-location {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.05rem;
-  min-width: 0;
-  padding: 0 0.5rem 0.35rem;
-  color: rgb(87 83 78);
-  font-size: 0.72rem;
-  line-height: 1.05rem;
-  white-space: nowrap;
-}
-
-.event-map-photo-location span:first-child {
-  flex: none;
-  color: rgb(164 92 48);
-}
-
-.event-map-photo-location span:last-child {
-  max-width: 100%;
-  font-size: 0.68rem;
-  overflow: hidden;
-  color: rgb(87 83 78);
-  text-overflow: ellipsis;
-}
-
-.dark .event-map-photo-card {
-  border-color: rgb(87 83 78 / 0.9);
-  background: rgb(41 37 36 / 0.97);
-  color: rgb(245 245 244);
-  box-shadow: 0 3px 14px rgb(0 0 0 / 0.42);
-}
-
-.dark .event-map-photo-card:hover,
-.dark .event-map-photo-card--focused {
-  border-color: rgb(231 184 125 / 0.9);
-}
-
-.dark .event-map-photo-card:focus-visible {
-  outline-color: rgb(231 184 125);
-}
-
-.dark .event-map-photo-card img {
-  background: rgb(68 64 60);
-}
-
-.dark .event-map-photo-location,
-.dark .event-map-photo-location span:last-child {
-  color: rgb(214 211 209);
-}
-
-.dark .event-map-photo-location span:first-child {
-  color: rgb(231 184 125);
-}
-
-.map-photo-enter-active {
-  transition: opacity 220ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.map-photo-enter-from {
-  opacity: 0;
-  transform: translateY(8px) scale(0.97);
-}
-
-.map-photo-leave-active {
-  transition: opacity 120ms ease;
-}
-
-.map-photo-leave-to {
-  opacity: 0;
-}
-
-@media (max-width: 640px) {
-  .event-map-photo-card {
-    width: 132px;
-  }
-
-  .event-map-photo-card img {
-    height: 66px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .map-photo-enter-active,
-  .map-photo-leave-active,
-  .event-map-photo-card {
-    transition: none;
-  }
-}
-
 /* OSM 單一瓦片來源：只在 tile pane 調色，不重新請求整張地圖。 */
 .event-map-container :deep(.leaflet-tile-pane) {
-  filter: grayscale(0.9) contrast(1.05);
+  filter: grayscale(1) contrast(.85) brightness(1.1);
+  opacity: .68;
 }
 .dark .event-map-container :deep(.leaflet-tile-pane) {
   filter: grayscale(1) invert(0.9) contrast(1.08) brightness(0.7);
+  opacity: .8;
 }
 
 /* 不在 SVG 上使用 filter：flyTo 平移時部分瀏覽器會出現路徑重影，誤以為多一顆標記 */
@@ -1129,4 +975,23 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.9);
 }
 
+
+@media (max-width: 639px) {
+  .event-map-container { height: 500px; }
+  .event-map-inset-frame { width: 128px; }
+  .event-map-inset .event-map-container { height: 140px; }
+  .event-map-selection { padding: .75rem .5rem; gap: .65rem; }
+  .event-map-selection > img { width: 44px; height: 44px; }
+  .event-map-photo-title { font-size: .85rem; }
+  .event-map-photo-date, .event-map-photo-location { font-size: .68rem; }
+  .event-map-selection__open { width: 36px; font-size: 0; gap: 0; justify-content: end; }
+}
+@media (hover: none) {
+  .event-map-instruction--pointer { display: none; }
+  .event-map-instruction--touch { display: inline; }
+  .event-map-expand-hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-map-photo-card { transition: none; }
+}
 </style>

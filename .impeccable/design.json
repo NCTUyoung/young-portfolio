@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T11:06:17.465Z",
+  "title": "Design System: Young Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "stone-50": {
+        "role": "neutral",
+        "displayName": "Stone 50",
+        "tonalRamp": [
+          "oklch(15% 0.001 106)",
+          "oklch(25% 0.001 106)",
+          "oklch(35% 0.001 106)",
+          "oklch(45% 0.001 106)",
+          "oklch(55% 0.001 106)",
+          "oklch(65% 0.001 106)",
+          "oklch(80% 0.001 106)",
+          "oklch(95% 0.001 106)"
+        ]
+      },
+      "stone-100": {
+        "role": "neutral",
+        "displayName": "Stone 100",
+        "tonalRamp": [
+          "oklch(15% 0.001 106)",
+          "oklch(25% 0.001 106)",
+          "oklch(35% 0.001 106)",
+          "oklch(45% 0.001 106)",
+          "oklch(55% 0.001 106)",
+          "oklch(65% 0.001 106)",
+          "oklch(80% 0.001 106)",
+          "oklch(95% 0.001 106)"
+        ]
+      },
+      "stone-300": {
+        "role": "neutral",
+        "displayName": "Stone 300",
+        "tonalRamp": [
+          "oklch(15% 0.004 56)",
+          "oklch(25% 0.004 56)",
+          "oklch(35% 0.004 56)",
+          "oklch(45% 0.004 56)",
+          "oklch(55% 0.004 56)",
+          "oklch(65% 0.004 56)",
+          "oklch(80% 0.004 56)",
+          "oklch(95% 0.004 56)"
+        ]
+      },
+      "stone-500": {
+        "role": "neutral",
+        "displayName": "Stone 500",
+        "tonalRamp": [
+          "oklch(15% 0.012 58)",
+          "oklch(25% 0.012 58)",
+          "oklch(35% 0.012 58)",
+          "oklch(45% 0.012 58)",
+          "oklch(55% 0.012 58)",
+          "oklch(65% 0.012 58)",
+          "oklch(80% 0.012 58)",
+          "oklch(95% 0.012 58)"
+        ]
+      },
+      "stone-700": {
+        "role": "neutral",
+        "displayName": "Stone 700",
+        "tonalRamp": [
+          "oklch(15% 0.009 68)",
+          "oklch(25% 0.009 68)",
+          "oklch(35% 0.009 68)",
+          "oklch(45% 0.009 68)",
+          "oklch(55% 0.009 68)",
+          "oklch(65% 0.009 68)",
+          "oklch(80% 0.009 68)",
+          "oklch(95% 0.009 68)"
+        ]
+      },
+      "stone-800": {
+        "role": "neutral",
+        "displayName": "Stone 800",
+        "tonalRamp": [
+          "oklch(15% 0.006 34)",
+          "oklch(25% 0.006 34)",
+          "oklch(35% 0.006 34)",
+          "oklch(45% 0.006 34)",
+          "oklch(55% 0.006 34)",
+          "oklch(65% 0.006 34)",
+          "oklch(80% 0.006 34)",
+          "oklch(95% 0.006 34)"
+        ]
+      },
+      "stone-900": {
+        "role": "neutral",
+        "displayName": "Stone 900",
+        "tonalRamp": [
+          "oklch(15% 0.006 56)",
+          "oklch(25% 0.006 56)",
+          "oklch(35% 0.006 56)",
+          "oklch(45% 0.006 56)",
+          "oklch(55% 0.006 56)",
+          "oklch(65% 0.006 56)",
+          "oklch(80% 0.006 56)",
+          "oklch(95% 0.006 56)"
+        ]
+      },
+      "terracotta-500": {
+        "role": "primary",
+        "displayName": "Terracotta 500",
+        "tonalRamp": [
+          "oklch(15% 0.120 55)",
+          "oklch(25% 0.120 55)",
+          "oklch(35% 0.120 55)",
+          "oklch(45% 0.120 55)",
+          "oklch(55% 0.120 55)",
+          "oklch(65% 0.120 55)",
+          "oklch(80% 0.120 55)",
+          "oklch(95% 0.120 55)"
+        ]
+      },
+      "terracotta-400": {
+        "role": "primary",
+        "displayName": "Terracotta 400",
+        "tonalRamp": [
+          "oklch(15% 0.120 62)",
+          "oklch(25% 0.120 62)",
+          "oklch(35% 0.120 62)",
+          "oklch(45% 0.120 62)",
+          "oklch(55% 0.120 62)",
+          "oklch(65% 0.120 62)",
+          "oklch(80% 0.120 62)",
+          "oklch(95% 0.120 62)"
+        ]
+      },
+      "terracotta-700": {
+        "role": "primary",
+        "displayName": "Terracotta 700",
+        "tonalRamp": [
+          "oklch(15% 0.120 43)",
+          "oklch(25% 0.120 43)",
+          "oklch(35% 0.120 43)",
+          "oklch(45% 0.120 43)",
+          "oklch(55% 0.120 43)",
+          "oklch(65% 0.120 43)",
+          "oklch(80% 0.120 43)",
+          "oklch(95% 0.120 43)"
+        ]
+      },
+      "gallery-wall": {
+        "role": "neutral",
+        "displayName": "Exhibition Wall",
+        "tonalRamp": [
+          "oklch(15% 0.018 89)",
+          "oklch(25% 0.018 89)",
+          "oklch(35% 0.018 89)",
+          "oklch(45% 0.018 89)",
+          "oklch(55% 0.018 89)",
+          "oklch(65% 0.018 89)",
+          "oklch(80% 0.018 89)",
+          "oklch(95% 0.018 89)"
+        ]
+      },
+      "gallery-wall-light": {
+        "role": "neutral",
+        "displayName": "Wall Wash",
+        "tonalRamp": [
+          "oklch(15% 0.012 92)",
+          "oklch(25% 0.012 92)",
+          "oklch(35% 0.012 92)",
+          "oklch(45% 0.012 92)",
+          "oklch(55% 0.012 92)",
+          "oklch(65% 0.012 92)",
+          "oklch(80% 0.012 92)",
+          "oklch(95% 0.012 92)"
+        ]
+      },
+      "gallery-wood": {
+        "role": "neutral",
+        "displayName": "Wood Frame",
+        "tonalRamp": [
+          "oklch(15% 0.038 57)",
+          "oklch(25% 0.038 57)",
+          "oklch(35% 0.038 57)",
+          "oklch(45% 0.038 57)",
+          "oklch(55% 0.038 57)",
+          "oklch(65% 0.038 57)",
+          "oklch(80% 0.038 57)",
+          "oklch(95% 0.038 57)"
+        ]
+      },
+      "gallery-mat": {
+        "role": "neutral",
+        "displayName": "Artwork Mat",
+        "tonalRamp": [
+          "oklch(15% 0.014 89)",
+          "oklch(25% 0.014 89)",
+          "oklch(35% 0.014 89)",
+          "oklch(45% 0.014 89)",
+          "oklch(55% 0.014 89)",
+          "oklch(65% 0.014 89)",
+          "oklch(80% 0.014 89)",
+          "oklch(95% 0.014 89)"
+        ]
+      },
+      "gallery-ink": {
+        "role": "neutral",
+        "displayName": "Gallery Ink",
+        "tonalRamp": [
+          "oklch(15% 0.016 75)",
+          "oklch(25% 0.016 75)",
+          "oklch(35% 0.016 75)",
+          "oklch(45% 0.016 75)",
+          "oklch(55% 0.016 75)",
+          "oklch(65% 0.016 75)",
+          "oklch(80% 0.016 75)",
+          "oklch(95% 0.016 75)"
+        ]
+      },
+      "gallery-muted": {
+        "role": "neutral",
+        "displayName": "Gallery Secondary Text",
+        "tonalRamp": [
+          "oklch(15% 0.022 75)",
+          "oklch(25% 0.022 75)",
+          "oklch(35% 0.022 75)",
+          "oklch(45% 0.022 75)",
+          "oklch(55% 0.022 75)",
+          "oklch(65% 0.022 75)",
+          "oklch(80% 0.022 75)",
+          "oklch(95% 0.022 75)"
+        ]
+      },
+      "photo-world": {
+        "role": "neutral",
+        "displayName": "Cool Silver Surface",
+        "tonalRamp": [
+          "oklch(15% 0.004 236)",
+          "oklch(25% 0.004 236)",
+          "oklch(35% 0.004 236)",
+          "oklch(45% 0.004 236)",
+          "oklch(55% 0.004 236)",
+          "oklch(65% 0.004 236)",
+          "oklch(80% 0.004 236)",
+          "oklch(95% 0.004 236)"
+        ]
+      },
+      "photo-paper": {
+        "role": "neutral",
+        "displayName": "Print Paper",
+        "tonalRamp": [
+          "oklch(15% 0.011 90)",
+          "oklch(25% 0.011 90)",
+          "oklch(35% 0.011 90)",
+          "oklch(45% 0.011 90)",
+          "oklch(55% 0.011 90)",
+          "oklch(65% 0.011 90)",
+          "oklch(80% 0.011 90)",
+          "oklch(95% 0.011 90)"
+        ]
+      },
+      "photo-ink": {
+        "role": "neutral",
+        "displayName": "Photo Ink",
+        "tonalRamp": [
+          "oklch(15% 0.018 239)",
+          "oklch(25% 0.018 239)",
+          "oklch(35% 0.018 239)",
+          "oklch(45% 0.018 239)",
+          "oklch(55% 0.018 239)",
+          "oklch(65% 0.018 239)",
+          "oklch(80% 0.018 239)",
+          "oklch(95% 0.018 239)"
+        ]
+      },
+      "photo-muted": {
+        "role": "neutral",
+        "displayName": "Photo Secondary Text",
+        "tonalRamp": [
+          "oklch(15% 0.020 235)",
+          "oklch(25% 0.020 235)",
+          "oklch(35% 0.020 235)",
+          "oklch(45% 0.020 235)",
+          "oklch(55% 0.020 235)",
+          "oklch(65% 0.020 235)",
+          "oklch(80% 0.020 235)",
+          "oklch(95% 0.020 235)"
+        ]
+      },
+      "photo-line": {
+        "role": "neutral",
+        "displayName": "Contact Strip Line",
+        "tonalRamp": [
+          "oklch(15% 0.011 226)",
+          "oklch(25% 0.011 226)",
+          "oklch(35% 0.011 226)",
+          "oklch(45% 0.011 226)",
+          "oklch(55% 0.011 226)",
+          "oklch(65% 0.011 226)",
+          "oklch(80% 0.011 226)",
+          "oklch(95% 0.011 226)"
+        ]
+      },
+      "photo-accent": {
+        "role": "primary",
+        "displayName": "Slate Accent",
+        "tonalRamp": [
+          "oklch(15% 0.042 254)",
+          "oklch(25% 0.042 254)",
+          "oklch(35% 0.042 254)",
+          "oklch(45% 0.042 254)",
+          "oklch(55% 0.042 254)",
+          "oklch(65% 0.042 254)",
+          "oklch(80% 0.042 254)",
+          "oklch(95% 0.042 254)"
+        ]
+      },
+      "gallery-wall-dark": {
+        "role": "neutral",
+        "displayName": "Dark Exhibition Wall",
+        "tonalRamp": [
+          "oklch(15% 0.007 68)",
+          "oklch(25% 0.007 68)",
+          "oklch(35% 0.007 68)",
+          "oklch(45% 0.007 68)",
+          "oklch(55% 0.007 68)",
+          "oklch(65% 0.007 68)",
+          "oklch(80% 0.007 68)",
+          "oklch(95% 0.007 68)"
+        ]
+      },
+      "gallery-mat-dark": {
+        "role": "neutral",
+        "displayName": "Dark Gallery Mat",
+        "tonalRamp": [
+          "oklch(15% 0.022 83)",
+          "oklch(25% 0.022 83)",
+          "oklch(35% 0.022 83)",
+          "oklch(45% 0.022 83)",
+          "oklch(55% 0.022 83)",
+          "oklch(65% 0.022 83)",
+          "oklch(80% 0.022 83)",
+          "oklch(95% 0.022 83)"
+        ]
+      },
+      "photo-world-dark": {
+        "role": "neutral",
+        "displayName": "Dark Photographic Surface",
+        "tonalRamp": [
+          "oklch(15% 0.009 240)",
+          "oklch(25% 0.009 240)",
+          "oklch(35% 0.009 240)",
+          "oklch(45% 0.009 240)",
+          "oklch(55% 0.009 240)",
+          "oklch(65% 0.009 240)",
+          "oklch(80% 0.009 240)",
+          "oklch(95% 0.009 240)"
+        ]
+      },
+      "photo-paper-dark": {
+        "role": "neutral",
+        "displayName": "Dark Print Paper",
+        "tonalRamp": [
+          "oklch(15% 0.011 92)",
+          "oklch(25% 0.011 92)",
+          "oklch(35% 0.011 92)",
+          "oklch(45% 0.011 92)",
+          "oklch(55% 0.011 92)",
+          "oklch(65% 0.011 92)",
+          "oklch(80% 0.011 92)",
+          "oklch(95% 0.011 92)"
+        ]
+      },
+      "gallery-wall-light-dark": {
+        "role": "neutral",
+        "displayName": "Dark Wall Wash",
+        "tonalRamp": [
+          "oklch(15% 0.012 72)",
+          "oklch(25% 0.012 72)",
+          "oklch(35% 0.012 72)",
+          "oklch(45% 0.012 72)",
+          "oklch(55% 0.012 72)",
+          "oklch(65% 0.012 72)",
+          "oklch(80% 0.012 72)",
+          "oklch(95% 0.012 72)"
+        ]
+      },
+      "gallery-wood-dark": {
+        "role": "neutral",
+        "displayName": "Dark Wood Frame",
+        "tonalRamp": [
+          "oklch(15% 0.054 62)",
+          "oklch(25% 0.054 62)",
+          "oklch(35% 0.054 62)",
+          "oklch(45% 0.054 62)",
+          "oklch(55% 0.054 62)",
+          "oklch(65% 0.054 62)",
+          "oklch(80% 0.054 62)",
+          "oklch(95% 0.054 62)"
+        ]
+      },
+      "gallery-ink-dark": {
+        "role": "neutral",
+        "displayName": "Dark Gallery Ink",
+        "tonalRamp": [
+          "oklch(15% 0.014 78)",
+          "oklch(25% 0.014 78)",
+          "oklch(35% 0.014 78)",
+          "oklch(45% 0.014 78)",
+          "oklch(55% 0.014 78)",
+          "oklch(65% 0.014 78)",
+          "oklch(80% 0.014 78)",
+          "oklch(95% 0.014 78)"
+        ]
+      },
+      "gallery-muted-dark": {
+        "role": "neutral",
+        "displayName": "Dark Gallery Secondary Text",
+        "tonalRamp": [
+          "oklch(15% 0.023 78)",
+          "oklch(25% 0.023 78)",
+          "oklch(35% 0.023 78)",
+          "oklch(45% 0.023 78)",
+          "oklch(55% 0.023 78)",
+          "oklch(65% 0.023 78)",
+          "oklch(80% 0.023 78)",
+          "oklch(95% 0.023 78)"
+        ]
+      },
+      "photo-ink-dark": {
+        "role": "neutral",
+        "displayName": "Dark Photo Ink",
+        "tonalRamp": [
+          "oklch(15% 0.013 87)",
+          "oklch(25% 0.013 87)",
+          "oklch(35% 0.013 87)",
+          "oklch(45% 0.013 87)",
+          "oklch(55% 0.013 87)",
+          "oklch(65% 0.013 87)",
+          "oklch(80% 0.013 87)",
+          "oklch(95% 0.013 87)"
+        ]
+      },
+      "photo-muted-dark": {
+        "role": "neutral",
+        "displayName": "Dark Photo Secondary Text",
+        "tonalRamp": [
+          "oklch(15% 0.015 231)",
+          "oklch(25% 0.015 231)",
+          "oklch(35% 0.015 231)",
+          "oklch(45% 0.015 231)",
+          "oklch(55% 0.015 231)",
+          "oklch(65% 0.015 231)",
+          "oklch(80% 0.015 231)",
+          "oklch(95% 0.015 231)"
+        ]
+      },
+      "photo-line-dark": {
+        "role": "neutral",
+        "displayName": "Dark Contact Strip Line",
+        "tonalRamp": [
+          "oklch(15% 0.021 238)",
+          "oklch(25% 0.021 238)",
+          "oklch(35% 0.021 238)",
+          "oklch(45% 0.021 238)",
+          "oklch(55% 0.021 238)",
+          "oklch(65% 0.021 238)",
+          "oklch(80% 0.021 238)",
+          "oklch(95% 0.021 238)"
+        ]
+      },
+      "photo-accent-dark": {
+        "role": "primary",
+        "displayName": "Dark Slate Accent",
+        "tonalRamp": [
+          "oklch(15% 0.041 254)",
+          "oklch(25% 0.041 254)",
+          "oklch(35% 0.041 254)",
+          "oklch(45% 0.041 254)",
+          "oklch(55% 0.041 254)",
+          "oklch(65% 0.041 254)",
+          "oklch(80% 0.041 254)",
+          "oklch(95% 0.041 254)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display-art": {
+        "displayName": "Artwork Display",
+        "purpose": "Geometric art-world titles on the homepage and in the gallery."
+      },
+      "display-photo": {
+        "displayName": "Photography Display",
+        "purpose": "Mincho photography-world titles on the homepage and in the gallery."
+      },
+      "body": {
+        "displayName": "Shared Body",
+        "purpose": "Site navigation and supporting copy."
+      },
+      "exhibition-plaque": {
+        "displayName": "Exhibition Plaque",
+        "purpose": "Title beside the featured artwork."
+      },
+      "photo-caption": {
+        "displayName": "Print Caption",
+        "purpose": "Selected photograph title and series position."
+      }
+    },
+    "shadows": [
+      {
+        "name": "global-ambient",
+        "value": "0 2px 8px rgba(168, 162, 158, 0.10), 0 1px 3px rgba(168, 162, 158, 0.05)",
+        "purpose": "Quiet general surfaces."
+      },
+      {
+        "name": "exhibition-frame",
+        "value": "2px 3px 5px rgba(31, 24, 18, 0.18), 8px 18px 32px -10px rgba(31, 24, 18, 0.32)",
+        "purpose": "Framed artwork resting on the wall."
+      },
+      {
+        "name": "loose-print",
+        "value": "3px 14px 22px -9px rgb(44 48 46 / 28%)",
+        "purpose": "Neighboring paper prints."
+      },
+      {
+        "name": "selected-print",
+        "value": "5px 25px 35px -13px rgb(36 42 43 / 35%)",
+        "purpose": "Currently selected photograph."
+      }
+    ],
+    "motion": [
+      {
+        "name": "material-lift",
+        "value": "450ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Light-table print lift; disabled for reduced motion."
+      },
+      {
+        "name": "gallery-frame-lift",
+        "value": "500ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Exhibition frame lift; disabled for reduced motion."
+      },
+      {
+        "name": "hero-object-lift",
+        "value": "550ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Homepage artwork and print lift; disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Art Gallery Entry",
+      "kind": "nav",
+      "description": "Image-led warm exhibition entry with an outlined keyboard focus state.",
+      "html": "<a class=\"ds-art-entry\" href=\"#\"><span class=\"ds-art-entry__frame\"><span class=\"ds-art-entry__mat\">繪作</span></span><span class=\"ds-art-entry__label\">走進展廳 ↗</span></a>",
+      "css": ".ds-art-entry { display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; background: #eee5d6; color: #302820; text-decoration: none; font-family: \"Outfit\", \"Noto Sans TC\", sans-serif; } .ds-art-entry__frame { display: block; padding: 7px; background: #493a2e; box-shadow: 0 16px 32px rgba(59,43,26,.21), 0 3px 7px rgba(59,43,26,.16); transition: transform 550ms cubic-bezier(.16,1,.3,1); } .ds-art-entry__mat { display: grid; place-items: center; width: 7rem; height: 9rem; padding: 1rem; background: #f5f0e5; font: 500 1.4rem \"Zen Kaku Gothic New\", \"Noto Sans TC\", sans-serif; } .ds-art-entry__label { border-bottom: 1px solid currentColor; padding-bottom: .2rem; } .ds-art-entry:hover .ds-art-entry__frame, .ds-art-entry:focus-visible .ds-art-entry__frame { transform: translateY(-5px); } .ds-art-entry:focus-visible { outline: 3px solid #9d592e; outline-offset: -5px; } @media (prefers-reduced-motion: reduce) { .ds-art-entry__frame { transition: none; } .ds-art-entry:hover .ds-art-entry__frame, .ds-art-entry:focus-visible .ds-art-entry__frame { transform: none; } }"
+    },
+    {
+      "name": "Photography Gallery Entry",
+      "kind": "nav",
+      "description": "Cool photographic entry with staggered paper prints.",
+      "html": "<a class=\"ds-photo-entry\" href=\"#\"><span class=\"ds-photo-entry__stack\"><span class=\"ds-photo-entry__back\"></span><span class=\"ds-photo-entry__front\">影作</span></span><span class=\"ds-photo-entry__label\">開啟攝影地圖 ↗</span></a>",
+      "css": ".ds-photo-entry { display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; background: linear-gradient(155deg,#f1f4f6,#dce5eb); color: #283846; text-decoration: none; font-family: \"Outfit\", \"Noto Sans TC\", sans-serif; } .ds-photo-entry__stack { position: relative; display: block; width: 8rem; height: 10rem; } .ds-photo-entry__back, .ds-photo-entry__front { position: absolute; display: grid; place-items: center; width: 5.5rem; height: 7rem; padding: .5rem .5rem 1.5rem; background: #f8f8f5; box-shadow: 0 16px 31px rgba(55,74,89,.19), 0 3px 6px rgba(55,74,89,.12); transition: transform 550ms cubic-bezier(.16,1,.3,1); } .ds-photo-entry__back { right: 0; top: 2rem; transform: rotate(7deg); } .ds-photo-entry__front { left: 0; top: .5rem; z-index: 1; transform: rotate(-3deg); font: 500 1.4rem \"Shippori Mincho\", \"Noto Serif JP\", serif; } .ds-photo-entry__label { border-bottom: 1px solid currentColor; padding-bottom: .2rem; } .ds-photo-entry:hover .ds-photo-entry__front, .ds-photo-entry:focus-visible .ds-photo-entry__front { transform: translateY(-8px) rotate(-1deg); } .ds-photo-entry:focus-visible { outline: 3px solid #9d592e; outline-offset: -5px; } @media (prefers-reduced-motion: reduce) { .ds-photo-entry__back, .ds-photo-entry__front { transition: none; } .ds-photo-entry:hover .ds-photo-entry__front, .ds-photo-entry:focus-visible .ds-photo-entry__front { transform: none; } }"
+    },
+    {
+      "name": "Framed Artwork",
+      "kind": "button",
+      "refersTo": "gallery-art-frame",
+      "description": "Square wood frame and mat; art image remains at its own aspect ratio.",
+      "html": "<button class=\"ds-art-button\" type=\"button\"><span class=\"ds-art-frame\"><span class=\"ds-art-mat\">作品</span></span></button>",
+      "css": ".ds-art-button { padding: 0; border: 0; background: none; cursor: pointer; } .ds-art-frame { display: block; padding: clamp(.28rem,.55vw,.5rem); background: #594435; box-shadow: 2px 3px 5px rgba(31,24,18,.18), 8px 18px 32px -10px rgba(31,24,18,.32); transition: transform 500ms cubic-bezier(.16,1,.3,1); } .ds-art-mat { display: grid; place-items: center; width: 11rem; height: 8rem; padding: clamp(.55rem,1.4vw,1.1rem); background: #f7f3e9; color: #403a32; font: 400 1rem \"Zen Kaku Gothic New\", \"Noto Sans TC\", sans-serif; } .ds-art-button:hover .ds-art-frame, .ds-art-button:focus-visible .ds-art-frame { transform: translateY(-3px); } .ds-art-button:focus-visible { outline: none; } .ds-art-button:focus-visible .ds-art-frame { outline: 2px solid #403a32; outline-offset: 5px; } @media (prefers-reduced-motion: reduce) { .ds-art-frame { transition: none; } .ds-art-button:hover .ds-art-frame, .ds-art-button:focus-visible .ds-art-frame { transform: none; } }"
+    },
+    {
+      "name": "Selected Photo Print",
+      "kind": "button",
+      "refersTo": "photo-print",
+      "description": "Paper print with the selected shadow and open-image affordance.",
+      "html": "<button class=\"ds-print\" type=\"button\"><span class=\"ds-print__image\">PHOTO</span><span class=\"ds-print__open\">查看大圖 ↗</span></button>",
+      "css": ".ds-print { display: block; width: 12rem; padding: clamp(.5rem,1.2vw,1rem); border: 0; background: #faf7ef; color: #39434a; text-align: left; box-shadow: 5px 25px 35px -13px rgb(36 42 43 / 35%); cursor: pointer; transition: transform 450ms cubic-bezier(.16,1,.3,1), box-shadow 450ms ease; } .ds-print__image { display: grid; place-items: center; height: 10rem; background: #dce5eb; font: 500 .75rem \"Outfit\", sans-serif; letter-spacing: .15em; } .ds-print__open { display: block; padding-top: .9rem; text-align: right; font: 400 .75rem \"Outfit\", \"Noto Sans TC\", sans-serif; } .ds-print:hover, .ds-print:focus-visible { transform: translateY(-6px); box-shadow: 5px 30px 40px -13px rgb(36 42 43 / 40%); } .ds-print:focus-visible { outline: 2px solid #3f4f63; outline-offset: 5px; } @media (prefers-reduced-motion: reduce) { .ds-print { transition: none; } .ds-print:hover, .ds-print:focus-visible { transform: none; } }"
+    },
+    {
+      "name": "Photo Selection Thumbnail",
+      "kind": "button",
+      "refersTo": "photo-thumbnail",
+      "description": "Numbered contact-strip frame with a clear selected underline.",
+      "html": "<button class=\"ds-thumb\" type=\"button\" aria-pressed=\"true\"><span class=\"ds-thumb__no\">03</span><span class=\"ds-thumb__image\"></span></button>",
+      "css": ".ds-thumb { position: relative; display: block; width: 5rem; padding: .25rem .35rem .6rem; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #58656d; opacity: .65; cursor: pointer; transition: opacity 180ms ease; } .ds-thumb__no { display: block; margin-bottom: .35rem; font: 400 .65rem \"Outfit\", sans-serif; text-align: left; font-variant-numeric: tabular-nums; } .ds-thumb__image { display: block; width: 100%; height: 3.8rem; background: #dce5eb; } .ds-thumb:hover, .ds-thumb[aria-pressed=\"true\"] { opacity: 1; } .ds-thumb[aria-pressed=\"true\"] { border-bottom-color: #3f4f63; } .ds-thumb:focus-visible { outline: 2px solid #3f4f63; outline-offset: 5px; } @media (prefers-reduced-motion: reduce) { .ds-thumb { transition: none; } }"
+    },
+    {
+      "name": "Metadata Chip",
+      "kind": "chip",
+      "description": "Stone metadata pill; the operable filter form gains a selected tint.",
+      "html": "<button class=\"ds-chip\" type=\"button\" aria-pressed=\"true\">攝影</button>",
+      "css": ".ds-chip { display: inline-block; padding: .16rem .65rem; border: 1px solid rgb(217 123 46 / .7); border-radius: 9999px; background: rgb(217 123 46 / .12); color: #a3491f; font: 400 .72rem/1.5 \"Outfit\", \"Noto Sans TC\", sans-serif; letter-spacing: .05em; cursor: pointer; transition: background-color 300ms ease, border-color 300ms ease; } .ds-chip:hover { background: rgb(217 123 46 / .18); } .ds-chip:focus-visible { outline: 2px solid #a3491f; outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-chip { transition: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "展廳與選片光桌",
+    "overview": "The portfolio uses Japanese editorial spacing to make two bodies of work feel distinct. Digital artwork sits on a warm exhibition wall, held by a restrained wood-tone frame and mat. Photography rests on a cool silver work surface as loose paper prints; a selected print rises slightly above its neighbors. The original images carry the color and detail.\n\nThe shared language is quiet stone typography, precise hairlines, sparse terracotta or slate accents, and generous space around each work. Light and dark themes retain the same material relationships. Motion supports the act of looking and yields to reduced-motion preferences.",
+    "keyCharacteristics": [
+      "Warm exhibition wall and cool photographic work surface.",
+      "Original-ratio artwork, small plaques, loose paper prints, and a visible selected state.",
+      "Asymmetric spacing and restrained material depth.",
+      "Distinct art and photography display type over a shared readable body stack."
+    ],
+    "rules": [
+      {
+        "name": "The Work Leads Rule",
+        "body": "Keep the original artwork and photography in color. Material colors create viewing conditions around each image.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Preserve the difference between the art world's geometric title and the photography world's Mincho title while keeping shared controls legible.",
+        "section": "typography"
+      },
+      {
+        "name": "The Viewing Distance Rule",
+        "body": "Give the selected work the most space, then let captions and neighboring works provide scale and context.",
+        "section": "layout"
+      },
+      {
+        "name": "The Material Depth Rule",
+        "body": "Shadows describe wood on a wall and paper on a table. Use stronger depth only where selection or interaction raises the work.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve original image identity, color, and aspect ratio in the work display.",
+      "Do use warm wall, wood, and mat for the exhibition, and cool surface plus paper for photography.",
+      "Do show light and dark material variants and a visible keyboard focus state.",
+      "Do make motion optional under `prefers-reduced-motion: reduce`."
+    ],
+    "donts": [
+      "Don't let ornamental graphics or interface chrome compete with the actual work.",
+      "Don't make the museum frame or print stack a site-wide treatment for unrelated content.",
+      "Don't turn the photography selection strip into a second owner of the image URL or global scroll lock."
+    ]
+  }
+}

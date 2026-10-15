@@ -335,6 +335,14 @@ export const useGalleryStore = defineStore('gallery', () => {
     clearCache(['filteredItems'])
   }
 
+  const resetSecondaryFilters = () => {
+    // Replace any pending search update, while restoring the visible collection immediately.
+    debouncedSetSearchQuery('')
+    filterState.value.searchQuery = ''
+    filterState.value.yearFilter = null
+    clearCache(['filteredItems', 'mixedItems'])
+  }
+
   const clearFilters = () => {
     filterState.value.selectedCategory = 'photography'
     filterState.value.selectedEvent = null
@@ -440,6 +448,7 @@ export const useGalleryStore = defineStore('gallery', () => {
     setSelectedEvent,
     setSearchQuery,
     setYearFilter,
+    resetSecondaryFilters,
     clearFilters,
     toggleGroupExpansion,
     setGroupExpansion,

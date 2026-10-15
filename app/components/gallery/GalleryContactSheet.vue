@@ -499,7 +499,7 @@ onBeforeUnmount(() => {
   background: #e7edf1;
   outline: 1px solid rgba(82, 100, 122, 0.18);
 }
-:global(.dark) .contact-sheet__btn {
+.dark .contact-sheet__btn {
   background: rgba(20, 24, 27, 0.08);
   outline: 1px solid color-mix(in srgb, var(--accent) 16%, transparent);
 }
@@ -576,7 +576,7 @@ onBeforeUnmount(() => {
   transition: transform 0.08s linear;
   background: #e7edf1;
 }
-:global(.dark) .contact-sheet__loupe {
+.dark .contact-sheet__loupe {
   box-shadow:
     0 0 0 1px rgba(238, 241, 243, 0.65),
     0 0 0 5px rgba(20, 24, 27, 0.92),
@@ -610,7 +610,7 @@ onBeforeUnmount(() => {
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius: 2px;
 }
-:global(.dark) .contact-sheet__loupe-readout {
+.dark .contact-sheet__loupe-readout {
   background: rgba(12, 15, 18, 0.86);
 }
 .contact-sheet__loupe-no {
@@ -619,7 +619,7 @@ onBeforeUnmount(() => {
   letter-spacing: 0.14em;
   color: #2b3640;
 }
-:global(.dark) .contact-sheet__loupe-no {
+.dark .contact-sheet__loupe-no {
   color: rgba(238, 241, 243, 0.92);
 }
 .contact-sheet__loupe-exif {
@@ -629,7 +629,7 @@ onBeforeUnmount(() => {
   /* freshen「光卓」：讀數面板上的 EXIF → 深 slate（亮底可讀） */
   color: #56697e;
 }
-:global(.dark) .contact-sheet__loupe-exif {
+.dark .contact-sheet__loupe-exif {
   color: color-mix(in srgb, var(--accent) 65%, #cbd5e1);
 }
 

@@ -1,117 +1,65 @@
 <template>
   <div ref="pageRef">
-    <!--
-      freshen R3（首頁精簡）：移除固定右側縦書「目次」chapter rail。
-      使用者反饋首頁排版雜亂、資訊太多——這條常駐右緣的縦向 rail（序/領/対/步/選/印）
-      在每一屏都疊一條裝飾縦書訊號，與內容無互動價值，是「雜亂」的來源之一。
-      敘事順序已由各 section 章題承載；移除 rail 把右緣余白還給內容。
-    -->
-
-    <!-- freshen R2：砍掉全頁「綴じ糸」固定縫線 + 朱結（scroll-driven 裝飾過載，
-         與「清新」相悖；critic 點名 motif/裝飾通膨）。bindingProgress JS 保留，
-         僅供 Featured 暖→冷 sweep 使用。 -->
-
-    <!-- =====================================================================
-         Hero — 対開扉頁（R4 強硬大膽：對開帶升格為首屏 hero）
-         上一輪 critic jump-out：「破『hero 三連拼貼』鐵律——首屏直接做左繪/右影對開，
-           兩半各鋪一張該世界代表圖（繪滿版方格/影膠卷流），背景色拉開明度差，
-           中央書脊縫即導覽，點任一半進對應 gallery；對開帶本身就是新 hero。
-           兩半 reveal 從書脊向外展開（reduced-motion 改淡入）。」
-         回應（結構性大改，非 chrome）：
-           - 廢除 3 連拼貼 hero-collage（5 年的 §11 策略 C），改 hero-spread 對開兩半。
-           - 左半 = 繪世界（暖陽 fdfaf4 + 工程方格紙 + Zen Kaku 幾何字 + 滿版代表電繪）。
-           - 右半 = 影世界（暗室 14181b + 顯影顆粒 + Shippori 明體 + 滿版代表攝影，明度差 ~15 階）。
-           - 中央書脊縫（hero-spine）= 導覽：縦書き「繪／影」與令和年號，視覺鉚定「翻開兩本書」。
-           - 兩半各掛世界標牌（製図室／暗室）+ 進場 reveal 從書脊向外展開（hero-spread--in）。
-           - 點任一半 → /gallery/digital | /gallery/photography（heroFocus toggle hover 強化）。
-         鐵律破例（見 rulesBroken）：破 hero 三連拼貼策略 C；右半 stone 主軸內換暗室冷青 +
-           serif 字族；左半暖陽 + 幾何 sans。皆有「兩世界 identity 首屏即兌現」之敘事正當性。
-         hero static 守線：無 autoplay/timer/carousel；hover/click 才變化（user-initiated）。
-         ===================================================================== -->
+    <!-- 繪／影並列入口：展牆與選片光桌 -->
     <section
-      class="hero-spread relative min-h-[600px] h-[82vh] md:min-h-[680px] overflow-hidden"
-      :class="{ 'hero-spread--in': heroIn }"
+      class="hero-spread"
       role="region"
       aria-roledescription="封面對開主視覺"
       aria-label="繪と影 — 左繪右影對開扉頁，點任一半進入對應圖片庫"
     >
-      <!-- 對開兩半：lg+ 左右；mobile 上下 -->
-      <div class="hero-spread__pages" :data-hover="heroHover || 'none'">
-        <!-- ============ 左半：繪世界（製図室） ============ -->
+      <div class="hero-spread__pages">
         <NuxtLink
           to="/gallery/digital"
-          class="hero-page hero-page--kai group"
+          class="hero-page hero-page--kai"
           aria-label="進入繪世界 — 製図室繪作"
-          @mouseenter="setHoverFocus('kai')"
-          @mouseleave="setHoverFocus(null)"
         >
-          <img
-            v-if="heroCollage.art"
-            :src="heroCollage.art"
-            :alt="`電繪作品代表 — ${heroCollage.artTitle}`"
-            class="hero-page__img"
-            fetchpriority="high"
-            loading="eager"
-            decoding="async"
-          >
-          <span class="hero-page__texture" aria-hidden="true"/>
-          <span class="hero-page__wash hero-page__wash--kai" aria-hidden="true"/>
-          <span class="hero-page__plate">
-            <span class="hero-page__eyebrow hero-page__eyebrow--mono"><span aria-hidden="true">[</span>繪 / DIGITAL<span aria-hidden="true">]</span></span>
-            <span class="hero-page__title hero-page__title--kai">製図室</span>
-            <span class="hero-page__note hero-page__note--kai">幾何から角色へ、規矩から自由へ。</span>
-            <span class="hero-page__enter">
-              <span class="hero-page__enter-label">觀看繪作</span>
-              <svg class="hero-page__enter-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          <span class="hero-page__gallery-wall" aria-hidden="true"/>
+          <span class="hero-page__scene hero-page__scene--kai">
+            <span class="hero-page__frame">
+              <span class="hero-page__mat">
+                <img
+                  v-if="heroCollage.art"
+                  :src="heroCollage.art"
+                  :alt="`電繪作品代表 — ${heroCollage.artTitle}`"
+                  class="hero-page__art"
+                  fetchpriority="high"
+                  loading="eager"
+                  decoding="async"
+                >
+              </span>
             </span>
+          </span>
+          <span class="hero-page__caption hero-page__caption--kai">
+            <span class="hero-page__title hero-page__title--kai">繪作</span>
+            <span class="hero-page__detail">{{ heroCollage.artTitle }}</span>
+            <span class="hero-page__enter">走進展廳 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </span>
         </NuxtLink>
 
-        <!-- ============ 中央書脊縫：導覽軸（縦書き 繪／影 + 令和年號） ============ -->
         <div class="hero-spine" aria-hidden="true">
-          <span class="hero-spine__rule hero-spine__rule--top"/>
-          <span class="hero-spine__kana font-jp">繪<span class="hero-spine__div">／</span>影</span>
-          <span class="hero-spine__era font-jp">令和七年</span>
-          <span class="hero-spine__rule hero-spine__rule--bot"/>
+          <span class="hero-spine__kana font-jp">繪<span>／</span>影</span>
         </div>
 
-        <!-- ============ 右半：影世界（暗室） ============ -->
         <NuxtLink
           to="/gallery/photography"
-          class="hero-page hero-page--kage group"
+          class="hero-page hero-page--kage"
           aria-label="開啟影世界攝影地圖"
-          @mouseenter="setHoverFocus('kage')"
-          @mouseleave="setHoverFocus(null)"
         >
-          <img
-            v-if="heroCollage.main"
-            :src="heroCollage.main"
-            alt=""
-            class="hero-page__img"
-            fetchpriority="high"
-            loading="eager"
-            decoding="async"
-            aria-hidden="true"
-          >
-          <span class="hero-page__texture" aria-hidden="true"/>
-          <span class="hero-page__wash hero-page__wash--kage" aria-hidden="true"/>
-          <span class="hero-page__plate hero-page__plate--right">
-            <span class="hero-page__eyebrow hero-page__eyebrow--serif">影 — Photography</span>
-            <span class="hero-page__title hero-page__title--kage">暗室</span>
-            <span class="hero-page__note hero-page__note--kage">光と影を、現像する。</span>
-            <span class="hero-page__enter hero-page__enter--right">
-              <svg class="hero-page__enter-arrow hero-page__enter-arrow--left" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 8l-4 4m0 0l4 4m-4-4h18"/></svg>
-              <span class="hero-page__enter-label hero-page__enter-label--serif">開啟攝影地圖</span>
+          <span class="hero-page__scene hero-page__scene--kage">
+            <span class="hero-page__print hero-page__print--sub">
+              <img v-if="heroCollage.sub" :src="heroCollage.sub" :alt="heroCollage.subTitle" loading="eager" decoding="async">
             </span>
+            <span class="hero-page__print hero-page__print--main">
+              <img v-if="heroCollage.main" :src="heroCollage.main" alt="攝影代表作品" fetchpriority="high" loading="eager" decoding="async">
+            </span>
+          </span>
+          <span class="hero-page__caption hero-page__caption--kage">
+            <span class="hero-page__title hero-page__title--kage">影作</span>
+            <span class="hero-page__detail">一張張，從光裡挑出來。</span>
+            <span class="hero-page__enter">開啟攝影地圖 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </span>
         </NuxtLink>
       </div>
-
-      <!-- 對開帶上方一行余白主題（極簡 overlay，不搶圖；首屏即見命題） -->
-      <p class="hero-spread__masthead" aria-label="余白 — 繪と影、二つの世界">
-        <span class="hero-spread__masthead-kanji font-jp">余白</span>
-        <span class="hero-spread__masthead-en">Two worlds · one ink</span>
-      </p>
     </section>
 
     <!-- =====================================================================
@@ -688,8 +636,7 @@ const galleryStore = useGalleryStore()
 // 用於 Hero 第一屏「双軌起算 ledger」（startYear 差 + declaration 並置）。
 const { digitalManifesto, photographyManifesto } = storeToRefs(galleryStore)
 const { data: photoPayload } = await useAsyncData('home-photography', fetchPhotographyWorks)
-// 2026-04-20：Hero 改 amble 清爽拼貼（§11 策略 C）— 需混合攝影 + 電繪兩線作品
-// 同屏彰顯雙主線。此處載入 digital 供 heroCollage computed 取代表作。
+// Hero 同屏展示電繪與攝影代表作。
 const { data: digitalPayload } = await useAsyncData('home-digital', fetchDigitalWorks)
 watch(
   photoPayload,
@@ -763,24 +710,6 @@ type HeroFocus = 'balanced' | 'kai' | 'kage'
 const route = useRoute()
 const heroFocus = ref<HeroFocus>('balanced')
 
-/**
- * R4：對開帶進場 — heroIn 在 mount 後一拍翻 true，觸發兩半「從書脊向外展開」
- * 的 CSS transition（hero-spread--in）。純一次性，無 timer/loop，不違 hero 靜態。
- * prefers-reduced-motion 由 CSS 改為純淡入。
- */
-const heroIn = ref(false)
-onMounted(() => {
-  if (typeof window === 'undefined') { heroIn.value = true; return }
-  requestAnimationFrame(() => requestAnimationFrame(() => { heroIn.value = true }))
-})
-
-/**
- * R4：對開兩半 hover 時把該世界推前（hero-page--lift），另一半微退，
- * 強化「翻開哪一本書」的選擇感。user-initiated（mouseenter），無 autoplay。
- */
-const heroHover = ref<'kai' | 'kage' | null>(null)
-function setHoverFocus (v: 'kai' | 'kage' | null) { heroHover.value = v }
-
 // Init from URL or sessionStorage on mount (R47：跨頁持久化)
 onMounted(() => {
   const q = route.query.focus
@@ -805,12 +734,10 @@ const galleryCtaLabel = computed(() => {
   return '作品を見る'
 })
 
-// ===== Hero 拼貼（§11 策略 C）=====
-// 2026-04-20：amble 清爽拼貼讓電繪 + 攝影同屏可見，彰顯雙主線。
+// ===== Hero 展牆與選片光桌 =====
 // - art：電繪代表作（series=hero 優先，否則最新一張，fallback 硬編）
 // - main：攝影主圖（= heroSource，SEO / og:image 同源，不動）
 // - sub：攝影副圖（series=hero-2 優先，否則 featured 排除主 hero，fallback 硬編）
-// 若後續改 admin UI 讓 user 勾選 Hero tag，這段就全數據驅動。
 const HERO_DIGITAL_FALLBACK = 'gallery/2026年電繪作品/21-編輯-編輯-編輯-1.jpg'
 const HERO_PHOTO_SUB_FALLBACK = 'photography/Annber 外拍/DSC_2702-編輯-1.jpg'
 
@@ -836,18 +763,12 @@ const heroCollage = computed(() => {
   const photoSubSource = photoSubPick?.filename || HERO_PHOTO_SUB_FALLBACK
   const photoSubTitle = photoSubPick?.title || 'Photography'
 
-  // R29: mobile 依 heroFocus 換主圖（kai = 電繪、其他 = 攝影主）
-  const mobileMain = heroFocus.value === 'kai'
-    ? getThumbPath(digitalSource, 800)
-    : heroImage.value
-
   return {
     art: getThumbPath(digitalSource, 800),
     artTitle: digitalTitle,
     main: heroImage.value,
     sub: getThumbPath(photoSubSource, 800),
-    subTitle: photoSubTitle,
-    mobileMain
+    subTitle: photoSubTitle
   }
 })
 
@@ -1001,349 +922,259 @@ useHead({
 /* freshen R2：綴じ糸（.home-binding*）整組 CSS 已移除——裝飾過載，與清新相悖。
    bindingProgress JS 保留，僅驅動 Featured 暖→冷 sweep。 */
 
-/* =========================================================================
-   R4 — Hero 対開扉頁（左繪／右影對開，書脊縫導覽，reveal 從脊向外展開）
-   破「hero 三連拼貼策略 C」；兩半各自字族＋質地＋明度差，首屏即「兩本不同的書」。
-   ========================================================================= */
+/* The two entrances share a viewport but use different viewing surfaces. */
 .hero-spread {
-  background: #fdfaf4; /* 繪半暖底兜底（影半自有暗底） */
+  position: relative;
+  height: 82svh;
+  min-height: 640px;
+  overflow: hidden;
+  background: #eeeae3;
 }
-.dark .hero-spread { background: #1a1714; }
-
 .hero-spread__pages {
-  position: absolute;
-  inset: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  height: 100%;
 }
-
-/* ---- 單半（page）共用 ---- */
-/*
-  R7（強硬大膽 · first-screen-invisible 修復）：
-  critic 連點「首屏整頁死白」。根因＝兩半起手 opacity:0 等 heroIn rAF + 800w 圖晚解碼，
-  首訪 3 秒只見奶白。結構性改法：兩半「世界底色 + 版面拓樸縮影（繪方格紙／影膠卷齒孔）」
-  在 first paint 即實心可見，不再依賴圖片解碼或進場動畫。只有照片本身做 cross-fade。
-  → 一進站就撞到「左暖製図室／右暗暗室」明度對開，圖片是後補的層，不是身分本身。
-*/
 .hero-page {
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
   overflow: hidden;
   text-decoration: none;
-  /* 世界底色：第一幀即見明度對開（與圖片解碼無關） */
-  background: var(--hp-base, #f3e9d6);
-  /* 進場只動 hover lift / flex；位移淡入交給內層 __img + __plate，避免整半藏起來 */
-  transition: flex-grow 0.55s ease;
 }
-.hero-page__img {
+.hero-page--kai {
+  color: #302820;
+  background: #eee5d6;
+}
+.hero-page--kage {
+  color: #283846;
+  background: linear-gradient(155deg, #f1f4f6, #dce5eb);
+}
+.dark .hero-page--kai {
+  color: #eee3d1;
+  background: #29241f;
+}
+.dark .hero-page--kage {
+  color: #e2e9ee;
+  background: linear-gradient(155deg, #29343c, #18232b);
+}
+.hero-page__scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.hero-page__scene--kai {
+  padding: clamp(3rem, 8vh, 7rem) clamp(1.5rem, 5vw, 5rem) 0;
+  background: radial-gradient(ellipse 58% 53% at 50% 24%, rgba(255, 252, 241, 0.92), transparent 100%);
+}
+.dark .hero-page__scene--kai {
+  background: radial-gradient(ellipse 58% 53% at 50% 24%, rgba(177, 145, 103, 0.18), transparent 100%);
+}
+.hero-page__gallery-wall {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 76%, rgba(113, 88, 64, 0.06) 91%, rgba(113, 88, 64, 0.12));
+}
+.hero-page__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(67%, 470px);
+  height: min(82%, 520px);
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(5px, 0.65vw, 9px);
+  background: #493a2e;
+  box-shadow: 0 16px 32px rgba(59, 43, 26, 0.21), 0 3px 7px rgba(59, 43, 26, 0.16);
+  transition: transform 550ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 550ms;
+}
+.hero-page__mat {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(12px, 2vw, 28px);
+  background: #f5f0e5;
+  box-shadow: inset 0 0 0 1px rgba(78, 62, 43, 0.18);
+}
+.hero-page__art {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.dark .hero-page__frame { background: #614d3a; }
+.dark .hero-page__mat { background: #dfd4c3; }
+.hero-page__scene--kage {
+  padding: clamp(2.5rem, 6vh, 5rem) clamp(1.25rem, 4vw, 4rem) 0;
+}
+.hero-page__print {
+  position: absolute;
+  display: block;
+  padding: clamp(6px, 0.7vw, 10px);
+  padding-bottom: clamp(18px, 2.4vw, 34px);
+  background: #f8f8f5;
+  box-shadow: 0 16px 31px rgba(55, 74, 89, 0.19), 0 3px 6px rgba(55, 74, 89, 0.12);
+  transition: transform 550ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 550ms;
+}
+.hero-page__print img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 圖片晚解碼也不害首屏：底色＋拓樸縮影已可見，圖在其上 cross-fade */
-  opacity: 0;
-  transition: opacity 1s ease;
 }
-.hero-spread--in .hero-page__img { opacity: 1; }
-.hero-spread--in .hero-page--kage .hero-page__img { transition-delay: 0.08s; }
-.hero-page__texture { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
-.hero-page__wash { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-
-/* 繪半：暖製図桌底色 + 工程方格紙（first-paint 即見「攤在製圖桌」的繪世界拓樸縮影） */
-.hero-page--kai { --hp-base: #f3e9d6; }
-.hero-page--kai .hero-page__wash--kai {
-  /* freshen R2：暖 wash 稍提（讓暗色電繪在暖世界裡讀得更柔、平衡右半放亮後的左重） */
-  background:
-    linear-gradient(105deg, rgba(243,233,214,0.52) 0%, rgba(243,233,214,0.22) 46%, rgba(243,233,214,0.07) 100%),
-    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.20) 0%, transparent 72%);
+.hero-page__print--main {
+  z-index: 2;
+  left: 18%;
+  top: 13%;
+  width: min(54%, 370px);
+  height: 71%;
+  transform: rotate(-3deg);
 }
-.hero-page--kai .hero-page__texture {
-  /* R7：粗 + 細雙層方格（製圖格牆縮影），底色上即可見的繪世界版面語彙 */
-  background-image:
-    linear-gradient(to right, rgba(180,98,46,0.16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(180,98,46,0.16) 1px, transparent 1px),
-    linear-gradient(to right, rgba(180,98,46,0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(180,98,46,0.06) 1px, transparent 1px);
-  background-size: 46px 46px, 46px 46px, 9.2px 9.2px, 9.2px 9.2px;
-  opacity: 0.7;
+.hero-page__print--sub {
+  z-index: 1;
+  right: 8%;
+  top: 30%;
+  width: min(39%, 275px);
+  height: 54%;
+  transform: rotate(7deg);
 }
-.dark .hero-page--kai { --hp-base: #1a1714; }
-.dark .hero-page--kai .hero-page__wash--kai {
-  background:
-    linear-gradient(105deg, rgba(26,23,20,0.42) 0%, rgba(26,23,20,0.16) 46%, rgba(26,23,20,0.05) 100%),
-    radial-gradient(72% 62% at 10% 94%, rgba(216,134,58,0.18) 0%, transparent 72%);
-}
-
-/* 影半（freshen 放亮）：light 模式改冷銀亮底、照片不再壓暗、wash/顆粒改冷淡；
-   dark 模式保留原暗室暗底配方。兩半皆亮 → 清新，仍靠暖/冷色溫 + 明朝/gothic 字族分世界。 */
-.hero-page--kage { --hp-base: #e8eef2; }
-.hero-page--kage .hero-page__img { filter: grayscale(0.08) contrast(1.01); }
-.hero-page--kage .hero-page__wash--kage {
-  /* 冷淡 wash，錨定右下角 plate 區托深墨字（與繪半暖 wash 鏡像） */
-  background:
-    linear-gradient(255deg, rgba(232,238,242,0.52) 0%, rgba(232,238,242,0.16) 48%, rgba(232,238,242,0.03) 100%),
-    radial-gradient(72% 62% at 90% 92%, rgba(154,173,197,0.20) 0%, transparent 70%);
-}
-.hero-page--kage .hero-page__texture {
-  /* 顯影顆粒 + 左緣縱向膠卷齒孔；改冷 slate，light 底上仍可辨、更 clean */
-  background-image:
-    radial-gradient(circle at center, rgba(82,100,122,0.28) 0 1.3px, transparent 1.6px),
-    radial-gradient(rgba(82,100,122,0.10) 0.6px, transparent 0.7px),
-    repeating-linear-gradient(to bottom, rgba(82,100,122,0.03) 0px, rgba(82,100,122,0.03) 1px, transparent 1px, transparent 5px);
-  background-size: 9px 17px, 4px 4px, 100% 5px;
-  background-position: 8px 0, 0 0, 0 0;
-  background-repeat: repeat-y, repeat, repeat;
-  opacity: 0.5;
-}
-.dark .hero-page--kage { --hp-base: #14181b; }
-.dark .hero-page--kage .hero-page__img { filter: grayscale(0.18) brightness(0.7) contrast(1.05); }
-.dark .hero-page--kage .hero-page__wash--kage {
-  background:
-    linear-gradient(255deg, rgba(15,18,21,0.66) 0%, rgba(15,18,21,0.3) 48%, rgba(15,18,21,0.12) 100%),
-    radial-gradient(75% 65% at 90% 10%, rgba(154,173,197,0.16) 0%, transparent 66%);
-}
-.dark .hero-page--kage .hero-page__texture {
-  background-image:
-    radial-gradient(circle at center, rgba(238,241,243,0.6) 0 1.5px, transparent 1.8px),
-    radial-gradient(rgba(206,214,224,0.12) 0.6px, transparent 0.7px),
-    repeating-linear-gradient(to bottom, rgba(206,214,224,0.035) 0px, rgba(206,214,224,0.035) 1px, transparent 1px, transparent 5px);
-  background-size: 9px 17px, 4px 4px, 100% 5px;
-  background-position: 8px 0, 0 0, 0 0;
-  background-repeat: repeat-y, repeat, repeat;
-  opacity: 0.7;
-}
-
-/* ---- 進場：底色 + 拓樸縮影 first-paint 即在；只有 plate 標牌做輕量滑入淡入 ----
-   （不再讓整半 opacity:0，杜絕「首屏整頁死白」。位移/淡入細節見下方 plate 區塊） */
-.hero-spread--in .hero-page__plate { opacity: 1; transform: translateY(0); }
-.hero-spread--in .hero-page--kage .hero-page__plate { transition-delay: 0.1s; }
-
-/* ---- hover lift：把選中那半的 plate 與圖略推前，另一半微暗 ---- */
-.hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
-.hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
-  /* 未選半「退位」：light 模式用降透明 + 微去彩，不再壓暗（清新不破） */
-  filter: grayscale(0.4) brightness(1.01) opacity(0.55);
-  transition: filter 0.5s ease;
-}
-.dark .hero-spread__pages[data-hover='kai'] .hero-page--kage .hero-page__img,
-.dark .hero-spread__pages[data-hover='kage'] .hero-page--kai .hero-page__img {
-  filter: grayscale(0.5) brightness(0.6);
-}
-.hero-spread--in .hero-page:hover .hero-page__plate { transform: translateY(-4px); }
-
-/* ---- 標牌 plate（左下／右下對位）；起手 opacity:0+下移，--in 後滑入 ---- */
-.hero-page__plate {
-  position: absolute;
+.dark .hero-page__print { background: #dddeda; }
+.hero-page__caption {
   z-index: 3;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,0.61,0.36,1);
-  left: clamp(1.4rem, 4vw, 4rem);
-  bottom: clamp(1.6rem, 5vh, 4rem);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.55rem;
-  max-width: 80%;
-  padding: 0.9rem 1.1rem 1rem;
-  background: rgba(250, 246, 238, 0.91);
-  box-shadow: 0 0 0 1px rgba(92, 74, 57, 0.16);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: clamp(1rem, 2.4vw, 2.5rem);
+  row-gap: 0.4rem;
+  min-height: 120px;
+  padding: 1rem clamp(1.5rem, 4.5vw, 4.5rem) clamp(1.5rem, 4vh, 3rem);
 }
-.hero-page__plate--right {
-  left: auto;
-  right: clamp(1.4rem, 4vw, 4rem);
-  align-items: flex-end;
-  text-align: right;
-  background: rgba(239, 243, 246, 0.92);
-  box-shadow: 0 0 0 1px rgba(70, 87, 105, 0.18);
-}
-.dark .hero-page--kai .hero-page__plate {
-  background: rgba(31, 27, 24, 0.9);
-  box-shadow: 0 0 0 1px rgba(231, 184, 125, 0.2);
-}
-.dark .hero-page--kage .hero-page__plate {
-  background: rgba(24, 29, 34, 0.91);
-  box-shadow: 0 0 0 1px rgba(154, 173, 197, 0.25);
-}
-.hero-page__eyebrow {
-  font-size: 0.66rem;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-}
-.hero-page__eyebrow--mono {
-  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
-  color: #b9601f;
-}
-.hero-page__eyebrow--mono span { opacity: 0.55; }
-.dark .hero-page__eyebrow--mono { color: #e7b87d; }
-.hero-page__eyebrow--serif {
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  letter-spacing: 0.4em;
-  text-transform: none;
-  color: #56697e;
-}
-.dark .hero-page__eyebrow--serif { color: #b9c6d6; }
 .hero-page__title {
-  font-size: clamp(2.6rem, 6vw, 4.4rem);
-  line-height: 1;
-  margin: 0.1rem 0 0.2rem;
+  font-size: clamp(1.7rem, 2.6vw, 2.6rem);
+  line-height: 1.25;
+  font-weight: 500;
+  white-space: nowrap;
 }
 .hero-page__title--kai {
   font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: #2b2017;
-}
-.dark .hero-page__title--kai { color: #f7efe4; }
-.hero-page__title--kage {
-  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: #2b3640;
-  text-shadow: 0 1px 12px rgba(255,255,255,0.5);
-}
-.dark .hero-page__title--kage { color: #eef1f3; text-shadow: 0 2px 18px rgba(0,0,0,0.45); }
-.hero-page__note {
-  font-size: 0.92rem;
-  font-weight: 300;
-  line-height: 1.8;
   letter-spacing: 0.08em;
 }
-.hero-page__note--kai { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; color: #5a4b3c; }
-.dark .hero-page__note--kai { color: #c9b9a6; }
-.hero-page__note--kage { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; color: #51616f; }
-.dark .hero-page__note--kage { color: #c2cdda; }
-
+.hero-page__title--kage {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  letter-spacing: 0.11em;
+}
+.hero-page__detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  opacity: 0.78;
+}
 .hero-page__enter {
-  margin-top: 0.65rem;
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #44382e;
-  transition: color 0.4s ease, gap 0.4s ease;
+  width: fit-content;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.2rem;
+  font-size: 0.83rem;
+  letter-spacing: 0.08em;
 }
-.hero-page__enter--right { color: #34475b; }
-.dark .hero-page__enter { color: #e7b87d; }
-.dark .hero-page__enter--right { color: #c2d0df; }
-.hero-page--kai:hover .hero-page__enter { color: #b9601f; }
-.dark .hero-page--kai:hover .hero-page__enter { color: #e7b87d; }
-.hero-page--kage:hover .hero-page__enter { color: #3f4f63; }
-.dark .hero-page--kage:hover .hero-page__enter { color: #cdd8e6; }
-.hero-page__enter-label { font-family: 'Zen Kaku Gothic New', 'Noto Sans TC', sans-serif; font-size: 1.05rem; font-weight: 500; letter-spacing: 0.12em; }
-.hero-page__enter-label--serif { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; letter-spacing: 0.14em; }
-.hero-page__enter-arrow { width: 1rem; height: 1rem; transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
-.hero-page--kai:hover .hero-page__enter-arrow { transform: translateX(0.4rem); }
-.hero-page--kage:hover .hero-page__enter-arrow--left { transform: translateX(-0.4rem); }
-.hero-page:focus-visible { outline: 2px solid currentColor; outline-offset: -6px; }
-
-/* ---- 中央書脊縫（hero-spine）：對開頁的書脊 = 導覽軸 ---- */
+.hero-page__enter svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-page--kai:hover .hero-page__frame,
+.hero-page--kai:focus-visible .hero-page__frame {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 42px rgba(59, 43, 26, 0.24), 0 5px 10px rgba(59, 43, 26, 0.15);
+}
+.hero-page--kage:hover .hero-page__print--main,
+.hero-page--kage:focus-visible .hero-page__print--main {
+  transform: translateY(-10px) rotate(-1deg);
+  box-shadow: 0 25px 42px rgba(55, 74, 89, 0.24), 0 6px 12px rgba(55, 74, 89, 0.15);
+}
+.hero-page:hover .hero-page__enter svg,
+.hero-page:focus-visible .hero-page__enter svg { transform: translate(2px, -2px); }
+.hero-page:focus-visible { outline: 3px solid #9d592e; outline-offset: -5px; }
+.dark .hero-page:focus-visible { outline-color: #d2ad83; }
 .hero-spine {
   position: absolute;
-  z-index: 5;
-  top: 0; bottom: 0;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
-  width: 2.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.1rem;
+  width: 1px;
+  background: rgba(90, 76, 64, 0.22);
   pointer-events: none;
-  /* freshen：書脊改淺色折縫（中央微亮、兩緣淡灰影），不再是暗縫 */
-  background: linear-gradient(to right, rgba(120,113,108,0.12), rgba(120,113,108,0.03) 35%, rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.03) 65%, rgba(120,113,108,0.12));
 }
-.dark .hero-spine {
-  background: linear-gradient(to right, rgba(0,0,0,0.16), rgba(0,0,0,0.04) 35%, rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.04) 65%, rgba(0,0,0,0.16));
-}
-.hero-spine__rule { width: 1px; flex: 1; background: linear-gradient(to bottom, transparent, rgba(120,113,108,0.4), transparent); }
-.dark .hero-spine__rule { background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent); }
 .hero-spine__kana {
-  writing-mode: vertical-rl;
-  font-size: 1.25rem;
-  font-weight: 300;
-  letter-spacing: 0.3em;
-  color: rgba(40,46,54,0.82);
-  text-shadow: 0 1px 8px rgba(255,255,255,0.4);
-  line-height: 1.1;
-}
-.dark .hero-spine__kana { color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
-.hero-spine__div { color: rgba(40,46,54,0.4); }
-.dark .hero-spine__div { color: rgba(255,255,255,0.5); }
-.hero-spine__era {
-  writing-mode: vertical-rl;
-  font-size: 0.6rem;
-  letter-spacing: 0.42em;
-  color: rgba(68,64,60,0.6);
-}
-.dark .hero-spine__era { color: rgba(255,255,255,0.6); }
-
-/* ---- 對開帶上方余白主題（極簡，居中上緣） ---- */
-.hero-spread__masthead {
   position: absolute;
-  z-index: 6;
-  top: clamp(1.6rem, 5vh, 3.4rem);
+  top: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  pointer-events: none;
-  text-align: center;
+  writing-mode: vertical-rl;
+  padding: 0.7rem 0.3rem;
+  background: #f1eee8;
+  font-size: 0.9rem;
+  letter-spacing: 0.28em;
+  white-space: nowrap;
+  color: #554e49;
 }
-.hero-spread__masthead-kanji {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 200;
-  letter-spacing: 0.5em;
-  color: rgba(41,37,36,0.44);
-  text-shadow: 0 1px 12px rgba(255,255,255,0.45);
-}
-.dark .hero-spread__masthead-kanji { color: rgba(255,255,255,0.48); text-shadow: 0 2px 14px rgba(0,0,0,0.35); }
-.hero-spread__masthead-en {
-  font-family: 'Outfit', 'Noto Sans TC', sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.46em;
-  text-transform: uppercase;
-  color: rgba(68,64,60,0.46);
-}
-.dark .hero-spread__masthead-en { color: rgba(255,255,255,0.48); }
-
-/* ---- mobile：對開頁改上下堆疊，書脊轉橫 ---- */
+.hero-spine__kana span { opacity: 0.48; }
+.dark .hero-spine { background: rgba(230, 222, 211, 0.22); }
+.dark .hero-spine__kana { color: #e3d6c7; background: #282b2b; }
 @media (max-width: 1023px) {
-  .hero-spread__pages { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
-  .hero-page--kai  { transform: translateY(-5%); }
-  .hero-page--kage { transform: translateY(5%); }
-  .hero-spread--in .hero-page--kai,
-  .hero-spread--in .hero-page--kage { transform: translateY(0); }
-  .hero-spine {
-    top: 50%; bottom: auto; left: 0; right: 0; width: 100%;
-    transform: translateY(-50%);
-    flex-direction: row;
-    height: 2.2rem;
-    background: linear-gradient(to bottom, rgba(120,113,108,0.12), rgba(255,255,255,0.5) 50%, rgba(120,113,108,0.12));
+  .hero-spread { height: 83svh; min-height: 610px; }
+  .hero-spread__pages { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .hero-page__scene--kai { padding: 1.2rem 1.2rem 0; }
+  .hero-page__scene--kage { padding: 0.8rem 1.2rem 0; }
+  .hero-page__frame { width: min(45%, 255px); height: 84%; }
+  .hero-page__print--main { left: 23%; top: 6%; width: min(42%, 260px); height: 82%; }
+  .hero-page__print--sub { right: 15%; top: 18%; width: min(32%, 200px); height: 65%; }
+  .hero-page__caption {
+    min-height: 74px;
+    padding: 0.3rem 1.5rem 1rem;
+    column-gap: 1rem;
   }
-  .dark .hero-spine {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.16));
+  .hero-page__title { font-size: 1.35rem; }
+  .hero-page__detail { font-size: 0.72rem; }
+  .hero-page__enter { font-size: 0.74rem; }
+  .hero-spine { top: 50%; bottom: auto; left: 0; right: 0; width: auto; height: 1px; }
+  .hero-spine__kana {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    writing-mode: horizontal-tb;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.75rem;
   }
-  .hero-spine__rule { width: auto; height: 1px; flex: 1; background: linear-gradient(to right, transparent, rgba(120,113,108,0.4), transparent); }
-  .dark .hero-spine__rule { background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent); }
-  .hero-spine__kana, .hero-spine__era { writing-mode: horizontal-tb; }
-  .hero-page__plate { max-width: 88%; }
 }
-
-/* ---- reduced-motion：底色 + 拓樸縮影 + 標牌 + 圖片全部即刻顯示，無位移無淡入 ---- */
+@media (max-width: 480px) {
+  .hero-page__frame { width: min(52%, 205px); }
+  .hero-page__print--main { left: 17%; width: 51%; }
+  .hero-page__print--sub { right: 10%; width: 39%; }
+  .hero-page__caption { grid-template-columns: auto minmax(0, 1fr); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hero-page { transition: none; }
-  .hero-page__img { opacity: 1 !important; transition: none; }
-  .hero-page__plate {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none;
-  }
-  .hero-page__enter-arrow { transition: none; }
-  .hero-spread--in .hero-page:hover .hero-page__plate { transform: none; }
+  .hero-page__frame, .hero-page__print, .hero-page__enter svg { transition: none; }
+  .hero-page:hover .hero-page__frame,
+  .hero-page:focus-visible .hero-page__frame,
+  .hero-page:hover .hero-page__print--main,
+  .hero-page:focus-visible .hero-page__print--main,
+  .hero-page:hover .hero-page__enter svg,
+  .hero-page:focus-visible .hero-page__enter svg { transform: none; }
 }
 
 /* ===== R27 — Hero 雙軌 toggle + 序卷頭語（挑戰 Hero static 鐵律） ===== */

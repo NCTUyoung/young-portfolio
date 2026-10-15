@@ -208,11 +208,28 @@ function focalStyle (img: GalleryItem): Record<string, string> {
    注意：原比例瀑布流用在「進入事件後」的接觸印樣格，此處索引刻意統一比例。 */
 .em__card-fig {
   position: relative;
-  overflow: hidden;
+  isolation: isolate;
   aspect-ratio: 3 / 2;
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  background: var(--surface);
+  padding: 0.55rem;
+  background: #faf7ef;
+  box-shadow: 2px 10px 20px -12px rgb(44 48 46 / 30%);
+}
+.em__card-fig::before {
+  content: '';
+  position: absolute;
+  inset: 0.3rem -0.2rem -0.2rem 0.2rem;
+  z-index: -1;
+  background: #e0e0d7;
+  transform: rotate(-2deg);
+  transition: transform 350ms ease;
+}
+.em__card-link:hover .em__card-fig::before {
+  transform: rotate(-4deg) translate(-2px, 2px);
+}
+.dark .em__card-fig { background: #302e28; }
+.dark .em__card-fig::before { background: #49473d; }
+@media (prefers-reduced-motion: reduce) {
+  .em__card-fig::before { transition: none; }
 }
 .em__img {
   width: 100%;

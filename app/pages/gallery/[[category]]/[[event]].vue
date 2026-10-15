@@ -3,7 +3,7 @@
     ref="pageRef"
     class="gallery-world min-h-screen transition-colors duration-300"
     :data-world="worldId"
-    :class="{ 'gallery-world--ready': worldReady }"
+    :class="{ 'gallery-world--ready': worldReady, 'gallery-world--event': !!filterState.selectedEvent, 'gallery-world--map': currentCategory === 'photography' && !filterState.selectedEvent }"
   >
     <!-- Fresh Dynamic pilot：同一個 Archive Controls 負責世界識別、分類與篩選狀態。 -->
     <div
@@ -86,28 +86,24 @@
         class="photo-map-entry scroll-mt-24"
         aria-labelledby="photo-map-heading"
       >
+        <div class="photo-map-entry__caption">
+          <div>
+            <h2 id="photo-map-heading" class="jp-section-title">踏跡</h2>
+            <p class="photo-map-entry__description">從一個地方，走進一組照片。</p>
+          </div>
+          <p class="photo-map-entry__hint">全部拍攝地點 · {{ eventLocations.length }} 組活動</p>
+        </div>
         <div class="photo-map-entry__map">
           <EventMap
             v-if="mapShouldMount"
             :events="eventLocations"
             :initial-view="restoredPhotoMapView"
             :selected-event-name="photoMapView.focusedEventName"
+            @select-event="photoMapView.focusedEventName = $event"
             @focus-event="handleFocusEvent"
             @viewport-change="savePhotoMapView"
           />
           <div v-else class="photo-map-entry__skeleton" aria-hidden="true" />
-        </div>
-        <div class="photo-map-entry__caption">
-          <div>
-            <p class="jp-eyebrow">其の一 · Footsteps</p>
-            <h2 id="photo-map-heading" class="jp-section-title">
-              踏跡<span class="jp-section-ruby">Photographs, Placed</span>
-            </h2>
-          </div>
-          <p class="photo-map-entry__hint">
-            <span class="photo-map-entry__hint--desktop">拖曳平移・Ctrl＋滾輪縮放；點照片看活動</span>
-            <span class="photo-map-entry__hint--touch">拖曳平移・雙指縮放；點照片看活動</span>
-          </p>
         </div>
       </section>
 
@@ -159,19 +155,8 @@
           </button>
         </div>
 
-        <!--
-          數位繪圖（繪 · 製図室）
-          i3（act-critic）：KILL 部落格地層 —— 移除舊「v-for stacked 章節 header
-          (其の N / 20XX年電繪作品) → GridWall」逐年上下堆疊（critic verdict #2「太像部落格」）。
-          改為單一【橫向可拖動製図台年表】GalleryAtelierTimeline：年份左→右鋪在同一張製圖桌上，
-          頂部年尺可點跳年，使用者主動橫拖／⇧滾輪／方向鍵探索（user-initiated，無 timer）。
-          桌機橫向、手機降級直落（normal scroll，瀏覽不破）。Intro 製圖宣言保留領銜。
-        -->
+        <!-- Filtered digital works are curated into the exhibition and its year rooms. -->
         <div v-else-if="currentCategory === 'digital'">
-          <!-- Event and filtered digital views retain the contextual intro before the timeline. -->
-          <div v-if="!isOverviewEntry" class="world-enter world-enter-d1">
-            <GalleryDigitalIntro />
-          </div>
           <GalleryAtelierTimeline
             :groups="atelierYearGroups"
             class="world-enter world-enter-d2"
@@ -181,50 +166,28 @@
 
         <!-- 攝影作品 - 保持原有的日式佈局 -->
         <div v-else-if="currentCategory === 'photography'">
-          <!--
-            進入特定 event 時：扉頁式入口（GalleryEventCover）
-            啟發自 sites/ryan-mcginley.md + sites/rinko-kawauchi.md（沉浸型訪客優先）。
-            跳過 overview 的 Map/Statement/Strip 三章節，直接呈現該 event 之代表照 + metadata + 展開鈕。
-            升級路徑：未來加 SERIES_TAG = 'event-cover' 後，cover 來源由 D1（第一張）改為 D2（admin 指定）。
-
-            注意：不能用 <template v-if/v-else> 包多元素群組——本層在 <transition>
-            內，多根 fragment 會觸發 Vue 內部 _leaveCb null reference（v3.4-3.6
-            transition + multi-root fragment 已知互動）。改用個別 v-if 維持單根。
-          -->
           <GalleryEventCover
             v-if="filterState.selectedEvent && currentEventGroup"
             :group="currentEventGroup"
             :series-expanded="isEventSeriesExpanded"
+            :active-image-id="imageViewerStore.isOpen ? imageViewerStore.currentViewerImage?.id : undefined"
+            @image-open="image => openImageViewer(image, currentEventGroup?.images || [])"
             @expand="scrollToEventTimeline"
           />
 
-          <!--
-            R32：「其の二 · Artist Statement」整段刪除（與首頁 Hero/Epilogue 重複）。
+          <div v-if="filterState.selectedEvent && hasActiveSecondaryFilter && currentEventGroup" class="event-filter-summary">
+            <p>目前顯示篩選後的照片<span v-if="filterState.searchQuery"> · {{ filterState.searchQuery }}</span><span v-if="filterState.yearFilter"> · {{ filterState.yearFilter }}</span></p>
+            <button type="button" @click="galleryStore.resetSecondaryFilters()">顯示完整組圖</button>
+          </div>
 
-            i4（act-critic / 暗室の横引き膠卷光桌）：KILL 影世界舊「stacked 摺合章 timeline
-            + 精選 strip」部落格地層（critic AVOID jump-out：影仍是死板縮圖格牆）。
-            overview 主欄改為一條【橫向可拖動的暗房光桌膠卷流】GalleryLightTable，
-            與繪 GalleryAtelierTimeline（製図台）對位——一張製圖桌、一卷底片，
-            兩世界各有招牌橫向手勢。HorizontalStripFeatured / GalleryPhotographySection
-            （逐年 stacked）只在「進 event 沉浸模式」保留垂直閱讀。
-          -->
-          <!-- overview：編輯模組網格（特稿大圖 + 編號日期格 + banner，每 event 一塊）。
-               取代舊橫向小圖膠卷光桌（使用者：圖太小、排版過時）。
-               wiki: patterns/newspaper-masthead-module-grid.md -->
-          <!--
-            book-spread-chapter-plate（wiki: patterns/book-spread-chapter-plate.md）：
-            踏跡不再是側欄裡的一塊地圖 widget（無論怎麼包 CSS 外衣，讀起來都是「貼上去的
-            app widget」），改把「其の一」升格成一頁真正的書頁對開扉頁——左頁地圖全出血
-            無邊框，右頁 jp-seal 印記 + 大數字 + 標題 + 一句引言，書溝 hairline 居中。
-            章節索引主欄改回全寬，接在扉頁之後。
-          -->
+          <!-- The map and activity directory stay available on the photography overview. -->
           <div v-if="!filterState.selectedEvent" class="kage-overview world-enter world-enter-d2">
             <div class="kage-overview__main">
               <GalleryEditorialModules :items="photographyEventItems" />
             </div>
           </div>
 
-          <!-- The event cover is the first step; mount the photo series only after an explicit expand. -->
+          <!-- The complete series remains available below the selection table. -->
           <div
             v-if="filterState.selectedEvent"
             id="event-photo-series"
@@ -331,7 +294,6 @@ const loadGalleryEventCover = () => import('~/components/gallery/GalleryEventCov
 const GalleryAtelierTimeline = defineAsyncComponent(loadGalleryAtelierTimeline)
 const GalleryPhotographySection = defineAsyncComponent(loadGalleryPhotographySection)
 const GalleryEventCover = defineAsyncComponent(loadGalleryEventCover)
-const GalleryDigitalIntro = defineAsyncComponent(() => import('~/components/gallery/GalleryDigitalIntro.vue'))
 
 // ===== Store 和 Composables =====
 const galleryStore = useGalleryStore()
@@ -363,6 +325,7 @@ type PhotoMapState = {
   center: [number, number] | null
   zoom: number | null
   focusedEventName: string | null
+  allLocations?: boolean
 }
 
 const photoMapView = useState<PhotoMapState>('photo-map-view', () => ({
@@ -371,8 +334,8 @@ const photoMapView = useState<PhotoMapState>('photo-map-view', () => ({
   focusedEventName: null
 }))
 const restoredPhotoMapView = computed(() => {
-  const { center, zoom } = photoMapView.value
-  return center && zoom !== null ? { center, zoom } : null
+  const { center, zoom, allLocations } = photoMapView.value
+  return center && zoom !== null ? { center, zoom, allLocations } : null
 })
 const router = useRouter()
 
@@ -456,24 +419,6 @@ const currentCategory = computed(() => filterState.value.selectedCategory)
  * 讓兩條 track 像兩個截然不同的世界，而非同一個 image browser 換內容。
  */
 const worldId = computed(() => (currentCategory.value === 'digital' ? 'kai' : 'kage'))
-
-/**
- * i2（act-critic / 雙世界共同入口）：overview「双世界の門」入口屏條件。
- * 回應 Round 1 critic「門被鎖在 photography 單一路由，/gallery/digital 與 /gallery/all
- * 落地仍是 header+左rail+逐年堆疊的部落格格」。
- * 改為：**任一 overview 路由**（digital 或 photography）未選 event、無次級篩選、
- * 兩軌都有資料時，第一屏都先見 full-bleed 繪×影對峙門面 —— 門已偏向當前世界（bias），
- * 但岐 seam 仍可拖回對側。門之後才是該世界內容（仍可瀏覽，bold ≠ broken）。
- * 進入任一 event（選 event）即離開門面、回到該世界沉浸導航。
- */
-const isOverviewEntry = computed(() =>
-  !galleryLoadFailed.value &&
-  !isGalleryLoading.value &&
-  !filterState.value.selectedEvent &&
-  !hasActiveSecondaryFilter.value &&
-  digitalWorks.value.length > 0 &&
-  photographyWorks.value.length > 0
-)
 
 /**
  * worldReady：控制 ::before/::after 質地層淡入。
@@ -648,9 +593,10 @@ const setEventRef = (name: string | null, el: Element | ComponentPublicInstance 
   eventRefs.value[name] = target
 }
 
-const savePhotoMapView = (view: { center: [number, number], zoom: number }) => {
+const savePhotoMapView = (view: { center: [number, number], zoom: number, allLocations?: boolean }) => {
   photoMapView.value.center = view.center
   photoMapView.value.zoom = view.zoom
+  photoMapView.value.allLocations = view.allLocations
 }
 
 const handleFocusEvent = (eventName: string) => {
@@ -903,6 +849,25 @@ useHead({
 </script>
 
 <style scoped>
+.event-filter-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 auto 2rem;
+  padding: 1rem;
+  border-block: 1px solid var(--border-soft);
+  color: var(--fg-3);
+  font-size: 0.8rem;
+}
+.event-filter-summary button {
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.event-filter-summary button:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
+
 /* ===== R40：Digital section 章封 header（與 photography Timeline 對位） ===== */
 .digital-chapter-header {
   position: relative;
@@ -982,99 +947,19 @@ useHead({
   gap: 0.5rem;
 }
 
-.photo-map-entry {
-  margin: 1rem auto clamp(3rem, 6vw, 5rem);
-}
-
-.photo-map-entry__map {
-  height: clamp(460px, 65svh, 720px);
-  overflow: hidden;
-  background: rgb(245 245 244);
-}
-
-.photo-map-entry__map :deep(.event-map-wrapper) {
-  height: 100%;
-  border: 0;
-  border-radius: 0.2rem;
-  box-shadow: none;
-}
-
-.photo-map-entry__map :deep(.event-map-container),
-.photo-map-entry__skeleton {
-  height: 100%;
-}
-
-.photo-map-entry__skeleton {
-  background: linear-gradient(135deg, rgb(231 229 228), rgb(245 245 244) 58%, rgb(231 229 228));
-}
-
-.dark .photo-map-entry__map,
-.dark .photo-map-entry__skeleton {
-  background: rgb(41 37 36);
-}
-
-.dark .photo-map-entry__skeleton {
-  background: linear-gradient(135deg, rgb(41 37 36), rgb(28 25 23) 58%, rgb(41 37 36));
-}
-
-.photo-map-entry__caption {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.3rem clamp(0.25rem, 1.5vw, 1rem) 0;
-}
-
-.photo-map-entry__caption .jp-eyebrow {
-  margin: 0 0 0.35rem;
-}
-
-.photo-map-entry__caption .jp-section-title {
-  margin: 0;
-  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
-}
-
-.photo-map-entry__hint {
-  margin: 0 0 0.4rem;
-  color: rgb(87 83 78);
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-}
-
-.photo-map-entry__hint--touch {
-  display: none;
-}
-
-.dark .photo-map-entry__hint {
-  color: rgb(214 211 209);
-}
-
+.photo-map-entry { margin: 1.75rem auto clamp(3rem, 6vw, 5rem); }
+.photo-map-entry__caption { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; padding-bottom: 1.75rem; }
+.photo-map-entry__caption .jp-section-title { margin: 0; font-size: clamp(1.9rem, 3.2vw, 2.6rem); }
+.photo-map-entry__description { margin: .65rem 0 0; color: var(--fg-secondary, #58656d); font-size: .85rem; }
+.photo-map-entry__hint { margin: 0; color: #58656d; font-size: .75rem; }
+.dark .photo-map-entry__hint, .dark .photo-map-entry__description { color: #bac5cb; }
+.photo-map-entry__skeleton { height: 440px; background: #e6ecef; }
+.dark .photo-map-entry__skeleton { background: #1d252a; }
 @media (max-width: 767px) {
-  .photo-map-entry {
-    margin-top: 0;
-  }
-
-  .photo-map-entry__map {
-    height: clamp(400px, 59svh, 560px);
-  }
-
-  .photo-map-entry__caption {
-    align-items: start;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .photo-map-entry__hint {
-    font-size: 0.8rem;
-  }
-
-  .photo-map-entry__hint--desktop {
-    display: none;
-  }
-
-  .photo-map-entry__hint--touch {
-    display: inline;
-  }
+  .photo-map-entry { margin-top: 1rem; }
+  .photo-map-entry__caption { align-items: start; gap: 1rem; padding-bottom: 1.25rem; }
+  .photo-map-entry__hint { max-width: 8em; line-height: 1.8; text-align: right; }
+  .photo-map-entry__description { font-size: .78rem; }
 }
 
 /* =========================================================

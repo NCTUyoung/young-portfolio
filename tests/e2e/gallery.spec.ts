@@ -35,10 +35,8 @@ test.describe('Gallery /gallery/photography', () => {
     await page.waitForLoadState('networkidle')
 
     await expect(page.locator('#event-cover-heading')).toHaveText('清大外拍 - 阿存')
-    await expect(page.locator('.event-cover img')).toHaveAttribute('alt', /花與白傘/)
-    await expect(
-      page.locator('p').filter({ hasText: /^扉頁\s*·\s*Cover\s*$/ })
-    ).toBeVisible()
+    await expect(page.getByTestId('light-table-open').locator('img')).toHaveAttribute('alt', /花與白傘/)
+    await expect(page.getByRole('region', { name: '暗房選片光桌' })).toBeVisible()
 
     // Overview 章節隱藏（Map / Statement heading；編輯模組的扉頁刊頭 写真記録 也不在 event mode）
     await expect(page.locator('#photo-map-heading')).toHaveCount(0)

@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
+import { applySearchAndYearFilter } from '~/stores/gallerySelectors'
 import type { GalleryItem } from '~~/shared/types/gallery'
 
 /**
@@ -69,7 +70,18 @@ export function useGalleryImageRoute () {
     if (found) {
       const scope = viewerScopeList.value
       // 若 scope 是事件集合卻不包含該圖（？image 不屬於此 event），退回 allWorks
-      const list = scope.some(w => w.id === id) ? scope : allWorks.value
+      let list = scope.some(w => w.id === id) ? scope : allWorks.value
+      if (route.params.event && list === scope) {
+        const visible = applySearchAndYearFilter(scope, filterState.value.searchQuery, filterState.value.yearFilter)
+          .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+        if (visible.some(image => image.id === id)) {
+          list = visible
+        } else {
+          // A shared photo takes precedence over stale local filters hiding it.
+          galleryStore.resetSecondaryFilters()
+          list = [...scope].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+        }
+      }
       imageViewerStore.openImageViewer(found, list)
       return
     }

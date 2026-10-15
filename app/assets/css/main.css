@@ -884,22 +884,12 @@
 .dark .gallery-world[data-world='kai'] {
   background-color: #1a1714;
 }
+/* The exhibition wall replaces the former drafting grid. */
 .gallery-world[data-world='kai']::before {
-  /* 製圖方格紙：major(38px 暖格線) + minor(7.6px 更細更淡的次格) → 雙層工程方格紙 */
-  background-image:
-    linear-gradient(to right, rgba(219, 123, 46, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(219, 123, 46, 0.06) 1px, transparent 1px),
-    linear-gradient(to right, rgba(219, 123, 46, 0.028) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(219, 123, 46, 0.028) 1px, transparent 1px);
-  background-size: 38px 38px, 38px 38px, 7.6px 7.6px, 7.6px 7.6px;
+  background: linear-gradient(90deg, rgba(126, 111, 86, 0.025), transparent 18%, transparent 82%, rgba(126, 111, 86, 0.025));
 }
 .dark .gallery-world[data-world='kai']::before {
-  background-image:
-    linear-gradient(to right, rgba(231, 184, 125, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(231, 184, 125, 0.05) 1px, transparent 1px),
-    linear-gradient(to right, rgba(231, 184, 125, 0.022) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(231, 184, 125, 0.022) 1px, transparent 1px);
-  background-size: 38px 38px, 38px 38px, 7.6px 7.6px, 7.6px 7.6px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.08));
 }
 .gallery-world[data-world='kai']::after {
   /* 右上暖陽光暈 + 頂部暖帶（讓 gateway 也坐在暖世界裡） */
@@ -989,6 +979,19 @@
     background-position: 0 0, 8px 0, 0 0, 2px 2px, 0 0;
     background-repeat: no-repeat, repeat-y, repeat, repeat, repeat;
   }
+}
+
+/* Activity light tables use a quiet surface around the loose photographic prints. */
+.gallery-world.gallery-world--event[data-world='kage']::before {
+  background: none;
+}
+
+/* A single film edge keeps the map's print surface quiet on narrow screens. */
+.gallery-world.gallery-world--map[data-world='kage']::before {
+  background: linear-gradient(to right, rgb(82 100 122 / .18) 0 1px, transparent 1px);
+}
+.dark .gallery-world.gallery-world--map[data-world='kage']::before {
+  background: linear-gradient(to right, rgb(154 173 197 / .2) 0 1px, transparent 1px);
 }
 
 /* --- accent 色溫分歧：影世界把 accent 由テラコッタ → 冷青 slate ---

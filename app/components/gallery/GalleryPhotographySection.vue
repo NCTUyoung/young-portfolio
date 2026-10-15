@@ -260,7 +260,7 @@ defineExpose({ expandEvent })
   background: rgb(168 162 158 / 0.06);
   padding-left: 0.5rem;
 }
-:global(.dark) .chapter-strip:hover { background: rgb(120 113 108 / 0.1); }
+.dark .chapter-strip:hover { background: rgb(120 113 108 / 0.1); }
 .chapter-strip:focus-visible {
   outline: 1px solid rgb(217 123 46 / 0.5);
   outline-offset: 3px;
@@ -297,7 +297,7 @@ defineExpose({ expandEvent })
   color: rgb(68 64 60);
   transition: color 0.25s ease;
 }
-:global(.dark) .chapter-strip__title { color: rgb(231 229 228); }
+.dark .chapter-strip__title { color: rgb(231 229 228); }
 .chapter-strip:hover .chapter-strip__title {
   color: color-mix(in srgb, var(--accent) 75%, rgb(68 64 60));
 }
@@ -320,7 +320,7 @@ defineExpose({ expandEvent })
   white-space: nowrap;
   max-width: 40rem;
 }
-:global(.dark) .chapter-strip__caption { color: rgb(168 162 158); }
+.dark .chapter-strip__caption { color: rgb(168 162 158); }
 .chapter-strip__cta {
   flex: 0 0 auto;
   display: inline-flex;
@@ -362,7 +362,7 @@ defineExpose({ expandEvent })
   box-shadow: inset 0 0 0 1px rgba(82, 100, 122, 0.18);
   overflow: hidden;
 }
-:global(.dark) .lighttable-bar {
+.dark .lighttable-bar {
   background: linear-gradient(165deg, #1a1f24 0%, #0e1114 100%);
   box-shadow: inset 0 0 0 1px rgba(154, 173, 197, 0.14);
 }
@@ -370,7 +370,7 @@ defineExpose({ expandEvent })
   outline: 1px solid rgba(82, 100, 122, 0.6);
   outline-offset: 3px;
 }
-:global(.dark) .lighttable-bar:focus-visible {
+.dark .lighttable-bar:focus-visible {
   outline-color: rgba(154, 173, 197, 0.7);
 }
 /* 左緣齒孔軌 */
@@ -387,7 +387,7 @@ defineExpose({ expandEvent })
   background-repeat: repeat-y;
   opacity: 0.6;
 }
-:global(.dark) .lighttable-bar__sprockets {
+.dark .lighttable-bar__sprockets {
   background-image: radial-gradient(circle at center, rgba(238, 241, 243, 0.8) 0 1.5px, transparent 1.8px);
   opacity: 0.45;
 }
@@ -400,7 +400,7 @@ defineExpose({ expandEvent })
   color: #5b6b7e;
   margin-bottom: 0.35rem;
 }
-:global(.dark) .lighttable-bar__frameno {
+.dark .lighttable-bar__frameno {
   color: rgba(154, 173, 197, 0.85);
 }
 .lighttable-bar__row {
@@ -420,7 +420,7 @@ defineExpose({ expandEvent })
   /* 光卓 light：標題深 slate（取代原反白 #eef1f3） */
   color: #2b3640;
 }
-:global(.dark) .lighttable-bar__title {
+.dark .lighttable-bar__title {
   color: #eef1f3;
 }
 .lighttable-bar__toggle {
@@ -430,7 +430,7 @@ defineExpose({ expandEvent })
   /* 光卓 light：冷 slate 序號/符號 */
   color: #3f4f63;
 }
-:global(.dark) .lighttable-bar__toggle {
+.dark .lighttable-bar__toggle {
   color: rgba(154, 173, 197, 0.9);
 }
 .lighttable-bar__meta {
@@ -441,7 +441,7 @@ defineExpose({ expandEvent })
   /* 光卓 light：副標冷 slate */
   color: #56697e;
 }
-:global(.dark) .lighttable-bar__meta {
+.dark .lighttable-bar__meta {
   color: rgba(190, 200, 212, 0.72);
 }
 .lighttable-bar__caption {
@@ -453,7 +453,7 @@ defineExpose({ expandEvent })
   /* 光卓 light：說明冷 slate */
   color: #56697e;
 }
-:global(.dark) .lighttable-bar__caption {
+.dark .lighttable-bar__caption {
   color: rgba(206, 214, 224, 0.8);
 }
 /* 底緣冷銀刻度尺（光桌標尺） */
@@ -475,7 +475,7 @@ defineExpose({ expandEvent })
   background-position: bottom;
   opacity: 0.7;
 }
-:global(.dark) .lighttable-bar__ticks {
+.dark .lighttable-bar__ticks {
   background-image: repeating-linear-gradient(
     to right,
     rgba(154, 173, 197, 0.32) 0,

@@ -98,8 +98,8 @@ const eventMode = computed(() => Boolean(props.selectedEvent))
 const identity = computed(() => props.world === 'kai'
   ? {
       eyebrow: '繪 — Digital Archive',
-      title: '作品索引',
-      note: eventMode.value ? '返回製図室，或調整目前的觀看條件。' : '線條、色彩與未完成的想像。',
+      title: '繪畫展間',
+      note: eventMode.value ? '返回展間，或調整目前的觀看條件。' : '沿著展牆，逐件觀看。',
       unit: '葉 · works',
     }
   : {
@@ -405,4 +405,20 @@ defineExpose({ open })
     transition: none;
   }
 }
+
+/* The exhibition title introduces the works without occupying their viewing space. */
+.archive-controls[data-world='kai'] { padding-top: 1.5rem; }
+.archive-controls[data-world='kai']::before { display: none; }
+.archive-controls[data-world='kai'] .archive-controls__identity {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.5rem 1.25rem;
+}
+.archive-controls[data-world='kai'] .archive-controls__eyebrow { display: none; }
+.archive-controls[data-world='kai'] .archive-controls__title { font-size: clamp(1.8rem, 3vw, 3rem); line-height: 1.4; }
+.archive-controls[data-world='kai'] .archive-controls__note { margin-top: 0.4rem; font-size: 0.8rem; }
+.archive-controls[data-world='kai'] .archive-controls__count { gap: 0.3rem; }
+.archive-controls[data-world='kai'] .archive-controls__count small { display: none; }
+.archive-controls[data-world='kai'] .archive-controls__commandbar { padding-inline: 0.5rem; }
 </style>

@@ -81,6 +81,7 @@ export type EventLocationPoint = {
   lng: number
   locationAccuracy: 'event' | 'regional'
   coverFilename: string
+  coverAspectRatio?: number
   timeRange: string
   count: number
   location?: string
@@ -276,6 +277,7 @@ export function buildEventLocations (
       lng: coord.lng,
       locationAccuracy: coordFromEvent ? 'event' : 'regional',
       coverFilename: cover.filename,
+      coverAspectRatio: cover.aspectRatio,
       timeRange,
       count: imagesSorted.length,
       location: info?.location

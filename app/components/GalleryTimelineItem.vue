@@ -261,7 +261,7 @@ const shouldShowContent = computed(() => {
   color: rgb(120 113 108);
   white-space: nowrap;
 }
-:global(.dark) .film-tl__time { color: rgb(168 162 158); }
+.dark .film-tl__time { color: rgb(168 162 158); }
 .film-tl__meta { flex-shrink: 0; display: inline-flex; align-items: center; }
 .film-tl__loc {
   display: inline-flex;
