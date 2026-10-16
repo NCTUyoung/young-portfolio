@@ -21,9 +21,9 @@ test.describe('首頁 /', () => {
       page.getByRole('link', { name: /開啟影世界攝影地圖/ })
     ).toBeVisible()
 
-    // 「領域 Domains」段落已於改版移除（與 Hero/対話 重複）；改驗仍存在的「自己紹介 About」段。
+    // 作者介紹位於作品選集之後，以繁中主標呈現。
     await expect(
-      page.getByRole('heading', { level: 2, name: /自己紹介/ })
+      page.getByRole('heading', { level: 2, name: /關於作者/ })
     ).toBeVisible()
   })
 

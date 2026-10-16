@@ -6,6 +6,7 @@
       scroll 後背景仍維持 backdrop-blur 但 shadow 撤掉，由 hairline 與微亮 bg 區分滾動狀態。
     -->
     <nav
+      :data-hydrated="layoutHydrated ? 'true' : 'false'"
       :class="[
         'fixed top-0 left-0 right-0 z-[1100] pt-[env(safe-area-inset-top,0px)] transition-all duration-500',
         isScrolled
@@ -75,13 +76,6 @@
               <span class="font-jp text-[0.65rem] tracking-[0.4em] text-stone-400 dark:text-stone-500 font-extralight">栞</span>
             </span>
 
-            <NuxtLink
-              to="/admin"
-              class="text-xs tracking-wide text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-500"
-            >
-              後台
-            </NuxtLink>
-
             <!--
               Dark Mode Toggle — editorial 化（撤 rounded-xl + border 工具列感）
               改為 bare 圖示，hover 才出現 hairline underline，與 nav 連結同 family。
@@ -126,7 +120,7 @@
           -->
           <div class="md:hidden flex items-center">
             <HeadlessMenu as="div" class="relative">
-              <HeadlessMenuButton class="group p-2 transition-colors duration-300">
+              <HeadlessMenuButton class="group flex h-11 w-11 items-center justify-center transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500">
                 <svg class="w-6 h-6 text-stone-600 group-hover:text-accent-600 dark:text-stone-300 dark:group-hover:text-accent-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 7h16M4 12h16M4 17h16"/>
                 </svg>
@@ -165,18 +159,6 @@
                       </NuxtLink>
                     </HeadlessMenuItem>
                     <div class="jp-hairline my-2"/>
-                    <HeadlessMenuItem v-slot="{ active }">
-                      <NuxtLink
-                        to="/admin"
-                        :class="[
-                          active ? 'bg-stone-100/70 dark:bg-stone-800/70 text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-300',
-                          'flex items-center justify-between px-3 py-3 text-sm font-light tracking-wide transition-colors duration-200'
-                        ]"
-                      >
-                        <span>後台管理</span>
-                        <span class="text-xs tracking-[0.2em] text-stone-400 dark:text-stone-500">Admin</span>
-                      </NuxtLink>
-                    </HeadlessMenuItem>
                     <HeadlessMenuItem v-slot="{ active }">
                       <ClientOnly>
                         <button
@@ -260,13 +242,17 @@
             </div>
           </div>
 
-          <!-- 右側：社群 + 技術說明 -->
+          <!-- 右側：社群 + 管理入口 -->
           <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             <SocialMediaLinks variant="bare" />
             <div class="hidden sm:block w-px h-4 bg-stone-200 dark:bg-stone-700"/>
-            <p class="text-stone-400 dark:text-stone-600 font-light tracking-wider text-xs italic">
-              nuxt · tailwind · 手作
-            </p>
+            <NuxtLink
+              to="/admin"
+              aria-label="後台管理入口"
+              class="inline-flex min-h-11 items-center text-xs font-light tracking-wider text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-500"
+            >
+              管理入口
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -304,12 +290,14 @@ const kanjiIndex = (i: number) => KANJI_INDEX[i] ?? `${i + 1}`
 
 // 滾動感知
 const isScrolled = ref(false)
+const layoutHydrated = ref(false)
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 40
 }
 
 onMounted(() => {
+  layoutHydrated.value = true
   window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll() // init
 })
