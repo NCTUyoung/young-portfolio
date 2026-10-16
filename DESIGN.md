@@ -92,7 +92,7 @@ components:
 
 ## Overview
 
-The global gallery entrance is a compact two-room index, not another work showcase. Photography retains its map-first arrival; its existing selected-series entry uses an uncropped photograph and authentic series text. Unnamed camera-file titles are displayed as activity name and stable collection order while original metadata remains available. Articles use one chapter list with one entrance per published piece and truthful publication states.
+The global gallery entrance opens photography directly, without a separate room-selection page. The homepage's existing two entrances and the in-gallery category links provide access to both collections. Photography retains its map-first arrival; its existing selected-series entry uses an uncropped photograph and authentic series text. Unnamed camera-file titles are displayed as activity name and stable collection order while original metadata remains available. Articles use one chapter list with one entrance per published piece and truthful publication states.
 
 **Creative North Star: "展廳與選片光桌"**
 

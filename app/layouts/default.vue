@@ -280,7 +280,7 @@ const currentYear = new Date().getFullYear()
 // 導航連結
 const navLinks = [
   { to: '/', label: '首頁' },
-  { to: '/gallery', label: '圖片庫' },
+  { to: '/gallery/photography', label: '圖片庫' },
   { to: '/article', label: '文章' },
 ]
 

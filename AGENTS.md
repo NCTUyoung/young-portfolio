@@ -3,7 +3,7 @@
 - **美感規範**：任何 UI／版型／色彩／字型改動前，先讀 `.cursor/rules/design-aesthetic.mdc`（日式排版精神：余白・間・侘寂；stone + accent tokens、`font-jp`/`font-sans` 混植、`jp-*` utilities、dark-mode 預設、Hero 輪播與單色化等鐵律都在裡面）。
 - **部署**：GitHub Pages，`app.baseURL` = `/young-portfolio/`；靜態資源與 `useImagePath` 依此組路徑。
 - **字型**：全站 `font-sans` = **Outfit**（拉丁）→ **Noto Sans TC**（繁中）；日式豎排／引言等維持 `font-jp`（**Noto Serif JP**）。來源：`nuxt.config.ts` 的 `fonts.families` + `tailwind.config.js` 的 `fontFamily.sans`，`assets/css/main.css` 的 `@layer base`。
-- **圖片庫路由**：`app/pages/gallery/index.vue` 為雙館索引；`app/pages/gallery/[category]/[[event]].vue` 為 `digital` | `photography` 展廳與活動頁，舊 `all` 分類會轉址。Lightbox 與 `?image=<id>` 由 `useGalleryImageRoute` 同步。列表篩選邏輯在 `app/stores/gallerySelectors.ts`。
+- **圖片庫路由**：導覽列直接進入 `/gallery/photography`；`app/pages/gallery/index.vue` 僅相容舊網址並轉入展廳，不加選館頁。`app/pages/gallery/[category]/[[event]].vue` 為 `digital` | `photography` 展廳與活動頁，舊 `all` 分類會轉址。Lightbox 與 `?image=<id>` 由 `useGalleryImageRoute` 同步。列表篩選邏輯在 `app/stores/gallerySelectors.ts`。
 - **攝影作品網格**：`GalleryPhotographySection` 為 **justified rows**（`utils/justifiedGalleryLayout.ts`）：依容器寬與長寬比決定 **每列張數**，同列等高、寬度依比例分配並填滿列寬（類 Google Images）；非固定雙欄。需 `ResizeObserver` + 圖片 `naturalWidth/Height` 更新比例。
 - **檢視器**：僅使用 Pinia `stores/imageViewer`，勿再引入已刪除的 viewer composable。`body.style.overflow`（捲動鎖）由 store 的 `openImageViewer`／`closeImageViewer` 獨占管理，`ImageViewer.vue` 的 focus trap 只處理焦點，**不可**重複讀寫 `body.style.overflow`（重複寫會在關閉時把先前鎖定值回填，導致整頁滾輪失靈）。
 - **Side-effect 單一擁有者原則**：全域 side effect（`document.body.style.*`、`window.addEventListener`、route query、timer／RAF、DOM class toggle 等）**只能由一處擁有 open↔close 配對**。要嘛 store 管、要嘛 component 管，**禁止兩端各自 save/restore 前值**——`watch` 與 action 的執行順序會讓「前值」被彼此污染，關閉時還原出錯誤狀態。新增 modal／lightbox／drawer 類元件時先確認擁有者。

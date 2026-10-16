@@ -2,18 +2,13 @@
 version: 1
 slug: "app-pages-gallery-index-vue"
 primary_target: "app/pages/gallery/index.vue"
-related_targets: ["app/pages/index.vue", "app/pages/gallery/[category]/[[event]].vue"]
+related_targets: ["app/layouts/default.vue", "app/pages/gallery/[category]/[[event]].vue"]
 ---
 
-# Two exhibition rooms
+# Direct exhibition entrance
 
-Mode: Experience. Direction: user-approved compact hall index, 2026-10-16.
+Mode: Experience. Updated after user feedback, 2026-10-16.
 
-## THESIS
-Offer two equally clear entrances before the visitor chooses a collection. This is a short wayfinding stop, with warm artwork and cool photography materials.
+The user rejected the additional room-selection stop after trying it. The global gallery link now opens photography directly. Existing homepage entrances and in-gallery category links provide the two-room navigation.
 
-## STORY AND FORM
-One heading, one sentence, two room links. Typographic room names and a hairline carry the hierarchy without additional work previews. Photography then opens its existing circular-photo map; digital artwork opens its existing year rooms. Preserve the homepage's separate visual entrances and do not restore a selected-works section.
-
-## BOUNDARIES AND VERIFICATION
-The ordinary index loads neither gallery datasets nor the Leaflet runtime, and remembered filters cannot redirect it. The existing global map stylesheet remains shared. Existing category/event routes and known legacy image links remain usable. Verify both links, SPA return and Back, persisted category, old image query/hash, mobile, light/dark, keyboard focus and reduced motion. Do not clear collection filters from the index.
+`/gallery` is only a compatibility redirect. It sends digital image IDs to digital and other visits to photography, preserving query/hash and replacing history. It renders no selection cards, previews or extra explanatory screen. Verify direct header navigation, old links, category switching and browser Back. Keep the existing exhibition layouts.
