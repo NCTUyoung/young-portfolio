@@ -1,7 +1,7 @@
 ---
 version: 1
 slug: "app-pages-gallery-category-event-vue"
-primary_target: "app/pages/gallery/[[category]]/[[event]].vue"
+primary_target: "app/pages/gallery/[category]/[[event]].vue"
 related_targets: ["app/pages/index.vue","app/components/gallery/GalleryPhotoLightTable.vue","app/components/gallery/GalleryAtelierTimeline.vue","app/components/EventMap.vue"]
 ---
 
@@ -27,4 +27,6 @@ Museum: original-ratio artwork, quiet wood-tone frame, mat, wash light, small pl
 Photography overview map: every nearby activity has its own circular cropped representative photograph, 48px on desktop and 44px on mobile; selection grows it to 64px or 56px. Close or shared coordinates form always-open local fans rather than a count badge. A separate inset shows remote activities until all-locations mode is chosen. Real coordinates remain the line anchors: short leaders update during pan, hide during animated zoom, and disappear when an anchor is offscreen even if its circle remains visible. Each circle group has one Tab stop; Arrow keys and Home/End move within it, so the activity path is main circle group → inset circle group → selected-activity footer. The footer gives title, location, accuracy, time range, and image count and opens the activity gallery. Before opening, it stops map animation and records the visible viewport. The circles may crop the thumbnail; the activity series retains the original photograph. “近景” returns from all-locations mode to the nearby region; mode changes are recorded immediately. Returning from a gallery restores viewport, selected activity, and all-locations mode. The map keeps the single 1px film edge, light/dark treatment, reduced-motion behavior, and tile-failure retry while allowing photo selection when tiles fail. Only the main map renders OpenStreetMap attribution for the shared tile source.
 
 ## BOUNDARIES AND VERIFICATION
+
+The compact `/gallery` index gives both rooms equal access without repeating homepage previews. The map's existing selected-activity button now pairs an uncropped cover with an available authentic series line and the visible action 看這組照片. Camera filenames remain source metadata; visitor-facing unnamed-photo labels use the real activity name and a stable ordinal from the complete activity collection, shared by the light table and viewer.
 Preserve category/year/search, map state and activity routing, URL sharing, complete image counts, SEO hero sources, and keyboard/reduced-motion/light/dark behavior. The map uses the public OpenStreetMap tile service and contributor attribution. Keep the legacy cover's unconnected technique/topic chips as descriptive metadata rather than pretending to filter. Verify before/after captures, selection/viewer/deep-link/event-reset flows, 0/1/2 images, existing gallery/map/overview checks, lint, typecheck, unit tests, and a production build.

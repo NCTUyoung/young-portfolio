@@ -1,4 +1,4 @@
-﻿import { watch, computed } from 'vue'
+import { watch, computed, ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import { useImageViewerStore } from '~/stores/imageViewer'
@@ -17,6 +17,9 @@ export function useGalleryImageRoute () {
   const router = useRouter()
   const galleryStore = useGalleryStore()
   const imageViewerStore = useImageViewerStore()
+  // Shared images open after the server's closed viewer has hydrated.
+  const routeMounted = ref(false)
+  onMounted(() => { routeMounted.value = true })
 
   const { allWorks, photographyWorks, digitalWorks, isLoading, galleryDataReady, filterState } = storeToRefs(galleryStore)
   const { isOpen: viewerOpen, currentViewerImage } = storeToRefs(imageViewerStore)
@@ -40,17 +43,19 @@ export function useGalleryImageRoute () {
   })
 
   function clearImageQuery () {
+    if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
     const next = { ...route.query } as Record<string, string | string[] | undefined>
     delete next.image
-    router.replace({ query: next })
+    router.replace({ query: next, hash: route.hash })
   }
 
   function syncViewerQueryFromStore () {
     if (!import.meta.client) return
+    if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
     if (viewerOpen.value && currentViewerImage.value) {
       const id = currentViewerImage.value.id
       if (route.query.image !== id) {
-        router.replace({ query: { ...route.query, image: id } })
+        router.replace({ query: { ...route.query, image: id }, hash: route.hash })
       }
     } else if (!viewerOpen.value && route.query.image !== undefined) {
       clearImageQuery()
@@ -61,6 +66,8 @@ export function useGalleryImageRoute () {
 
   function tryOpenViewerFromQuery () {
     if (!import.meta.client) return
+    if (!routeMounted.value) return
+    if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
     const raw = route.query.image
     const id = Array.isArray(raw) ? raw[0] : raw
     if (!id || typeof id !== 'string') return
@@ -91,5 +98,5 @@ export function useGalleryImageRoute () {
     }
   }
 
-  watch([() => route.query.image, isLoading, allWorks, galleryDataReady], tryOpenViewerFromQuery, { immediate: true })
+  watch([() => route.query.image, isLoading, allWorks, galleryDataReady, routeMounted], tryOpenViewerFromQuery, { immediate: true })
 }

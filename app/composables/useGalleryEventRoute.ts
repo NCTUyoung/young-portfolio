@@ -37,6 +37,7 @@ export function useGalleryEventRoute () {
   }
 
   function applyEventFromRoute () {
+    if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
     if (isLoading.value) return
 
     const cat = filterState.value.selectedCategory
@@ -59,7 +60,7 @@ export function useGalleryEventRoute () {
     if (!valid.has(pathEvent)) {
       // SSR：不執行 router.replace（讓 client 進來再導正），但仍把 store 拉回 null 與 URL 保持一致渲染。
       if (import.meta.client) {
-        router.replace({ path: `/gallery/${cat}`, query: route.query })
+        router.replace({ path: `/gallery/${cat}`, query: route.query, hash: route.hash })
       }
       if (filterState.value.selectedEvent !== null) {
         syncingFromRoute.value = true
@@ -100,6 +101,7 @@ export function useGalleryEventRoute () {
     (ev) => {
       if (!import.meta.client) return
       if (syncingFromRoute.value) return
+      if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
 
       const cat = filterState.value.selectedCategory
       if (cat !== 'photography' && cat !== 'digital') return
@@ -108,13 +110,13 @@ export function useGalleryEventRoute () {
 
       if (ev === null) {
         if (current !== null) {
-          router.replace({ path: `/gallery/${cat}`, query: route.query })
+          router.replace({ path: `/gallery/${cat}`, query: route.query, hash: route.hash })
         }
         return
       }
 
       if (current !== ev) {
-        router.replace({ path: `/gallery/${cat}/${encodeURIComponent(ev)}`, query: route.query })
+        router.replace({ path: `/gallery/${cat}/${encodeURIComponent(ev)}`, query: route.query, hash: route.hash })
       }
     }
   )

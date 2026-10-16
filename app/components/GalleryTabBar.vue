@@ -20,10 +20,10 @@
           :to="{ path: `/gallery/${tab.key}`, query: route.query }"
           class="gallery-tabs__link flex-shrink-0 touch-manipulation"
           :class="[
-            'relative px-5 py-2.5 font-light tracking-wide transition-all duration-300 group',
+            'relative min-h-11 px-5 py-3 font-normal tracking-wide transition-all duration-300 group',
             isActive(tab.key)
               ? 'text-stone-800 dark:text-stone-100'
-              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+              : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-50'
           ]"
         >
           <!-- 日式指示條：選中時出現 -->
@@ -54,13 +54,13 @@
           -->
           <span class="inline-flex items-baseline gap-x-2">
             <span class="font-jp text-base lg:text-lg font-extralight tracking-[0.3em] leading-none whitespace-nowrap">{{ tab.kanji }}</span>
-            <span v-if="props.variant !== 'rail'" class="text-[0.62rem] tracking-[0.3em] uppercase opacity-80 whitespace-nowrap">{{ tab.latin }}</span>
+            <span v-if="props.variant !== 'rail'" class="text-xs sm:text-sm tracking-[0.08em] uppercase whitespace-nowrap">{{ tab.latin }}</span>
             <span
               :class="[
                 'gallery-tabs__count text-xs transition-colors duration-300 whitespace-nowrap',
                 isActive(tab.key)
-                  ? 'text-accent-500/80 dark:text-accent-400/80'
-                  : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-400 dark:group-hover:text-stone-500'
+                  ? 'text-accent-700 dark:text-accent-300'
+                  : 'text-stone-600 dark:text-stone-300 group-hover:text-stone-900 dark:group-hover:text-stone-50'
               ]"
             >{{ categoryStats[tab.key] }}</span>
           </span>

@@ -10,13 +10,13 @@
           type="button"
           class="light-table__print light-table__neighbor"
           :class="`light-table__neighbor--${index + 1}`"
-          :aria-label="`選看：${neighbor.image.title || '照片'}`"
+          :aria-label="`選看：${getGalleryDisplayTitle(neighbor.image, galleryStore.photographyWorks)}`"
           @click="selectImage(neighbor.index, true)"
         >
           <picture>
             <source :srcset="getGridAvifSrcset(neighbor.image.filename)" sizes="(max-width: 639px) 22vw, 20vw" type="image/avif">
             <source :srcset="getGridImageSrcset(neighbor.image.filename)" sizes="(max-width: 639px) 22vw, 20vw" type="image/webp">
-            <img :src="getThumbPath(neighbor.image.filename, 400)" :alt="neighbor.image.title || '攝影作品'" decoding="async" draggable="false">
+            <img :src="getThumbPath(neighbor.image.filename, 400)" :alt="getGalleryDisplayTitle(neighbor.image, galleryStore.photographyWorks)" decoding="async" draggable="false">
           </picture>
         </button>
       </div>
@@ -26,7 +26,7 @@
           ref="selectedButton"
           type="button"
           class="light-table__print light-table__main"
-          :aria-label="`放大觀看：${selected.title || '照片'}`"
+          :aria-label="`放大觀看：${getGalleryDisplayTitle(selected, galleryStore.photographyWorks)}`"
           data-testid="light-table-open"
           @click="$emit('imageOpen', selected)"
         >
@@ -35,7 +35,7 @@
             <source :srcset="mainWebpSrcset" sizes="(max-width: 639px) 75vw, 44vw" type="image/webp">
             <img
               :src="getThumbPath(selected.filename, 800)"
-              :alt="selected.title || '攝影作品'"
+              :alt="getGalleryDisplayTitle(selected, galleryStore.photographyWorks)"
               loading="eager"
               fetchpriority="high"
               decoding="async"
@@ -45,7 +45,7 @@
           <span class="light-table__open-label">查看大圖 <Icon name="lucide:arrow-up-right" aria-hidden="true" /></span>
         </button>
         <figcaption class="light-table__caption">
-          <span>{{ selected.title || '未命名' }}</span>
+          <span>{{ getGalleryDisplayTitle(selected, galleryStore.photographyWorks) }}</span>
           <span aria-live="polite">{{ selectedIndex + 1 }} / {{ items.length }}</span>
         </figcaption>
       </figure>
@@ -59,7 +59,7 @@
           :ref="element => setThumbnailRef(element, index)"
           type="button"
           class="light-table__thumb"
-          :aria-label="`選看第 ${index + 1} 張：${image.title || '照片'}`"
+          :aria-label="`選看第 ${index + 1} 張：${getGalleryDisplayTitle(image, galleryStore.photographyWorks)}`"
           :aria-pressed="index === selectedIndex"
           :data-index="index"
           @click="selectImage(index)"
@@ -67,7 +67,7 @@
           <span class="light-table__frame-no" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
           <picture>
             <source :srcset="getAvifThumbPath(image.filename, 400)" type="image/avif">
-            <img :src="getThumbPath(image.filename, 400)" :alt="image.title || '攝影作品'" :loading="index < 6 ? 'eager' : 'lazy'" decoding="async" draggable="false">
+            <img :src="getThumbPath(image.filename, 400)" :alt="getGalleryDisplayTitle(image, galleryStore.photographyWorks)" :loading="index < 6 ? 'eager' : 'lazy'" decoding="async" draggable="false">
           </picture>
         </button>
       </div>
@@ -81,11 +81,14 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { GalleryItem } from '~~/shared/types/gallery'
 import { useImagePath } from '~/composables/useImagePath'
+import { useGalleryStore } from '~/stores/gallery'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
 
 const props = defineProps<{ items: GalleryItem[]; eventName: string; activeImageId?: string }>()
 defineEmits<{ imageOpen: [image: GalleryItem] }>()
 
 const { getThumbPath, getAvifThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()
+const galleryStore = useGalleryStore()
 const selectedFilename = ref<string | null>(null)
 const selectedButton = ref<HTMLButtonElement | null>(null)
 const mounted = ref(false)
@@ -181,7 +184,7 @@ function onStripKeydown (event: KeyboardEvent) {
 .light-table__main img { height: auto; aspect-ratio: var(--photo-ratio); }
 .light-table__main:hover, .light-table__main:focus-visible { transform: translateY(-6px); box-shadow: 5px 30px 40px -13px rgb(36 42 43 / 40%); }
 .light-table__open-label { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; padding-top: 0.9rem; font-size: 0.75rem; color: var(--table-ink); }
-.light-table__caption { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0.2rem; color: var(--table-muted); font-size: 0.75rem; line-height: 1.6; transform: rotate(-2deg); }
+.light-table__caption { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0.2rem; color: var(--table-ink); font-size: 0.875rem; line-height: 1.6; transform: rotate(-2deg); }
 .light-table__caption span:first-child { min-width: 0; overflow-wrap: anywhere; }
 .light-table__caption span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .light-table__footer { display: flex; align-items: flex-end; gap: 2rem; margin-top: 1rem; }
@@ -191,10 +194,10 @@ function onStripKeydown (event: KeyboardEvent) {
 .light-table__thumb::before { left: 0; }.light-table__thumb::after { right: 0; }
 .light-table__thumb:hover, .light-table__thumb[aria-pressed='true'] { opacity: 1; }
 .light-table__thumb[aria-pressed='true'] { border-bottom-color: var(--accent-ink); }
-.light-table__frame-no { display: block; margin-bottom: 0.35rem; color: var(--table-muted); font-size: 0.65rem; font-variant-numeric: tabular-nums; text-align: left; }
+.light-table__frame-no { display: block; margin-bottom: 0.35rem; color: var(--table-muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; text-align: left; }
 .light-table__thumb img { display: block; width: 100%; height: 3.8rem; object-fit: cover; }
 .light-table__hint { margin-left: auto; color: var(--table-muted); font-family: var(--font-jp); font-size: 0.8rem; line-height: 1.9; white-space: nowrap; }
-.light-table__hint span { display: block; font-family: var(--font-sans); font-size: 0.7rem; }
+.light-table__hint span { display: block; font-family: var(--font-sans); font-size: 0.8rem; }
 .dark .light-table { --table-paper: #302e28; --table-ink: #ece8df; --table-muted: #bac5cb; --table-line: #64717a; }
 .dark .light-table__print { box-shadow: 3px 14px 22px -9px rgb(0 0 0 / 65%); }
 .dark .light-table__main { box-shadow: 5px 25px 35px -13px rgb(0 0 0 / 75%); }
@@ -212,7 +215,7 @@ function onStripKeydown (event: KeyboardEvent) {
   .light-table__selected { position: relative; inset: auto; width: min(95%, calc(clamp(17rem, 43svh, 24rem) * var(--photo-ratio) + 1.2rem)); margin-left: auto; margin-right: 2%; grid-row: 2; grid-column: 2; }
   .light-table__main { padding: 0.6rem 0.6rem 0.75rem; }
   .light-table__open-label { font-size: 0.7rem; padding-top: 0.7rem; }
-  .light-table__caption { font-size: 0.7rem; gap: 0.5rem; padding-top: 0.8rem; }
+  .light-table__caption { font-size: 0.8rem; gap: 0.5rem; padding-top: 0.8rem; }
   .light-table__neighbors { position: relative; inset: auto; width: 100%; height: 12rem; grid-row: 2; grid-column: 1; align-self: center; }
   .light-table__neighbor { width: 100%; height: 5.8rem; padding: 0.3rem; }
   .light-table__neighbor--1 { left: 0; top: 0; transform: rotate(-7deg); }
@@ -222,7 +225,7 @@ function onStripKeydown (event: KeyboardEvent) {
   .light-table__strip { max-width: 100%; }
   .light-table__thumb { flex-basis: 4.25rem; }
   .light-table__thumb img { height: 3.3rem; }
-  .light-table__hint { margin: 0.75rem 0 0; font-size: 0.75rem; }
+  .light-table__hint { margin: 0.75rem 0 0; font-size: 0.8rem; }
   .light-table__hint span { display: inline; margin-left: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {

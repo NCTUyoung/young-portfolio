@@ -117,11 +117,11 @@ v-if="showInfoPanel && currentViewerImage && imageInfo"
         <p class="info-eyebrow">對軌 · PAIRED</p>
         <NuxtLink :to="`/gallery/${pairedImage.category}?image=${encodeURIComponent(pairedImage.id)}`" class="info-paired__link">
           <div class="info-paired__thumb">
-            <img :src="getThumbPath(pairedImage.filename, 400)" :alt="`對軌 — ${pairedImage.title}`" decoding="async" loading="lazy">
+            <img :src="getThumbPath(pairedImage.filename, 400)" :alt="`對軌 — ${getGalleryDisplayTitle(pairedImage, galleryStore.photographyWorks)}`" decoding="async" loading="lazy">
           </div>
           <div class="info-paired__meta">
             <p class="info-paired__kana font-jp">{{ pairedImage.category === 'digital' ? '繪' : '影' }}</p>
-            <p class="info-paired__title">{{ pairedImage.title }}</p>
+            <p class="info-paired__title">{{ getGalleryDisplayTitle(pairedImage, galleryStore.photographyWorks) }}</p>
             <p v-if="pairedImage.event?.name" class="info-paired__event">{{ pairedImage.event.name }}</p>
             <p class="info-paired__cta">PAIRED →</p>
           </div>
@@ -153,6 +153,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
 import { nonBoilerplateOrEmpty } from '~/utils/descriptionFilters'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
 
 // Histogram 會跑 canvas 取色 + 排序，單獨切出來避免在只看描述時也背一份
 const ImageHistogram = defineAsyncComponent(() => import('./ImageHistogram.vue'))
@@ -286,7 +287,7 @@ const imageInfo = computed(() => {
 
   return {
     filename: image.filename,
-    title: image.title || '未命名',
+    title: getGalleryDisplayTitle(image, galleryStore.photographyWorks),
     description: image.description || '',
     category: image.category || '未分類',
     dimensions: dimensions,
@@ -557,8 +558,12 @@ const formatDate = (date: Date | null) => {
   margin: 0;
 }
 .info-header__close {
-  padding: 0.35rem;
-  color: rgb(168 162 158);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: rgb(214 211 209);
   background: transparent;
   border: 1px solid transparent;
   transition: color 0.2s ease, border-color 0.2s ease;
@@ -566,6 +571,10 @@ const formatDate = (date: Date | null) => {
 .info-header__close:hover {
   color: rgb(250 250 249);
   border-color: rgb(214 211 209 / 0.25);
+}
+.info-header__close:focus-visible, .info-paired__link:focus-visible {
+  outline: 2px solid rgb(231 184 125);
+  outline-offset: 2px;
 }
 
 .info-body {
@@ -599,10 +608,11 @@ const formatDate = (date: Date | null) => {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   letter-spacing: 0.18em;
-  color: rgb(168 162 158 / 0.82);
+  color: rgb(214 211 209);
 }
+.info-subline__label { min-width: 0; overflow-wrap: anywhere; }
 .info-subline__sep {
   display: inline-block;
   width: 14px;

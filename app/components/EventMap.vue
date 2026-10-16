@@ -125,14 +125,15 @@
     </div>
 
 
-    <button v-if="variant === 'default' && selectedEvent" type="button" class="event-map-selection" :aria-label="`進入「${selectedEvent.name}」組圖，共 ${selectedEvent.count} 張`" @click="openSelectedEvent">
-      <img :src="getThumbPath(selectedEvent.coverFilename, 400)" :style="{ objectPosition: (selectedEvent.coverAspectRatio ?? 1) < 1 ? '50% 28%' : '50% 50%' }" alt="" decoding="async">
+    <button v-if="variant === 'default' && selectedEvent" type="button" class="event-map-selection" data-testid="map-series-entry" :aria-label="`進入「${selectedEvent.name}」組圖，共 ${selectedEvent.count} 張`" @click="openSelectedEvent">
+      <img :src="getThumbPath(selectedEvent.coverFilename, 800)" :srcset="getGridImageSrcset(selectedEvent.coverFilename)" sizes="(max-width: 639px) calc(100vw - 3rem), 320px" data-full-image="true" alt="" decoding="async">
       <span class="event-map-selection__caption">
         <span class="event-map-photo-title">{{ selectedEvent.name }}</span>
+        <span v-if="selectedEventNarrative" class="event-map-selection__narrative">{{ selectedEventNarrative }}</span>
         <span class="event-map-photo-location">{{ selectedEvent.location || '活動所在地' }}<span v-if="selectedEvent.locationAccuracy === 'regional'"> · 約略地區</span></span>
         <span class="event-map-photo-date">{{ selectedEvent.timeRange }} · {{ selectedEvent.count }} 張</span>
+        <span class="event-map-selection__open">看這組照片<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" /></svg></span>
       </span>
-      <span class="event-map-selection__open">看這組照片<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" /></svg></span>
     </button>
   </div>
 </template>
@@ -144,6 +145,7 @@ import type * as LeafletNS from 'leaflet'
 import type { Map as LeafletMap, LayerGroup, TileLayer, LatLngTuple, CircleMarker } from 'leaflet'
 import { layoutPhotoMapCircles, type PhotoMapCircle } from '~/utils/photoMapCircleLayout'
 import { PHOTO_MAP_OPENING_EVENTS } from '~/stores/galleryConstants'
+import type { SeriesNarrative } from '~~/shared/types/gallery'
 // Leaflet CSS 在元件層 import，避開 Vite 7 + Windows 處理 node_modules CSS
 // 的 @fs 絕對路徑 MIME 異常；同時享有 code-splitting（非地圖頁不載入）。
 import 'leaflet/dist/leaflet.css'
@@ -162,6 +164,7 @@ interface EventLocation {
   lng: number
   coverFilename: string
   coverAspectRatio?: number
+  seriesNarrative?: SeriesNarrative
   timeRange: string
   count: number
   location?: string
@@ -261,7 +264,7 @@ function onWrapperLeave () {
   }, HOVER_COLLAPSE_DELAY)
 }
 
-const { getThumbPath } = useImagePath()
+const { getThumbPath, getGridImageSrcset } = useImagePath()
 
 let map: LeafletMap | null = null
 let markersLayer: LayerGroup | null = null
@@ -282,6 +285,11 @@ const selectedEvent = computed(() => {
   const selected = props.events.find(event => event.name === (props.variant === 'inset' ? props.selectedEventName : previewName.value))
   if (props.variant === 'inset') return selected
   return selected ?? props.events.find(event => event.name === PHOTO_MAP_OPENING_EVENTS[0]) ?? props.events[0]
+})
+const selectedEventNarrative = computed(() => {
+  const narrative = selectedEvent.value?.seriesNarrative
+  return [narrative?.strongest_line, narrative?.prologue, narrative?.narrative]
+    .find(line => line?.trim())?.trim()
 })
 
 function distanceKm (a: EventLocation, b: EventLocation) {
@@ -742,12 +750,13 @@ onBeforeUnmount(() => {
 .event-map-inset .event-map-tile-status { top: -24px; left: 0; right: 0; height: 24px; padding: 0 4px; font-size: .6rem; }
 .event-map-inset .event-map-tile-status p { display: none; }
 .event-map-inset .event-map-tile-status button { min-height: 24px; margin: 0; }
-.event-map-selection { display: flex; align-items: center; gap: 1rem; width: 100%; min-height: 88px; margin-top: 1rem; padding: .75rem 1rem; text-align: left; background: var(--map-paper); color: var(--map-ink); }
-.event-map-selection > img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex: none; }
-.event-map-selection__caption { display: flex; flex: 1; flex-direction: column; min-width: 0; }
-.event-map-photo-title { font-family: var(--font-jp, 'Shippori Mincho', serif); font-size: 1rem; line-height: 1.6; }
-.event-map-photo-date, .event-map-photo-location { color: var(--map-muted); font-size: .72rem; line-height: 1.6; }
-.event-map-selection__open { display: inline-flex; align-items: center; gap: .75rem; flex: none; font-size: .8rem; }
+.event-map-selection { display: grid; grid-template-columns: minmax(0, 32%) minmax(0, 1fr); align-items: center; gap: 1.5rem; width: 100%; min-height: 180px; margin-top: 1rem; padding: 1rem; text-align: left; background: var(--map-paper); color: var(--map-ink); }
+.event-map-selection > img { display: block; width: 100%; height: auto; max-height: 220px; object-fit: contain; }
+.event-map-selection__caption { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.event-map-photo-title { font-family: var(--font-jp, 'Shippori Mincho', serif); font-size: 1.2rem; line-height: 1.5; }
+.event-map-selection__narrative { max-width: 65ch; margin: .6rem 0 .8rem; font-family: var(--font-jp, 'Shippori Mincho', serif); font-size: .88rem; line-height: 1.8; }
+.event-map-photo-date, .event-map-photo-location { color: var(--map-muted); font-size: .78rem; line-height: 1.6; }
+.event-map-selection__open { display: inline-flex; align-items: center; align-self: flex-start; gap: .75rem; margin-top: .85rem; border-bottom: 1px solid currentColor; padding-bottom: .15rem; font-size: .8rem; }
 .event-map-selection__open svg { width: 20px; height: 20px; }
 .event-map-instruction { position: absolute; z-index: 700; bottom: 1.6rem; left: 1rem; padding: .3rem .5rem; background: var(--map-paper); color: var(--map-ink); font-size: .68rem; pointer-events: none; }
 .event-map-instruction--touch { display: none; }
@@ -980,11 +989,12 @@ onBeforeUnmount(() => {
   .event-map-container { height: 500px; }
   .event-map-inset-frame { width: 128px; }
   .event-map-inset .event-map-container { height: 140px; }
-  .event-map-selection { padding: .75rem .5rem; gap: .65rem; }
-  .event-map-selection > img { width: 44px; height: 44px; }
-  .event-map-photo-title { font-size: .85rem; }
-  .event-map-photo-date, .event-map-photo-location { font-size: .68rem; }
-  .event-map-selection__open { width: 36px; font-size: 0; gap: 0; justify-content: end; }
+  .event-map-selection { grid-template-columns: minmax(0, 1fr); gap: .9rem; padding: .85rem; }
+  .event-map-selection > img { max-height: 220px; }
+  .event-map-photo-title { font-size: 1.05rem; }
+  .event-map-selection__narrative { margin: .4rem 0 .65rem; font-size: .82rem; }
+  .event-map-photo-date, .event-map-photo-location { font-size: .72rem; }
+  .event-map-selection__open { margin-top: .75rem; }
 }
 @media (hover: none) {
   .event-map-instruction--pointer { display: none; }

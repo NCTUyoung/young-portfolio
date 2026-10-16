@@ -261,6 +261,7 @@ defineExpose({ open })
   display: flex;
   justify-content: center;
   min-width: 0;
+  min-height: 44px;
 }
 
 .archive-controls__commandbar :deep(.gallery-tabs__divider) {
@@ -303,7 +304,7 @@ defineExpose({ open })
   min-width: 0;
   overflow: hidden;
   color: rgb(87 83 78);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 300;
   letter-spacing: 0.08em;
   text-overflow: ellipsis;

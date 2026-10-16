@@ -6,6 +6,7 @@ import { formatDateFull } from '~/utils/formatters'
 import type {
   GalleryItem,
   PhotoEvent,
+  SeriesNarrative,
   EventGroup,
   MixedPhotoItem,
   FilterState,
@@ -82,6 +83,7 @@ export type EventLocationPoint = {
   locationAccuracy: 'event' | 'regional'
   coverFilename: string
   coverAspectRatio?: number
+  seriesNarrative?: SeriesNarrative
   timeRange: string
   count: number
   location?: string
@@ -278,6 +280,7 @@ export function buildEventLocations (
       locationAccuracy: coordFromEvent ? 'event' : 'regional',
       coverFilename: cover.filename,
       coverAspectRatio: cover.aspectRatio,
+      seriesNarrative: cover.seriesNarrative,
       timeRange,
       count: imagesSorted.length,
       location: info?.location

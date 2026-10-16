@@ -25,7 +25,7 @@ v-if="currentViewerImage"
              ref="navigatorImageElement"
              :src="getThumbPath(currentViewerImage.filename, 400)"
              decoding="async"
-             :alt="currentViewerImage.title"
+             :alt="getGalleryDisplayTitle(currentViewerImage, galleryStore.photographyWorks)"
              class="w-full h-full object-contain cursor-pointer"
              draggable="false"
              @click="handleNavigatorClick" >
@@ -62,8 +62,11 @@ class="px-2 py-1 bg-stone-800/80 hover:bg-stone-700/70 border border-stone-700/6
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useImageViewerStore } from '~/stores/imageViewer'
+import { useGalleryStore } from '~/stores/gallery'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
 
 const imageViewerStore = useImageViewerStore()
+const galleryStore = useGalleryStore()
 const { getThumbPath } = useImagePath()
 const {
   showNavigator,

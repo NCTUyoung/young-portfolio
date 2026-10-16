@@ -63,7 +63,7 @@ class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 flex items-start
               <span>{{ viewerImages.length }}</span>
             </p>
             <h3 class="mt-1 truncate font-jp font-light tracking-wider text-[0.95rem] sm:text-base">
-              {{ currentViewerImage?.title || '未命名' }}
+              {{ currentViewerImage ? getGalleryDisplayTitle(currentViewerImage, galleryStoreViewer.photographyWorks) : '未命名' }}
             </h3>
             <span aria-hidden="true" class="mt-2 block h-px w-10 bg-stone-300/30"/>
           </div>
@@ -170,7 +170,7 @@ v-if="viewerChromeReady && viewerImages.length > 1 && hasNext"
             <img
               ref="imageElement"
               :src="getImagePath(currentViewerImage.filename)"
-              :alt="currentViewerImage.title"
+              :alt="getGalleryDisplayTitle(currentViewerImage, galleryStoreViewer.photographyWorks)"
               :class="[
                 'select-none user-select-none',
                 isDragging ? 'cursor-grabbing' : (viewerScale > 1 ? 'cursor-grab' : 'cursor-default'),
@@ -305,6 +305,7 @@ import { storeToRefs } from 'pinia'
 import { useMediaQuery, useWindowSize } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
 
 // 非關鍵子元件採 lazy 載入；資訊對頁與放大導覽器在真正需要時才掛載。
 const ImageInfoPanel = defineAsyncComponent(() => import('./ImageInfoPanel.vue'))

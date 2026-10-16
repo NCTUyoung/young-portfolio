@@ -92,6 +92,8 @@ components:
 
 ## Overview
 
+The global gallery entrance is a compact two-room index, not another work showcase. Photography retains its map-first arrival; its existing selected-series entry uses an uncropped photograph and authentic series text. Unnamed camera-file titles are displayed as activity name and stable collection order while original metadata remains available. Articles use one chapter list with one entrance per published piece and truthful publication states.
+
 **Creative North Star: "展廳與選片光桌"**
 
 The portfolio uses Japanese editorial spacing to make two bodies of work feel distinct. Digital artwork sits on a warm exhibition wall, held by a restrained wood-tone frame and mat. Photography rests on a cool silver work surface as loose paper prints; a selected print rises slightly above its neighbors. The original images carry the color and detail.

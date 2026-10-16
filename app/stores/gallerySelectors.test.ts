@@ -92,4 +92,22 @@ describe('gallerySelectors', () => {
     ])
     expect(locations[1]).toMatchObject({ lat: 24.8, lng: 121 })
   })
+
+  it('passes the chosen cover narrative to the map location', () => {
+    const narrative = { strongest_line: '真實系列詩句', prologue: '真實系列序文' }
+    const locations = buildEventLocations([
+      item({ filename: 'older.jpg', time: '2024 Jan 01', event: { name: 'Series', description: '', location: '臺北', lat: 25, lng: 121 } }),
+      item({ filename: 'cover.jpg', time: '2025 Jan 01', event: { name: 'Series', description: '', location: '臺北', lat: 25, lng: 121 }, seriesNarrative: narrative })
+    ], {})
+
+    expect(locations[0]).toMatchObject({ coverFilename: 'cover.jpg', seriesNarrative: narrative })
+  })
+
+  it('leaves the map location without a narrative when its cover has none', () => {
+    const locations = buildEventLocations([
+      item({ event: { name: 'Quiet', description: '', location: '臺北', lat: 25, lng: 121 } })
+    ], {})
+
+    expect(locations[0]?.seriesNarrative).toBeUndefined()
+  })
 })

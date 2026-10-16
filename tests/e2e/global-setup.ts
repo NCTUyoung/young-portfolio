@@ -16,7 +16,7 @@ import { chromium, type FullConfig } from '@playwright/test'
  */
 const ROUTES = [
   '/', // 首頁 Hero 對開
-  '/gallery', // all
+  '/gallery', // 雙館索引
   '/gallery/photography', // 影 overview（最重）
   '/gallery/digital', // 繪 overview
   '/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D', // 代表性 event 沉浸頁

@@ -4,8 +4,8 @@
     <section class="relative pt-24 lg:pt-32 pb-10 lg:pb-16">
       <div class="max-w-3xl mx-auto px-6 sm:px-10">
         <!-- breadcrumb -->
-        <nav class="flex items-center gap-3 mb-10 text-[0.7rem] tracking-[0.32em] uppercase text-stone-500 dark:text-stone-400" aria-label="breadcrumb">
-          <NuxtLink to="/article" class="hover:text-accent-600 dark:hover:text-accent-400 transition-colors">
+        <nav class="flex items-center gap-2 mb-10 text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300" aria-label="breadcrumb">
+          <NuxtLink to="/article" class="inline-flex min-h-11 min-w-11 items-center rounded-sm px-2 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-700 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300">
             目次
           </NuxtLink>
           <span aria-hidden="true" class="text-stone-300 dark:text-stone-600">／</span>
@@ -14,7 +14,7 @@
 
         <!-- 章節 eyebrow + track chip -->
         <div class="flex items-baseline flex-wrap gap-3 mb-2">
-          <p class="text-[0.62rem] tracking-[0.4em] uppercase text-accent-600/85 dark:text-accent-400/85 font-light">
+          <p class="text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300">
             {{ article.kansuji }} · {{ article.trackKana }} {{ article.trackLabel }}
           </p>
         </div>
@@ -28,7 +28,7 @@
         <p class="article-content-strongest mt-6">「{{ article.strongestLine }}」</p>
 
         <!-- meta -->
-        <p class="mt-6 text-[0.7rem] tracking-[0.32em] uppercase text-stone-400 dark:text-stone-500 jp-kansuji">
+        <p class="mt-6 text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300 jp-kansuji">
           {{ article.date }} · {{ article.readingTime }} min read
         </p>
 
@@ -44,44 +44,18 @@
       </div>
     </section>
 
-    <!-- 奥付 mini — 與 /article 主頁同 motif -->
-    <section class="reveal py-12 lg:py-16">
-      <div class="max-w-2xl mx-auto px-6">
-        <div class="article-colophon-divider" aria-hidden="true">
-          <span class="article-colophon-divider__line"/>
-          <span class="article-colophon-divider__dot"/>
-          <span class="article-colophon-divider__line"/>
-        </div>
-        <p class="article-colophon-eyebrow">奥付 · COLOPHON</p>
-        <dl class="article-colophon-list">
-          <div>
-            <dt>初出</dt>
-            <dd class="jp-kansuji">{{ article.date }}</dd>
-          </div>
-          <div>
-            <dt>編者</dt>
-            <dd>Young / NCTU · 楊</dd>
-          </div>
-          <div>
-            <dt>軌道</dt>
-            <dd>{{ article.trackKana }} · {{ article.trackLabel }}</dd>
-          </div>
-        </dl>
-
-        <!-- 回目次 -->
-        <div class="mt-10 text-center">
-          <NuxtLink
-            to="/article"
-            class="group inline-flex items-center gap-3 text-stone-500 dark:text-stone-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
-          >
-            <svg class="w-4 h-4 rotate-180 transition-transform duration-500 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-            <span class="font-jp tracking-[0.25em] text-base">回目次</span>
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
+    <footer class="mx-auto max-w-3xl border-t border-stone-300/70 px-6 py-10 dark:border-stone-600/70 sm:px-10">
+      <p class="text-sm text-stone-600 dark:text-stone-300">Young / NCTU · 楊</p>
+      <NuxtLink
+        to="/article"
+        class="group mt-5 inline-flex min-h-11 min-w-11 items-center gap-3 rounded-sm px-2 font-jp text-base text-stone-700 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-700 dark:text-stone-200 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300"
+      >
+        <svg class="h-4 w-4 rotate-180 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+        返回目錄
+      </NuxtLink>
+    </footer>
   </article>
 </template>
 
@@ -318,16 +292,4 @@ useSeoMeta({
   border-radius: 9999px;
 }
 
-/* Reuse article.vue colophon styles via plain classes — duplicated lightly */
-.article-colophon-divider { display: flex; align-items: center; justify-content: center; gap: 0.85rem; margin-bottom: 2rem; }
-.article-colophon-divider__line { flex: 1; max-width: 100px; height: 1px; background: linear-gradient(to right, transparent, rgb(168 162 158 / 0.4), transparent); }
-.article-colophon-divider__dot { width: 5px; height: 5px; border-radius: 9999px; background: rgb(217 123 46 / 0.85); box-shadow: 0 0 0 4px rgb(217 123 46 / 0.08); }
-.article-colophon-eyebrow { text-align: center; font-size: 0.62rem; letter-spacing: 0.4em; color: rgb(217 123 46 / 0.9); text-transform: uppercase; font-weight: 300; margin: 0 0 1.6rem; }
-.article-colophon-list { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin: 0; }
-@media (min-width: 640px) { .article-colophon-list { grid-template-columns: 1fr 1fr; column-gap: 2.2rem; } }
-.article-colophon-list > div { display: flex; justify-content: space-between; gap: 1.2rem; font-size: 0.78rem; padding: 0.55rem 0; border-bottom: 1px solid rgb(168 162 158 / 0.15); }
-.article-colophon-list dt { flex-shrink: 0; font-size: 0.66rem; letter-spacing: 0.32em; color: rgb(120 113 108 / 0.85); text-transform: uppercase; }
-:global(.dark) .article-colophon-list dt { color: rgb(168 162 158 / 0.7); }
-.article-colophon-list dd { margin: 0; text-align: right; color: rgb(68 64 60); font-weight: 300; letter-spacing: 0.05em; }
-:global(.dark) .article-colophon-list dd { color: rgb(214 211 209 / 0.92); }
 </style>

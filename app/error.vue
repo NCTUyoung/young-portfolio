@@ -33,13 +33,13 @@
       <!-- 雙軌 CTA -->
       <div class="error-page__ctas">
         <NuxtLink to="/" class="error-page__cta">
-          <span class="font-jp">回表紙</span>
+          <span class="font-jp">回首頁</span>
           <span class="error-page__cta-en">HOME</span>
           <span class="error-page__cta-arrow" aria-hidden="true">←</span>
         </NuxtLink>
         <span class="error-page__cta-sep" aria-hidden="true"/>
         <NuxtLink to="/gallery" class="error-page__cta">
-          <span class="font-jp">繪 · 影</span>
+          <span class="font-jp">看作品</span>
           <span class="error-page__cta-en">GALLERY</span>
           <span class="error-page__cta-arrow" aria-hidden="true">→</span>
         </NuxtLink>

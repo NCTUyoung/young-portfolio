@@ -56,7 +56,7 @@
           <button
             type="button"
             class="contact-sheet__btn group"
-            :aria-label="cell.image.title || '攝影作品'"
+            :aria-label="displayTitles.get(cell.image.id)"
             @click="$emit('imageClick', cell.image)"
           >
             <picture class="contents">
@@ -66,7 +66,7 @@
                 :src="getThumbPath(cell.image.filename, 400)"
                 :srcset="getGridImageSrcset(cell.image.filename)"
                 :sizes="cellSizes"
-                :alt="cell.image.title"
+                :alt="displayTitles.get(cell.image.id)"
                 class="contact-sheet__img"
                 :loading="cell.i < 4 ? 'eager' : 'lazy'"
                 :fetchpriority="cell.i === 0 ? 'high' : 'auto'"
@@ -77,7 +77,7 @@
             </picture>
             <!-- hover 浮出最小標籤（標題 + 焦段/光圈），避免常駐占高度 -->
             <span class="contact-sheet__cap">
-              <span class="contact-sheet__cap-title font-jp">{{ cell.image.title || '未命名' }}</span>
+              <span class="contact-sheet__cap-title font-jp">{{ displayTitles.get(cell.image.id) }}</span>
               <span v-if="exifLine(cell.image)" class="contact-sheet__cap-exif">{{ exifLine(cell.image) }}</span>
             </span>
           </button>
@@ -115,9 +115,16 @@ import { useImagePath } from '~/composables/useImagePath'
 import { formatShutterSpeed } from '~/utils/formatters'
 import { computeMasonryColumns } from '~/utils/masonryColumns'
 import { DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
+import { useGalleryStore } from '~/stores/gallery'
 import type { GalleryItem } from '~~/shared/types/gallery'
 
 const props = defineProps<{ items: GalleryItem[] }>()
+const galleryStore = useGalleryStore()
+// Loupe pointer updates must not repeatedly sort the full collection for every caption.
+const displayTitles = computed(() => new Map(props.items.map(image => [
+  image.id, getGalleryDisplayTitle(image, galleryStore.photographyWorks)
+])))
 defineEmits<{ imageClick: [item: GalleryItem] }>()
 
 const { getThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()

@@ -36,7 +36,7 @@
                 :src="getThumbPath(m.featured.filename, 800)"
                 :srcset="getGridImageSrcset(m.featured.filename)"
                 :sizes="cardSizes"
-                :alt="m.featured.title"
+                :alt="getGalleryDisplayTitle(m.featured, galleryStore.photographyWorks)"
                 class="em__img"
                 :style="focalStyle(m.featured)"
                 :loading="mi === 0 ? 'eager' : 'lazy'"
@@ -71,9 +71,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useImagePath } from '~/composables/useImagePath'
+import { useGalleryStore } from '~/stores/gallery'
+import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
 import type { GalleryItem, MixedPhotoItem, SeriesNarrative } from '~~/shared/types/gallery'
 
 const props = defineProps<{ items: MixedPhotoItem[] }>()
+const galleryStore = useGalleryStore()
 
 const { getThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()
 
