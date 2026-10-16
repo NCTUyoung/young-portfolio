@@ -63,13 +63,12 @@
       </div>
     </section>
 
-    <div v-if="photoError || digitalError" role="alert" data-testid="home-exhibition-error" class="mx-auto max-w-5xl px-6 py-16 text-stone-700 dark:text-stone-200">
+    <div v-if="photoError || digitalError" role="alert" data-testid="home-gallery-error" class="mx-auto max-w-5xl px-6 py-16 text-stone-700 dark:text-stone-200">
       <p>作品資料暫時無法載入，請重新載入。</p>
-      <button type="button" class="mt-3 inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-500 disabled:cursor-wait disabled:opacity-60" :disabled="exhibitionPending" @click="reloadExhibition">
-        {{ exhibitionPending ? '載入中…' : '重新載入作品' }}
+      <button type="button" class="mt-3 inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-500 disabled:cursor-wait disabled:opacity-60" :disabled="galleryPending" @click="reloadGallery">
+        {{ galleryPending ? '載入中…' : '重新載入作品' }}
       </button>
     </div>
-    <HomeFeaturedExhibition :artwork="exhibitionArt" :photograph="exhibitionPhoto" />
 
     <section id="about" class="home-about" aria-labelledby="home-about-heading">
       <div class="home-about__portrait">
@@ -125,22 +124,20 @@
 </template>
 
 <script setup lang="ts">
-import type { GalleryItem } from '~~/shared/types/gallery'
 import { useImagePath } from '~/composables/useImagePath'
 import { SEO_CONFIG, SOCIAL_LINKS } from '~~/shared/config/constants'
 import { buildPersonSchema, buildWebSiteSchema, toHeadScripts } from '~/utils/siteSchema'
 import { useGalleryStore } from '~/stores/gallery'
 import { fetchPhotographyWorks, fetchDigitalWorks } from '~/stores/galleryLoaders'
-import HomeFeaturedExhibition from '~/components/home/HomeFeaturedExhibition.vue'
 
 const { getThumbPath } = useImagePath()
 const galleryStore = useGalleryStore()
 const { digitalManifesto, photographyManifesto } = storeToRefs(galleryStore)
 const { data: photoPayload, error: photoError, status: photoStatus, refresh: refreshPhotography } = await useAsyncData('home-photography', fetchPhotographyWorks)
 const { data: digitalPayload, error: digitalError, status: digitalStatus, refresh: refreshDigital } = await useAsyncData('home-digital', fetchDigitalWorks)
-const exhibitionPending = computed(() => photoStatus.value === 'pending' || digitalStatus.value === 'pending')
+const galleryPending = computed(() => photoStatus.value === 'pending' || digitalStatus.value === 'pending')
 
-async function reloadExhibition () {
+async function reloadGallery () {
   await Promise.all([refreshPhotography(), refreshDigital()])
 }
 
@@ -171,21 +168,12 @@ const heroCollage = computed(() => {
   return {
     art: getThumbPath(artSource, 800),
     artTitle: artwork?.title || '數位繪畫作品',
-    artSource,
     main: heroImage.value,
     mainTitle: photoWorks.find(work => work.filename === heroSource.value)?.title || '攝影作品',
     sub: getThumbPath(subSource, 800),
-    subTitle: photoSub?.title || '攝影作品',
-    subSource
+    subTitle: photoSub?.title || '攝影作品'
   }
 })
-
-function selectExhibit (works: GalleryItem[], heroFilenames: string[]) {
-  const candidates = works.filter(work => !heroFilenames.includes(work.filename))
-  return candidates.find(work => work.series?.includes('featured')) || candidates[0] || works[0]
-}
-const exhibitionArt = computed(() => selectExhibit(digitalPayload.value?.works ?? [], [heroCollage.value.artSource]))
-const exhibitionPhoto = computed(() => selectExhibit(photoPayload.value?.works ?? [], [heroSource.value, heroCollage.value.subSource]))
 
 // Preserve existing shared ?focus= links and session-based gallery destinations.
 type HeroFocus = 'balanced' | 'kai' | 'kage'
