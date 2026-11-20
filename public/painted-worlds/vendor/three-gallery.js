@@ -3823,3 +3823,6 @@ void main() {
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
+
+// Expose the existing Three.js primitives used by the hall installation.
+export { Ji as BoxGeometry, Ys as PlaneGeometry, xi as MeshStandardMaterial };

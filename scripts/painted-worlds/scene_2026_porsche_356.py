@@ -15,13 +15,17 @@ VIEWS = [
          position=(4.88, -6.8, 3.32), target=(.48, -.55, .83), fov=38, mobileFov=60),
 ]
 CHECKS = [((-.7, 7.3, 3.15), (0, 0, .72), 39), ((7.6, 4.1, 3.1), (0, 0, .73), 41)]
+READER_POSITION = (.31, -4.40)
 READER_VIEWS = [
     dict(label='沿海公路', description='從左前方沿著墨線公路看過低車身，右側寬簷帽、手籃和坐姿衣褶落在同一幅海景。',
-         position=(-5.05, -7.85, 2.25), target=(.86, -.70, .94), fov=35, mobileFov=68),
+         position=(-3.7, -9.35, 1.08), target=(-.19, -2.45, .65), fov=31, mobileFov=58),
     dict(label='掌影下停駐', description='往車尾側換站，從打開的門看進座位與儀表，近處可看見寬簷帽、衣褶和手籃。',
-         position=(4.57, -7.42, 3.24), target=(1.03, -.93, .77), fov=42, mobileFov=65),
+         position=(4.70, -7.55, 2.85), target=(.27, -1.97, .68), fov=48, mobileFov=73),
 ]
-READER_CHECKS = [((5.75, -3.46, 1.64), (2.91, -2.66, .61), 33), ((4.7, .73, 1.91), (2.91, -2.66, .64), 32)]
+READER_CHECKS = [(position, (.46, -4.45, .63), 34) for position in (
+    (-1.05, -7.52, 1.48), (1.85, -7.01, 1.55), (3.30, -5.19, 1.43),
+    (1.88, -1.71, 1.52), (-2.30, -2.55, 1.57),
+)]
 LOOK = dict(sky='#dfded8', fog=dict(color='#dfded8', near=15, far=45), key='#fffcf1', fill='#dde5ed',
             ground='#948c83', keyIntensity=2.6, fillIntensity=.62, skyIntensity=1.14)
 
@@ -365,7 +369,9 @@ def palm(root, height, tilt, scale, rng, m):
 
 
 def still_life(m, with_reader):
-    x, y, span, depth = (2.91, -2.68, 1.90, 1.18) if with_reader else (2.24, -2.51, 1.48, .85)
+    x, y, span, depth = (*READER_POSITION, 1.90, 1.18) if with_reader else (2.24, -2.51, 1.48, .85)
+    if with_reader:
+        y -= .02
     # Pleated cloth, resting on the verge, with an open paper book and straw hat.
     n = 23
     fold = .005 if with_reader else .018

@@ -1,4 +1,5 @@
 import * as T from './vendor/three-gallery.js'
+import { createHallArt, getHallWallView, removeOldHallArt } from './hall-hanging.js'
 
 const palettes = {
   hall: { sky: 0xd9d5c9, hemisphere: 1.12, ground: 0xb9a184, key: 0xffeed6, power: 2.83, fill: 0xdce6ef, bounce: .64, sun: [-2.65, 8.5, 4.3], shadow: .57 },
@@ -106,6 +107,8 @@ export function createExhibition(canvas, data, enterPainting) {
   const pointer = new T.Vector2()
   const reduced = matchMedia('(prefers-reduced-motion: reduce)')
   let pending = null
+  let pendingHangings = null
+  let hallHangings = null
   let frame = 0
   let room = null
   let world = ''
@@ -238,7 +241,7 @@ export function createExhibition(canvas, data, enterPainting) {
     sky.renderOrder = -2
     return sky
   }
-  async function loadTexture(url, signal, reflection = false) {
+  async function loadTexture(url, signal, kind) {
     if (!url) return null
     try {
       const response = await fetch(url, { signal })
@@ -252,8 +255,8 @@ export function createExhibition(canvas, data, enterPainting) {
           texture.dispose()
           return null
         }
-        if (reflection || url === data.sky) texture.colorSpace = T.SRGBColorSpace
-        if (reflection) texture.mapping = T.EquirectangularReflectionMapping
+        if (kind || url === data.sky) texture.colorSpace = T.SRGBColorSpace
+        if (kind === 'environment') texture.mapping = T.EquirectangularReflectionMapping
         return texture
       } finally {
         URL.revokeObjectURL(objectURL)
@@ -262,9 +265,46 @@ export function createExhibition(canvas, data, enterPainting) {
       return null
     }
   }
+
+  async function hangPaintings(works) {
+    if (world !== 'hall') return
+    pendingHangings?.abort()
+    const task = new AbortController()
+    pendingHangings = task
+    delete canvas.dataset.hit
+    const images = await Promise.all(works.map(({ art }) => loadTexture(art.thumb, task.signal, 'art')))
+    if (task.signal.aborted) {
+      disposeAssets([], images)
+      return
+    }
+    pendingHangings = null
+    const entries = works.flatMap((work, i) => {
+      const texture = images[i]
+      if (!texture) return []
+      texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy())
+      const { naturalWidth: width, naturalHeight: height } = texture.image
+      return [{ work, texture, width, height }]
+    })
+    if (hallHangings) {
+      room.remove(hallHangings)
+      disposeAssets([hallHangings])
+      renderer.renderLists.dispose()
+    }
+    hallHangings = entries.length ? createHallArt(entries, omitOpaqueShadowMaps) : null
+    if (hallHangings) room.add(hallHangings)
+    room.updateMatrixWorld(true)
+    renderer.shadowMap.needsUpdate = true
+    draw()
+    return entries.length
+  }
+
   function clear() {
     pending?.abort()
     pending = null
+    pendingHangings?.abort()
+    pendingHangings = null
+    hallHangings = null
+    delete canvas.dataset.hit
     travel = null
     cancelAnimationFrame(frame)
     frame = 0
@@ -336,7 +376,7 @@ export function createExhibition(canvas, data, enterPainting) {
     const reflection = data.reflections?.[id]
     const loaded = await Promise.allSettled([
       model(id, signal), hall ? model('statue', signal) : null,
-      loadTexture(reflection, signal, true), orchard ? loadTexture(data.canopyLight, signal) : null,
+      loadTexture(reflection, signal, 'environment'), orchard ? loadTexture(data.canopyLight, signal) : null,
       orchard && data.sky !== reflection ? loadTexture(data.sky, signal) : null
     ])
     const [primary, statue, environment, sunflecks, sky] = loaded.map(result => result.value)
@@ -348,6 +388,7 @@ export function createExhibition(canvas, data, enterPainting) {
     }
     pending = null
     room = new T.Group()
+    if (hall) disposeAssets(removeOldHallArt(primary))
     room.add(primary)
     if (statue) room.add(statue)
     const panorama = sky ?? environment
@@ -441,6 +482,23 @@ export function createExhibition(canvas, data, enterPainting) {
     orbit.update()
     draw()
   }
+
+  function paintingAt(event) {
+    if (!hallHangings || pendingHangings) return
+    const b = canvas.getBoundingClientRect()
+    pointer.set(2 * (event.clientX - b.left) / b.width - 1, 1 - 2 * (event.clientY - b.top) / b.height)
+    ray.setFromCamera(pointer, displayCamera)
+    if (!ray.intersectObject(hallHangings, true).length) return
+    const hit = ray.intersectObjects(room.children, true)[0]
+    for (let node = hit?.object; node && node !== room; node = node.parent) {
+      if (node.userData.paintingId) return node.userData.paintingId
+    }
+  }
+  canvas.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || event.buttons) return
+    if (paintingAt(event)) canvas.dataset.hit = 'painting'
+    else delete canvas.dataset.hit
+  })
   canvas.addEventListener('pointerdown', event => {
     contacts.add(event.pointerId)
     start = contacts.size === 1 ? [event.clientX, event.clientY] : null
@@ -451,15 +509,8 @@ export function createExhibition(canvas, data, enterPainting) {
     const origin = start
     start = null
     if (!origin || event.button !== 0 || world !== 'hall' || Math.hypot(event.clientX - origin[0], event.clientY - origin[1]) > 7) return
-    const b = canvas.getBoundingClientRect()
-    pointer.set(2 * (event.clientX - b.left) / b.width - 1, 1 - 2 * (event.clientY - b.top) / b.height)
-    ray.setFromCamera(pointer,displayCamera)
-    const hit = ray.intersectObjects(room.children,true)[0]
-    for (let n=hit?.object; n && n!==room; n=n.parent) {
-      for (const [id,portal] of Object.entries(data.portals)) {
-        if (n.name.includes(portal.mesh)) { enterPainting(id); return }
-      }
-    }
+    const id = paintingAt(event)
+    if (id) enterPainting(id)
   })
   window.addEventListener('pagehide', event => {
     if (event.persisted) return
@@ -472,5 +523,6 @@ export function createExhibition(canvas, data, enterPainting) {
     renderer.dispose()
   })
   resize()
-  return { show, setView, move, clear }
+  return { show, setView, move, clear, hangPaintings,
+    hallView: wall => getHallWallView(wall, canvas.clientWidth / Math.max(1, canvas.clientHeight)) }
 }

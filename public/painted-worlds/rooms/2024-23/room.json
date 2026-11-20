@@ -14,36 +14,36 @@
   ],
   "views": [
     {
-      "label": "斜望燈巷",
-      "description": "左上圓燈與弧棚、右側車窗沿窄月台向後收束。",
+      "label": "月台近望",
+      "description": "近看暖光中的臉、開掌與青灰披肩，右側車窗延伸到深處。",
       "position": [
-        0.36,
-        1.69,
-        3.05
+        -0.36,
+        1.44,
+        0.57
       ],
       "target": [
-        -0.12,
-        1.73,
-        -2.08
+        -0.2,
+        1.34,
+        -1.31
       ],
-      "fov": 48,
-      "mobileFov": 51
+      "fov": 42,
+      "mobileFov": 58
     },
     {
-      "label": "石衣背側",
-      "description": "從石塑背後回望，車側、石塑和吊燈之間可讀出通道寬度。",
+      "label": "掌與披肩斜側",
+      "description": "從車側看掌心到袖口的距離、披肩厚度和鞋底落點。",
       "position": [
-        1.53,
-        1.92,
-        -4.85
+        1.36,
+        1.47,
+        -2.24
       ],
       "target": [
-        -0.48,
-        1.56,
-        -0.44
+        -0.52,
+        0.98,
+        -1.16
       ],
-      "fov": 51,
-      "mobileFov": 55
+      "fov": 54,
+      "mobileFov": 62
     }
   ],
   "look": {
@@ -53,11 +53,11 @@
       "near": 7,
       "far": 21
     },
-    "key": "#f2d1a0",
+    "key": "#ffd8ad",
     "fill": "#a6bfcb",
-    "ground": "#676b70",
-    "keyIntensity": 1.85,
-    "fillIntensity": 0.9,
-    "skyIntensity": 1.26
+    "ground": "#747578",
+    "keyIntensity": 2.22,
+    "fillIntensity": 1.02,
+    "skyIntensity": 1.31
   }
 }

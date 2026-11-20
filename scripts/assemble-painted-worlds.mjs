@@ -183,9 +183,12 @@ async function assemble() {
     if (/^gallery\/202[456]年電繪作品\//.test(filename)) assert(seenWorks.has(id), `Gallery work missing from inventory: ${id}`)
   }
   assert(allowPending || !pending.length, `Missing room.json: ${pending.join(', ')}`)
+  const years = [...new Set(registry.map(work => work.year))].sort((a, b) => a - b)
+  const alternateHallStills = years.slice(0, -1).flatMap(year => [`./media/hall-${year}.webp`, `./media/hall-${year}-mobile.webp`])
   await Promise.all([
     ...Object.values(legacyModels), previous.sky, previous.canopyLight, ...Object.values(previous.reflections),
-    ...[rooms.hall, ...legacyIds.map(id => rooms[id])].flatMap(room => [...room.stills, ...room.mobileStills])
+    ...[rooms.hall, ...legacyIds.map(id => rooms[id])].flatMap(room => [...room.stills, ...room.mobileStills]),
+    ...alternateHallStills
   ].map(url => asset(path.resolve(worlds, url))))
 
   const manifest = { ...previous, models, rooms }
@@ -206,7 +209,7 @@ async function assemble() {
   if (bundle) {
     const destination = path.resolve(bundle)
     await mkdir(destination)
-    const runtime = ['index.html', 'exhibit.css', 'main.js', 'renderer.js', 'vendor/three-gallery.js', 'vendor/LICENSE.txt']
+    const runtime = ['index.html', 'exhibit.css', 'main.js', 'renderer.js', 'hall-hanging.js', 'vendor/three-gallery.js', 'vendor/LICENSE.txt']
     for (const file of [...assets, ...runtime.map(name => path.join(worlds, name))].sort()) {
       const target = path.join(destination, path.relative(publicRoot, file))
       await mkdir(path.dirname(target), { recursive: true })

@@ -59,7 +59,7 @@ def inspect(path, output):
     print(json.dumps(report, ensure_ascii=False), flush=True)
 
 
-def place(path, report_file):
+def place(path, report_file, position):
     """Preserve the folds and weave with a shallow silhouette and no texture payload."""
     obj = import_source(path)
     obj.data.calc_loop_triangles()
@@ -112,19 +112,19 @@ def place(path, report_file):
     # The source seat and soles have slightly different heights. Lean them onto
     # the same cloth and keep the basket resting against the near trouser leg.
     turn = Matrix.Rotation(math.radians(-30), 3, 'Z') @ Matrix.Rotation(math.radians(2.35), 3, 'Y')
-    scale = 1.26
+    scale = 1.3608
     points = [turn @ (v.co*scale) for v in clean.vertices]
     floor = .015-min(p.z for p in points)
-    offset = Vector((2.91, -2.66, floor))
-    for vertex, position in zip(clean.vertices, points, strict=True):
-        vertex.co = position+offset
+    offset = Vector((*position, floor))
+    for vertex, point in zip(clean.vertices, points, strict=True):
+        vertex.co = point+offset
     clean.update()
     clean.calc_loop_triangles()
-    foot = min(p.z+floor for p,v in zip(points, clean.vertices, strict=True) if v.co.x < 2.67)
-    seat = min(p.z+floor for p,v in zip(points, clean.vertices, strict=True) if v.co.x > 3.21 and v.co.y > -2.73)
+    foot = min(vertex.co.z for vertex in clean.vertices if vertex.co.x < position[0]-.24)
+    seat = min(vertex.co.z for vertex in clean.vertices if vertex.co.x > position[0]+.30 and vertex.co.y > position[1]-.07)
     world_bounds = [[round(f(vertex.co[i] for vertex in clean.vertices), 6) for i in range(3)] for f in (min, max)]
     geometry = dict(source=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest(), sourceTriangles=original_triangles,
                     triangles=len(clean.loop_triangles), vertices=len(clean.vertices), boundaryEdges=boundary, branchedEdges=branched,
-                    worldBounds=world_bounds, clothFeetZ=round(foot, 5), clothSeatZ=round(seat, 5), scale=scale)
+                    worldBounds=world_bounds, placement=list(position), clothFeetZ=round(foot, 5), clothSeatZ=round(seat, 5), scale=scale)
     report_file.write_text(json.dumps(geometry, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(json.dumps(geometry, ensure_ascii=False), flush=True)

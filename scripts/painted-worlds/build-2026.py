@@ -242,7 +242,7 @@ def configure(phase):
     return scene
 
 
-def export(path):
+def export(path, with_textures=False):
     """Batch authored pieces by scene layer. Preserve individual pieces in the .blend."""
     groups = {}
     for obj in list(bpy.context.scene.objects):
@@ -266,7 +266,8 @@ def export(path):
         batch.select_set(True)
     bpy.ops.export_scene.gltf(filepath=str(path), export_format='GLB', use_selection=True, export_yup=True,
                              export_animations=False, export_lights=False, export_cameras=False,
-                             export_texcoords=False, export_meshopt_compression_enable=False)
+                             export_texcoords=with_textures, export_image_format='JPEG' if with_textures else 'AUTO',
+                             export_jpeg_quality=88, export_meshopt_compression_enable=False)
 
 
 def y_up(vector):
@@ -291,11 +292,14 @@ def main():
     parser.add_argument('--slug', required=True, choices=('porsche-356', 'raven'))
     parser.add_argument('--phase', choices=('gray', 'preview', 'final', 'reader-check'), default='final')
     parser.add_argument('--porsche-reader', type=Path, help='Opt in to the supplied original Porsche companion GLB')
+    parser.add_argument('--raven-tripo', type=Path, help='Opt in to the supplied Raven character GLB')
     parser.add_argument('--evidence-root', type=Path, default=DEFAULT_EVIDENCE, help='Directory containing inventory.json')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
     slug, phase = args.slug, args.phase
     if args.porsche_reader and slug != 'porsche-356':
         parser.error('--porsche-reader applies to porsche-356 only')
+    if args.raven_tripo and slug != 'raven':
+        parser.error('--raven-tripo applies to raven only')
     if phase == 'reader-check' and not args.porsche_reader:
         parser.error('reader-check requires --porsche-reader')
     evidence = args.evidence_root / '2026-scene-evidence' / slug
@@ -309,13 +313,24 @@ def main():
     room = REPO / 'public' / 'painted-worlds' / 'rooms' / slug
     module = importlib.import_module('scene_2026_' + slug.replace('-', '_'))
     scene = configure(phase)
-    stage = evidence / ('reader-' + phase if args.porsche_reader else phase)
+    variation = 'reader-' if args.porsche_reader else 'tripo-' if args.raven_tripo else ''
+    stage = evidence / (variation + phase)
     stage.mkdir(exist_ok=True)
+    textured = False
     if args.porsche_reader:
         reader = importlib.import_module('scene_2026_porsche_reader')
         module.build(with_reader=True)
-        reader.place(args.porsche_reader, evidence / 'reader-geometry.json')
+        reader.place(args.porsche_reader, evidence / 'reader-geometry.json', module.READER_POSITION)
         views, checks = module.READER_VIEWS, module.READER_CHECKS
+    elif args.raven_tripo:
+        raven = importlib.import_module('scene_2026_raven_tripo')
+
+        def place_raven():
+            nonlocal textured
+            textured = raven.place(args.raven_tripo, evidence / 'tripo-geometry.json', module.PEDESTAL_TOP)
+
+        module.build(tripo=place_raven)
+        views, checks = module.TRIPO_VIEWS, module.TRIPO_CHECKS
     else:
         module.build()
         views, checks = module.VIEWS, module.CHECKS
@@ -344,7 +359,7 @@ def main():
         bpy.context.preferences.filepaths.save_version = 0
         scene.render.filepath = '//render.webp'
         bpy.ops.wm.save_as_mainfile(filepath=str(evidence / (slug + '.blend')), compress=True)
-        export(stage / 'scene.glb')
+        export(stage / 'scene.glb', with_textures=textured)
         size = (stage / 'scene.glb').stat().st_size
         budget = 3_000_000 if args.porsche_reader else 2_500_000
         if size > budget:

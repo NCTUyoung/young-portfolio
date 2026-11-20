@@ -15,6 +15,22 @@ VIEWS = [
          position=(-5.65, -6.23, 3.15), target=(.02, .02, 1.95), fov=35, mobileFov=49),
 ]
 CHECKS = [((6.38, -.78, 2.8), (0, .03, 1.90), 40), ((-4.22, 5.7, 3.44), (-.05, .12, 1.91), 38)]
+TRIPO_VIEWS = [
+    dict(label='電青斜刃', description='從正面看斜向青光跨過人物，深藍髮束和衣帶在暗艙中往外延伸。',
+         position=(1.15, -7.9, 2.35), target=(.02, 0, 1.77), fov=32, mobileFov=49),
+    dict(label='從光刃側看', description='橫移看髮束、手與青光的間距，腳下深色基座托住整尊雕塑。',
+         position=(5.04, -6.25, 2.62), target=(.03, .02, 1.68), fov=36, mobileFov=52),
+]
+TRIPO_CHECKS = [
+    ((0, -6.3, 2.11), (0, 0, 1.67), 39),
+    ((3.60, -5.15, 2.30), (0, 0, 1.67), 39),
+    ((6.20, -.35, 2.37), (0, 0, 1.67), 39),
+    ((0, 4.28, 2.36), (0, 0, 1.67), 46),
+    ((-3.72, -5.00, 2.31), (0, 0, 1.67), 39),
+    ((1.35,-2.63,3.14), (.12,.34,2.93), 26),
+    ((1.42,-2.34,.69), (0,0,.43), 29),
+]
+PEDESTAL_TOP = .178
 LOOK = dict(sky='#05080e', fog=dict(color='#05080e', near=10, far=17), key='#badceb', fill='#85c0e5',
             ground='#1c3049', keyIntensity=1.50, fillIntensity=1.70, skyIntensity=1.10)
 
@@ -282,7 +298,23 @@ def chamber(m):
         box('Drifting squares / distant dust', (x,y,z), (size,)*3, m['distance'] if j%3 else m['cyan_edge']).rotation_euler = (.4,.7,.3)
 
 
-def build():
+def pedestal(m):
+    """Low, solid slate and a recessed blue line below the contact surface."""
+    for name, low, high, radius, upper, surface in (
+        ('stone lower edge', .002, .048, .78, .83, m['wall']),
+        ('solid slate body', .048, .143, .83, .83, m['suit']),
+        ('recessed cold metal seam', .143, .155, .82, .82, m['metal']),
+        ('open bevel top', .155, PEDESTAL_TOP, .83, .787, m['wall']),
+    ):
+        o = cylinder('Pedestal floor / '+name, (0,0,low), (0,0,high), radius, surface, 64, top=upper)
+        o.scale.y = .83
+    for start, stop in ((.28,1.35),(2.28,3.18),(4.52,5.88)):
+        angles = [start+(stop-start)*i/24 for i in range(25)]
+        tube('Pedestal floor / shallow blue inlay', [(.763*math.cos(t),.633*math.sin(t),PEDESTAL_TOP+.002) for t in angles],
+             m['distance'], .006, 6)
+
+
+def build(tripo=None):
     m = {
         'skin': material('Pale bisque', '#c8c1bc', .55, glow=.026),
         'skinshade': material('Pressed porcelain shadow', '#5c5363', .69),
@@ -309,14 +341,23 @@ def build():
         'distance': material('Faint depth lines', '#1a364a', .58, .15, .26),
     }
     chamber(m)
-    figure(m)
-    face(m)
-    hair(m)
-    sword(m)
+    if tripo is None:
+        figure(m)
+        face(m)
+        hair(m)
+        sword(m)
+    else:
+        pedestal(m)
+        tripo()
     backdrop('#8bb4d0', .20, '#04060a', reflection_hue='#04060a')
-    area('Quiet portrait key', (-2.4,-4.0,5.5), (-.52,.03,2.75), 315, '#eff0fa', 3.35)
-    area('Blade bounce above the core', (.70,-1.52,2.18), (-.22,.04,1.79), 160, '#39d8ff', 2.05)
-    area('Icy low bounce', (-1.05,-.69,.48), (-.07,.10,1.40), 56, '#2aa9ea', 1.7)
+    if tripo:
+        area('Quiet porcelain key', (.83,-3.82,4.53), (.05,.35,2.92), 215, '#f1e5dd', 2.9)
+        area('Cold reflection from the blade', (.73,-1.72,1.97), (-.04,.18,1.55), 75, '#47c5f1', 2.0)
+        area('Raking pedestal bounce', (-1.43,-.89,.79), (0,.12,.64), 32, '#68b2de', 1.9)
+    else:
+        area('Quiet portrait key', (-2.4,-4.0,5.5), (-.52,.03,2.75), 315, '#eff0fa', 3.35)
+        area('Blade bounce above the core', (.70,-1.52,2.18), (-.22,.04,1.79), 160, '#39d8ff', 2.05)
+        area('Icy low bounce', (-1.05,-.69,.48), (-.07,.10,1.40), 56, '#2aa9ea', 1.7)
     area('Tint on back hair only', (2.25,2.16,3.57), (-.11,.25,2.03), 83, '#c886ce', 2.8)
     area('Cool separations behind the jacket', (-2.5,1.34,3.65), (-.20,.10,2.02), 170, '#5cb9f2', 2.8)
     bloom()

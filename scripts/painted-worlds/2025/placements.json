@@ -1,0 +1,37 @@
+{
+  "solitude": {
+    "remove": ["Waiting on the bench", "Girl in silver cap"],
+    "roles": {
+      "hero": {"target": [-0.34, -0.11, 0.628], "yaw": 19, "height": 2.02, "floor": 0.14, "plantedSoles": 1, "landmarks": ["chinHand", "supportHand"]}
+    }
+  },
+  "mirror": {
+    "remove": ["Visitor at glass", "Virtual mirror figure"],
+    "mirror": {"y": 0.288, "archCenterX": -0.32, "archRadius": 1.13, "archBase": 1.18, "archShoulder": 2.6},
+    "roles": {
+      "hero": {"target": [0.33, -0.90, 0.0], "yaw": 193, "height": 2.65, "floor": 0.0, "plantedSoles": 2, "landmarks": ["mirrorFingertip", "counterHand"]}
+    }
+  },
+  "cosplayer": {
+    "remove": ["Long eared sitter", "Ear stitched spine", "Photographer ", "Sculpted camera ", "Near kneeling photographer", "Foreground phone paper sleeves", "Foreground phone holder hands", "Phone grip fingers"],
+    "roles": {
+      "hero": {"target": [0.0, 0.132, 0.823], "yaw": -9, "height": 2.98, "floor": 0.086, "plantedSoles": 1, "landmarks": ["leftEarTip", "rightEarTip", "chinHand"]},
+      "crowd-left": {"target": [-2.35, 0.64, 0.0], "yaw": 78, "height": 1.68, "floor": 0.0, "plantedSoles": 2, "optional": true},
+      "crowd-right": {"target": [2.52, 1.94, 0.0], "yaw": -53, "height": 1.69, "floor": 0.0, "plantedSoles": 2, "optional": true},
+      "crowd-rear": {"target": [-0.82, 3.62, 0.0], "yaw": 13, "height": 1.65, "floor": 0.0, "plantedSoles": 2, "optional": true}
+    }
+  },
+  "2025-36": {
+    "remove": ["Blue figure with braided bun", "Blue figure with long braid"],
+    "roles": {
+      "front-bun": {"target": [-0.50, -0.18, 0.18], "yaw": 15, "height": 2.46, "floor": 0.18, "plantedSoles": 2, "landmarks": ["leftHand", "rightHand"]},
+      "rear-braid": {"target": [0.46, 0.22, 0.18], "yaw": -21, "height": 2.78, "floor": 0.18, "plantedSoles": 2, "landmarks": ["leftHand", "rightHand"]}
+    }
+  },
+  "diamond": {
+    "remove": ["Crystal costume", "Crystal hair cuts", "Pearl bow knot", "Folded white bow lobes", "Layered rear bow fold", "Small bow pearls", "Long sword blade", "Blade ridge silver", "Indigo sword handle", "Sword grip wraps", "Cut pommel", "Sword cross guard", "Tapered refraction glints", "Refraction core"],
+    "roles": {
+      "hero": {"target": [0.25, 0.04, 0.138], "yaw": -16, "height": 3.00, "floor": 0.138, "plantedSoles": 1, "landmarks": ["swordGrip", "swordTip", "bowTop"]}
+    }
+  }
+}

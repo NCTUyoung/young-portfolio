@@ -7,8 +7,8 @@ const roomTitle = $('#room-title')
 const index = $('.room-index')
 const doors = $('.doors')
 const years = $('.years')
+const hallView = $('#hall-view')
 const mobile = matchMedia('(max-width: 650px)')
-const reduced = matchMedia('(prefers-reduced-motion: reduce)')
 const isEmbedded = document.documentElement.dataset.embed === '1'
 const source = new URLSearchParams(location.search).get('from')
 
@@ -82,17 +82,31 @@ async function mount() {
   let engine
   let enginePromise
   let revision = 0
-  let approach
 
   function view() {
-    if (room === 'hall') return closeup ? data.figureView : data.hallView[mobile.matches ? 'mobile' : 'desktop']
+    if (room === 'hall') {
+      if (closeup) return data.figureView
+      if (hallView.value !== 'overview' && engine) return engine.hallView(hallView.value)
+      return data.hallView[mobile.matches ? 'mobile' : 'desktop']
+    }
     const v = data.rooms[room].views[station]
     return { ...v, fov: mobile.matches ? v.mobileFov : v.fov }
   }
 
+  const yearWorks = () => registry.filter(work => work.year === year)
+
+  async function hangYear() {
+    const requested = year
+    delete shell.dataset.hangingYear
+    const count = await engine.hangPaintings(yearWorks())
+    if (room !== 'hall' || requested !== year || count === undefined) return
+    if (count === yearWorks().length) shell.dataset.hangingYear = String(year)
+    else $('#status').textContent = '部分掛畫未能載入，仍可從作品索引進入展間。'
+  }
+
   function renderDoors() {
     for (const button of years.children) button.setAttribute('aria-pressed', String(Number(button.dataset.year) === year))
-    const selection = registry.filter(work => work.year === year)
+    const selection = yearWorks()
     doors.replaceChildren(...selection.map(work => {
       const link = document.createElement('a')
       link.href = '#' + work.id
@@ -124,9 +138,14 @@ async function mount() {
     button.textContent = String(option)
     button.onclick = () => {
       if (year === option) return
-      clearTimeout(approach)
       year = option
+      closeup = false
       renderDoors()
+      refresh()
+      if (live) {
+        engine.setView(view(), true)
+        void hangYear()
+      }
     }
     years.append(button)
   }
@@ -145,7 +164,7 @@ async function mount() {
     const shot = hall ? Number(closeup) : station
     const point = settings?.views?.[station]
     const description = point?.description ?? (hall
-      ? (closeup ? '中央雕像《唯一真神》' : '中央雕像與牆上的兩幅電繪')
+      ? (closeup ? '中央雕像《唯一真神》' : '畫界迴廊與中央雕像《唯一真神》')
       : work.art.title)
     const title = work?.title ?? settings.title
     if (roomTitle.textContent !== title) {
@@ -191,7 +210,9 @@ async function mount() {
       button.querySelector('.station-cue').textContent = position === station ? '目前站點' : position === station + 1 ? '下一站' : ''
     })
 
-    if (!live) {
+    if (!live && hall && !closeup && year !== yearOptions.at(-1)) {
+      setStill(`./media/hall-${year}.webp`, `./media/hall-${year}-mobile.webp`, description)
+    } else if (!live) {
       const src = settings?.stills[shot] ?? work.art.thumb
       setStill(src, settings?.mobileStills?.[shot] ?? src, description)
     }
@@ -202,11 +223,12 @@ async function mount() {
     if (live) canvas.setAttribute('aria-label', description.replace(/。$/, '') + '。可用方向鍵調整角度與遠近。')
     canvas.setAttribute('aria-hidden', String(!live))
     $('.view-tools').hidden = !live
+    hallView.hidden = !hall || !live
     $('#view-caption').hidden = !point
     $('#view-caption').textContent = point ? description : ''
     $('#hint').textContent = !settings ? '展間準備中，原作已可觀看。'
-      : live ? (hall ? (mobile.matches ? '拖曳環看' : '點選牆上的畫，或拖曳環看。') : '拖曳環看，可用雙指縮放。')
-      : loading ? '立體場景載入中。' : (hall ? '從上方選擇一幅作品。' : '目前顯示展間定格。')
+      : live ? (hall ? '選一幅掛畫進入展間，或拖曳環看。' : '拖曳環看，可用雙指縮放。')
+      : loading ? '立體場景載入中。' : (hall ? '從作品索引進入畫中展間。' : '目前顯示展間定格。')
   }
 
   async function showScene() {
@@ -215,7 +237,7 @@ async function mount() {
     refresh()
     if (!loading) return
     enginePromise ??= import('./renderer.js')
-      .then(({ createExhibition }) => createExhibition(canvas, data, enterPortal))
+      .then(({ createExhibition }) => createExhibition(canvas, data, goToRoom))
       .catch(() => undefined)
     engine = await enginePromise
     if (run !== revision) return
@@ -225,7 +247,10 @@ async function mount() {
         if (run !== revision) return
         live = shown
         // The visitor may choose another station while the room is loading.
-        if (shown) engine.setView(view())
+        if (shown) {
+          engine.setView(view())
+          if (room === 'hall') void hangYear()
+        }
       } catch {
         if (run !== revision) return
         engine.clear()
@@ -237,9 +262,9 @@ async function mount() {
 
   function onRoomChange(id) {
     if (id === room) return
-    clearTimeout(approach)
     if (dialog.open) dialog.close()
     engine?.clear()
+    delete shell.dataset.hangingYear
     room = id
     station = 0
     closeup = live = false
@@ -254,21 +279,15 @@ async function mount() {
     onRoomChange(id)
   }
 
-  function enterPortal(id) {
-    clearTimeout(approach)
-    const portal = data.portals[id]
-    if (room === 'hall' && live && portal && !reduced.matches) {
-      engine.setView({ position: portal.focusCamera, target: portal.focusTarget, fov: 34 }, true)
-      approach = setTimeout(() => goToRoom(id), 440)
-    } else {
-      goToRoom(id)
-    }
-  }
-
   $('#back').onclick = () => goToRoom('hall')
   $('#sculpture').onclick = () => {
-    clearTimeout(approach)
+    hallView.value = 'overview'
     closeup = !closeup
+    refresh()
+    if (live) engine.setView(view(), true)
+  }
+  hallView.onchange = () => {
+    closeup = false
     refresh()
     if (live) engine.setView(view(), true)
   }
@@ -302,7 +321,7 @@ async function mount() {
   }
   canvas.addEventListener('exhibit-lost', () => {
     ++revision
-    clearTimeout(approach)
+    delete shell.dataset.hangingYear
     live = loading = false
     refresh()
   })

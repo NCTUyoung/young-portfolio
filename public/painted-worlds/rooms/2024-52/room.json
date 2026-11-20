@@ -14,35 +14,35 @@
   ],
   "views": [
     {
-      "label": "玫紅與湖青",
-      "description": "沿粉／青對角看兩枚晶心，左側浮著一顆牽繩的粉色心形氣球。",
+      "label": "手勢與雙晶心",
+      "description": "從粉心與青心之間看靠近臉頰的手勢、交疊的腿與座面。",
       "position": [
-        0.42,
-        2.6,
-        6.06
+        0.14,
+        2.04,
+        5.5
       ],
       "target": [
-        -0.11,
-        1.99,
-        -0.44
+        -0.08,
+        1.39,
+        -0.52
       ],
-      "fov": 40,
-      "mobileFov": 54
+      "fov": 39,
+      "mobileFov": 57
     },
     {
-      "label": "晶心與氣球厚度",
-      "description": "繞到斜側，比對玻璃晶心的切面、氣球的圓薄側影和後方繫繩。",
+      "label": "彩心與側影",
+      "description": "從斜側看坐姿和雙手、前後懸吊的晶心與光帶。",
       "position": [
-        4.21,
-        3.06,
-        3.86
+        1.95,
+        2.49,
+        4.83
       ],
       "target": [
-        -0.02,
-        2.0,
-        -0.58
+        0.03,
+        1.38,
+        -0.49
       ],
-      "fov": 46,
+      "fov": 41,
       "mobileFov": 57
     }
   ],
@@ -56,8 +56,8 @@
     "key": "#fff1df",
     "fill": "#beefff",
     "ground": "#394b61",
-    "keyIntensity": 1.5,
-    "fillIntensity": 0.8,
-    "skyIntensity": 0.98
+    "keyIntensity": 1.76,
+    "fillIntensity": 0.98,
+    "skyIntensity": 1.04
   }
 }
