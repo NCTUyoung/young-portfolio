@@ -6,6 +6,7 @@ const { cover } = defineProps<{
 }>()
 
 const baseURL = useRuntimeConfig().app.baseURL
+const corridorUrl = joinURL(baseURL, 'painted-worlds/index.html?from=home')
 </script>
 
 <template>
@@ -37,9 +38,7 @@ const baseURL = useRuntimeConfig().app.baseURL
           開始看展
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
         </NuxtLink>
-        <NuxtLink to="/gallery" class="museum-entrance__collection" no-prefetch>
-          瀏覽館藏
-        </NuxtLink>
+        <a :href="corridorUrl" class="museum-entrance__corridor">逛 3D 迴廊</a>
       </div>
     </div>
   </section>
@@ -155,7 +154,7 @@ const baseURL = useRuntimeConfig().app.baseURL
   height: 1rem;
 }
 
-.museum-entrance__collection {
+.museum-entrance__corridor {
   color: var(--museum-muted);
   text-decoration: underline;
   text-decoration-thickness: 1px;

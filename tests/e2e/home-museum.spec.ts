@@ -2,13 +2,13 @@ import { expect, test } from '@playwright/test'
 import { waitForSiteHydration } from './site-ready'
 
 test.describe('首頁序廳', () => {
-  test('the foyer offers the current exhibition and collection before the author sections', async ({ page }) => {
+  test('the foyer offers the current exhibition and 3D corridor before the author sections', async ({ page }) => {
     await page.goto('/young-portfolio/')
     const entrance = page.getByRole('region', { name: '光落之處' })
     await expect(entrance.getByRole('link', { name: '開始看展', exact: true }))
       .toHaveAttribute('href', /\/young-portfolio\/exhibition\/light\/?#painting$/)
-    await expect(entrance.getByRole('link', { name: '瀏覽館藏', exact: true }))
-      .toHaveAttribute('href', /\/young-portfolio\/gallery\/?$/)
+    await expect(entrance.getByRole('link', { name: '逛 3D 迴廊', exact: true }))
+      .toHaveAttribute('href', /\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
     await expect(page.getByRole('heading', { name: '作品選集', exact: true })).toHaveCount(0)
     await expect(page.locator('#featured')).toHaveCount(0)
     await expect(page.locator('#about')).toBeVisible()
@@ -75,14 +75,14 @@ for (const viewport of [
     const mobile = viewport.width < 768
     test.use({ viewport, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' })
 
-    test('the exhibition and collection links fit on the first screen and reach their destinations', async ({ page }) => {
+    test('the exhibition and 3D corridor links fit on the first screen and reach their destinations', async ({ page }) => {
       await page.goto('./')
       await waitForSiteHydration(page)
       const entrance = page.getByRole('region', { name: '光落之處' })
       const start = entrance.getByRole('link', { name: '開始看展', exact: true })
-      const collection = entrance.getByRole('link', { name: '瀏覽館藏', exact: true })
+      const corridor = entrance.getByRole('link', { name: '逛 3D 迴廊', exact: true })
 
-      for (const link of [start, collection]) {
+      for (const link of [start, corridor]) {
         await expect(link).toBeInViewport({ ratio: 1 })
         const bounds = (await link.boundingBox())!
         expect(bounds.width).toBeGreaterThanOrEqual(44)
@@ -98,16 +98,11 @@ for (const viewport of [
       await page.goBack()
       await expect(page).toHaveURL(/\/young-portfolio\/$/)
       await waitForSiteHydration(page)
-      await collection.click()
-      await expect(page).toHaveURL(/\/young-portfolio\/gallery\/?$/)
-      const rooms = page.getByRole('navigation', { name: '館藏目錄' })
-      for (const name of ['繪畫館', '攝影館']) {
-        const room = rooms.getByRole('link', { name, exact: true })
-        await expect(room).toBeVisible()
-        const bounds = (await room.boundingBox())!
-        expect(bounds.width).toBeGreaterThanOrEqual(44)
-        expect(bounds.height).toBeGreaterThanOrEqual(44)
-      }
+      await corridor.click()
+      await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
+      const rooms = page.getByRole('navigation', { name: '畫中展間' })
+      await expect(rooms.getByRole('link', { name: /柑橘樹下/ })).toBeVisible()
+      await expect(rooms.getByRole('link', { name: /紅色舞台/ })).toBeVisible()
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     })
   })

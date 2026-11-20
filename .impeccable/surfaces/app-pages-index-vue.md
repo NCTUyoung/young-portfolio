@@ -19,10 +19,10 @@ Preserve the warm framed-art exhibition and cool photographic-print language in 
 
 ## FIRST VIEWPORT AND FLOW
 
-Use a responsive static render of the sculpture for the hero. The prologue offers a secondary link to 館藏. The author introduction follows.
+Use a responsive static render of the sculpture for the hero. The prologue links directly to the exhibition and the 3D corridor. The author introduction follows.
 
 Keep the author media, social links, creative-history disclosure, and journey/dialogue anchors. The primary navigation reads 當期展, 館藏, and 手記.
 
 ## VERIFICATION
 
-Check desktop and mobile in both themes. Verify that the main action opens the first stop, 館藏 opens the collection, and the first viewport fits at 320 px. Check visible focus, the history disclosure, and that homepage entry makes no WebGL requests.
+Check desktop and mobile in both themes. Verify that the first stop and the 3D corridor are reachable from the first viewport at 320 px. 館藏 in the shared navigation opens the collection. Check visible focus, the history disclosure, and that homepage entry makes no WebGL requests.

@@ -16,7 +16,7 @@ Present Young's digital artwork and photography through a current exhibition and
 - The gallery supports category, activity, year, and search filters.
 - Photography has an overview map and directory, individual activity pages, and a complete photo series.
 - The existing image viewer supports large-image inspection, previous/next navigation, and `?image=<id>` sharing links.
-- Painted worlds open from the relevant artwork or exhibition stop and link back to that source.
+- The homepage links directly to the 3D corridor. Painted worlds also open from the relevant artwork or exhibition stop and link back to that source.
 
 ## Constraints
 

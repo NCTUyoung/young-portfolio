@@ -18,7 +18,7 @@ test.describe('首頁 /', () => {
     await page.goto('./')
     await waitForSiteHydration(page)
 
-    await page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '瀏覽館藏', exact: true }).click()
+    await page.getByRole('navigation', { name: '網站導覽' }).getByRole('link', { name: '館藏', exact: true }).click()
     await expect(page).toHaveURL(/\/young-portfolio\/gallery\/?$/)
     const photography = page.getByRole('navigation', { name: '館藏目錄' })
       .getByRole('link', { name: '攝影館', exact: true })

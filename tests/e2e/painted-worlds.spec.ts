@@ -36,10 +36,11 @@ test('the orchard and stage each contain their own three-dimensional character',
   }
 })
 
-test('the legacy foyer link still opens the painted-worlds hub and both rooms', async ({ page }) => {
+test('the homepage opens the 3D corridor, both rooms and their original artworks', async ({ page }) => {
   test.setTimeout(90_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('painted-worlds/index.html?from=home')
+  await page.goto('./')
+  await page.getByRole('link', { name: '逛 3D 迴廊', exact: true }).click()
   await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
   await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
   await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
