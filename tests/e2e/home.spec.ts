@@ -22,6 +22,7 @@ test.describe('首頁 /', () => {
     await expect(photography).toHaveAttribute('href', '/young-portfolio/gallery/photography#gallery-activities')
     await photography.click()
     await expect(page).toHaveURL(/\/young-portfolio\/gallery\/photography\/?#gallery-activities$/)
+    await waitForSiteHydration(page)
     const activityModes = page.getByRole('navigation', { name: '拍攝活動瀏覽方式' })
     await expect(activityModes.getByRole('link', { name: '依活動', exact: true })).toHaveAttribute('aria-current', 'location')
     await expect(page.getByTestId('gallery-activity-index').getByRole('heading', { level: 3 }).first()).toBeInViewport()
