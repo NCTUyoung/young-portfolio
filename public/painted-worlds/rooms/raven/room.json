@@ -1,0 +1,63 @@
+{
+  "id": "raven",
+  "year": 2026,
+  "workId": "digital-gallery/2026年電繪作品/21-編輯-編輯-編輯-1",
+  "title": "蕾雯 Raven",
+  "model": "./rooms/raven/scene.glb",
+  "stills": [
+    "./rooms/raven/view-0.webp",
+    "./rooms/raven/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/raven/view-0-mobile.webp",
+    "./rooms/raven/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "電青斜刃",
+      "description": "從正面看低處刃尖斜接右上護環，深藍髮束沿雕像兩側翻起，方形光點落在暗處。",
+      "position": [
+        2.35,
+        2.82,
+        8.65
+      ],
+      "target": [
+        0.04,
+        1.98,
+        0.01
+      ],
+      "fov": 33,
+      "mobileFov": 47
+    },
+    {
+      "label": "從光刃側看",
+      "description": "橫移看刃的厚度、近側圓形機件，以及髮束與後方暗艙之間的距離。",
+      "position": [
+        -5.65,
+        3.15,
+        6.23
+      ],
+      "target": [
+        0.02,
+        1.95,
+        -0.02
+      ],
+      "fov": 35,
+      "mobileFov": 49
+    }
+  ],
+  "look": {
+    "sky": "#05080e",
+    "fog": {
+      "color": "#05080e",
+      "near": 10,
+      "far": 17
+    },
+    "key": "#badceb",
+    "fill": "#85c0e5",
+    "ground": "#1c3049",
+    "keyIntensity": 1.5,
+    "fillIntensity": 1.7,
+    "skyIntensity": 1.1
+  }
+}

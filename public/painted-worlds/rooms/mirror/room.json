@@ -1,0 +1,63 @@
+{
+  "id": "mirror",
+  "year": 2025,
+  "workId": "digital-gallery/2025年電繪作品/21-編輯",
+  "title": "鏡",
+  "model": "./rooms/mirror/scene.glb",
+  "stills": [
+    "./rooms/mirror/view-0.webp",
+    "./rooms/mirror/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/mirror/view-0-mobile.webp",
+    "./rooms/mirror/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "靠近拱鏡",
+      "description": "在白花與水龍頭上方，兩張冷藍側臉隔著拱鏡相望。",
+      "position": [
+        -2.19,
+        2.59,
+        3.55
+      ],
+      "target": [
+        -0.04,
+        2.07,
+        0.02
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    },
+    {
+      "label": "妝台側切",
+      "description": "從妝台另一端看瓶罐、雙面拱框和鏡內退深的磁磚格。",
+      "position": [
+        -4.02,
+        2.74,
+        1.81
+      ],
+      "target": [
+        -0.16,
+        2.02,
+        0.04
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#1d343f",
+    "fog": {
+      "color": "#1d343f",
+      "near": 8,
+      "far": 25
+    },
+    "key": "#d8efff",
+    "fill": "#a6baff",
+    "ground": "#34485a",
+    "keyIntensity": 1.75,
+    "fillIntensity": 0.72,
+    "skyIntensity": 0.82
+  }
+}

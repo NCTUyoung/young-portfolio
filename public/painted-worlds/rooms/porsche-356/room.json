@@ -1,0 +1,63 @@
+{
+  "id": "porsche-356",
+  "year": 2026,
+  "workId": "digital-gallery/2026年電繪作品/7-編輯-2-1",
+  "title": "保時捷356",
+  "model": "./rooms/porsche-356/scene.glb",
+  "stills": [
+    "./rooms/porsche-356/view-0.webp",
+    "./rooms/porsche-356/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/porsche-356/view-0-mobile.webp",
+    "./rooms/porsche-356/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "沿海公路",
+      "description": "從左前方沿著墨線公路看過低車身，右側寬簷帽、手籃和坐姿衣褶落在同一幅海景。",
+      "position": [
+        -5.05,
+        2.25,
+        7.85
+      ],
+      "target": [
+        0.86,
+        0.94,
+        0.7
+      ],
+      "fov": 35,
+      "mobileFov": 68
+    },
+    {
+      "label": "掌影下停駐",
+      "description": "往車尾側換站，從打開的門看進座位與儀表，近處可看見寬簷帽、衣褶和手籃。",
+      "position": [
+        4.57,
+        3.24,
+        7.42
+      ],
+      "target": [
+        1.03,
+        0.77,
+        0.93
+      ],
+      "fov": 42,
+      "mobileFov": 65
+    }
+  ],
+  "look": {
+    "sky": "#dfded8",
+    "fog": {
+      "color": "#dfded8",
+      "near": 15,
+      "far": 45
+    },
+    "key": "#fffcf1",
+    "fill": "#dde5ed",
+    "ground": "#948c83",
+    "keyIntensity": 2.6,
+    "fillIntensity": 0.62,
+    "skyIntensity": 1.14
+  }
+}

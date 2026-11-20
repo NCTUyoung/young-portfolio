@@ -3,7 +3,19 @@
     "hall": "./media/hall.glb",
     "statue": "./media/statue.glb",
     "orchard": "./media/orchard.glb",
-    "stage": "./media/stage.glb"
+    "stage": "./media/stage.glb",
+    "2024-55": "./rooms/2024-55/scene.glb",
+    "2024-23": "./rooms/2024-23/scene.glb",
+    "2024-18-4": "./rooms/2024-18-4/scene.glb",
+    "2024-28": "./rooms/2024-28/scene.glb",
+    "2024-52": "./rooms/2024-52/scene.glb",
+    "solitude": "./rooms/solitude/scene.glb",
+    "2025-36": "./rooms/2025-36/scene.glb",
+    "mirror": "./rooms/mirror/scene.glb",
+    "diamond": "./rooms/diamond/scene.glb",
+    "cosplayer": "./rooms/cosplayer/scene.glb",
+    "porsche-356": "./rooms/porsche-356/scene.glb",
+    "raven": "./rooms/raven/scene.glb"
   },
   "portals": {
     "orchard": {
@@ -128,12 +140,12 @@
             -9.19
           ],
           "target": [
-            0.158,
+            0.195,
             1.23,
             -7.73
           ],
           "fov": 42,
-          "mobileFov": 46
+          "mobileFov": 56
         },
         {
           "label": "伸手採果",
@@ -200,8 +212,8 @@
             1.15,
             0.82
           ],
-          "fov": 41,
-          "mobileFov": 46
+          "fov": 45,
+          "mobileFov": 50
         },
         {
           "label": "持麥演唱",
@@ -232,8 +244,8 @@
             1.17,
             0.8
           ],
-          "fov": 43,
-          "mobileFov": 47
+          "fov": 46,
+          "mobileFov": 50
         }
       ],
       "stills": [
@@ -246,6 +258,774 @@
         "./media/stage-1-mobile.webp",
         "./media/stage-2-mobile.webp"
       ]
+    },
+    "2024-55": {
+      "title": "55",
+      "views": [
+        {
+          "label": "出紙口",
+          "description": "窗下左邊是酒紅文件夾，右邊是深藍影印機和機頂紙疊。",
+          "position": [
+            1.72,
+            2.39,
+            4.86
+          ],
+          "target": [
+            -0.25,
+            1.69,
+            -0.51
+          ],
+          "fov": 40,
+          "mobileFov": 54
+        },
+        {
+          "label": "窗邊側面",
+          "description": "沿通風格柵側板看前景紙、文件夾與機頂紙疊的前後距離。",
+          "position": [
+            -3.92,
+            2.91,
+            2.88
+          ],
+          "target": [
+            -0.11,
+            1.74,
+            -0.64
+          ],
+          "fov": 43,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/2024-55/view-0.webp",
+        "./rooms/2024-55/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2024-55/view-0-mobile.webp",
+        "./rooms/2024-55/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#acbfbd",
+        "fog": {
+          "color": "#acbfbd",
+          "near": 9,
+          "far": 25
+        },
+        "key": "#f8f4e9",
+        "fill": "#dce9f4",
+        "ground": "#9caaa9",
+        "keyIntensity": 2.3,
+        "fillIntensity": 0.95,
+        "skyIntensity": 1.18
+      },
+      "art": {
+        "title": "55",
+        "date": "2024.04.27",
+        "src": "../images/_thumbs/1600w/gallery/2024年電繪作品/55.webp"
+      }
+    },
+    "2024-23": {
+      "title": "23",
+      "views": [
+        {
+          "label": "斜望燈巷",
+          "description": "左上圓燈與弧棚、右側車窗沿窄月台向後收束。",
+          "position": [
+            0.36,
+            1.69,
+            3.05
+          ],
+          "target": [
+            -0.12,
+            1.73,
+            -2.08
+          ],
+          "fov": 48,
+          "mobileFov": 51
+        },
+        {
+          "label": "石衣背側",
+          "description": "從石塑背後回望，車側、石塑和吊燈之間可讀出通道寬度。",
+          "position": [
+            1.53,
+            1.92,
+            -4.85
+          ],
+          "target": [
+            -0.48,
+            1.56,
+            -0.44
+          ],
+          "fov": 51,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/2024-23/view-0.webp",
+        "./rooms/2024-23/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2024-23/view-0-mobile.webp",
+        "./rooms/2024-23/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#343f46",
+        "fog": {
+          "color": "#343f46",
+          "near": 7,
+          "far": 21
+        },
+        "key": "#f2d1a0",
+        "fill": "#a6bfcb",
+        "ground": "#676b70",
+        "keyIntensity": 1.85,
+        "fillIntensity": 0.9,
+        "skyIntensity": 1.26
+      },
+      "art": {
+        "title": "23",
+        "date": "2024.06.18",
+        "src": "../images/_thumbs/1600w/gallery/2024年電繪作品/23.webp"
+      }
+    },
+    "2024-18-4": {
+      "title": "18-4",
+      "views": [
+        {
+          "label": "花台前緣",
+          "description": "從玫瑰和白花冠掃過交叉白手套，落在右邊的桃青晶泡。",
+          "position": [
+            0,
+            2.67,
+            6.46
+          ],
+          "target": [
+            -0.03,
+            2.2,
+            -1.1
+          ],
+          "fov": 40,
+          "mobileFov": 54
+        },
+        {
+          "label": "晶泡與光盤側面",
+          "description": "從側翼分辨前層晶泡、花與手套、後層放射光盤的實體距離。",
+          "position": [
+            4.86,
+            3.15,
+            3.19
+          ],
+          "target": [
+            0.06,
+            2.1,
+            -1.29
+          ],
+          "fov": 46,
+          "mobileFov": 58
+        }
+      ],
+      "stills": [
+        "./rooms/2024-18-4/view-0.webp",
+        "./rooms/2024-18-4/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2024-18-4/view-0-mobile.webp",
+        "./rooms/2024-18-4/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#c6aebc",
+        "fog": {
+          "color": "#c6aebc",
+          "near": 9,
+          "far": 25
+        },
+        "key": "#fff1e2",
+        "fill": "#c3eef4",
+        "ground": "#c1adb5",
+        "keyIntensity": 1.99,
+        "fillIntensity": 0.82,
+        "skyIntensity": 1.17
+      },
+      "art": {
+        "title": "18-4",
+        "date": "2024.07.19",
+        "src": "../images/_thumbs/1600w/gallery/2024年電繪作品/18-4.webp"
+      }
+    },
+    "2024-28": {
+      "title": "28-編輯-2",
+      "views": [
+        {
+          "label": "紅藍主軸",
+          "description": "由紅藍柱基的彩色反照，沿中央暖光望進後方通道。",
+          "position": [
+            0.02,
+            1.64,
+            6.6
+          ],
+          "target": [
+            0.02,
+            2.78,
+            -0.93
+          ],
+          "fov": 52,
+          "mobileFov": 61
+        },
+        {
+          "label": "藍柱後仰望",
+          "description": "從柱後斜仰看藍柱的弧面、錯位紅柱和跨過兩柱的拱形格棚。",
+          "position": [
+            -2.01,
+            1.59,
+            -6.66
+          ],
+          "target": [
+            0.01,
+            2.99,
+            -1.1
+          ],
+          "fov": 58,
+          "mobileFov": 67
+        }
+      ],
+      "stills": [
+        "./rooms/2024-28/view-0.webp",
+        "./rooms/2024-28/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2024-28/view-0-mobile.webp",
+        "./rooms/2024-28/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#222439",
+        "fog": {
+          "color": "#222439",
+          "near": 10,
+          "far": 30
+        },
+        "key": "#ffe5cf",
+        "fill": "#b7d8ff",
+        "ground": "#636674",
+        "keyIntensity": 1.8,
+        "fillIntensity": 0.84,
+        "skyIntensity": 1.06
+      },
+      "art": {
+        "title": "28-編輯-2",
+        "date": "2024.10.09",
+        "src": "../images/_thumbs/1600w/gallery/2024年電繪作品/28-編輯-2.webp"
+      }
+    },
+    "2024-52": {
+      "title": "52-1",
+      "views": [
+        {
+          "label": "玫紅與湖青",
+          "description": "沿粉／青對角看兩枚晶心，左側浮著一顆牽繩的粉色心形氣球。",
+          "position": [
+            0.42,
+            2.6,
+            6.06
+          ],
+          "target": [
+            -0.11,
+            1.99,
+            -0.44
+          ],
+          "fov": 40,
+          "mobileFov": 54
+        },
+        {
+          "label": "晶心與氣球厚度",
+          "description": "繞到斜側，比對玻璃晶心的切面、氣球的圓薄側影和後方繫繩。",
+          "position": [
+            4.21,
+            3.06,
+            3.86
+          ],
+          "target": [
+            -0.02,
+            2,
+            -0.58
+          ],
+          "fov": 46,
+          "mobileFov": 57
+        }
+      ],
+      "stills": [
+        "./rooms/2024-52/view-0.webp",
+        "./rooms/2024-52/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2024-52/view-0-mobile.webp",
+        "./rooms/2024-52/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#15233b",
+        "fog": {
+          "color": "#15233b",
+          "near": 8,
+          "far": 24
+        },
+        "key": "#fff1df",
+        "fill": "#beefff",
+        "ground": "#394b61",
+        "keyIntensity": 1.5,
+        "fillIntensity": 0.8,
+        "skyIntensity": 0.98
+      },
+      "art": {
+        "title": "52-1",
+        "date": "2024.11.14",
+        "src": "../images/_thumbs/1600w/gallery/2024年電繪作品/52-1.webp"
+      }
+    },
+    "solitude": {
+      "title": "孤独が描く美学",
+      "views": [
+        {
+          "label": "窗前等雨",
+          "description": "隔著斜落的小雨和玻璃水珠，看候車長椅、坐姿人物與濕街盡頭的銀光。",
+          "position": [
+            1.8,
+            1.76,
+            3.83
+          ],
+          "target": [
+            0.1,
+            1.36,
+            -0.1
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        },
+        {
+          "label": "沿雨棚看街",
+          "description": "沿長椅斜看街角，提袋、玻璃框、路面積水和電線分布在不同深度。",
+          "position": [
+            -3.24,
+            1.96,
+            1.36
+          ],
+          "target": [
+            0.01,
+            1.27,
+            -0.14
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/solitude/view-0.webp",
+        "./rooms/solitude/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/solitude/view-0-mobile.webp",
+        "./rooms/solitude/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#8d999d",
+        "fog": {
+          "color": "#8d999d",
+          "near": 5,
+          "far": 24
+        },
+        "key": "#e1ebef",
+        "fill": "#b9c9da",
+        "ground": "#646e70",
+        "keyIntensity": 1.7,
+        "fillIntensity": 0.62,
+        "skyIntensity": 0.85
+      },
+      "art": {
+        "title": "孤独が描く美学",
+        "date": "2025.01.24",
+        "src": "../images/_thumbs/1600w/gallery/2025年電繪作品/17.webp"
+      }
+    },
+    "2025-36": {
+      "title": "36-編輯-1",
+      "views": [
+        {
+          "label": "紅黑雙環",
+          "description": "漆紅黑格前，兩頂冷藍帽與手銬構成交錯的雙人輪廓。",
+          "position": [
+            0.59,
+            2.47,
+            4.31
+          ],
+          "target": [
+            0,
+            2.13,
+            -0.11
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        },
+        {
+          "label": "藍側鏈列",
+          "description": "從藍光側移讀出兩人的肩臂、扣環與後方懸吊紅環的距離。",
+          "position": [
+            -4.02,
+            2.67,
+            2.68
+          ],
+          "target": [
+            -0.08,
+            1.93,
+            -0.16
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/2025-36/view-0.webp",
+        "./rooms/2025-36/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/2025-36/view-0-mobile.webp",
+        "./rooms/2025-36/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#160711",
+        "fog": {
+          "color": "#160711",
+          "near": 8,
+          "far": 24
+        },
+        "key": "#ffd3ab",
+        "fill": "#769eff",
+        "ground": "#331019",
+        "keyIntensity": 1.9,
+        "fillIntensity": 0.81,
+        "skyIntensity": 0.56
+      },
+      "art": {
+        "title": "36-編輯-1",
+        "date": "2025.05.29",
+        "src": "../images/_thumbs/1600w/gallery/2025年電繪作品/36-編輯-1.webp"
+      }
+    },
+    "mirror": {
+      "title": "鏡",
+      "views": [
+        {
+          "label": "靠近拱鏡",
+          "description": "在白花與水龍頭上方，兩張冷藍側臉隔著拱鏡相望。",
+          "position": [
+            -2.19,
+            2.59,
+            3.55
+          ],
+          "target": [
+            -0.04,
+            2.07,
+            0.02
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        },
+        {
+          "label": "妝台側切",
+          "description": "從妝台另一端看瓶罐、雙面拱框和鏡內退深的磁磚格。",
+          "position": [
+            -4.02,
+            2.74,
+            1.81
+          ],
+          "target": [
+            -0.16,
+            2.02,
+            0.04
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/mirror/view-0.webp",
+        "./rooms/mirror/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/mirror/view-0-mobile.webp",
+        "./rooms/mirror/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#1d343f",
+        "fog": {
+          "color": "#1d343f",
+          "near": 8,
+          "far": 25
+        },
+        "key": "#d8efff",
+        "fill": "#a6baff",
+        "ground": "#34485a",
+        "keyIntensity": 1.75,
+        "fillIntensity": 0.72,
+        "skyIntensity": 0.82
+      },
+      "art": {
+        "title": "鏡",
+        "date": "2025.07.20",
+        "src": "../images/_thumbs/1600w/gallery/2025年電繪作品/21-編輯.webp"
+      }
+    },
+    "diamond": {
+      "title": "鑽石",
+      "views": [
+        {
+          "label": "星芒與晶冠",
+          "description": "冷白結冠、細劍和月盤在近黑裡疊出主角，紫尖光落於劍身。",
+          "position": [
+            1.5,
+            2.3,
+            4.41
+          ],
+          "target": [
+            0.02,
+            1.96,
+            -0.1
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        },
+        {
+          "label": "晶瓣側面",
+          "description": "繞向另一側可讀出晶瓣的厚度、劍尖落點與月盤之間的空間。",
+          "position": [
+            -4.05,
+            2.67,
+            3.65
+          ],
+          "target": [
+            -0.05,
+            1.99,
+            -0.12
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/diamond/view-0.webp",
+        "./rooms/diamond/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/diamond/view-0-mobile.webp",
+        "./rooms/diamond/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#090817",
+        "fog": {
+          "color": "#090817",
+          "near": 9,
+          "far": 26
+        },
+        "key": "#edf5ff",
+        "fill": "#a191ff",
+        "ground": "#231a43",
+        "keyIntensity": 2.1,
+        "fillIntensity": 0.96,
+        "skyIntensity": 0.57
+      },
+      "art": {
+        "title": "鑽石",
+        "date": "2025.09.08",
+        "src": "../images/_thumbs/1600w/gallery/2025年電繪作品/17-編輯.webp"
+      }
+    },
+    "cosplayer": {
+      "title": "Cosplayer",
+      "views": [
+        {
+          "label": "穿過取景人群",
+          "description": "從手機與攝影者之間看紙白舞台上的斜展長耳與圓框眼鏡。",
+          "position": [
+            0.38,
+            2.46,
+            5.42
+          ],
+          "target": [
+            0,
+            1.77,
+            -0.01
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        },
+        {
+          "label": "棚燈一側",
+          "description": "從側面看人物、地上石墨線、相機和後排攝影者拉開的深度。",
+          "position": [
+            4.08,
+            2.72,
+            3.78
+          ],
+          "target": [
+            0.05,
+            1.73,
+            -0.08
+          ],
+          "fov": 50,
+          "mobileFov": 55
+        }
+      ],
+      "stills": [
+        "./rooms/cosplayer/view-0.webp",
+        "./rooms/cosplayer/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/cosplayer/view-0-mobile.webp",
+        "./rooms/cosplayer/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#e9bbb8",
+        "fog": {
+          "color": "#e9bbb8",
+          "near": 8,
+          "far": 27
+        },
+        "key": "#fff3e2",
+        "fill": "#e1c6e8",
+        "ground": "#b79196",
+        "keyIntensity": 1.65,
+        "fillIntensity": 0.68,
+        "skyIntensity": 0.95
+      },
+      "art": {
+        "title": "Cosplayer",
+        "date": "2025.11.30",
+        "src": "../images/_thumbs/1600w/gallery/2025年電繪作品/test3-1.webp"
+      }
+    },
+    "porsche-356": {
+      "title": "保時捷356",
+      "views": [
+        {
+          "label": "沿海公路",
+          "description": "從左前方沿著墨線公路看過低車身，右側寬簷帽、手籃和坐姿衣褶落在同一幅海景。",
+          "position": [
+            -5.05,
+            2.25,
+            7.85
+          ],
+          "target": [
+            0.86,
+            0.94,
+            0.7
+          ],
+          "fov": 35,
+          "mobileFov": 68
+        },
+        {
+          "label": "掌影下停駐",
+          "description": "往車尾側換站，從打開的門看進座位與儀表，近處可看見寬簷帽、衣褶和手籃。",
+          "position": [
+            4.57,
+            3.24,
+            7.42
+          ],
+          "target": [
+            1.03,
+            0.77,
+            0.93
+          ],
+          "fov": 42,
+          "mobileFov": 65
+        }
+      ],
+      "stills": [
+        "./rooms/porsche-356/view-0.webp",
+        "./rooms/porsche-356/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/porsche-356/view-0-mobile.webp",
+        "./rooms/porsche-356/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#dfded8",
+        "fog": {
+          "color": "#dfded8",
+          "near": 15,
+          "far": 45
+        },
+        "key": "#fffcf1",
+        "fill": "#dde5ed",
+        "ground": "#948c83",
+        "keyIntensity": 2.6,
+        "fillIntensity": 0.62,
+        "skyIntensity": 1.14
+      },
+      "art": {
+        "title": "保時捷356",
+        "date": "2026.01.04",
+        "src": "../images/_thumbs/1600w/gallery/2026年電繪作品/7-編輯-2-1.webp"
+      }
+    },
+    "raven": {
+      "title": "蕾雯 Raven",
+      "views": [
+        {
+          "label": "電青斜刃",
+          "description": "從正面看低處刃尖斜接右上護環，深藍髮束沿雕像兩側翻起，方形光點落在暗處。",
+          "position": [
+            2.35,
+            2.82,
+            8.65
+          ],
+          "target": [
+            0.04,
+            1.98,
+            0.01
+          ],
+          "fov": 33,
+          "mobileFov": 47
+        },
+        {
+          "label": "從光刃側看",
+          "description": "橫移看刃的厚度、近側圓形機件，以及髮束與後方暗艙之間的距離。",
+          "position": [
+            -5.65,
+            3.15,
+            6.23
+          ],
+          "target": [
+            0.02,
+            1.95,
+            -0.02
+          ],
+          "fov": 35,
+          "mobileFov": 49
+        }
+      ],
+      "stills": [
+        "./rooms/raven/view-0.webp",
+        "./rooms/raven/view-1.webp"
+      ],
+      "mobileStills": [
+        "./rooms/raven/view-0-mobile.webp",
+        "./rooms/raven/view-1-mobile.webp"
+      ],
+      "look": {
+        "sky": "#05080e",
+        "fog": {
+          "color": "#05080e",
+          "near": 10,
+          "far": 17
+        },
+        "key": "#badceb",
+        "fill": "#85c0e5",
+        "ground": "#1c3049",
+        "keyIntensity": 1.5,
+        "fillIntensity": 1.7,
+        "skyIntensity": 1.1
+      },
+      "art": {
+        "title": "蕾雯 Raven",
+        "date": "2026.03.22",
+        "src": "../images/_thumbs/1600w/gallery/2026年電繪作品/21-編輯-編輯-編輯-1.webp"
+      }
     }
   },
   "canopyLight": "./media/canopy-sunflecks.webp"

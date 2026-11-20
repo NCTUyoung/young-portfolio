@@ -6,6 +6,37 @@ const palettes = {
   stage: { sky: 0x2a0714, hemisphere: .52, ground: 0x79354a, key: 0xffddd1, power: 1.15, fill: 0xbacbde, bounce: .56, sun: [-3, 6, 3] }
 }
 const sculptureLighting = { hemisphere: 1.12, ground: 0xa59a89, power: 2.15, bounce: .40, sun: [-4.5, 7, 3], shadow: .77 }
+const roomDefaults = { sky: 0xd9d5c9, ground: 0xa59a89, key: 0xffeed6, fill: 0xdce6ef, keyIntensity: 2.15, fillIntensity: .55, skyIntensity: 1.05 }
+
+function omitOpaqueShadowMaps(_renderer, _object, _camera, _shadowCamera, _geometry, depthMaterial) {
+  // The shared depth material can otherwise retain a disposed room's color map in its uniforms.
+  if (depthMaterial.alphaTest > 0) return
+  depthMaterial.map = null
+  depthMaterial.alphaMap = null
+}
+
+function disposeAssets(objects, extraTextures = []) {
+  const geometry = new Set()
+  const materials = new Set()
+  const skeletons = new Set()
+  for (const object of objects) object?.traverse(node => {
+    if (node.geometry) geometry.add(node.geometry)
+    if (node.material) for (const material of [node.material].flat()) materials.add(material)
+    if (node.skeleton) skeletons.add(node.skeleton)
+  })
+  const textures = new Set(extraTextures.filter(Boolean))
+  for (const material of materials) {
+    for (const value of Object.values(material)) if (value?.isTexture) textures.add(value)
+    material.dispose()
+  }
+  for (const object of [...geometry, ...skeletons]) object.dispose()
+  const bitmaps = new Set()
+  for (const texture of textures) {
+    if (texture.image?.close) bitmaps.add(texture.image)
+    texture.dispose()
+  }
+  for (const bitmap of bitmaps) bitmap.close()
+}
 
 export function createExhibition(canvas, data, enterPainting) {
   const renderer = new T.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
@@ -16,7 +47,6 @@ export function createExhibition(canvas, data, enterPainting) {
   renderer.shadowMap.autoUpdate = false
   renderer.shadowMap.type = T.PCFSoftShadowMap
   const scene = new T.Scene()
-  const orchardHaze = new T.Fog(0xffeac2, 9.2, 36)
   const camera = new T.PerspectiveCamera(52, 1, .035, 140)
   // Keep orbit input at its requested radius while the displayed lens clears scenery.
   const displayCamera = camera.clone()
@@ -61,7 +91,6 @@ export function createExhibition(canvas, data, enterPainting) {
   canopySun.position.set(.56, 2.36, -10.63)
   canopySun.target.position.set(-.07, 1.483, -7.881)
   // A fixed light projection follows the folds and hand throughout the orbit.
-  let canopyProjection
   scene.add(canopySun, canopySun.target)
   const roseKey = new T.SpotLight(0xffadad, 13, 7, .32, .84)
   roseKey.position.set(-.33, 2.7, 3.35)
@@ -73,24 +102,22 @@ export function createExhibition(canvas, data, enterPainting) {
   hairLight.position.set(1.64, 3.12, -.73)
   scene.add(hemi, key, key.target, fill, exhibitLight, stageLight, stageLight.target, curtainLight, skirtFill, portraitFill, hairLight)
   const loader = new T.GLTFLoader().setMeshoptDecoder(T.MeshoptDecoder)
-  const cache = new Map()
-  const reflections = new Map()
   const ray = new T.Raycaster()
   const pointer = new T.Vector2()
   const reduced = matchMedia('(prefers-reduced-motion: reduce)')
-  let request = 0
+  let pending = null
   let frame = 0
   let room = null
   let world = ''
   let closeupLighting = false
   let travel = null
-  let sky = null
   let start = null
   let lost = false
+  let disposed = false
   const contacts = new Set()
 
   function draw() {
-    if (!frame && !lost && !document.hidden) frame = requestAnimationFrame(render)
+    if (room && !frame && !lost && !document.hidden) frame = requestAnimationFrame(render)
   }
   function render(time) {
     frame = 0
@@ -143,19 +170,21 @@ export function createExhibition(canvas, data, enterPainting) {
     camera.updateProjectionMatrix()
     draw()
   }
-  new ResizeObserver(resize).observe(canvas)
+  const observer = new ResizeObserver(resize)
+  observer.observe(canvas)
   orbit.addEventListener('change', () => {
-    if (world && camera.position.y < .32) {
+    if (Object.hasOwn(palettes, world) && camera.position.y < .32) {
       camera.position.y = .32
       camera.lookAt(orbit.target)
     }
     draw()
   })
   orbit.addEventListener('start', () => { travel = null })
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) draw() })
+  document.addEventListener('visibilitychange', draw)
   canvas.addEventListener('webglcontextlost', event => {
     event.preventDefault()
     lost = true
+    clear()
     canvas.dispatchEvent(new Event('exhibit-lost'))
   })
   canvas.addEventListener('webglcontextrestored', () => {
@@ -163,67 +192,97 @@ export function createExhibition(canvas, data, enterPainting) {
     canvas.dispatchEvent(new Event('exhibit-restored'))
   })
 
-  function model(id) {
-    if (!cache.has(id)) {
-      const pending = loader.loadAsync(data.models[id]).then(({ scene: group }) => {
-        group.traverse(node => {
-          if (!node.isMesh) return
-          const materials = Array.isArray(node.material) ? node.material : [node.material]
-          const soft = materials.some(material => material.transparent)
-          node.castShadow = !soft && (id === 'hall' ? /beam|rafter|bench|lintel/i.test(node.name) : !/floor|terrain|road|dais|platform|ground/i.test(node.name))
-          node.receiveShadow = !soft && id !== 'statue'
-          if (id === 'stage') for (const material of materials) {
-            if (!material.transparent) continue
-            material.depthWrite = false
-            if (/tapered followspot|light pool/i.test(material.name)) {
-              material.blending = T.AdditiveBlending
-              material.opacity = /followspot/i.test(material.name) ? 2.8 : 1.15
-              material.emissiveIntensity = 1.7
-              material.toneMapped = false
-            }
-          }
-        })
-        if (id === 'statue') {
-          group.position.fromArray(data.sculpture.foot)
-          group.rotation.y = data.sculpture.yaw * Math.PI / 180
-          group.scale.setScalar(data.sculpture.scale)
+  async function model(id, signal) {
+    const url = new URL(data.models[id], location.href)
+    const response = await fetch(url, { signal })
+    if (!response.ok) throw new Error(`Unable to load room ${id}: ${response.status}`)
+    const bytes = await response.arrayBuffer()
+    signal.throwIfAborted()
+    const { scene: group } = await loader.parseAsync(bytes, new URL('.', url).href)
+    group.traverse(node => {
+      if (!node.isMesh) return
+      const materials = [node.material].flat()
+      const soft = materials.some(material => material.transparent)
+      node.castShadow = !soft && (id === 'hall' ? /beam|rafter|bench|lintel/i.test(node.name) : !/floor|terrain|road|dais|platform|ground/i.test(node.name))
+      node.receiveShadow = !soft && id !== 'statue'
+      if (node.castShadow) node.onBeforeShadow = omitOpaqueShadowMaps
+      if (id === 'stage') for (const material of materials) {
+        if (!material.transparent) continue
+        material.depthWrite = false
+        if (/tapered followspot|light pool/i.test(material.name)) {
+          material.blending = T.AdditiveBlending
+          material.opacity = /followspot/i.test(material.name) ? 2.8 : 1.15
+          material.emissiveIntensity = 1.7
+          material.toneMapped = false
         }
-        return group
-      }).catch(error => { cache.delete(id); throw error })
-      cache.set(id, pending)
-    }
-    return cache.get(id)
-  }
-  function skyDome(environment) {
-    if (!sky && data.sky) {
-      const texture = environment ?? new T.TextureLoader().load(data.sky, draw)
-      texture.colorSpace = T.SRGBColorSpace
-      const dome = new T.SphereGeometry(84, 48, 32)
-      // The painted skyline sits three quarters of the way down the panorama.
-      const uv = dome.attributes.uv
-      for (let i = 0; i < uv.count; i++) {
-        const v = uv.getY(i)
-        uv.setY(i, v < .5 ? .5 * v : .25 + 1.5 * (v - .5))
       }
-      sky = new T.Mesh(dome, new T.MeshBasicMaterial({
-        map: texture, side: T.BackSide, depthWrite: false, toneMapped: false, fog: false
-      }))
-      sky.renderOrder = -2
+    })
+    if (id === 'statue') {
+      group.position.fromArray(data.sculpture.foot)
+      group.rotation.y = data.sculpture.yaw * Math.PI / 180
+      group.scale.setScalar(data.sculpture.scale)
     }
+    return group
+  }
+  function skyDome(texture) {
+    const dome = new T.SphereGeometry(84, 48, 32)
+    // The painted skyline sits three quarters of the way down the panorama.
+    const uv = dome.attributes.uv
+    for (let i = 0; i < uv.count; i++) {
+      const v = uv.getY(i)
+      uv.setY(i, v < .5 ? .5 * v : .25 + 1.5 * (v - .5))
+    }
+    const sky = new T.Mesh(dome, new T.MeshBasicMaterial({
+      map: texture, side: T.BackSide, depthWrite: false, toneMapped: false, fog: false
+    }))
+    sky.renderOrder = -2
     return sky
   }
-  function reflection(id) {
-    const url = data.reflections?.[id]
+  async function loadTexture(url, signal, reflection = false) {
     if (!url) return null
-    if (!reflections.has(id)) {
-      const pending = new T.TextureLoader().loadAsync(url).then(texture => {
-        texture.colorSpace = T.SRGBColorSpace
-        texture.mapping = T.EquirectangularReflectionMapping
+    try {
+      const response = await fetch(url, { signal })
+      if (!response.ok) return null
+      const blob = await response.blob()
+      signal.throwIfAborted()
+      const objectURL = URL.createObjectURL(blob)
+      try {
+        const texture = await new T.TextureLoader().loadAsync(objectURL)
+        if (signal.aborted) {
+          texture.dispose()
+          return null
+        }
+        if (reflection || url === data.sky) texture.colorSpace = T.SRGBColorSpace
+        if (reflection) texture.mapping = T.EquirectangularReflectionMapping
         return texture
-      }).catch(() => { reflections.delete(id); return null })
-      reflections.set(id, pending)
+      } finally {
+        URL.revokeObjectURL(objectURL)
+      }
+    } catch {
+      return null
     }
-    return reflections.get(id)
+  }
+  function clear() {
+    pending?.abort()
+    pending = null
+    travel = null
+    cancelAnimationFrame(frame)
+    frame = 0
+    contacts.clear()
+    start = null
+    if (!room) return
+    scene.remove(room)
+    disposeAssets([room], [scene.environment, canopySun.map])
+    room = null
+    world = ''
+    scene.environment = null
+    canopySun.map = null
+    blockers.length = 0
+    foliage.length = 0
+    // Release the render list references and the stage-only shadow target.
+    renderer.renderLists.dispose()
+    stageLight.shadow.dispose()
+    stageLight.shadow.map = null
   }
   function aimLights(rig) {
     hemi.intensity = rig.hemisphere
@@ -243,7 +302,12 @@ export function createExhibition(canvas, data, enterPainting) {
     }
     const to = new T.Vector3(...view.position)
     const target = new T.Vector3(...view.target)
-    const limit = Math.min(18, to.distanceTo(target) * 1.4)
+    const distance = to.distanceTo(target)
+    const legacy = Object.hasOwn(palettes, world)
+    const limit = legacy ? Math.min(18, distance * 1.4) : distance * 1.65
+    orbit.minDistance = legacy ? .45 : Math.min(.45, distance * .45)
+    camera.near = Math.min(.035, distance / 10)
+    camera.far = Math.max(140, distance * 8, scene.fog?.far ?? 0)
     const fov = view.fov ?? view.fovDegrees ?? 52
     if (animated && !reduced.matches) {
       orbit.maxDistance = Math.max(limit, camera.position.distanceTo(orbit.target))
@@ -261,67 +325,101 @@ export function createExhibition(canvas, data, enterPainting) {
     draw()
   }
   async function show(id, view) {
-    const revision = ++request
-    if (id === 'orchard' && data.canopyLight && !canopyProjection) {
-      canopyProjection = new T.TextureLoader().loadAsync(data.canopyLight).catch(() => {
-        canopyProjection = null
-        return null
-      })
-    }
-    const [models, environment, sunflecks] = await Promise.all([
-      Promise.all((id === 'hall' ? ['hall', 'statue'] : [id]).map(model)),
-      reflection(id),
-      id === 'orchard' ? canopyProjection : null
+    clear()
+    if (lost || disposed) return false
+    const task = new AbortController()
+    pending = task
+    const { signal } = task
+    const hall = id === 'hall'
+    const orchard = id === 'orchard'
+    const stage = id === 'stage'
+    const reflection = data.reflections?.[id]
+    const loaded = await Promise.allSettled([
+      model(id, signal), hall ? model('statue', signal) : null,
+      loadTexture(reflection, signal, true), orchard ? loadTexture(data.canopyLight, signal) : null,
+      orchard && data.sky !== reflection ? loadTexture(data.sky, signal) : null
     ])
-    if (revision !== request || lost) return false
-    if (room) scene.remove(room)
+    const [primary, statue, environment, sunflecks, sky] = loaded.map(result => result.value)
+    if (signal.aborted || !primary || (hall && !statue)) {
+      disposeAssets([primary, statue], [environment, sunflecks, sky])
+      if (signal.aborted) return false
+      pending = null
+      throw loaded.find(result => result.status === 'rejected').reason
+    }
+    pending = null
     room = new T.Group()
-    room.add(...models)
-    if (id === 'orchard' && skyDome(environment)) room.add(sky)
+    room.add(primary)
+    if (statue) room.add(statue)
+    const panorama = sky ?? environment
+    if (orchard && panorama) room.add(skyDome(panorama))
     scene.add(room)
     room.updateMatrixWorld(true)
-    blockers.length = 0
-    foliage.length = 0
-    models[0].traverse(node => {
+    const legacy = Object.hasOwn(palettes, id)
+    if (legacy) primary.traverse(node => {
       if (!node.isMesh) return
-      const materials = Array.isArray(node.material) ? node.material : [node.material]
-      const surface = materials.map(material => material.name).join(' ')
-      const solid = id === 'hall' ? /limewash|sawn oak|honed fossil limestone/i.test(surface)
-        : id === 'orchard' ? /bark|trunk/i.test(surface)
+      const surface = [node.material].flat().map(material => material.name).join(' ')
+      const solid = hall ? /limewash|sawn oak|honed fossil limestone/i.test(surface)
+        : orchard ? /bark|trunk/i.test(surface)
         : /garnet inks|wine ink|dyed reverse|carbon at overlaps|carmine glaze/i.test(surface)
       if (solid) blockers.push(node)
-      if (id === 'orchard' && /citron green|leaf blades|waxy citrus lamina/i.test(surface)) foliage.push(node)
+      if (orchard && /citron green|leaf blades|waxy citrus lamina/i.test(surface)) foliage.push(node)
     })
     world = id
     closeupLighting = false
-    const p = palettes[id]
     scene.environment = environment
-    scene.environmentIntensity = id === 'stage' ? 1.04 : id === 'orchard' ? .61 : .35
-    scene.background = new T.Color(p.sky)
-    scene.fog = id === 'orchard' ? orchardHaze : null
-    key.target.position.set(0, 0, id === 'orchard' ? -7.7 : 0)
-    aimLights(p)
-    hemi.groundColor.setHex(p.ground)
-    key.color.setHex(p.key)
-    key.shadow.intensity = id === 'hall' ? p.shadow : 1
-    const radius = id === 'orchard' ? 11 : 6
-    Object.assign(key.shadow.camera, { left: -radius, right: radius, top: radius, bottom: -radius })
+    scene.environmentIntensity = stage ? 1.04 : orchard ? .61 : .35
+    hemi.color.setHex(0xffffff)
+    let radius
+    let shadowFar
+    if (legacy) {
+      const p = palettes[id]
+      scene.background = new T.Color(p.sky)
+      scene.fog = orchard ? new T.Fog(0xffeac2, 9.2, 36) : null
+      key.target.position.set(0, 0, orchard ? -7.7 : 0)
+      aimLights(p)
+      hemi.groundColor.setHex(p.ground)
+      key.color.setHex(p.key)
+      fill.color.setHex(p.fill)
+      fill.position.set(2.5, 3, 4)
+      key.shadow.intensity = hall ? p.shadow : 1
+      radius = orchard ? 11 : 6
+      shadowFar = 32
+    } else {
+      const look = { ...roomDefaults, ...data.rooms[id].look }
+      const { fog } = look
+      scene.background = new T.Color(look.sky)
+      scene.fog = fog ? new T.Fog(fog.color, fog.near, fog.far) : null
+      hemi.intensity = look.skyIntensity
+      hemi.groundColor.set(look.ground)
+      key.color.set(look.key)
+      key.intensity = look.keyIntensity
+      fill.color.set(look.fill)
+      fill.intensity = look.fillIntensity
+      // Keep the rig centered on the authored view even in off-origin rooms.
+      const firstView = data.rooms[id].views[0]
+      key.target.position.fromArray(firstView.target)
+      const distance = new T.Vector3(...firstView.position).distanceTo(key.target.position)
+      radius = Math.max(2, distance * 1.6)
+      shadowFar = radius * 5
+      key.position.set(-.65, 1.25, .72).multiplyScalar(radius).add(key.target.position)
+      fill.position.set(.5, .65, .8).multiplyScalar(radius).add(key.target.position)
+      key.shadow.intensity = 1
+      renderer.shadowMap.needsUpdate = true
+    }
+    Object.assign(key.shadow.camera, { left: -radius, right: radius, top: radius, bottom: -radius, far: shadowFar })
     key.shadow.camera.updateProjectionMatrix()
-    fill.color.setHex(p.fill)
     canopySun.map = sunflecks
     canopySun.visible = !!sunflecks
-    exhibitLight.visible = id === 'hall'
-    roseKey.visible = denimBounce.visible = stageLight.visible = id === 'stage'
-    curtainLight.visible = id === 'stage'
-    skirtFill.visible = id === 'stage'
-    portraitFill.visible = id !== 'hall'
-    hairLight.visible = id === 'stage'
-    if (id === 'stage') {
+    exhibitLight.visible = hall
+    roseKey.visible = denimBounce.visible = stageLight.visible = stage
+    curtainLight.visible = skirtFill.visible = hairLight.visible = stage
+    portraitFill.visible = orchard || stage
+    if (stage) {
       portraitFill.position.set(1.6, 3.2, 3.9)
       portraitFill.color.setHex(0xffc3ba)
       portraitFill.intensity = 12.5
       portraitFill.distance = 7
-    } else if (id === 'orchard') {
+    } else if (orchard) {
       portraitFill.position.set(.15, 2.75, -10)
       portraitFill.color.setHex(0xffefcb)
       portraitFill.intensity = 2.6
@@ -363,6 +461,16 @@ export function createExhibition(canvas, data, enterPainting) {
       }
     }
   })
+  window.addEventListener('pagehide', event => {
+    if (event.persisted) return
+    disposed = true
+    clear()
+    observer.disconnect()
+    orbit.dispose()
+    document.removeEventListener('visibilitychange', draw)
+    key.shadow.dispose()
+    renderer.dispose()
+  })
   resize()
-  return { show, setView, move }
+  return { show, setView, move, clear }
 }

@@ -1,0 +1,63 @@
+{
+  "id": "2024-28",
+  "year": 2024,
+  "workId": "digital-gallery/2024年電繪作品/28-編輯-2",
+  "title": "28-編輯-2",
+  "model": "./rooms/2024-28/scene.glb",
+  "stills": [
+    "./rooms/2024-28/view-0.webp",
+    "./rooms/2024-28/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2024-28/view-0-mobile.webp",
+    "./rooms/2024-28/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "紅藍主軸",
+      "description": "由紅藍柱基的彩色反照，沿中央暖光望進後方通道。",
+      "position": [
+        0.02,
+        1.64,
+        6.6
+      ],
+      "target": [
+        0.02,
+        2.78,
+        -0.93
+      ],
+      "fov": 52,
+      "mobileFov": 61
+    },
+    {
+      "label": "藍柱後仰望",
+      "description": "從柱後斜仰看藍柱的弧面、錯位紅柱和跨過兩柱的拱形格棚。",
+      "position": [
+        -2.01,
+        1.59,
+        -6.66
+      ],
+      "target": [
+        0.01,
+        2.99,
+        -1.1
+      ],
+      "fov": 58,
+      "mobileFov": 67
+    }
+  ],
+  "look": {
+    "sky": "#222439",
+    "fog": {
+      "color": "#222439",
+      "near": 10,
+      "far": 30
+    },
+    "key": "#ffe5cf",
+    "fill": "#b7d8ff",
+    "ground": "#636674",
+    "keyIntensity": 1.8,
+    "fillIntensity": 0.84,
+    "skyIntensity": 1.06
+  }
+}

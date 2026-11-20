@@ -105,6 +105,7 @@ test.describe('standalone fallback', () => {
     await page.getByRole('link', { name: '逛 3D 迴廊', exact: true }).click()
     await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
     await expect(page.getByRole('heading', { level: 1, name: '畫界迴廊', exact: true })).toBeVisible()
+    await expect(page.getByRole('img', { name: '畫界迴廊中央的《唯一真神》雕像' })).toBeVisible()
   })
 })
 

@@ -1,0 +1,63 @@
+{
+  "id": "cosplayer",
+  "year": 2025,
+  "workId": "digital-gallery/2025年電繪作品/test3-1",
+  "title": "Cosplayer",
+  "model": "./rooms/cosplayer/scene.glb",
+  "stills": [
+    "./rooms/cosplayer/view-0.webp",
+    "./rooms/cosplayer/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/cosplayer/view-0-mobile.webp",
+    "./rooms/cosplayer/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "穿過取景人群",
+      "description": "從手機與攝影者之間看紙白舞台上的斜展長耳與圓框眼鏡。",
+      "position": [
+        0.38,
+        2.46,
+        5.42
+      ],
+      "target": [
+        0.0,
+        1.77,
+        -0.01
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    },
+    {
+      "label": "棚燈一側",
+      "description": "從側面看人物、地上石墨線、相機和後排攝影者拉開的深度。",
+      "position": [
+        4.08,
+        2.72,
+        3.78
+      ],
+      "target": [
+        0.05,
+        1.73,
+        -0.08
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#e9bbb8",
+    "fog": {
+      "color": "#e9bbb8",
+      "near": 8,
+      "far": 27
+    },
+    "key": "#fff3e2",
+    "fill": "#e1c6e8",
+    "ground": "#b79196",
+    "keyIntensity": 1.65,
+    "fillIntensity": 0.68,
+    "skyIntensity": 0.95
+  }
+}

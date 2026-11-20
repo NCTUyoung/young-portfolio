@@ -1,0 +1,63 @@
+{
+  "id": "solitude",
+  "year": 2025,
+  "workId": "digital-gallery/2025年電繪作品/17",
+  "title": "孤独が描く美学",
+  "model": "./rooms/solitude/scene.glb",
+  "stills": [
+    "./rooms/solitude/view-0.webp",
+    "./rooms/solitude/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/solitude/view-0-mobile.webp",
+    "./rooms/solitude/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "窗前等雨",
+      "description": "隔著斜落的小雨和玻璃水珠，看候車長椅、坐姿人物與濕街盡頭的銀光。",
+      "position": [
+        1.8,
+        1.76,
+        3.83
+      ],
+      "target": [
+        0.1,
+        1.36,
+        -0.1
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    },
+    {
+      "label": "沿雨棚看街",
+      "description": "沿長椅斜看街角，提袋、玻璃框、路面積水和電線分布在不同深度。",
+      "position": [
+        -3.24,
+        1.96,
+        1.36
+      ],
+      "target": [
+        0.01,
+        1.27,
+        -0.14
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#8d999d",
+    "fog": {
+      "color": "#8d999d",
+      "near": 5,
+      "far": 24
+    },
+    "key": "#e1ebef",
+    "fill": "#b9c9da",
+    "ground": "#646e70",
+    "keyIntensity": 1.7,
+    "fillIntensity": 0.62,
+    "skyIntensity": 0.85
+  }
+}

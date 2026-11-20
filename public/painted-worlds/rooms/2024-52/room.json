@@ -1,0 +1,63 @@
+{
+  "id": "2024-52",
+  "year": 2024,
+  "workId": "digital-gallery/2024年電繪作品/52-1",
+  "title": "52-1",
+  "model": "./rooms/2024-52/scene.glb",
+  "stills": [
+    "./rooms/2024-52/view-0.webp",
+    "./rooms/2024-52/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2024-52/view-0-mobile.webp",
+    "./rooms/2024-52/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "玫紅與湖青",
+      "description": "沿粉／青對角看兩枚晶心，左側浮著一顆牽繩的粉色心形氣球。",
+      "position": [
+        0.42,
+        2.6,
+        6.06
+      ],
+      "target": [
+        -0.11,
+        1.99,
+        -0.44
+      ],
+      "fov": 40,
+      "mobileFov": 54
+    },
+    {
+      "label": "晶心與氣球厚度",
+      "description": "繞到斜側，比對玻璃晶心的切面、氣球的圓薄側影和後方繫繩。",
+      "position": [
+        4.21,
+        3.06,
+        3.86
+      ],
+      "target": [
+        -0.02,
+        2.0,
+        -0.58
+      ],
+      "fov": 46,
+      "mobileFov": 57
+    }
+  ],
+  "look": {
+    "sky": "#15233b",
+    "fog": {
+      "color": "#15233b",
+      "near": 8,
+      "far": 24
+    },
+    "key": "#fff1df",
+    "fill": "#beefff",
+    "ground": "#394b61",
+    "keyIntensity": 1.5,
+    "fillIntensity": 0.8,
+    "skyIntensity": 0.98
+  }
+}

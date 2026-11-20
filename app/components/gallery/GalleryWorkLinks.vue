@@ -1,8 +1,8 @@
 <template>
   <div v-if="paintedRoom" class="work-links">
     <PaintedWorldLink
-      :href="`${baseURL}painted-worlds/index.html?from=work#${paintedRoom.hash}`"
-      :data-painted-room="paintedRoom.hash"
+      :href="`${baseURL}painted-worlds/index.html?from=work#${paintedRoom.id}`"
+      :data-painted-room="paintedRoom.id"
       data-testid="gallery-work-painted-room"
       class="work-links__link"
     >
@@ -15,14 +15,9 @@
 <script lang="ts">
 import { computed } from 'vue'
 import PaintedWorldLink from '~/components/museum/PaintedWorldLink.vue'
+import registry from '../../../public/painted-worlds/work-registry.json'
 
-// IDs match the gallery source files and the original artwork in painted-worlds/exhibition.json.
-const orchardId = 'digital-gallery/2026年電繪作品/23-編輯-4-1'
-const stageId = 'digital-gallery/2026年電繪作品/16-編輯-1'
-const paintedRooms = new Map([
-  [orchardId, { hash: 'orchard', title: '柑橘樹下' }],
-  [stageId, { hash: 'stage', title: '紅色舞台' }]
-])
+const paintedRooms = new Map(registry.map(({ workId, id, title }) => [workId, { id, title }]))
 </script>
 
 <script setup lang="ts">

@@ -1,0 +1,63 @@
+{
+  "id": "diamond",
+  "year": 2025,
+  "workId": "digital-gallery/2025年電繪作品/17-編輯",
+  "title": "鑽石",
+  "model": "./rooms/diamond/scene.glb",
+  "stills": [
+    "./rooms/diamond/view-0.webp",
+    "./rooms/diamond/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/diamond/view-0-mobile.webp",
+    "./rooms/diamond/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "星芒與晶冠",
+      "description": "冷白結冠、細劍和月盤在近黑裡疊出主角，紫尖光落於劍身。",
+      "position": [
+        1.5,
+        2.3,
+        4.41
+      ],
+      "target": [
+        0.02,
+        1.96,
+        -0.1
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    },
+    {
+      "label": "晶瓣側面",
+      "description": "繞向另一側可讀出晶瓣的厚度、劍尖落點與月盤之間的空間。",
+      "position": [
+        -4.05,
+        2.67,
+        3.65
+      ],
+      "target": [
+        -0.05,
+        1.99,
+        -0.12
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#090817",
+    "fog": {
+      "color": "#090817",
+      "near": 9,
+      "far": 26
+    },
+    "key": "#edf5ff",
+    "fill": "#a191ff",
+    "ground": "#231a43",
+    "keyIntensity": 2.1,
+    "fillIntensity": 0.96,
+    "skyIntensity": 0.57
+  }
+}

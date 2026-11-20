@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="走進《唯一真神》與《Mika Nakashima》的立體畫界。">
+  <meta name="description" content="從 2024–2026 年的數位繪畫中挑一幅，走進它的立體畫界。">
   <meta property="og:url" content="https://nctuyoung.github.io/young-portfolio/painted-worlds/index.html">
   <title>畫界迴廊｜Young Portfolio</title>
   <link rel="canonical" href="https://nctuyoung.github.io/young-portfolio/painted-worlds/index.html">
@@ -50,16 +50,6 @@
       <button id="sculpture" type="button" hidden>近看雕像</button>
     </div>
   </header>
-  <nav class="doors" aria-label="畫中展間">
-    <a href="#orchard" data-door="orchard">
-      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/23-編輯-4-1.webp" alt="">
-      <span><strong>唯一真神</strong><small>進入畫界 · <span class="door-room">柑橘樹下</span></small></span>
-    </a>
-    <a href="#stage" data-door="stage">
-      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/16-編輯-1.webp" alt="">
-      <span><strong lang="en">Mika Nakashima</strong><small>進入畫界 · <span class="door-room">紅色舞台</span></small></span>
-    </a>
-  </nav>
   <div class="work-plaque" hidden>
     <div>
       <p id="work-title" class="work-title"></p>
@@ -75,14 +65,20 @@
     <div id="scene" class="scene" data-ready="false">
       <canvas tabindex="-1" aria-hidden="true"></canvas>
       <picture class="still">
-        <source media="(max-width: 650px)" srcset="./media/hall-mobile.webp">
-        <img src="./media/hall.webp" alt="中央雕像與兩幅近期電繪">
+        <source media="(max-width: 650px)">
+        <img alt="">
       </picture>
+      <noscript>
+        <picture class="still">
+          <source media="(max-width: 650px)" srcset="./media/hall-mobile.webp">
+          <img src="./media/hall.webp" alt="畫界迴廊中央的《唯一真神》雕像">
+        </picture>
+      </noscript>
     </div>
     <figcaption>
       <div class="view-caption">
         <p id="view-caption" hidden></p>
-        <p id="hint">從上方門牌選擇畫中展間。</p>
+        <p id="hint">作品載入中。</p>
       </div>
       <div class="view-tools" role="group" aria-label="調整視角" hidden>
         <button data-move="left" type="button">左轉</button>
@@ -92,6 +88,13 @@
       </div>
     </figcaption>
   </figure>
+  <section class="room-index" aria-labelledby="work-index-title" hidden>
+    <header class="index-header">
+      <h2 id="work-index-title">作品索引</h2>
+      <div class="years" role="group" aria-label="作品年份"></div>
+    </header>
+    <nav class="doors" aria-label="畫中展間"></nav>
+  </section>
   <p id="status" class="sr" role="status"></p>
   <noscript><p>開啟 JavaScript 即可進入畫中展間。</p></noscript>
 </main>

@@ -1,0 +1,63 @@
+{
+  "id": "2024-55",
+  "year": 2024,
+  "workId": "digital-gallery/2024年電繪作品/55",
+  "title": "55",
+  "model": "./rooms/2024-55/scene.glb",
+  "stills": [
+    "./rooms/2024-55/view-0.webp",
+    "./rooms/2024-55/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2024-55/view-0-mobile.webp",
+    "./rooms/2024-55/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "出紙口",
+      "description": "窗下左邊是酒紅文件夾，右邊是深藍影印機和機頂紙疊。",
+      "position": [
+        1.72,
+        2.39,
+        4.86
+      ],
+      "target": [
+        -0.25,
+        1.69,
+        -0.51
+      ],
+      "fov": 40,
+      "mobileFov": 54
+    },
+    {
+      "label": "窗邊側面",
+      "description": "沿通風格柵側板看前景紙、文件夾與機頂紙疊的前後距離。",
+      "position": [
+        -3.92,
+        2.91,
+        2.88
+      ],
+      "target": [
+        -0.11,
+        1.74,
+        -0.64
+      ],
+      "fov": 43,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#acbfbd",
+    "fog": {
+      "color": "#acbfbd",
+      "near": 9,
+      "far": 25
+    },
+    "key": "#f8f4e9",
+    "fill": "#dce9f4",
+    "ground": "#9caaa9",
+    "keyIntensity": 2.3,
+    "fillIntensity": 0.95,
+    "skyIntensity": 1.18
+  }
+}

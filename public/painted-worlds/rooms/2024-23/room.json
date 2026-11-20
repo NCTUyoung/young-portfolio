@@ -1,0 +1,63 @@
+{
+  "id": "2024-23",
+  "year": 2024,
+  "workId": "digital-gallery/2024年電繪作品/23",
+  "title": "23",
+  "model": "./rooms/2024-23/scene.glb",
+  "stills": [
+    "./rooms/2024-23/view-0.webp",
+    "./rooms/2024-23/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2024-23/view-0-mobile.webp",
+    "./rooms/2024-23/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "斜望燈巷",
+      "description": "左上圓燈與弧棚、右側車窗沿窄月台向後收束。",
+      "position": [
+        0.36,
+        1.69,
+        3.05
+      ],
+      "target": [
+        -0.12,
+        1.73,
+        -2.08
+      ],
+      "fov": 48,
+      "mobileFov": 51
+    },
+    {
+      "label": "石衣背側",
+      "description": "從石塑背後回望，車側、石塑和吊燈之間可讀出通道寬度。",
+      "position": [
+        1.53,
+        1.92,
+        -4.85
+      ],
+      "target": [
+        -0.48,
+        1.56,
+        -0.44
+      ],
+      "fov": 51,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#343f46",
+    "fog": {
+      "color": "#343f46",
+      "near": 7,
+      "far": 21
+    },
+    "key": "#f2d1a0",
+    "fill": "#a6bfcb",
+    "ground": "#676b70",
+    "keyIntensity": 1.85,
+    "fillIntensity": 0.9,
+    "skyIntensity": 1.26
+  }
+}

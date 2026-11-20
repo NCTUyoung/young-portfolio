@@ -1,0 +1,63 @@
+{
+  "id": "2025-36",
+  "year": 2025,
+  "workId": "digital-gallery/2025年電繪作品/36-編輯-1",
+  "title": "36-編輯-1",
+  "model": "./rooms/2025-36/scene.glb",
+  "stills": [
+    "./rooms/2025-36/view-0.webp",
+    "./rooms/2025-36/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2025-36/view-0-mobile.webp",
+    "./rooms/2025-36/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "紅黑雙環",
+      "description": "漆紅黑格前，兩頂冷藍帽與手銬構成交錯的雙人輪廓。",
+      "position": [
+        0.59,
+        2.47,
+        4.31
+      ],
+      "target": [
+        0.0,
+        2.13,
+        -0.11
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    },
+    {
+      "label": "藍側鏈列",
+      "description": "從藍光側移讀出兩人的肩臂、扣環與後方懸吊紅環的距離。",
+      "position": [
+        -4.02,
+        2.67,
+        2.68
+      ],
+      "target": [
+        -0.08,
+        1.93,
+        -0.16
+      ],
+      "fov": 50,
+      "mobileFov": 55
+    }
+  ],
+  "look": {
+    "sky": "#160711",
+    "fog": {
+      "color": "#160711",
+      "near": 8,
+      "far": 24
+    },
+    "key": "#ffd3ab",
+    "fill": "#769eff",
+    "ground": "#331019",
+    "keyIntensity": 1.9,
+    "fillIntensity": 0.81,
+    "skyIntensity": 0.56
+  }
+}

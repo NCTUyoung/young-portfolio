@@ -1,0 +1,63 @@
+{
+  "id": "2024-18-4",
+  "year": 2024,
+  "workId": "digital-gallery/2024年電繪作品/18-4",
+  "title": "18-4",
+  "model": "./rooms/2024-18-4/scene.glb",
+  "stills": [
+    "./rooms/2024-18-4/view-0.webp",
+    "./rooms/2024-18-4/view-1.webp"
+  ],
+  "mobileStills": [
+    "./rooms/2024-18-4/view-0-mobile.webp",
+    "./rooms/2024-18-4/view-1-mobile.webp"
+  ],
+  "views": [
+    {
+      "label": "花台前緣",
+      "description": "從玫瑰和白花冠掃過交叉白手套，落在右邊的桃青晶泡。",
+      "position": [
+        0.0,
+        2.67,
+        6.46
+      ],
+      "target": [
+        -0.03,
+        2.2,
+        -1.1
+      ],
+      "fov": 40,
+      "mobileFov": 54
+    },
+    {
+      "label": "晶泡與光盤側面",
+      "description": "從側翼分辨前層晶泡、花與手套、後層放射光盤的實體距離。",
+      "position": [
+        4.86,
+        3.15,
+        3.19
+      ],
+      "target": [
+        0.06,
+        2.1,
+        -1.29
+      ],
+      "fov": 46,
+      "mobileFov": 58
+    }
+  ],
+  "look": {
+    "sky": "#c6aebc",
+    "fog": {
+      "color": "#c6aebc",
+      "near": 9,
+      "far": 25
+    },
+    "key": "#fff1e2",
+    "fill": "#c3eef4",
+    "ground": "#c1adb5",
+    "keyIntensity": 1.99,
+    "fillIntensity": 0.82,
+    "skyIntensity": 1.17
+  }
+}
