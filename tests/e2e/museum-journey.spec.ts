@@ -137,6 +137,7 @@ test('an unnamed photograph keeps its exhibition label across viewer and filtere
 test('header Gallery enters photography directly and Back restores the visited room', async ({ page }) => {
   for (const path of ['gallery/digital', 'gallery/photography/Annber%20%E5%A4%96%E6%8B%8D']) {
     await page.goto(path)
+    const previousRoomUrl = page.url()
     const room = path === 'gallery/digital'
       ? page.getByTestId('gallery-archive-controls')
       : page.locator('#event-cover-heading')
@@ -150,7 +151,7 @@ test('header Gallery enters photography directly and Back restores the visited r
     await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
     await expect(page.locator('.hall-index')).toHaveCount(0)
     await page.goBack()
-    await expect(page).toHaveURL(new RegExp(`${path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`))
+    await expect(page).toHaveURL(previousRoomUrl)
     await expect(room).toBeVisible()
   }
 })

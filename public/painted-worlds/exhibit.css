@@ -57,7 +57,16 @@ a { text-decoration: none; }
   border-bottom: 1px solid var(--line);
 }
 
-.signature { font-size: 19px; letter-spacing: .015em; }
+.signature > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .45rem;
+  padding-left: .65rem;
+  border-left: 2px solid var(--museum-mark, #875c49);
+  line-height: 1;
+}
+.signature strong { font-size: 1.26rem; letter-spacing: .06em; }
+.signature small { font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; }
 .museum-header nav, .room-actions {
   display: flex;
   align-items: center;
@@ -220,7 +229,7 @@ dialog p { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
 
 @media (max-width: 650px) {
   .museum-header { min-height: 48px; }
-  .signature { font-size: 14px; }
+  .signature strong { font-size: 1rem; }
   .museum-header a, .room-actions button, .work-plaque button { font-size: 13px; }
   .room-header { align-items: center; padding-block: 16px 8px; }
   .doors a { min-height: 68px; }

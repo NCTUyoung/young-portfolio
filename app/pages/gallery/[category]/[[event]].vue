@@ -264,7 +264,9 @@ import ImageViewer from '~/components/ImageViewer.vue'
 
 // Both collection tabs share one gallery. The route watchers switch its contents
 // without restarting the async page setup during a quick return to the other tab.
-definePageMeta({ key: route => route.params.event ? route.path : 'gallery-overview' })
+// A Pages directory URL can gain a trailing slash on direct entry. Keep the same
+// event instance when a viewer query update resolves the equivalent slashless URL.
+definePageMeta({ key: route => route.params.event ? route.path.replace(/\/$/, '') : 'gallery-overview' })
 
 const loadGalleryAtelierTimeline = () => import('~/components/gallery/GalleryAtelierTimeline.vue')
 const loadGalleryPhotographySection = () => import('~/components/gallery/GalleryPhotographySection.vue')
