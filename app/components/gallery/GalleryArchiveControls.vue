@@ -9,22 +9,40 @@
     aria-labelledby="gallery-archive-title"
   >
     <div class="archive-controls__identity">
-      <div class="archive-controls__heading">
-        <p class="archive-controls__eyebrow">{{ identity.eyebrow }}</p>
-        <h1 id="gallery-archive-title" class="archive-controls__title font-jp">
-          {{ identity.title }}
-        </h1>
-        <p class="archive-controls__note">{{ identity.note }}</p>
+      <div>
+        <NuxtLink
+          v-if="world === 'kai' && selectedEvent"
+          :to="{ path: '/gallery/digital', hash: '#gallery-year-index' }"
+          class="archive-controls__return"
+          data-testid="gallery-year-return"
+        >
+          <Icon name="lucide:arrow-left" aria-hidden="true" />
+          繪畫展間
+        </NuxtLink>
+        <component :is="hasMapHeading ? 'h2' : 'h1'" id="gallery-archive-title" class="archive-controls__title font-jp">
+          {{ title }}
+        </component>
       </div>
-
-      <p class="archive-controls__count">
-        <span>{{ String(count).padStart(3, '0') }}</span>
-        <small>{{ identity.unit }}</small>
-      </p>
+      <p class="archive-controls__count">{{ count }} {{ world === 'kai' ? '件作品' : '張照片' }}</p>
     </div>
 
     <div class="archive-controls__commandbar">
-      <GalleryTabBar class="!mb-0" />
+      <nav class="gallery-tabs__list" aria-label="切換展館">
+        <NuxtLink
+          :to="{ path: '/gallery/digital', query: route.query }"
+          :aria-current="world === 'kai' ? 'location' : undefined"
+          class="gallery-tabs__link"
+        >
+          繪畫館
+        </NuxtLink>
+        <NuxtLink
+          :to="{ path: '/gallery/photography', query: route.query }"
+          :aria-current="world === 'kage' ? 'location' : undefined"
+          class="gallery-tabs__link"
+        >
+          攝影館
+        </NuxtLink>
+      </nav>
 
       <button
         ref="disclosureButtonRef"
@@ -36,8 +54,7 @@
         @click="toggleDrawer"
       >
         <span class="archive-controls__disclosure-label">
-          <span class="font-jp">{{ drawerOpen ? '閉' : '選' }}</span>
-          {{ drawerOpen ? 'Close' : 'Filter' }}
+          {{ drawerOpen ? '收合篩選' : '篩選' }}
         </span>
         <span class="archive-controls__summary">{{ filterSummary }}</span>
         <Icon
@@ -67,7 +84,6 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
-import GalleryTabBar from '~/components/GalleryTabBar.vue'
 import EventFilter from '~/components/EventFilter.vue'
 import GalleryFilterToolbar from '~/components/GalleryFilterToolbar.vue'
 
@@ -76,6 +92,7 @@ type GalleryWorld = 'kai' | 'kage'
 const props = withDefaults(defineProps<{
   world: GalleryWorld
   count: number
+  hasMapHeading?: boolean
   selectedEvent?: string | null
   controlsId?: string
 }>(), {
@@ -87,6 +104,7 @@ const emit = defineEmits<{
 }>()
 
 const galleryStore = useGalleryStore()
+const route = useRoute()
 const { filterState } = storeToRefs(galleryStore)
 
 const drawerOpen = ref(false)
@@ -95,19 +113,9 @@ const disclosureButtonRef = ref<HTMLButtonElement | null>(null)
 const drawerId = computed(() => `${props.controlsId}-drawer`)
 const eventMode = computed(() => Boolean(props.selectedEvent))
 
-const identity = computed(() => props.world === 'kai'
-  ? {
-      eyebrow: '繪 — Digital Archive',
-      title: '繪畫展間',
-      note: eventMode.value ? '返回展間，或調整目前的觀看條件。' : '沿著展牆，逐件觀看。',
-      unit: '葉 · works',
-    }
-  : {
-      eyebrow: '影 — Photography Archive',
-      title: '写真記録',
-      note: eventMode.value ? '返回写真記録，或調整目前的觀看條件。' : '光、場所與記憶留下的座標。',
-      unit: '枚 · frames',
-    })
+const title = computed(() => props.world === 'kai'
+  ? props.selectedEvent || '繪畫展間'
+  : props.hasMapHeading ? '拍攝活動' : '攝影展間')
 
 const filterSummary = computed(() => {
   const event = filterState.value.selectedEvent || '全部事件'
@@ -141,137 +149,81 @@ defineExpose({ open })
 
 <style scoped>
 .archive-controls {
-  --archive-accent: var(--accent, #c46023);
-  position: relative;
-  padding: clamp(2rem, 5vw, 4.5rem) 0 1rem;
-  color: var(--fg, rgb(41 37 36));
+  color: var(--museum-ink);
+  padding: clamp(1.2rem, 3vw, 2.6rem) 0 clamp(0.9rem, 2vw, 1.6rem);
 }
-
-.archive-controls[data-world='kage'] {
-  --archive-accent: #52647a;
-}
-
-:global(.dark .archive-controls[data-world='kage']) {
-  --archive-accent: #9aadc5;
-}
-
-.archive-controls::before {
-  content: '';
-  position: absolute;
-  top: clamp(2rem, 5vw, 4.5rem);
-  bottom: 1rem;
-  left: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, var(--archive-accent), transparent 78%);
-  opacity: 0.62;
-}
+.archive-controls[data-world='kage'] { padding-top: 0; }
 
 .archive-controls__identity {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 2rem;
-  padding: 0 clamp(1.25rem, 4vw, 3.5rem) clamp(1.75rem, 4vw, 3rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  padding-bottom: clamp(0.75rem, 1.7vw, 1.4rem);
 }
-
-.archive-controls__heading {
-  max-width: 46rem;
-}
-
-.archive-controls__eyebrow {
-  margin: 0 0 0.85rem;
-  color: color-mix(in srgb, var(--archive-accent) 82%, rgb(87 83 78));
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-}
-
 .archive-controls__title {
   margin: 0;
-  color: rgb(41 37 36);
-  font-size: clamp(3.25rem, 7vw, 6.75rem);
-  font-weight: 200;
-  letter-spacing: 0.08em;
-  line-height: 0.98;
-}
-
-:global(.dark .archive-controls__title) {
-  color: rgb(245 245 244);
-}
-
-.archive-controls__note {
-  margin: 1.25rem 0 0;
-  max-width: 32rem;
-  color: rgb(120 113 108);
-  font-size: 0.9rem;
+  color: var(--museum-ink);
+  font-size: clamp(1.8rem, 4.5vw, 3.6rem);
   font-weight: 300;
-  letter-spacing: 0.08em;
-  line-height: 1.8;
+  letter-spacing: 0.045em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
-
-:global(.dark .archive-controls__note) {
-  color: rgb(168 162 158);
-}
-
+.archive-controls[data-world='kage'] .archive-controls__title { font-size: clamp(1.55rem, 3vw, 2.6rem); }
 .archive-controls__count {
-  display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  margin: 0;
-  color: rgb(68 64 60);
+  color: var(--museum-muted);
+  font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
 }
-
-.archive-controls__count > span {
-  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', monospace;
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
+.archive-controls__return {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  color: var(--museum-muted);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-decoration-color: var(--museum-line);
+  text-underline-offset: 0.3em;
 }
-
-.archive-controls__count small {
-  color: rgb(168 162 158);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-:global(.dark .archive-controls__count) { color: rgb(231 229 228); }
-:global(.dark .archive-controls__count small) { color: rgb(120 113 108); }
+.archive-controls__return:hover { color: var(--museum-ink); text-decoration-color: currentColor; }
+.archive-controls__return:focus-visible { outline: 2px solid var(--museum-ink); outline-offset: 3px; }
 
 .archive-controls__commandbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(17rem, auto);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, auto);
   align-items: center;
-  gap: 1.5rem;
-  min-height: 4.5rem;
-  padding: 0 clamp(1.25rem, 4vw, 3.5rem);
-  border-top: 1px solid rgb(214 211 209 / 0.7);
-  border-bottom: 1px solid rgb(214 211 209 / 0.7);
-  background: rgb(255 255 255 / 0.38);
+  gap: 1.25rem;
+  min-height: 3.4rem;
+  padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+  border-block: 1px solid var(--museum-line);
+  background: color-mix(in srgb, var(--museum-light) 60%, transparent);
 }
 
-.archive-controls__commandbar :deep(.gallery-tabs__list) {
+.gallery-tabs__list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  overflow: visible;
 }
 
-.archive-controls__commandbar :deep(.gallery-tabs__link) {
+.gallery-tabs__link {
   display: flex;
+  align-items: center;
   justify-content: center;
   min-width: 0;
   min-height: 44px;
+  border-bottom: 1px solid transparent;
+  color: var(--museum-muted);
+  font-size: 0.9rem;
 }
-
-.archive-controls__commandbar :deep(.gallery-tabs__divider) {
-  display: none;
+.gallery-tabs__link[aria-current] {
+  border-bottom-color: currentColor;
+  color: var(--museum-ink);
+  font-weight: 500;
 }
-
-:global(.dark .archive-controls__commandbar) {
-  border-color: rgb(87 83 78 / 0.6);
-  background: rgb(28 25 23 / 0.35);
-}
+.gallery-tabs__link:hover { color: var(--museum-ink); }
+.gallery-tabs__link:focus-visible { outline: 2px solid var(--museum-ink); outline-offset: -2px; }
 
 .archive-controls__disclosure {
   display: grid;
@@ -281,12 +233,12 @@ defineExpose({ open })
   width: 100%;
   min-height: 44px;
   padding: 0.65rem 0;
-  color: rgb(87 83 78);
+  color: var(--museum-muted);
   text-align: left;
 }
 
 .archive-controls__disclosure:focus-visible {
-  outline: 1px solid var(--archive-accent);
+  outline: 1px solid var(--museum-ink);
   outline-offset: 4px;
 }
 
@@ -294,7 +246,7 @@ defineExpose({ open })
   display: inline-flex;
   align-items: baseline;
   gap: 0.45rem;
-  color: var(--archive-accent);
+  color: var(--museum-ink);
   font-size: 0.8rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -303,15 +255,13 @@ defineExpose({ open })
 .archive-controls__summary {
   min-width: 0;
   overflow: hidden;
-  color: rgb(87 83 78);
+  color: var(--museum-muted);
   font-size: 0.875rem;
   font-weight: 300;
   letter-spacing: 0.08em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-:global(.dark .archive-controls__summary) { color: rgb(214 211 209); }
 
 .archive-controls__chevron {
   width: 0.9rem;
@@ -326,13 +276,8 @@ defineExpose({ open })
   grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
   gap: clamp(1.5rem, 4vw, 4rem);
   padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 4vw, 3.5rem);
-  border-bottom: 1px solid rgb(214 211 209 / 0.7);
-  background: rgb(250 250 249 / 0.7);
-}
-
-:global(.dark .archive-controls__drawer) {
-  border-color: rgb(87 83 78 / 0.6);
-  background: rgb(28 25 23 / 0.55);
+  border-bottom: 1px solid var(--museum-line);
+  background: var(--museum-light);
 }
 
 .archive-drawer-enter-active,
@@ -347,56 +292,9 @@ defineExpose({ open })
 }
 
 @media (max-width: 767px) {
-  .archive-controls {
-    padding-top: 1.75rem;
-  }
-
-  .archive-controls::before {
-    top: 1.75rem;
-  }
-
-  .archive-controls__identity {
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
-    padding-bottom: 1.75rem;
-  }
-
-  .archive-controls__title {
-    font-size: clamp(3.25rem, 17vw, 4.35rem);
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-  }
-
-  .archive-controls__note {
-    max-width: 23rem;
-    margin-top: 1rem;
-  }
-
-  .archive-controls__count {
-    justify-self: end;
-  }
-
-  .archive-controls__commandbar {
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding-top: 0.75rem;
-  }
-
-  .archive-controls__commandbar :deep(.gallery-tabs__count) {
-    display: none;
-  }
-
-  .archive-controls__disclosure {
-    border-top: 1px solid rgb(214 211 209 / 0.55);
-  }
-
-  :global(.dark .archive-controls__disclosure) {
-    border-color: rgb(87 83 78 / 0.55);
-  }
-
-  .archive-controls__drawer {
-    grid-template-columns: 1fr;
-  }
+  .archive-controls__commandbar { grid-template-columns: 1fr; gap: 0; }
+  .archive-controls__disclosure { border-top: 1px solid var(--museum-line); }
+  .archive-controls__drawer { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -407,19 +305,4 @@ defineExpose({ open })
   }
 }
 
-/* The exhibition title introduces the works without occupying their viewing space. */
-.archive-controls[data-world='kai'] { padding-top: 1.5rem; }
-.archive-controls[data-world='kai']::before { display: none; }
-.archive-controls[data-world='kai'] .archive-controls__identity {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 0.5rem 1.25rem;
-}
-.archive-controls[data-world='kai'] .archive-controls__eyebrow { display: none; }
-.archive-controls[data-world='kai'] .archive-controls__title { font-size: clamp(1.8rem, 3vw, 3rem); line-height: 1.4; }
-.archive-controls[data-world='kai'] .archive-controls__note { margin-top: 0.4rem; font-size: 0.8rem; }
-.archive-controls[data-world='kai'] .archive-controls__count { gap: 0.3rem; }
-.archive-controls[data-world='kai'] .archive-controls__count small { display: none; }
-.archive-controls[data-world='kai'] .archive-controls__commandbar { padding-inline: 0.5rem; }
 </style>

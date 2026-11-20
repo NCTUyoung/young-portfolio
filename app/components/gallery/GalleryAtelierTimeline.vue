@@ -1,9 +1,8 @@
 <template>
   <section class="museum" aria-labelledby="museum-heading">
-    <h2 id="museum-heading" class="sr-only">繪畫作品展間</h2>
+    <h2 id="museum-heading" class="sr-only">{{ selectedYear || '繪畫作品' }}</h2>
     <div v-if="featured" class="museum__stage">
       <div class="museum__stage-wall">
-        <span class="museum__collection-count jp-kansuji">館藏 {{ totalCount }} 件</span>
         <figure class="museum__feature">
           <button
             type="button"
@@ -36,17 +35,30 @@
             <span class="museum__plaque-line" aria-hidden="true" />
             <span class="museum__plaque-title font-jp">{{ featured.title || '無題' }}</span>
             <span class="museum__plaque-date">{{ featured.time }}</span>
-            <span class="museum__plaque-medium">Digital painting</span>
+            <span class="museum__plaque-medium">數位繪畫</span>
+            <GalleryWorkLinks :work-id="featured.id" />
           </figcaption>
         </figure>
       </div>
       <div class="museum__floor" aria-hidden="true" />
     </div>
 
-    <div class="museum__rooms">
+    <nav
+      v-if="!selectedYear && groups.length"
+      id="gallery-year-index"
+      class="museum__year-index"
+      aria-label="按年代看繪畫"
+    >
+      <span>按年代看</span>
+      <NuxtLink v-for="group in groups" :key="group.eventName" :to="yearRoute(group.eventName)" data-testid="gallery-year-entry">
+        {{ group.year }}
+      </NuxtLink>
+    </nav>
+
+    <div v-if="remainingGroups.length" class="museum__rooms">
       <article v-for="group in remainingGroups" :key="group.eventName" class="museum__room">
         <header class="museum__room-head">
-          <h3 class="museum__room-year font-jp">{{ group.year }}</h3>
+          <h3 class="museum__room-year font-jp">{{ selectedYear ? '同年度作品' : group.year }}</h3>
           <span class="museum__room-count jp-kansuji">{{ group.images.length }} 件</span>
           <p v-if="group.strongestLine" class="museum__room-line font-jp">{{ group.strongestLine }}</p>
         </header>
@@ -81,6 +93,7 @@
             <figcaption class="museum__work-plaque">
               <span class="museum__work-title font-jp">{{ item.title || '無題' }}</span>
               <span class="museum__work-date">{{ item.time }}</span>
+              <GalleryWorkLinks :work-id="item.id" />
             </figcaption>
           </figure>
         </div>
@@ -91,6 +104,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import GalleryWorkLinks from './GalleryWorkLinks.vue'
 import { useImagePath } from '~/composables/useImagePath'
 import { DEFAULT_ASPECT_RATIO } from '~/utils/justifiedGalleryLayout'
 import type { GalleryItem } from '~~/shared/types/gallery'
@@ -102,7 +116,7 @@ interface YearGroup {
   strongestLine: string | null
 }
 
-const props = defineProps<{ groups: YearGroup[] }>()
+const props = defineProps<{ groups: YearGroup[]; selectedYear: string | null }>()
 defineEmits<{ imageClick: [item: GalleryItem] }>()
 
 const { getThumbPath, getGridImageSrcset, getGridAvifSrcset } = useImagePath()
@@ -110,7 +124,7 @@ const featureSizes = '(max-width: 767px) 88vw, (max-width: 1200px) 65vw, 850px'
 const frameSizes = '(max-width: 767px) 86vw, (max-width: 1200px) 42vw, 550px'
 
 const allImages = computed(() => props.groups.flatMap(group => group.images))
-const totalCount = computed(() => allImages.value.length)
+const yearRoute = (eventName: string) => `/gallery/digital/${encodeURIComponent(eventName)}`
 const featured = computed(() => {
   const images = allImages.value
   const hero = images.find(item => item.series?.includes('hero'))
@@ -137,66 +151,50 @@ function aspectOf (item: GalleryItem): string {
 
 <style scoped>
 .museum {
-  --museum-wall: #eee9dc;
-  --museum-wall-light: #f9f6ed;
-  --museum-wood: #594435;
-  --museum-mat: #f7f3e9;
-  --museum-ink: #403a32;
-  --museum-muted: #685f53;
   color: var(--museum-ink);
-  padding-bottom: clamp(3.5rem, 7vw, 6rem);
-}
-.dark .museum {
-  --museum-wall: #302d2a;
-  --museum-wall-light: #403b35;
-  --museum-wood: #8d6f55;
-  --museum-mat: #d8d0c1;
-  --museum-ink: #eee8df;
-  --museum-muted: #cbc1b2;
 }
 .museum__stage {
+  --frame-wood: color-mix(in srgb, #765e48 78%, var(--museum-warm));
   position: relative;
-  overflow: hidden;
-  background: var(--museum-wall);
-  margin-inline: calc(-1 * clamp(0rem, 2vw, 2rem));
+  background: var(--museum-warm);
 }
 .museum__stage-wall {
-  position: relative;
-  isolation: isolate;
-  padding: clamp(3rem, 5vw, 4rem) clamp(1rem, 5vw, 5rem) clamp(2rem, 4vw, 3rem);
-  background: radial-gradient(ellipse 63% 85% at 43% 25%, var(--museum-wall-light), var(--museum-wall) 95%);
+  padding: clamp(2rem, 4.5vw, 4.25rem) clamp(1rem, 5vw, 5rem) clamp(2rem, 4vw, 3.5rem);
+  background:
+    linear-gradient(90deg, var(--museum-warm), transparent 18% 82%, var(--museum-warm)),
+    radial-gradient(ellipse 80% 115% at 40% 0, var(--museum-light), var(--museum-warm));
+  border-inline: 1px solid var(--museum-line);
 }
-.museum__collection-count {
-  position: absolute;
-  top: clamp(1rem, 2vw, 1.6rem);
-  right: clamp(1.2rem, 5vw, 5rem);
-  color: var(--museum-muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-}
-.museum__stage-wall::before,
-.museum__stage-wall::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  pointer-events: none;
-  background: rgba(59, 49, 39, 0.12);
-}
-.museum__stage-wall::before { left: clamp(0.8rem, 3vw, 3rem); }
-.museum__stage-wall::after { right: clamp(0.8rem, 3vw, 3rem); }
-.dark .museum__stage-wall::before,
-.dark .museum__stage-wall::after { background: rgba(255, 243, 220, 0.12); }
 .museum__floor {
-  height: clamp(1.1rem, 2.6vw, 2rem);
-  border-top: 1px solid rgba(76, 58, 40, 0.24);
-  background: linear-gradient(175deg, rgba(101, 75, 52, 0.15), transparent 80%);
+  height: clamp(1rem, 2.5vw, 1.85rem);
+  border-top: 1px solid var(--museum-line);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--museum-line) 62%, transparent), transparent);
 }
-.dark .museum__floor {
-  border-top-color: rgba(238, 222, 197, 0.18);
-  background: linear-gradient(175deg, rgba(0, 0, 0, 0.2), transparent 80%);
+.museum__year-index {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 1.15rem;
+  margin-top: clamp(2rem, 4vw, 3.25rem);
+  padding-block: 0.4rem;
+  border-block: 1px solid var(--museum-line);
+  scroll-margin-top: 6rem;
+  color: var(--museum-muted);
+  font-size: 0.85rem;
 }
+.museum__year-index a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--museum-ink);
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+  text-underline-offset: 0.32em;
+  text-decoration-color: var(--museum-line);
+}
+.museum__year-index a:hover { text-decoration-color: currentColor; }
+.museum__year-index a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
 .museum__feature {
   display: flex;
   align-items: center;
@@ -221,7 +219,7 @@ function aspectOf (item: GalleryItem): string {
 .museum__frame {
   display: block;
   padding: clamp(0.28rem, 0.55vw, 0.5rem);
-  background: var(--museum-wood);
+  background: var(--frame-wood, color-mix(in srgb, #765e48 78%, var(--museum-warm)));
   box-shadow: 2px 3px 5px rgba(31, 24, 18, 0.18), 8px 18px 32px -10px rgba(31, 24, 18, 0.32);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -237,7 +235,7 @@ function aspectOf (item: GalleryItem): string {
 .museum__mat {
   display: block;
   padding: clamp(0.55rem, 1.4vw, 1.1rem);
-  background: var(--museum-mat);
+  background: var(--museum-paper);
 }
 .museum__frame--feature .museum__mat { padding: clamp(0.8rem, 2vw, 1.6rem); }
 .museum__art {
@@ -250,8 +248,8 @@ function aspectOf (item: GalleryItem): string {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: min(12rem, 22%);
-  min-width: 8rem;
+  width: min(17rem, 27%);
+  min-width: min(10rem, 100%);
   color: var(--museum-ink);
 }
 .museum__plaque-line {
@@ -288,9 +286,8 @@ function aspectOf (item: GalleryItem): string {
   gap: 0.7rem 1.2rem;
   padding-bottom: 1rem;
   margin-bottom: clamp(2rem, 3vw, 3rem);
-  border-bottom: 1px solid rgba(89, 68, 53, 0.2);
+  border-bottom: 1px solid var(--museum-line);
 }
-.dark .museum__room-head { border-bottom-color: rgba(221, 205, 183, 0.25); }
 .museum__room-year {
   margin: 0;
   font-size: clamp(1.8rem, 3vw, 2.5rem);
@@ -339,6 +336,8 @@ function aspectOf (item: GalleryItem): string {
   font-size: 0.72rem;
   line-height: 1.5;
 }
+.museum__feature-plaque :deep(.work-links),
+.museum__work-plaque :deep(.work-links) { margin-top: 0.4rem; }
 @media (max-width: 767px) {
   .museum__feature { flex-direction: column; gap: 1.5rem; }
   .museum__feature-plaque { align-self: flex-start; width: auto; min-width: 0; margin-left: clamp(0rem, 5vw, 2rem); }

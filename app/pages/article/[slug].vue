@@ -1,100 +1,78 @@
 <template>
-  <article ref="pageRef" class="min-h-screen">
-    <!-- 文章 Header — 與 /article 目次同 motif -->
-    <section class="relative pt-24 lg:pt-32 pb-10 lg:pb-16">
-      <div class="max-w-3xl mx-auto px-6 sm:px-10">
-        <!-- breadcrumb -->
-        <nav class="flex items-center gap-2 mb-10 text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300" aria-label="breadcrumb">
-          <NuxtLink to="/article" class="inline-flex min-h-11 min-w-11 items-center rounded-sm px-2 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-700 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300">
-            目次
-          </NuxtLink>
-          <span aria-hidden="true" class="text-stone-300 dark:text-stone-600">／</span>
-          <span class="text-stone-700 dark:text-stone-200">{{ article.kansuji }} · {{ article.kanji }}</span>
-        </nav>
+  <article class="article-reading" aria-labelledby="article-title">
+    <div class="article-reading__column">
+      <MuseumReadingHeader :title="article.title" title-id="article-title">
+        <template #navigation>
+          <nav class="article-reading__wayfinding" aria-label="breadcrumb">
+            <NuxtLink to="/article" class="article-reading__link">
+              <Icon name="lucide:arrow-left" aria-hidden="true" />
+              目次
+            </NuxtLink>
+          </nav>
+        </template>
 
-        <!-- 章節 eyebrow + track chip -->
-        <div class="flex items-baseline flex-wrap gap-3 mb-2">
-          <p class="text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300">
-            {{ article.kansuji }} · {{ article.trackKana }} {{ article.trackLabel }}
+        <p class="article-reading__quote font-jp">「{{ article.strongestLine }}」</p>
+
+        <template #details>
+          <p class="article-reading__details">
+            {{ article.trackLabel }}
+            <span aria-hidden="true">·</span>
+            <time :datetime="article.date.replaceAll('·', '-')">{{ article.date }}</time>
+            <span aria-hidden="true">·</span>
+            {{ article.readingTime }} 分鐘閱讀
           </p>
-        </div>
+        </template>
+      </MuseumReadingHeader>
 
-        <!-- 標題 -->
-        <h1 class="font-jp text-4xl sm:text-5xl lg:text-6xl font-extralight tracking-[0.1em] text-stone-900 dark:text-stone-50 leading-[1.15]">
-          {{ article.title }}
-        </h1>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <div class="article-prose" v-html="article.htmlBody" />
 
-        <!-- 章首詩 -->
-        <p class="article-content-strongest mt-6">「{{ article.strongestLine }}」</p>
-
-        <!-- meta -->
-        <p class="mt-6 text-sm tracking-[0.08em] text-stone-600 dark:text-stone-300 jp-kansuji">
-          {{ article.date }} · {{ article.readingTime }} min read
-        </p>
-
-        <div class="jp-hairline w-full mt-10"/>
-      </div>
-    </section>
-
-    <!-- 文章主體 -->
-    <section class="relative pb-24 lg:pb-32">
-      <div class="max-w-3xl mx-auto px-6 sm:px-10 article-prose">
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-html="article.htmlBody"/>
-      </div>
-    </section>
-
-    <footer class="mx-auto max-w-3xl border-t border-stone-300/70 px-6 py-10 dark:border-stone-600/70 sm:px-10">
-      <p class="text-sm text-stone-600 dark:text-stone-300">Young / NCTU · 楊</p>
-      <NuxtLink
-        to="/article"
-        class="group mt-5 inline-flex min-h-11 min-w-11 items-center gap-3 rounded-sm px-2 font-jp text-base text-stone-700 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-700 dark:text-stone-200 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300"
-      >
-        <svg class="h-4 w-4 rotate-180 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
-        返回目錄
-      </NuxtLink>
-    </footer>
+      <footer class="article-reading__footer">
+        <p>Young / NCTU · 楊</p>
+        <nav class="article-reading__exits" aria-label="讀完這篇文章">
+          <NuxtLink to="/article" class="article-reading__link">
+            <Icon name="lucide:arrow-left" aria-hidden="true" />
+            返回目次
+          </NuxtLink>
+          <NuxtLink
+            v-if="article.relatedCollection"
+            :to="article.relatedCollection.to"
+            class="article-reading__link"
+          >
+            看「{{ article.relatedCollection.title }}」活動照片
+            <Icon name="lucide:arrow-right" aria-hidden="true" />
+          </NuxtLink>
+        </nav>
+      </footer>
+    </div>
   </article>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import MuseumReadingHeader from '~/components/museum/MuseumReadingHeader.vue'
 
 const route = useRoute()
-const { observeAll } = useScrollReveal()
-const pageRef = ref<HTMLElement | null>(null)
 
 interface ArticleData {
-  slug: string
-  kansuji: string
-  kanji: string
   title: string
   strongestLine: string
-  trackKana: '繪' | '影' | '両'
+
   trackLabel: string
   date: string
   readingTime: number
+  relatedCollection?: { title: string, to: string }
   htmlBody: string
 }
 
-/**
- * R36 — Article 第一章「思 · 設計心得」真內容
- * 後續 add 其他章節時，在這個 articles map 加 slug 即可。
- */
 const articles: Record<string, ArticleData> = {
   'gear-119mm': {
-    slug: 'gear-119mm',
-    kansuji: '其の四',
-    kanji: '具',
     title: '器材評測 — 119mm 的場邊',
     strongestLine: '119mm 看小腿和板凳',
-    trackKana: '影',
-    trackLabel: 'Photography lean',
+
+    trackLabel: '攝影',
     date: '2026·05·27',
     readingTime: 5,
+    relatedCollection: { title: 'WBC 2026', to: '/gallery/photography/WBC%202026' },
     htmlBody: `
 <p class="article-lead">場邊那些長到像砲管的鏡頭，是另一種職業。我只有 119mm。</p>
 
@@ -133,13 +111,10 @@ const articles: Record<string, ArticleData> = {
   },
 
   'design-thinking': {
-    slug: 'design-thinking',
-    kansuji: '其の一',
-    kanji: '思',
     title: '設計心得',
     strongestLine: '為什麼這格的色塊比那格重要',
-    trackKana: '繪',
-    trackLabel: 'Digital lean',
+
+    trackLabel: '繪畫',
     date: '2026·05·27',
     readingTime: 4,
     htmlBody: `
@@ -177,15 +152,11 @@ const articles: Record<string, ArticleData> = {
 
 const article = computed<ArticleData>(() => {
   const slug = String(route.params.slug || '')
-  const found = articles[slug]
+  const found = Object.hasOwn(articles, slug) ? articles[slug] : undefined
   if (!found) {
-    throw createError({ statusCode: 404, statusMessage: `Article not found: ${slug}`, fatal: true })
+    throw createError({ statusCode: 404, statusMessage: 'Article not found', fatal: true })
   }
   return found
-})
-
-onMounted(() => {
-  observeAll(pageRef.value)
 })
 
 useSeoMeta({
@@ -198,98 +169,119 @@ useSeoMeta({
 </script>
 
 <style scoped>
-.article-content-strongest {
-  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
-  font-size: 1.3rem;
-  letter-spacing: 0.06em;
-  line-height: 1.7;
-  color: rgb(120 113 108);
-  font-weight: 300;
-  margin: 0;
+.article-reading {
+  color: var(--museum-ink);
+  background:
+    radial-gradient(ellipse 65% 36rem at 46% 0%, var(--museum-light), transparent 88%),
+    linear-gradient(108deg, transparent 66%, color-mix(in srgb, var(--museum-line) 15%, transparent)),
+    var(--museum-paper);
 }
-:global(.dark) .article-content-strongest { color: rgb(168 162 158); }
 
-/* ===== article body prose (manual; no markdown engine yet) ===== */
-.article-prose :deep(.article-lead) {
-  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
-  font-size: 1.18rem;
-  letter-spacing: 0.04em;
-  line-height: 2;
-  color: rgb(68 64 60);
-  font-weight: 300;
-  margin: 0 0 2.4rem;
-  padding-left: 1rem;
-  border-left: 2px solid rgb(217 123 46 / 0.6);
+.article-reading__column {
+  box-sizing: content-box;
+  max-inline-size: 39rem;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 4vw, 3.1rem) clamp(1rem, 6vw, 4.75rem) clamp(3rem, 7vw, 6rem);
 }
-:global(.dark) .article-prose :deep(.article-lead) { color: rgb(231 229 228); }
+
+.article-reading__wayfinding {
+  margin-block-end: clamp(1.5rem, 4vw, 3rem);
+}
+
+.article-reading__link {
+  display: inline-flex;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.32em;
+}
+
+.article-reading__link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.article-reading__link:focus-visible {
+  outline: 2px solid var(--museum-ink);
+  outline-offset: 3px;
+}
+
+.article-reading__quote {
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+
+.article-reading__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  margin-block-start: 1.15rem;
+  color: var(--museum-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.article-prose {
+  margin-block-start: clamp(1.65rem, 4.4vw, 2.65rem);
+  padding-block-start: clamp(1.6rem, 3.8vw, 2.5rem);
+  border-block-start: 1px solid var(--museum-line);
+  font-size: 1.0625rem;
+  line-height: 1.95;
+  letter-spacing: 0.025em;
+  overflow-wrap: break-word;
+}
+
+.article-prose :deep(.article-lead) {
+  font-size: 1.15em;
+  font-weight: 500;
+}
 
 .article-prose :deep(h2) {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 1.4rem;
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  margin: 3rem 0 1.2rem;
-  color: rgb(68 64 60);
-  position: relative;
-  padding-left: 1rem;
-}
-:global(.dark) .article-prose :deep(h2) { color: rgb(231 229 228); }
-.article-prose :deep(h2)::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.4rem;
-  bottom: 0.4rem;
-  width: 2px;
-  background: rgb(217 123 46 / 0.55);
+  margin-block: clamp(2.5rem, 5.5vw, 4.15rem) 0.85rem;
+  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
+  font-size: clamp(1.25rem, 3vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0.065em;
 }
 
 .article-prose :deep(p) {
-  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
-  font-size: 1rem;
-  line-height: 2;
-  letter-spacing: 0.04em;
-  color: rgb(68 64 60);
-  font-weight: 300;
-  margin: 0 0 1.2rem;
+  margin-block-end: 1.1rem;
 }
-:global(.dark) .article-prose :deep(p) { color: rgb(214 211 209); }
-
-.article-prose :deep(em) {
-  font-style: italic;
-  color: rgb(120 113 108);
-}
-:global(.dark) .article-prose :deep(em) { color: rgb(168 162 158); }
 
 .article-prose :deep(strong) {
-  font-weight: 400;
-  color: rgb(217 123 46);
+  font-weight: 600;
 }
-:global(.dark) .article-prose :deep(strong) { color: rgb(231 184 125); }
 
 .article-prose :deep(ul) {
-  margin: 1.2rem 0 1.6rem;
-  padding-left: 1.4rem;
-  list-style: none;
-}
-.article-prose :deep(ul li) {
-  position: relative;
-  padding-left: 1.4rem;
-  margin-bottom: 0.6rem;
-  font-family: 'Noto Serif JP', serif;
-  line-height: 1.85;
-  color: rgb(68 64 60);
-}
-:global(.dark) .article-prose :deep(ul li) { color: rgb(214 211 209); }
-.article-prose :deep(ul li)::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.7em;
-  width: 5px;
-  height: 5px;
-  background: rgb(217 123 46 / 0.85);
-  border-radius: 9999px;
+  margin-block: 1rem 1.4rem;
+  padding-inline-start: 1.35em;
+  list-style: disc;
 }
 
+.article-prose :deep(li + li) {
+  margin-block-start: 0.35em;
+}
+
+.article-reading__footer {
+  margin-block-start: clamp(3rem, 6.5vw, 5.5rem);
+  padding-block-start: 1.35rem;
+  border-block-start: 1px solid var(--museum-line);
+}
+
+.article-reading__footer p {
+  color: var(--museum-muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+}
+
+.article-reading__exits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2rem;
+  margin-block-start: 0.55rem;
+}
 </style>

@@ -15,7 +15,8 @@
     aria-modal="true"
     aria-label="圖片檢視器"
     tabindex="-1"
-    class="fixed inset-0 z-[9999] bg-stone-950/95 backdrop-blur-md"
+    class="viewer-museum fixed inset-0 z-[9999]"
+    :data-work-category="currentViewerImage?.category"
   >
     <!-- 背景點擊關閉 -->
     <div class="absolute inset-0" @click="closeImageViewer"/>
@@ -46,30 +47,27 @@ class="image-viewer-area flex-1 flex items-center justify-center p-2 sm:p-4 tran
            }"
            @wheel.prevent="handleWheel">
 
-        <!-- 頂部漸層（讓標題／圖示不必框就可讀） -->
-        <div class="viewer-top-veil pointer-events-none absolute inset-x-0 top-0 z-0 h-24 bg-gradient-to-b from-stone-950/75 via-stone-950/25 to-transparent sm:h-32"/>
-
         <!-- 頂部：標題（左）+ 工具列（右）— 無框浮空，遵循「余白・細線」原則 -->
         <div
 v-if="viewerChromeReady"
-class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 flex items-start justify-between gap-3 sm:top-5 sm:left-5 sm:right-5"
+class="viewer-toolbar-wrap absolute top-2.5 left-3 right-3 z-10 sm:top-5 sm:left-5 sm:right-5"
              :style="toolbarInsetStyle">
 
           <!-- 標題區：純文字 + 細線收束，無背景、無邊框 -->
-          <div class="min-w-0 flex-1 pt-1 text-stone-100">
-            <p class="text-[0.65rem] sm:text-xs text-stone-400 font-light tracking-[0.3em] jp-kansuji tabular-nums">
-              <span class="text-stone-100">{{ currentImageIndex + 1 }}</span>
-              <span class="mx-1.5 text-stone-600">／</span>
-              <span>{{ viewerImages.length }}</span>
-            </p>
-            <h3 class="mt-1 truncate font-jp font-light tracking-wider text-[0.95rem] sm:text-base">
+          <div class="viewer-museum-plaque">
+            <h3 class="truncate font-jp">
               {{ currentViewerImage ? getGalleryDisplayTitle(currentViewerImage, galleryStoreViewer.photographyWorks) : '未命名' }}
             </h3>
-            <span aria-hidden="true" class="mt-2 block h-px w-10 bg-stone-300/30"/>
+            <div class="viewer-museum-plaque__meta">
+              <span v-if="currentViewerImage?.event?.name" class="truncate">{{ currentViewerImage.event.name }}</span>
+              <span v-if="currentViewerImage?.time">{{ currentViewerImage.time }}</span>
+              <p class="tabular-nums">{{ currentImageIndex + 1 }} / {{ viewerImages.length }}</p>
+            </div>
+            <GalleryWorkLinks v-if="currentViewerImage && !showInfoPanel" :work-id="currentViewerImage.id" />
           </div>
 
           <!-- 操作列：一排簡素圖示，無外框；「關閉」前以細線分隔收束 -->
-          <div class="flex flex-shrink-0 items-center gap-0 mr-0 sm:-mr-2">
+          <div class="viewer-museum-tools flex items-center">
             <button
 :disabled="!canZoomOut" class="viewer-btn"
                     title="縮小 (Ctrl + -)"
@@ -159,7 +157,7 @@ v-if="viewerChromeReady && viewerImages.length > 1 && hasNext"
                 @click="goToNextImage"/>
 
                 <!-- 主要圖片區域 -->
-        <div class="relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
+        <div class="viewer-museum-image relative w-full h-full flex items-center justify-center overflow-hidden" @click.stop>
           <!--
             Lightbox 優先用符合目前顯示尺寸的 800/1600 AVIF；不支援時用同尺寸 WebP，
             縮圖缺檔或格式都不支援時才退回原圖。放大會升至 1600，原始下載仍可另行取得。
@@ -306,6 +304,7 @@ import { useMediaQuery, useWindowSize } from '@vueuse/core'
 import { useImageViewerStore } from '~/stores/imageViewer'
 import { useGalleryStore } from '~/stores/gallery'
 import { getGalleryDisplayTitle } from '~/utils/galleryDisplayTitle'
+import GalleryWorkLinks from './gallery/GalleryWorkLinks.vue'
 
 // 非關鍵子元件採 lazy 載入；資訊對頁與放大導覽器在真正需要時才掛載。
 const ImageInfoPanel = defineAsyncComponent(() => import('./ImageInfoPanel.vue'))
@@ -801,6 +800,54 @@ watch(isOpen, (open) => {
 
 <style scoped>
 /* ===== 檢視器按鈕（無框、簡素；手機 44px 最小觸控目標） ===== */
+.viewer-museum {
+  --viewer-tone: var(--museum-cool);
+  --viewer-shadow: #171819;
+  --viewer-display-ink: #f2eae0;
+  --viewer-display-muted: #c6bfb5;
+  --work-link-ink: var(--viewer-display-ink);
+  --work-link-rule: #887e74;
+  background:
+    linear-gradient(90deg, var(--viewer-shadow), transparent 14% 86%, var(--viewer-shadow)),
+    radial-gradient(ellipse 75% 100% at 48% 0%, color-mix(in srgb, var(--viewer-tone) 17%, var(--viewer-shadow)), var(--viewer-shadow));
+}
+.viewer-museum[data-work-category='digital'] { --viewer-tone: var(--museum-warm); }
+.viewer-toolbar-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.3rem 1rem;
+  border-bottom: 1px solid rgb(242 234 224 / 20%);
+  padding-bottom: 0.4rem;
+  background: linear-gradient(to bottom, var(--viewer-shadow), transparent 180%);
+}
+.viewer-museum-plaque {
+  min-width: 0;
+  padding-block: 0.32rem;
+  color: var(--viewer-display-ink);
+}
+.viewer-museum-plaque h3 { font-size: clamp(0.95rem, 2vw, 1.35rem); font-weight: 400; line-height: 1.3; }
+.viewer-museum-plaque__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.65rem;
+  margin-top: 0.32rem;
+  color: var(--viewer-display-muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.viewer-museum-tools { justify-self: end; }
+.viewer-museum-image { padding-block: min(7.75rem, 17dvh) min(3rem, 7dvh); }
+@media (max-width: 639px) {
+  .viewer-toolbar-wrap { grid-template-columns: minmax(0, 1fr); }
+  .viewer-museum-tools { grid-row: 1; }
+  .viewer-museum-image { padding-top: min(10.5rem, 24dvh); }
+}
+.viewer-museum :where(button, a):focus-visible {
+  outline: 2px solid var(--viewer-display-ink);
+  outline-offset: 2px;
+}
+
 .viewer-btn {
   align-items: center;
   justify-content: center;

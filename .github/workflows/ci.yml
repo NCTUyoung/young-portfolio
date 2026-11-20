@@ -55,6 +55,9 @@ jobs:
       - name: Test
         run: npm run test
 
+      - name: Validate gallery and original-art references
+        run: npm run lint:data
+
       - name: Build
         run: npx nuxt build --preset github-pages
 

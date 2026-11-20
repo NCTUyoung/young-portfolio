@@ -3,63 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f1eb">
   <meta name="description" content="走進《唯一真神》與《Mika Nakashima》的立體畫界。">
+  <meta property="og:url" content="https://nctuyoung.github.io/young-portfolio/painted-worlds/index.html">
   <title>畫界迴廊｜Young Portfolio</title>
+  <link rel="canonical" href="https://nctuyoung.github.io/young-portfolio/painted-worlds/index.html">
   <link rel="icon" href="data:,">
+  <script>
+    const systemDark = matchMedia('(prefers-color-scheme: dark)')
+    function syncTheme() {
+      try {
+        const scheme = localStorage.getItem('vueuse-color-scheme')
+        document.documentElement.classList.toggle('dark', scheme === 'dark' || (scheme === 'auto' && systemDark.matches))
+      } catch { /* Storage can be unavailable in standalone previews. */ }
+    }
+    syncTheme()
+    systemDark.addEventListener('change', syncTheme)
+    window.addEventListener('storage', syncTheme)
+    window.addEventListener('pageshow', syncTheme)
+  </script>
   <link rel="stylesheet" href="./exhibit.css">
 </head>
-<body data-world="hall">
+<body data-world="hall" data-mode="stills">
 <header class="museum-header">
   <span class="signature" lang="en">Young Portfolio</span>
-  <nav aria-label="展廳導覽">
-    <a href="../exhibition/light/">光落之處</a>
+  <nav aria-label="離開畫界">
+    <a id="source-return" class="return-link" href="../" hidden></a>
     <a id="gallery-link" href="../gallery/digital">數位繪畫展廳</a>
+    <a id="light-link" href="../exhibition/light/#painting">光落之處</a>
   </nav>
 </header>
 <main>
   <header class="room-header">
-    <div><p class="byline" id="catalog">近期電繪　／　2026</p><h1 id="room-title">畫界迴廊</h1></div>
+    <h1 id="room-title" tabindex="-1">畫界迴廊</h1>
     <div class="room-actions">
-      <button id="back" hidden>返回迴廊</button>
-      <button id="original" hidden>看原畫</button>
-      <button id="sculpture">近看雕像</button>
+      <button id="back" class="return-link" type="button" hidden>返回迴廊</button>
+      <button id="sculpture" type="button" hidden>近看雕像</button>
     </div>
   </header>
+  <nav class="doors" aria-label="畫中展間">
+    <a href="#orchard" data-door="orchard">
+      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/23-編輯-4-1.webp" alt="">
+      <span><strong>唯一真神</strong><small>柑橘樹下</small></span>
+    </a>
+    <a href="#stage" data-door="stage">
+      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/16-編輯-1.webp" alt="">
+      <span><strong lang="en">Mika Nakashima</strong><small>紅色舞台</small></span>
+    </a>
+  </nav>
+  <div class="work-plaque" hidden>
+    <div>
+      <p id="work-title" class="work-title"></p>
+      <p id="catalog" class="work-meta"></p>
+    </div>
+    <button id="original" type="button">看原畫</button>
+  </div>
+  <nav class="stations" aria-label="展線站點" hidden></nav>
   <figure class="exhibition">
     <div id="scene" class="scene" data-ready="false">
-      <canvas tabindex="0" aria-label="立體展間，可用方向鍵調整角度與遠近" aria-hidden="true"></canvas>
+      <canvas tabindex="-1" aria-hidden="true"></canvas>
       <picture class="still">
         <source media="(max-width: 650px)" srcset="./media/hall-mobile.webp">
         <img src="./media/hall.webp" alt="中央雕像與兩幅近期電繪">
       </picture>
     </div>
     <figcaption>
-      <span id="hint">點選牆上的畫進入展間</span>
-      <div class="view-tools" aria-label="調整視角" hidden>
-        <button data-move="left" aria-label="向左轉">↶</button>
-        <button data-move="right" aria-label="向右轉">↷</button>
-        <button data-move="far" aria-label="拉遠">−</button>
-        <button data-move="near" aria-label="拉近">＋</button>
+      <div class="view-caption">
+        <p id="view-caption" hidden></p>
+        <p id="hint">從上方門牌選擇畫中展間。</p>
+      </div>
+      <div class="view-tools" role="group" aria-label="調整視角" hidden>
+        <button data-move="left" type="button">左轉</button>
+        <button data-move="right" type="button">右轉</button>
+        <button data-move="far" type="button">拉遠</button>
+        <button data-move="near" type="button">拉近</button>
       </div>
     </figcaption>
   </figure>
-  <nav class="doors" aria-label="畫中展間">
-    <a href="#orchard" data-door="orchard">
-      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/23-編輯-4-1.webp" alt="">
-      <span><small><span class="work-date">2026.09.06　／　</span>柑橘林</small><strong>唯一真神</strong></span><i aria-hidden="true">↗</i>
-    </a>
-    <a href="#stage" data-door="stage">
-      <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/16-編輯-1.webp" alt="">
-      <span><small><span class="work-date">2026.06.14　／　</span>舞台</small><strong lang="en">Mika Nakashima</strong></span><i aria-hidden="true">↗</i>
-    </a>
-  </nav>
-  <nav class="stations" aria-label="展線站點" hidden></nav>
   <p id="status" class="sr" role="status"></p>
-  <noscript>開啟 JavaScript 即可轉動視角或進入畫中展間。</noscript>
+  <noscript><p>開啟 JavaScript 即可進入畫中展間。</p></noscript>
 </main>
 <dialog aria-labelledby="original-title">
-  <header><h2 id="original-title"></h2><button id="close">關閉</button></header>
+  <header><h2 id="original-title"></h2><button id="close" type="button" autofocus>關閉</button></header>
   <img alt=""><p id="original-date"></p>
 </dialog>
 <script type="module" src="./main.js"></script>

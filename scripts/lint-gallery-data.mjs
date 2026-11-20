@@ -123,6 +123,28 @@ function checkEventCoords (works, category) {
   return missing
 }
 
+function checkPaintedWorldArt (works) {
+  const worldsRoot = path.join(PUB, 'painted-worlds')
+  const { rooms } = readJson(path.join(worldsRoot, 'exhibition.json'))
+  const artBySource = new Map(works.map(work => [
+    '../images/_thumbs/1600w/' + work.filename.replace(/\.[^.]+$/, '.webp'),
+    work
+  ]))
+  const problems = []
+  for (const [room, settings] of Object.entries(rooms)) {
+    if (!settings.art) continue
+    const { src, title } = settings.art
+    if (artBySource.get(src)?.title !== title) {
+      problems.push(`${room} 的原畫網址或標題與繪畫館藏不一致`)
+      continue
+    }
+    if (!fs.existsSync(path.resolve(worldsRoot, src))) {
+      problems.push(`${room} 的原畫縮圖不存在：${src}`)
+    }
+  }
+  return problems
+}
+
 function main () {
   const targets = [
     { file: 'galleryList.json', category: 'digital' },
@@ -143,6 +165,13 @@ function main () {
     const data = readJson(abs)
     const works = data.Img || []
     const eventStats = data.eventStats || {}
+
+    if (category === 'digital') {
+      for (const problem of checkPaintedWorldArt(works)) {
+        errorCount++
+        report.push(flagLine('error', problem))
+      }
+    }
 
     report.push(`\n=== ${file} (${works.length} 筆) ===`)
 

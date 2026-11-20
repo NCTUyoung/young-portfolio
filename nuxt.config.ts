@@ -2,6 +2,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { galleryEventPaths } from './shared/utils/galleryEventPaths'
 
 /**
  * 讀作品 JSON、依 category 分組所有 event 名，組出
@@ -16,28 +17,20 @@ import { fileURLToPath } from 'node:url'
  */
 function buildEventPrerenderRoutes (): string[] {
   type Work = { event?: { name?: string } }
-  type Bag = { Img?: Record<string, Work> }
+  type Bag = { Img?: Work[] }
   const here = fileURLToPath(new URL('.', import.meta.url))
   const read = (rel: string): Bag => {
     try {
       return JSON.parse(readFileSync(`${here}/public/${rel}`, 'utf8')) as Bag
     } catch {
-      return { Img: {} }
+      return { Img: [] }
     }
   }
   const photo = read('photographyList.json')
   const digi = read('galleryList.json')
-  const collect = (bag: Bag, cat: 'photography' | 'digital'): string[] => {
-    const set = new Set<string>()
-    for (const w of Object.values(bag.Img || {})) {
-      const n = w?.event?.name
-      if (typeof n === 'string' && n.length > 0) set.add(n)
-    }
-    return [...set].map(name => `/gallery/${cat}/${name}`)
-  }
   return [
-    ...collect(photo, 'photography'),
-    ...collect(digi, 'digital')
+    ...galleryEventPaths(photo, 'photography'),
+    ...galleryEventPaths(digi, 'digital')
   ]
 }
 
@@ -116,7 +109,8 @@ export default defineNuxtConfig({
   },
 
   css: [
-    '~/assets/css/main.css'
+    '~/assets/css/main.css',
+    '~/assets/css/museum.css'
     // 'leaflet/dist/leaflet.css' 改於 app/components/EventMap.vue 內 import，
     // 避開 Vite 7 + Windows 讀取 node_modules CSS 透過 @fs 絕對路徑時的 MIME 異常。
   ],
@@ -152,8 +146,8 @@ export default defineNuxtConfig({
       routes: [
         '/',
         '/gallery',
-        // 2026-05-09：移除 /gallery/all 預渲染（雙主線敘事不容 mixed feed）；
-        // 舊 path 由 useGalleryCategoryRoute 在 client-side replace 到 /gallery/photography
+        '/gallery/all',
+        '/sitemap.xml',
         '/gallery/digital',
         '/gallery/photography',
         '/exhibition/light',
@@ -248,7 +242,6 @@ export default defineNuxtConfig({
         { property: 'og:site_name', content: 'Young Portfolio' },
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'zh_TW' },
-        { property: 'og:url', content: 'https://nctuyoung.github.io/young-portfolio/' },
         // og:image 全站預設（非首頁也能分享）；首頁的 useSeoMeta 會以 hero series
         // 圖覆寫（page-level 後註冊 > global meta）。若要換 hero 圖，改
         // photographyList.json 的 `series: ['hero']` 目標；此預設同步更新。
@@ -261,8 +254,7 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/young-portfolio/favicon.ico' },
-        { rel: 'canonical', href: 'https://nctuyoung.github.io/young-portfolio/' }
+        { rel: 'icon', type: 'image/x-icon', href: '/young-portfolio/favicon.ico' }
       ]
     }
   }

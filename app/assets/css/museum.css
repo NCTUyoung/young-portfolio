@@ -1,0 +1,42 @@
+:root {
+  scroll-padding-top: calc(4.75rem + env(safe-area-inset-top, 0px));
+  --museum-paper: #f5f1e9;
+  --museum-ink: #332c25;
+  --museum-muted: #665a4e;
+  --museum-line: #d5cbbd;
+  --museum-light: #fffaf0;
+  --museum-warm: #eee3d3;
+  --museum-cool: #e7ebea;
+  --museum-mark: #894831;
+}
+
+html.dark {
+  --museum-paper: #25211e;
+  --museum-ink: #f1e9dc;
+  --museum-muted: #c8baaa;
+  --museum-line: #574b42;
+  --museum-light: #3a312a;
+  --museum-warm: #352823;
+  --museum-cool: #252e34;
+  --museum-mark: #e4ab8c;
+}
+
+.museum-shell {
+  min-height: 100svh;
+  background-color: var(--museum-paper);
+  color: var(--museum-ink);
+}
+
+.museum-heading {
+  color: var(--museum-ink);
+  font-family: var(--font-jp);
+  font-weight: 300;
+  line-height: 1.16;
+  letter-spacing: .045em;
+  text-wrap: balance;
+}
+
+.museum-shell :where(a, button):focus-visible {
+  outline: 2px solid var(--museum-mark);
+  outline-offset: 4px;
+}

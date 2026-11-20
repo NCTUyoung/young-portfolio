@@ -6,6 +6,8 @@
 import { onMounted } from 'vue'
 
 // Keep old /gallery links usable without adding a stop before the exhibition.
+definePageMeta({ alias: ['/gallery/all'] })
+useSeoMeta({ robots: 'noindex, follow' })
 const route = useRoute()
 // A prerendered HTTP redirect would discard the visitor's image query on GitHub Pages.
 onMounted(() => {

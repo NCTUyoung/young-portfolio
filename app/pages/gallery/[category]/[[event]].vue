@@ -1,15 +1,14 @@
 <template>
   <div
-    ref="pageRef"
-    class="gallery-world min-h-screen transition-colors duration-300"
+    class="gallery-world min-h-screen"
     :data-world="worldId"
-    :class="{ 'gallery-world--ready': worldReady, 'gallery-world--event': !!filterState.selectedEvent, 'gallery-world--map': currentCategory === 'photography' && !filterState.selectedEvent }"
   >
     <!-- Fresh Dynamic pilot：同一個 Archive Controls 負責世界識別、分類與篩選狀態。 -->
     <div
       v-if="currentCategory !== 'photography'"
+      id="gallery-hall-heading"
       ref="controlsSectionRef"
-      class="container mx-auto px-4 sm:px-6"
+      class="hall-content scroll-mt-24"
     >
       <GalleryArchiveControls
         ref="archiveControlsRef"
@@ -43,7 +42,7 @@
     </transition>
 
     <!-- Gallery Content -->
-    <div class="container mx-auto px-4 sm:px-6 relative">
+    <div class="hall-content">
       <!-- Loading State -->
       <div v-if="isGalleryLoading" class="text-center py-28">
         <!-- 日式菱形旋轉動畫 -->
@@ -82,16 +81,19 @@
 
       <section
         v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent && eventLocations.length"
+        id="gallery-footsteps"
         ref="mapSectionRef"
         class="photo-map-entry scroll-mt-24"
         aria-labelledby="photo-map-heading"
       >
         <div class="photo-map-entry__caption">
           <div>
-            <h2 id="photo-map-heading" class="jp-section-title">踏跡</h2>
-            <p class="photo-map-entry__description">從一個地方，走進一組照片。</p>
+            <h1 id="photo-map-heading" class="jp-section-title">踏跡</h1>
+            <p class="photo-map-entry__description">攝影展間</p>
           </div>
-          <p class="photo-map-entry__hint">全部拍攝地點 · {{ eventLocations.length }} 組活動</p>
+          <a class="hall-link" href="#gallery-activities">
+            活動索引 <Icon name="lucide:arrow-down" aria-hidden="true" />
+          </a>
         </div>
         <div class="photo-map-entry__map">
           <EventMap
@@ -109,49 +111,19 @@
 
       <div
         v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent"
+        id="gallery-activities"
         ref="controlsSectionRef"
-        class="container mx-auto px-4 sm:px-6"
+        class="scroll-mt-24"
       >
         <GalleryArchiveControls
           ref="archiveControlsRef"
           :world="worldId"
           :count="categoryCount"
           :selected-event="filterState.selectedEvent"
+          :has-map-heading="eventLocations.length > 0"
           @open-change="archiveControlsOpen = $event"
         />
       </div>
-
-      <!--
-        地點地圖：僅在攝影作品分類顯示（2026-04-19 起改 compact 版；2026-04-28 priority 2 重構）
-        敘事章節結構：
-          一 · 踏跡 Footsteps（map） → 二 · 句 Statement → 三 · 精選 Selected → 四 · 時間軸 Timeline
-        每段冠以 editorial section header（章碼 + 漢字 + Ruby + hairline）取代孤立的 eyebrow 行，
-        讓策展節奏取代功能感。
-      -->
-
-      <nav
-        v-if="!filterState.selectedEvent && !isGalleryLoading && !galleryLoadFailed"
-        aria-label="主題展"
-        class="mx-auto mb-8 mt-6 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-y border-stone-300/70 dark:border-stone-600/70 lg:mb-12"
-      >
-        <NuxtLink
-          to="/exhibition/light"
-          class="group flex min-h-11 flex-1 items-center justify-between gap-5 py-3 text-stone-800 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-600 dark:text-stone-100 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300"
-        >
-          <span class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span class="font-jp text-lg tracking-[0.08em] sm:text-xl">光落之處</span>
-            <span class="text-sm text-stone-600 dark:text-stone-300">從電繪走向攝影</span>
-          </span>
-          <span aria-hidden="true" class="text-accent-700 dark:text-accent-300">↗</span>
-        </NuxtLink>
-        <a
-          v-if="currentCategory === 'digital'"
-          :href="paintedWorldsUrl"
-          class="inline-flex min-h-11 items-center text-sm text-stone-700 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-600 dark:text-stone-200 dark:focus-visible:outline-accent-300"
-        >
-          進入畫界迴廊
-        </a>
-      </nav>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
@@ -181,7 +153,7 @@
         <div v-else-if="currentCategory === 'digital'">
           <GalleryAtelierTimeline
             :groups="atelierYearGroups"
-            class="world-enter world-enter-d2"
+            :selected-year="filterState.selectedEvent"
             @image-click="(img) => openImageViewer(img, digitalArtItems)"
           />
         </div>
@@ -203,11 +175,7 @@
           </div>
 
           <!-- The map and activity directory stay available on the photography overview. -->
-          <div v-if="!filterState.selectedEvent" class="kage-overview world-enter world-enter-d2">
-            <div class="kage-overview__main">
-              <GalleryEditorialModules :items="photographyEventItems" />
-            </div>
-          </div>
+          <GalleryEditorialModules v-if="!filterState.selectedEvent" :items="photographyEventItems" />
 
           <!-- The complete series remains available below the selection table. -->
           <div
@@ -236,53 +204,36 @@
       </transition>
     </div>
 
-    <!-- Footer — 根據分類變化 -->
-    <div class="container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:py-28 text-center relative overflow-hidden">
-      <div class="deco-line-h absolute left-1/2 top-0 w-40 -translate-x-1/2"/>
-
-      <!-- 背景漢字裝飾 -->
-      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span class="font-jp text-[10rem] sm:text-[14rem] font-thin leading-none text-stone-100/80 dark:text-stone-800/40">
-          {{ currentCategory === 'digital' ? '繪' : currentCategory === 'photography' ? '影' : '創' }}
-        </span>
-      </div>
-
-      <div class="relative">
-        <!-- 上方裝飾：hairline + 墨點 -->
-        <div class="flex items-center justify-center gap-3 mb-6">
-          <div class="h-px w-12 bg-gradient-to-r from-transparent to-stone-300/60 dark:to-stone-600/40"/>
-          <span class="jp-sumi-dot opacity-70"/>
-          <div class="h-px w-12 bg-gradient-to-l from-transparent to-stone-300/60 dark:to-stone-600/40"/>
-        </div>
-
-        <div class="font-jp text-2xl md:text-3xl font-thin text-stone-300 dark:text-stone-600 tracking-wider">{{ footerQuote }}</div>
-        <div class="text-xs text-accent-400/50 dark:text-accent-500/35 mt-3 font-light tracking-[0.4em]">{{ footerSub }}</div>
-      </div>
-    </div>
+    <nav v-if="!isGalleryLoading && !galleryLoadFailed" class="hall-content hall-exit" aria-label="展間動線">
+      <NuxtLink
+        v-if="filterState.selectedEvent"
+        :to="`/gallery/${currentCategory}`"
+        replace
+        class="hall-link"
+      >
+        <Icon name="lucide:arrow-left" aria-hidden="true" />
+        {{ currentCategory === 'photography' ? '回踏跡地圖' : '回繪畫展間' }}
+      </NuxtLink>
+      <NuxtLink v-else to="/" class="hall-link">
+        <Icon name="lucide:arrow-left" aria-hidden="true" /> 回首頁
+      </NuxtLink>
+      <NuxtLink :to="currentCategory === 'photography' ? '/gallery/digital' : '/gallery/photography'" class="hall-link">
+        {{ currentCategory === 'photography' ? '前往繪畫展間' : '前往攝影展間' }}
+        <Icon name="lucide:arrow-right" aria-hidden="true" />
+      </NuxtLink>
+    </nav>
     <!-- 圖片檢視器 -->
     <ImageViewer />
-    <!-- 回到地圖：桌機右側膠囊按鈕 -->
+    <!-- 回到地圖 -->
     <button
       v-if="showBackToMap && currentCategory === 'photography'"
-      class="hidden md:flex fixed right-[10%] top-1/2 z-[1005] -translate-y-1/2 px-3 py-1.5 text-[0.7rem] tracking-[0.3em] rounded-full bg-white/90 border border-stone-200 text-stone-500 hover:text-accent-600 hover:border-accent-300 shadow-japanese transition-all"
+      class="hall-map-return"
       type="button"
       aria-label="回到地圖"
       title="回到地圖"
       @click="scrollToMap"
     >
-      MAP
-    </button>
-
-    <!-- 回到地圖：手機右下圓形按鈕 -->
-    <button
-      v-if="showBackToMap && currentCategory === 'photography'"
-      class="md:hidden fixed z-[1005] flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-stone-200 bg-white/95 text-[0.65rem] tracking-[0.2em] text-stone-500 shadow-japanese transition-all active:scale-95 right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(5rem+env(safe-area-inset-bottom))]"
-      type="button"
-      aria-label="回到地圖"
-      title="回到地圖"
-      @click="scrollToMap"
-    >
-      MAP
+      <Icon name="lucide:arrow-up" aria-hidden="true" /> 踏跡
     </button>
   </div>
 </template>
@@ -293,6 +244,7 @@ import { storeToRefs } from 'pinia'
 import { useGalleryStore } from '~/stores/gallery'
 import { fetchDigitalWorks, fetchPhotographyWorks } from '~/stores/galleryLoaders'
 import { SEO_CONFIG } from '~~/shared/config/constants'
+import { sitePageUrl } from '~~/shared/utils/sitePageUrl'
 import {
   resolveGalleryShareMeta,
   parseGalleryImageIdFromRoute,
@@ -346,7 +298,6 @@ const {
 } = galleryStore
 
 const { getImagePath, getThumbPath } = useImagePath()
-const paintedWorldsUrl = `${useRuntimeConfig().app.baseURL.replace(/\/?$/, '/')}painted-worlds/index.html`
 
 type PhotoMapState = {
   center: [number, number] | null
@@ -422,7 +373,6 @@ const toast = useGlobalToast()
 useGalleryImageRoute()
 useGalleryCategoryRoute()
 useGalleryEventRoute()
-const pageRef = ref<HTMLElement | null>(null)
 const controlsSectionRef = ref<HTMLElement | null>(null)
 const archiveControlsRef = ref<{ open: () => Promise<void> } | null>(null)
 const archiveControlsOpen = ref(false)
@@ -447,30 +397,6 @@ const currentCategory = computed(() => filterState.value.selectedCategory)
  */
 const worldId = computed(() => (currentCategory.value === 'digital' ? 'kai' : 'kage'))
 
-/**
- * worldReady：控制 ::before/::after 質地層淡入。
- * 切換 track 時先抽離再掛回 → 重新觸發世界進場（質地淡入 + .world-enter 動畫重播）。
- * 純一次性進場，無 timer/autoplay，不違 hero 靜態鐵律（此處非 hero）。
- */
-const worldReady = ref(false)
-let worldReadyRaf = 0
-const armWorld = () => {
-  worldReady.value = false
-  if (typeof window === 'undefined') return
-  cancelAnimationFrame(worldReadyRaf)
-  worldReadyRaf = requestAnimationFrame(() => {
-    worldReadyRaf = requestAnimationFrame(() => { worldReady.value = true })
-  })
-}
-
-/**
- * 切換 track 時重新觸發世界進場（質地淡入 + .world-enter 重播）。
- * two-rooms-r1：移除「世界幕」overlay 後，跨世界只靠書口門檻 + 進場呼吸，不再額外掛幕。
- */
-watch(worldId, () => {
-  armWorld()
-})
-
 // Gallery header dynamic info
 // 2026-05-09：移除 'all'，labels 收斂為雙主線
 // （categoryLabel 已隨 GalleryLeftRail 移除而刪除——其唯一消費者是左 rail）
@@ -491,14 +417,6 @@ const miniSearchLabel = computed(() => {
   if (!value) return '無'
   return value.length > 18 ? `${value.slice(0, 18)}…` : value
 })
-
-// Footer quotes by category（2026-05-09：移除 'all' quote）
-const footerQuotes: Record<FilterState['selectedCategory'], { quote: string; sub: string }> = {
-  digital:     { quote: '每一筆都是故事', sub: 'every stroke tells a story' },
-  photography: { quote: '光影之間，皆是詩', sub: 'poetry between light and shadow' },
-}
-const footerQuote = computed(() => footerQuotes[currentCategory.value].quote)
-const footerSub = computed(() => footerQuotes[currentCategory.value].sub)
 
 // 數位作品列表 - 使用經過篩選的 currentWorks（含搜尋／年份）
 const digitalArtItems = computed(() => {
@@ -674,7 +592,9 @@ const isMapComfortablyVisible = () => {
 const scrollToMap = () => {
   // block: 'nearest' 避免使用者已在地圖下方瀏覽時被強拉回頂端；
   // 只有完全看不到地圖時瀏覽器才會自動對齊，符合「柔性引導」原則。
-  mapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  if (!mapSectionRef.value) return
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  mapSectionRef.value.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' })
 }
 
 const scrollToControls = async () => {
@@ -772,14 +692,12 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
-    armWorld()
   }
 })
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', handleScroll)
-    cancelAnimationFrame(worldReadyRaf)
   }
 })
 
@@ -798,25 +716,10 @@ const defaultOgImageAbs = absoluteUrlFromSitePath(
 )
 
 const route = useRoute()
-const requestUrl = useRequestURL()
-
 const shareUrl = computed(() => {
-  if (import.meta.client) return window.location.href
-  return `${requestUrl.origin}${requestUrl.pathname}${requestUrl.search}`
-})
-
-/**
- * JSON-LD 專用的 canonical URL。
- *
- * `useRequestURL()` 在 `nuxt generate` 預渲染時 origin 會是 `http://localhost`，
- * 丟進 schema 會被 Google 當 staging URL。這裡改以 `SEO_CONFIG.siteUrl` 作
- * 基準 origin，但保留 pathname/query 讓 event / image 參數仍帶得進去。
- * （`og:url` 保留原 behavior，避免動到既有 share flow。）
- */
-const schemaCanonicalUrl = computed(() => {
-  if (import.meta.client) return window.location.href
-  const canonicalOrigin = new URL(SEO_CONFIG.siteUrl).origin
-  return `${canonicalOrigin}${requestUrl.pathname}${requestUrl.search}`
+  const [location = ''] = route.fullPath.split('#', 1)
+  const queryStart = location.indexOf('?')
+  return sitePageUrl(route.path, queryStart === -1 ? '' : location.slice(queryStart))
 })
 
 const absPathClean = (filename: string) => {
@@ -848,7 +751,7 @@ const gallerySeoResolved = computed(() =>
     defaultOgImageAbs,
     defaultTitle: seoTitles[currentCategory.value],
     defaultDescription: seoDefaultDescription,
-    pageUrl: schemaCanonicalUrl.value,
+    pageUrl: shareUrl.value,
     author: gallerySchemaAuthor
   })
 )
@@ -895,110 +798,85 @@ useHead({
 }
 .event-filter-summary button:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
 
-/* ===== R40：Digital section 章封 header（與 photography Timeline 對位） ===== */
-.digital-chapter-header {
-  position: relative;
-  padding: 1.6rem 0 1.2rem;
-  margin-bottom: 1.4rem;
-  border-bottom: 1px solid rgb(168 162 158 / 0.2);
+.gallery-world[data-world] {
+  --hall-tone: var(--museum-warm);
+  color: var(--museum-ink);
+  background:
+    linear-gradient(90deg, var(--hall-tone), transparent 15% 85%, var(--hall-tone)),
+    radial-gradient(ellipse 82% 45rem at 48% 0, var(--museum-light), transparent 92%),
+    var(--museum-paper);
 }
-.digital-chapter-header__index {
-  font-size: 0.62rem;
-  letter-spacing: 0.34em;
-  color: rgb(217 123 46 / 0.85);
-  text-transform: uppercase;
-  /* R4：章碼改等寬 mono 製圖字（繪世界專屬 --world-mono），與影 serif 章碼分歧 */
-  font-family: var(--world-mono, ui-monospace, monospace);
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 0.5rem;
+.gallery-world[data-world='kage'] { --hall-tone: var(--museum-cool); }
+.gallery-world::before,
+.gallery-world::after { content: none; }
+
+.hall-content {
+  width: min(86rem, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 5vw, 4rem);
 }
-.digital-chapter-header__title {
-  /* R2：繪章名改世界字族（Zen Kaku Gothic New，幾何 gothic），與影 Shippori 明體分家 */
-  font-family: var(--world-display, 'Noto Serif JP', serif);
-  font-size: 1.85rem;
-  font-weight: var(--world-display-weight, 400);
-  letter-spacing: var(--world-display-spacing, 0.18em);
-  color: rgb(68 64 60);
-  margin: 0;
-  line-height: 1.3;
-}
-:global(.dark) .digital-chapter-header__title { color: rgb(231 229 228); }
-.digital-chapter-header__strongest {
-  margin: 0.6rem 0 0;
-  font-family: 'Noto Serif JP', 'Source Han Serif TC', serif;
-  font-size: 1rem;
-  letter-spacing: 0.06em;
-  line-height: 1.7;
-  color: rgb(120 113 108);
-  font-weight: 300;
-}
-:global(.dark) .digital-chapter-header__strongest { color: rgb(168 162 158); }
-.digital-chapter-header__meta {
-  margin: 0.85rem 0 0;
+.hall-link {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.3em;
-  color: rgb(120 113 108);
-  text-transform: uppercase;
-  /* R4：meta 行（繪 · DIGITAL · N 葉）等寬 mono，製圖標註觸感。
-     「繪」漢字首字由既有 .digital-chapter-header__meta > span:first-child 規則覆寫回 serif */
-  font-family: var(--world-mono, ui-monospace, monospace);
-  font-variant-numeric: tabular-nums;
-}
-.digital-chapter-header__meta > span:first-child {
-  font-family: 'Noto Serif JP', serif;
-  color: rgb(217 123 46);
-  font-size: 0.92rem;
-}
-:global(.dark) .digital-chapter-header__meta > span:first-child { color: rgb(231 184 125); }
-.digital-chapter-header::before {
-  content: '';
-  position: absolute;
-  left: -1rem;
-  top: 1.8rem;
-  bottom: 1rem;
-  width: 2px;
-  border-radius: 1px;
-  background: rgb(217 123 46 / 0.55);
-}
-
-/* R45：digital chapter axes 3 row — 與 photography 對等 */
-.digital-chapter-axes-3row {
-  margin: 1rem 0 0;
-  padding-top: 0.85rem;
-  border-top: 1px solid rgb(168 162 158 / 0.15);
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
+  color: var(--museum-ink);
+  font-size: 0.84rem;
+  text-decoration: underline;
+  text-underline-offset: 0.32em;
+  text-decoration-color: var(--museum-line);
 }
-
-.photo-map-entry { margin: 1.75rem auto clamp(3rem, 6vw, 5rem); }
-.photo-map-entry__caption { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; padding-bottom: 1.75rem; }
-.photo-map-entry__caption .jp-section-title { margin: 0; font-size: clamp(1.9rem, 3.2vw, 2.6rem); }
-.photo-map-entry__description { margin: .65rem 0 0; color: var(--fg-secondary, #58656d); font-size: .85rem; }
-.photo-map-entry__hint { margin: 0; color: #58656d; font-size: .75rem; }
-.dark .photo-map-entry__hint, .dark .photo-map-entry__description { color: #bac5cb; }
-.photo-map-entry__skeleton { height: 440px; background: #e6ecef; }
-.dark .photo-map-entry__skeleton { background: #1d252a; }
-@media (max-width: 767px) {
-  .photo-map-entry { margin-top: 1rem; }
-  .photo-map-entry__caption { align-items: start; gap: 1rem; padding-bottom: 1.25rem; }
-  .photo-map-entry__hint { max-width: 8em; line-height: 1.8; text-align: right; }
-  .photo-map-entry__description { font-size: .78rem; }
-}
-
-/* =========================================================
-   overview：書頁對開扉頁（全寬）之後接章節索引主欄（全寬）
-   ========================================================= */
-.kage-overview {
+.hall-link:hover { text-decoration-color: currentColor; }
+.hall-link:focus-visible,
+.hall-map-return:focus-visible { outline: 2px solid var(--museum-ink); outline-offset: 3px; }
+.hall-exit {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding-block: 2rem clamp(3rem, 7vw, 6rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
 }
+.hall-exit::before { content: ''; flex-basis: 100%; border-top: 1px solid var(--museum-line); }
+.hall-map-return {
+  position: fixed;
+  z-index: 1005;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--museum-line);
+  background: var(--museum-paper);
+  color: var(--museum-ink);
+  font-size: 0.8rem;
+}
+.hall-map-return:hover { border-color: var(--museum-muted); }
 
+.photo-map-entry { margin: 0 auto clamp(2.75rem, 5vw, 4.5rem); padding-top: clamp(1.25rem, 3vw, 2.5rem); }
+.photo-map-entry__caption {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+}
+.photo-map-entry__caption .jp-section-title {
+  margin: 0;
+  color: var(--museum-ink);
+  font-size: clamp(2.15rem, 5vw, 4.35rem);
+  line-height: 1.16;
+}
+.photo-map-entry__description { margin: 0.35rem 0 0; color: var(--museum-muted); font-size: 0.85rem; }
+.photo-map-entry__map {
+  padding: clamp(0.25rem, 0.7vw, 0.55rem);
+  background: var(--museum-cool);
+  border: 1px solid var(--museum-line);
+}
+.photo-map-entry__skeleton { height: 440px; background: var(--museum-cool); }
 
-/* 僅保留頁面內過場與響應式 h1 調整；共用樣式（shadow-japanese、backdrop-blur-japanese、scrollbar 等）已遷入 assets/css/main.css */
 .gallery-fade-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
 .gallery-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
 .gallery-fade-enter-from { opacity: 0; transform: translateY(12px); }
@@ -1029,21 +907,4 @@ useHead({
   }
 }
 
-@media (max-width: 768px) {
-  h1:not(.gallery-masthead-m__title) {
-    font-size: 2rem !important;
-    line-height: 1.2;
-  }
-  /* R6：世界標牌在手機略收，但保留兩世界字級差（mono 緊 / serif 鬆） */
-  .gallery-masthead-m__title--mono { font-size: 1.75rem; }
-  .gallery-masthead-m__title--serif { font-size: 2rem; }
-}
-
-@media (max-width: 480px) {
-  h1:not(.gallery-masthead-m__title) {
-    font-size: 1.75rem !important;
-  }
-  .gallery-masthead-m__title--mono { font-size: 1.6rem; }
-  .gallery-masthead-m__title--serif { font-size: 1.85rem; }
-}
 </style>
