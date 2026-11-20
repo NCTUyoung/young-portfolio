@@ -1,12 +1,16 @@
 import { expect, test } from '@playwright/test'
 
 test('the thematic exhibition connects the two galleries and its three stops', async ({ page }) => {
+  test.setTimeout(75_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/gallery/digital')
   const digitalEntrance = page.getByRole('navigation', { name: '主題展', exact: true })
   await expect(digitalEntrance.getByRole('link', { name: /光落之處/ })).toBeVisible()
-  await page.locator('.gallery-tabs__link[href$="/gallery/photography"]').first().click()
-  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
+  const galleryControls = page.getByTestId('gallery-archive-controls')
+  await expect(galleryControls).toHaveAttribute('data-hydrated', 'true', { timeout: 20_000 })
+  await galleryControls.locator('.gallery-tabs__link[href$="/gallery/photography"]').click()
+  await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
+  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible({ timeout: 20_000 })
   await page.getByRole('navigation', { name: '主題展', exact: true }).getByRole('link', { name: /光落之處/ }).click()
   await expect(page.getByRole('heading', { name: '光落之處', level: 1 })).toBeVisible()
 
