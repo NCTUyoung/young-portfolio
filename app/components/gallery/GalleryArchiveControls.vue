@@ -17,9 +17,9 @@
           data-testid="gallery-year-return"
         >
           <Icon name="lucide:arrow-left" aria-hidden="true" />
-          繪畫展間
+          繪畫館
         </NuxtLink>
-        <component :is="hasMapHeading ? 'h2' : 'h1'" id="gallery-archive-title" class="archive-controls__title font-jp">
+        <component :is="hasMapHeading ? 'h2' : 'h1'" id="gallery-archive-title" class="archive-controls__title font-jp" tabindex="-1">
           {{ title }}
         </component>
       </div>
@@ -114,8 +114,8 @@ const drawerId = computed(() => `${props.controlsId}-drawer`)
 const eventMode = computed(() => Boolean(props.selectedEvent))
 
 const title = computed(() => props.world === 'kai'
-  ? props.selectedEvent || '繪畫展間'
-  : props.hasMapHeading ? '拍攝活動' : '攝影展間')
+  ? props.selectedEvent || '繪畫館'
+  : props.hasMapHeading ? '拍攝活動' : '攝影館')
 
 const filterSummary = computed(() => {
   const event = filterState.value.selectedEvent || '全部事件'
@@ -172,6 +172,11 @@ defineExpose({ open })
   overflow-wrap: anywhere;
 }
 .archive-controls[data-world='kage'] .archive-controls__title { font-size: clamp(1.55rem, 3vw, 2.6rem); }
+.archive-controls__title:focus-visible {
+  outline: none;
+  text-decoration: underline var(--museum-mark) 1px;
+  text-underline-offset: 0.2em;
+}
 .archive-controls__count {
   color: var(--museum-muted);
   font-size: 0.86rem;

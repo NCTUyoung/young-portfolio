@@ -36,12 +36,10 @@ test('the orchard and stage each contain their own three-dimensional character',
   }
 })
 
-test('the homepage reaches the painted-worlds hub, both rooms and their original art', async ({ page }) => {
+test('the legacy foyer link still opens the painted-worlds hub and both rooms', async ({ page }) => {
   test.setTimeout(90_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('./')
-  await waitForSiteHydration(page)
-  await page.getByRole('region', { name: '日光迴廊' }).getByRole('link', { name: /畫界迴廊/ }).click()
+  await page.goto('painted-worlds/index.html?from=home')
   await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
   await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
   await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
@@ -66,11 +64,24 @@ test('the homepage reaches the painted-worlds hub, both rooms and their original
     await expect(original.getByRole('heading')).toHaveText(artwork)
     await expect.poll(() => original.getByRole('img', { name: artwork }).evaluate(img => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
     await page.getByRole('button', { name: '關閉' }).click()
-    await page.getByRole('button', { name: '返回迴廊' }).click()
+    await page.getByRole('button', { name: '迴廊總覽', exact: true }).click()
     await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
   }
-  await page.getByRole('link', { name: '返回首頁', exact: true }).click()
+  await page.getByRole('link', { name: '回到首頁', exact: true }).click()
   await expect(page).toHaveURL(/\/young-portfolio\/$/)
+})
+
+test('the legacy Mika bookmark opens the stage and its original artwork', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('painted-worlds/index.html#stage')
+  await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
+  await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html#stage$/)
+  await expect(page.getByRole('heading', { level: 1, name: '紅色舞台', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: '看原畫' }).click()
+  const original = page.getByRole('dialog')
+  await expect(original.getByRole('heading', { name: 'Mika Nakashima', exact: true })).toBeVisible()
+  await expect.poll(() => original.getByRole('img', { name: 'Mika Nakashima' })
+    .evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true)
 })
 
 const paintedWorks = [
@@ -98,11 +109,11 @@ for (const work of paintedWorks) {
     await page.getByRole('button', { name: '關閉' }).click()
 
     // Exploring a different room and reloading must retain the original source artwork.
-    await page.getByRole('button', { name: '返回迴廊' }).click()
+    await page.getByRole('button', { name: '迴廊總覽', exact: true }).click()
     await page.locator(`[data-door="${work.room === 'orchard' ? 'stage' : 'orchard'}"]`).click()
     await expect(page).not.toHaveURL(new RegExp(`#${work.room}$`))
     await page.reload()
-    await page.getByRole('link', { name: `返回《${work.art}》`, exact: true }).click()
+    await page.getByRole('link', { name: `回到《${work.art}》`, exact: true }).click()
     await expect(page).toHaveURL(/\/young-portfolio\/gallery\/digital\/?\?/)
     await expect.poll(() => new URL(page.url()).searchParams.get('image')).toBe(work.id)
     const viewer = page.getByRole('dialog', { name: '圖片檢視器' })
@@ -140,7 +151,7 @@ test('painted worlds remain usable on a narrow viewport without WebGL', async ({
   await page.getByRole('button', { name: '看原畫' }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await page.getByRole('button', { name: '關閉' }).click()
-  await page.getByRole('button', { name: '返回迴廊' }).click()
+  await page.getByRole('button', { name: '迴廊總覽', exact: true }).click()
   await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
   expect(models).toEqual([])
 })

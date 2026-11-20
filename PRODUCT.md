@@ -8,7 +8,7 @@ Web. A Nuxt portfolio deployed as a static site on GitHub Pages under `/young-po
 
 ## Purpose
 
-Present Young's digital artwork and photography as two distinct, connected bodies of work. Visitors can explore the portfolio from its homepage, browse artwork by year, locate photographic activities on a map, and inspect individual images.
+Present Young's digital artwork and photography through a current exhibition and a browsable collection. Visitors can follow the exhibition from the homepage or go directly to the collection to find a work, a year, or a photographic activity.
 
 ## Content and workflows
 
@@ -16,6 +16,7 @@ Present Young's digital artwork and photography as two distinct, connected bodie
 - The gallery supports category, activity, year, and search filters.
 - Photography has an overview map and directory, individual activity pages, and a complete photo series.
 - The existing image viewer supports large-image inspection, previous/next navigation, and `?image=<id>` sharing links.
+- Painted worlds open from the relevant artwork or exhibition stop and link back to that source.
 
 ## Constraints
 
@@ -26,4 +27,4 @@ Present Young's digital artwork and photography as two distinct, connected bodie
 
 ## Confirmed scope
 
-The October 2026 design work covers the homepage entries and both gallery experiences. The approved presentation directions are a museum exhibition for digital artwork and a photographer's print-selection light table for photography, while retaining the map and activity structure.
+The homepage introduces 《光落之處》 with 《唯一真神》 as the first exhibit. The primary navigation is 當期展, 館藏, and 手記. 館藏 opens the two-collection index. Each collection keeps its established browsing tools and display materials.

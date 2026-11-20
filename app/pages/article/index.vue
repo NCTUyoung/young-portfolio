@@ -17,9 +17,9 @@ const previews = [
 ]
 
 useSeoMeta({
-  title: '文章專區',
+  title: '手記',
   description: '電繪設計心得與 119mm 場邊攝影器材手記。',
-  ogTitle: '文章專區 - 創作手記',
+  ogTitle: '手記 · 繪畫與攝影',
   ogDescription: '電繪設計心得與 119mm 場邊攝影器材手記。',
   ogType: 'website',
   ogImage: 'https://nctuyoung.github.io/young-portfolio/images/gallery/2024年電繪作品/23.jpg',
@@ -30,8 +30,8 @@ useSeoMeta({
 <template>
   <div class="article-index">
     <div class="article-index__contents">
-      <MuseumReadingHeader title="文章">
-        <p>創作手記，記下繪畫、攝影與製作這個網站時的思考。</p>
+      <MuseumReadingHeader title="手記">
+        <p>繪畫、攝影與製作這個網站時的思考。</p>
       </MuseumReadingHeader>
 
       <section aria-labelledby="article-index-heading">

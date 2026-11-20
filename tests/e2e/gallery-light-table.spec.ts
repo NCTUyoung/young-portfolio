@@ -31,7 +31,10 @@ async function filterAndOpenEvent (page: Page, searchQuery: string) {
 test.describe('Photography selection table', () => {
   test('selection stays local until opening, then viewer navigation returns to the chosen print', async ({ page }) => {
     test.setTimeout(60_000)
-    const table = await openTable(page)
+    // Pages opens an activity directory with a trailing slash. The image
+    // query update must retain the same element for Escape to restore focus.
+    const table = await openTable(page, EVENT_PATH + '/')
+    await expect(page).toHaveURL(/\/gallery\/photography\/[^/]+\/$/)
     const strip = table.getByRole('group', { name: '選擇照片' })
     const choices = strip.getByRole('button')
     const total = await choices.count()
@@ -72,16 +75,18 @@ test.describe('Photography selection table', () => {
     const eventImages = photoData.Img.filter(image => image.event.name === EVENT)
     const target = eventImages[1]!
     const imageId = `photography-${target.filename.replace(/\.[^/.]+$/, '')}`
-    const table = await openTable(page, `${EVENT_PATH}?image=${encodeURIComponent(imageId)}`)
+    const table = await openTable(page, `${EVENT_PATH}/?image=${encodeURIComponent(imageId)}`)
     const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
     await expect(dialog).toBeVisible()
     await expect(dialog.locator('.image-viewer-area picture img')).toHaveAttribute('alt', target.title)
+    expect(new URL(page.url()).searchParams.get('image')).toBe(imageId)
     const choices = table.getByRole('group', { name: '選擇照片' }).getByRole('button')
     const total = await choices.count()
     await expect(dialog.locator('.viewer-museum-plaque__meta .tabular-nums')).toContainText(new RegExp(`[／/]\\s*${total}\\s*$`))
 
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
+    await expect(page).not.toHaveURL(/[?&]image=/)
     await expect(table.getByTestId('light-table-selected').locator('img')).toHaveAttribute('alt', target.title)
     await expect(choices.filter({ has: page.locator(`img[alt="${target.title}"]`) })).toHaveAttribute('aria-pressed', 'true')
   })

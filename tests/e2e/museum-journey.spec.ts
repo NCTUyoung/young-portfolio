@@ -6,34 +6,70 @@ import { waitForSiteHydration } from './site-ready'
 const galleryIndex = 'gallery'
 const photographyHall = 'gallery/photography'
 const photoData = JSON.parse(readFileSync(resolve(process.cwd(), 'public/photographyList.json'), 'utf8')) as {
+  Img: Array<{ filename: string; title: string; event: { name: string } }>
   seriesNarratives: Record<string, { prologue?: string; annotation?: string; strongest_line?: string }>
 }
 const digitalData = JSON.parse(readFileSync(resolve(process.cwd(), 'public/galleryList.json'), 'utf8')) as {
-  Img: Array<{ filename: string }>
+  Img: Array<{ filename: string; title: string }>
 }
 
-test('gallery entrance opens the exhibition directly and still offers both collections', async ({ page }) => {
+test('the collection opens both halls and keeps cross-hall navigation', async ({ page }) => {
   await page.goto(galleryIndex)
-  await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
   await waitForSiteHydration(page)
-  await expect(page.locator('.hall-index')).toHaveCount(0)
-  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
-  await page.locator('.gallery-tabs__link[href$="/gallery/digital"]').first().click()
+  await expect(page).toHaveURL(/\/young-portfolio\/gallery\/?$/)
+  await expect(page.getByRole('heading', { name: '館藏', exact: true, level: 1 })).toBeVisible()
+  const rooms = page.getByRole('navigation', { name: '館藏目錄' })
+  const digital = rooms.getByRole('link', { name: '繪畫館', exact: true })
+  await expect(digital).toHaveAttribute('href', '/young-portfolio/gallery/digital')
+  await expect(rooms.getByRole('link', { name: '攝影館', exact: true }))
+    .toHaveAttribute('href', '/young-portfolio/gallery/photography#gallery-activities')
+  await digital.click()
   await expect(page).toHaveURL(/\/gallery\/digital\/?$/)
   await expect(page.getByTestId('gallery-archive-controls')).toBeVisible()
-  await page.locator('.gallery-tabs__link[href$="/gallery/photography"]').first().click()
+  await expect(page.getByTestId('gallery-work-exhibition').getByText(/繪作/)).toBeVisible()
+
+  await page.getByRole('navigation', { name: '切換展館' }).getByRole('link', { name: '攝影館', exact: true }).click()
   await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
   await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
+  await page.getByRole('navigation', { name: '切換展館' }).getByRole('link', { name: '繪畫館', exact: true }).click()
+  await expect(page).toHaveURL(/\/gallery\/digital\/?$/)
 })
 
-test('gallery entrance has no extra selection page with a persisted category choice', async ({ page }) => {
+test('the painting year room returns to the year index anchor', async ({ page }) => {
+  await page.goto(galleryIndex)
+  await waitForSiteHydration(page)
+  await page.getByRole('navigation', { name: '館藏目錄' }).getByRole('link', { name: '繪畫館', exact: true }).click()
+  await expect(page).toHaveURL(/\/gallery\/digital\/?$/)
+  const years = page.getByRole('navigation', { name: '按年代看繪畫' })
+  const year = years.getByRole('link', { name: '2026', exact: true })
+  await year.click()
+  await expect.poll(() => decodeURIComponent(new URL(page.url()).pathname).replace(/\/$/, ''))
+    .toBe('/young-portfolio/gallery/digital/2026年電繪作品')
+  await expect(page.getByRole('heading', { name: '2026年電繪作品', exact: true, level: 1 })).toBeVisible()
+  const backToYears = page.getByTestId('gallery-year-return')
+  await expect(backToYears).toHaveAttribute('href', /\/gallery\/digital\/?#gallery-year-index$/)
+  await backToYears.click()
+  await expect(page).toHaveURL(/\/gallery\/digital\/?#gallery-year-index$/)
+  await expect(year).toBeVisible()
+})
+
+test('the collection opens photography activities despite a persisted painting category', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('gallery-filters', JSON.stringify({
     selectedCategory: 'digital', selectedEvent: null, searchQuery: '', yearFilter: null
   })))
   await page.goto(galleryIndex)
-  await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
-  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
-  await expect(page.locator('.hall-index')).toHaveCount(0)
+  await waitForSiteHydration(page)
+  await expect(page).toHaveURL(/\/gallery\/?$/)
+  const rooms = page.getByRole('navigation', { name: '館藏目錄' })
+  await expect(rooms.getByRole('link', { name: '繪畫館', exact: true })).toBeVisible()
+  await rooms.getByRole('link', { name: '攝影館', exact: true }).click()
+  await expect(page).toHaveURL(/\/gallery\/photography\/?#gallery-activities$/)
+  await expect(page.getByRole('heading', { name: '拍攝活動', exact: true })).toBeFocused()
+  await expect(page.getByTestId('gallery-activity-index').getByRole('heading', { level: 3 }).first()).toBeInViewport()
+  await page.getByRole('navigation', { name: '拍攝活動瀏覽方式' }).getByRole('link', { name: '依地點', exact: true }).click()
+  await expect(page).toHaveURL(/\/gallery\/photography\/?#gallery-footsteps$/)
+  await expect(page.getByRole('heading', { name: '踏跡', exact: true })).toBeFocused()
+  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeInViewport()
 })
 
 test('photography map keeps all activity circles and its selected series card opens that event', async ({ page }) => {
@@ -73,7 +109,7 @@ test('photography map keeps all activity circles and its selected series card op
 test('article index gives each published chapter one entrance with durable wording', async ({ page }) => {
   await page.goto('./')
   await waitForSiteHydration(page)
-  await page.getByRole('navigation', { name: '網站導覽' }).getByRole('link', { name: '文章', exact: true }).click()
+  await page.getByRole('navigation', { name: '網站導覽' }).getByRole('link', { name: '手記', exact: true }).click()
   await expect(page).toHaveURL(/\/young-portfolio\/article\/?$/)
   await expect(page.locator('main a[href$="/article/design-thinking"]')).toHaveCount(1)
   await expect(page.locator('main a[href$="/article/gear-119mm"]')).toHaveCount(1)
@@ -134,7 +170,7 @@ test('an unnamed photograph keeps its exhibition label across viewer and filtere
   await expect.poll(() => new URL(page.url()).searchParams.get('image')).toBe(firstImageId)
 })
 
-test('header Gallery enters photography directly and Back restores the visited room', async ({ page }) => {
+test('header Collection shows both halls and Back restores the visited room', async ({ page }) => {
   for (const path of ['gallery/digital', 'gallery/photography/Annber%20%E5%A4%96%E6%8B%8D']) {
     await page.goto(path)
     const previousRoomUrl = page.url()
@@ -142,14 +178,15 @@ test('header Gallery enters photography directly and Back restores the visited r
       ? page.getByTestId('gallery-archive-controls')
       : page.locator('#event-cover-heading')
     await expect(room).toBeVisible()
-    const header = page.locator('nav[data-hydrated]')
+    const header = page.getByRole('navigation', { name: '網站導覽' })
     await waitForSiteHydration(page)
-    const galleryLink = header.getByRole('link', { name: '圖片庫', exact: true })
-    await expect(galleryLink).toHaveAttribute('href', /\/gallery\/photography$/)
+    const galleryLink = header.getByRole('link', { name: '館藏', exact: true })
+    await expect(galleryLink).toHaveAttribute('href', /\/gallery\/?$/)
     await galleryLink.click()
-    await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
-    await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
-    await expect(page.locator('.hall-index')).toHaveCount(0)
+    await expect(page).toHaveURL(/\/gallery\/?$/)
+    const rooms = page.getByRole('navigation', { name: '館藏目錄' })
+    await expect(rooms.getByRole('link', { name: '繪畫館', exact: true })).toBeVisible()
+    await expect(rooms.getByRole('link', { name: '攝影館', exact: true })).toBeVisible()
     await page.goBack()
     await expect(page).toHaveURL(previousRoomUrl)
     await expect(room).toBeVisible()
@@ -157,25 +194,31 @@ test('header Gallery enters photography directly and Back restores the visited r
 })
 
 test('legacy gallery image links open the matching hall while an unknown image leaves photography usable', async ({ page }) => {
+  test.setTimeout(60_000)
   const hydrationWarnings: string[] = []
   page.on('console', message => {
     if (/hydration.*mismatch/i.test(message.text())) hydrationWarnings.push(message.text())
   })
-  const filename = digitalData.Img[0]!.filename
-  const imageId = `digital-${filename.replace(/\.[^/.]+$/, '')}`
-  await page.goto(`/gallery?image=${encodeURIComponent(imageId)}&keep=x#fragment`)
-  await expect(page).toHaveURL(/\/gallery\/digital\?/)
-  await expect(page.getByRole('dialog', { name: '圖片檢視器' })).toBeVisible()
-  const resolved = new URL(page.url())
-  expect(resolved.searchParams.get('image')).toBe(imageId)
-  expect(resolved.searchParams.get('keep')).toBe('x')
-  expect(resolved.hash).toBe('#fragment')
-  expect(hydrationWarnings).toEqual([])
+  const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
+  for (const example of [
+    { path: 'gallery/', category: 'digital', work: digitalData.Img[0]! },
+    { path: 'gallery/all/', category: 'photography', work: photoData.Img.find(work => work.event.name === 'Annber 外拍')! }
+  ]) {
+    const imageId = `${example.category}-${example.work.filename.replace(/\.[^/.]+$/, '')}`
+    await page.goto(`${example.path}?image=${encodeURIComponent(imageId)}&keep=x#fragment`)
+    await expect(page).toHaveURL(new RegExp(`/young-portfolio/gallery/${example.category}/?\\?`))
+    await expect(dialog.locator('.image-viewer-area picture img')).toHaveAttribute('alt', example.work.title)
+    const resolved = new URL(page.url())
+    expect(resolved.searchParams.get('image')).toBe(imageId)
+    expect(resolved.searchParams.get('keep')).toBe('x')
+    expect(resolved.hash).toBe('#fragment')
+  }
 
   await page.goto('gallery?image=missing-image-8372&keep=x#fragment')
   await expect(page).toHaveURL(/\/gallery\/photography\?/)
   await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
-  await expect(page.getByRole('dialog', { name: '圖片檢視器' })).toHaveCount(0)
+  await expect(dialog).toHaveCount(0)
+  expect(hydrationWarnings).toEqual([])
 })
 
 test('viewer radial choices stay on screen and switch photos at desktop and mobile widths', async ({ page }) => {
@@ -227,16 +270,25 @@ test('viewer radial choices stay on screen and switch photos at desktop and mobi
 test.describe('museum journey on mobile', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
 
-  test('mobile Gallery menu enters photography without a room-selection page', async ({ page }) => {
-    await page.goto('article')
+  test('the three visible mobile navigation links open the exhibition, collection and journal at 320px', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 })
+    await page.goto('./')
     await waitForSiteHydration(page)
-    await page.getByRole('button', { name: '開啟選單' }).click()
-    const galleryLink = page.getByRole('menuitem', { name: /圖片庫/ })
-    await expect(galleryLink).toHaveAttribute('href', /\/gallery\/photography$/)
-    await galleryLink.click()
-    await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
-    await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
-    await expect(page.locator('.hall-index')).toHaveCount(0)
+    const nav = page.getByRole('navigation', { name: '網站導覽' })
+    await nav.getByRole('link', { name: '當期展', exact: true }).tap()
+    await expect(page).toHaveURL(/\/exhibition\/light\/?#painting$/)
+    await expect(page.getByRole('heading', { level: 2, name: '唯一真神', exact: true })).toBeVisible()
+    await nav.getByRole('link', { name: '館藏', exact: true }).tap()
+    await expect(page).toHaveURL(/\/gallery\/?$/)
+    await page.getByRole('navigation', { name: '館藏目錄' }).getByRole('link', { name: '攝影館', exact: true }).tap()
+    await expect(page).toHaveURL(/\/gallery\/photography\/?#gallery-activities$/)
+    await expect(page.getByTestId('gallery-activity-index').getByRole('heading', { level: 3 }).first()).toBeInViewport()
+    await page.getByRole('navigation', { name: '拍攝活動瀏覽方式' }).getByRole('link', { name: '依地點', exact: true }).tap()
+    await expect(page).toHaveURL(/\/gallery\/photography\/?#gallery-footsteps$/)
+    await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeInViewport()
+    await nav.getByRole('link', { name: '手記', exact: true }).tap()
+    await expect(page).toHaveURL(/\/young-portfolio\/article\/?$/)
+    await expect(page.getByRole('heading', { level: 1, name: '手記', exact: true })).toBeVisible()
   })
 
   test('article breadcrumb has a readable touch target without horizontal overflow', async ({ page }) => {

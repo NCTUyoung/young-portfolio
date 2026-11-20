@@ -25,8 +25,7 @@ export function useGalleryEventRoute () {
   const syncingFromRoute = ref(false)
 
   /** 取出已 decode 的事件名（path 進來時 vue-router 會自動 decodeURIComponent，但保險起見再 decode 一次以容錯）。 */
-  function readEventParam (): string | null {
-    const raw = route.params.event
+  function readEventParam (raw: string | string[] | undefined): string | null {
     const v = Array.isArray(raw) ? raw[0] : raw
     if (!v || typeof v !== 'string') return null
     try { return decodeURIComponent(v) } catch { return v }
@@ -41,7 +40,7 @@ export function useGalleryEventRoute () {
     if (isLoading.value) return
 
     const cat = filterState.value.selectedCategory
-    const pathEvent = readEventParam()
+    const pathEvent = readEventParam(route.params.event)
 
     if (cat !== 'photography' && cat !== 'digital') return
 
@@ -101,22 +100,26 @@ export function useGalleryEventRoute () {
     (ev) => {
       if (!import.meta.client) return
       if (syncingFromRoute.value) return
-      if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(route.path)) return
+      const location = router.currentRoute.value
+      if (!/^\/gallery\/(?:digital|photography)(?:\/|$)/.test(location.path)) return
+      // Nuxt can retain the outgoing view while the incoming page resets the store.
+      // Only the current gallery view may sync the selected event back to the URL.
+      if (location.path.replace(/\/$/, '') !== route.path.replace(/\/$/, '')) return
 
       const cat = filterState.value.selectedCategory
       if (cat !== 'photography' && cat !== 'digital') return
 
-      const current = readEventParam()
+      const current = readEventParam(location.params.event)
 
       if (ev === null) {
         if (current !== null) {
-          router.replace({ path: `/gallery/${cat}`, query: route.query, hash: route.hash })
+          router.replace({ path: `/gallery/${cat}`, query: location.query, hash: location.hash })
         }
         return
       }
 
       if (current !== ev) {
-        router.replace({ path: `/gallery/${cat}/${encodeURIComponent(ev)}`, query: route.query, hash: route.hash })
+        router.replace({ path: `/gallery/${cat}/${encodeURIComponent(ev)}`, query: location.query, hash: location.hash })
       }
     }
   )

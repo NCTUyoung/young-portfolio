@@ -6,7 +6,7 @@
           <strong>NCTU</strong><span>Young</span>
         </NuxtLink>
 
-        <div class="site-nav-desktop">
+        <div class="site-nav-links">
           <NuxtLink
             v-for="link in navLinks"
             :key="link.to"
@@ -23,32 +23,6 @@
           </button>
         </div>
 
-        <div class="site-nav-mobile">
-          <HeadlessMenu as="div" class="relative">
-            <HeadlessMenuButton type="button" class="site-menu-toggle" aria-label="開啟選單">
-              <Icon name="lucide:menu" aria-hidden="true" />
-            </HeadlessMenuButton>
-            <HeadlessMenuItems class="site-menu">
-              <HeadlessMenuItem v-for="link in navLinks" :key="link.to" v-slot="{ active }">
-                <NuxtLink :to="link.to" class="site-menu-item" :class="{ 'site-menu-active': active }">
-                  {{ link.label }}
-                </NuxtLink>
-              </HeadlessMenuItem>
-              <HeadlessMenuItem v-slot="{ active }">
-                <button
-                  type="button"
-                  class="site-menu-item site-menu-theme"
-                  :class="{ 'site-menu-active': active }"
-                  @click="toggleDark()"
-                >
-                  <span>{{ themeLabel }}</span>
-                  <Icon v-if="isDark" name="lucide:sun" aria-hidden="true" />
-                  <Icon v-else name="lucide:moon" aria-hidden="true" />
-                </button>
-              </HeadlessMenuItem>
-            </HeadlessMenuItems>
-          </HeadlessMenu>
-        </div>
       </div>
     </nav>
 
@@ -91,15 +65,16 @@ const themeLabel = computed(() => layoutHydrated.value && isDark.value ? '切換
 const currentYear = new Date().getFullYear()
 
 const navLinks = [
-  { to: '/', label: '首頁', section: 'home' },
-  { to: '/gallery/photography', label: '圖片庫', section: 'works' },
-  { to: '/article', label: '文章', section: 'article' },
+  { to: '/exhibition/light#painting', label: '當期展', section: 'exhibition' },
+  { to: '/gallery', label: '館藏', section: 'collection' },
+  { to: '/article', label: '手記', section: 'journal' },
 ] as const
 
 const currentSection = computed(() => {
-  if (route.path.startsWith('/gallery') || route.path.startsWith('/exhibition')) return 'works'
-  if (route.path.startsWith('/article')) return 'article'
-  return route.path === '/' ? 'home' : undefined
+  if (route.path === '/' || route.path.startsWith('/exhibition')) return 'exhibition'
+  if (route.path.startsWith('/gallery')) return 'collection'
+  if (route.path.startsWith('/article')) return 'journal'
+  return undefined
 })
 
 onMounted(() => { layoutHydrated.value = true })
@@ -140,21 +115,22 @@ onMounted(() => { layoutHydrated.value = true })
 
 .site-signature strong { font-size: 1.26rem; letter-spacing: .06em; }
 .site-signature span { font-size: .68rem; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; }
-.site-nav-desktop, .site-footer-actions { display: flex; align-items: center; gap: clamp(.8rem, 2vw, 2rem); }
+.site-nav-links, .site-footer-actions { display: flex; align-items: center; gap: clamp(.8rem, 2vw, 2rem); }
 
 .site-nav-link {
   display: grid;
   place-items: center;
+  min-width: 44px;
   min-height: 44px;
   padding-inline: .4rem;
   border-block: 1px solid transparent;
   color: var(--museum-muted);
   font-size: .88rem;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .site-nav-current, .site-nav-link:hover { border-bottom-color: var(--museum-mark); color: var(--museum-ink); }
-.site-nav-mobile { display: none; }
 
 .site-menu-toggle {
   display: grid;
@@ -164,29 +140,6 @@ onMounted(() => { layoutHydrated.value = true })
   color: var(--museum-ink);
 }
 
-.site-menu {
-  position: absolute;
-  inset: calc(100% + 7px) 0 auto auto;
-  min-width: min(15rem, 77vw);
-  padding: .5rem .75rem;
-  border: 1px solid var(--museum-line);
-  background: var(--museum-paper);
-  box-shadow: 0 12px 24px #17110b14;
-}
-
-.site-menu-item {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  width: 100%;
-  padding-inline: .65rem;
-  border-bottom: 1px solid var(--museum-line);
-  color: var(--museum-ink);
-  text-decoration: none;
-}
-
-.site-menu-active { background: var(--museum-light); }
-.site-menu-theme { justify-content: space-between; border: none; }
 .site-main { min-height: min(28rem, 70svh); }
 
 .site-footer {
@@ -205,8 +158,12 @@ onMounted(() => { layoutHydrated.value = true })
 .site-admin:hover { color: var(--museum-mark); text-decoration: underline; text-underline-offset: .22em; }
 
 @media (max-width: 767px) {
-  .site-nav-desktop { display: none; }
-  .site-nav-mobile { display: block; }
+  .site-nav-inner { gap: .45rem; }
+  .site-nav-links { gap: clamp(0rem, calc((100vw - 320px) / 12), .65rem); }
+  .site-nav-link { padding-inline: .2rem; font-size: .8rem; }
+  .site-nav .site-signature { gap: .25rem; padding-left: .35rem; }
+  .site-nav .site-signature strong { font-size: .95rem; }
+  .site-nav .site-signature span { font-size: .55rem; letter-spacing: .13em; }
   .site-footer-actions { flex-wrap: wrap; }
 }
 </style>

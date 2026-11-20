@@ -1,23 +1,20 @@
 import { expect, test } from '@playwright/test'
 import { waitForSiteHydration } from './site-ready'
 
-test('the thematic exhibition connects the two galleries and its three stops', async ({ page }) => {
+test('the current exhibition goes from the home foyer to all three stops and returns from the painted world', async ({ page }) => {
   test.setTimeout(75_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('gallery/digital')
-  await expect(page.getByTestId('gallery-work-exhibition').getByText(/繪作/)).toBeVisible()
-  const galleryControls = page.getByTestId('gallery-archive-controls')
-  await expect(galleryControls).toHaveAttribute('data-hydrated', 'true', { timeout: 20_000 })
-  await galleryControls.locator('.gallery-tabs__link[href$="/gallery/photography"]').click()
-  await expect(page).toHaveURL(/\/gallery\/photography\/?$/)
-  await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible({ timeout: 20_000 })
-  await page.getByRole('navigation', { name: '網站導覽' }).getByRole('link', { name: '首頁', exact: true }).click()
-  await page.getByRole('region', { name: '日光迴廊' }).getByRole('link', { name: /主題展.*光落之處/ }).click()
-  await expect(page).toHaveURL(/\/exhibition\/light\/?#painting$/)
+  await page.goto('./')
+  await waitForSiteHydration(page)
+  await page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展', exact: true }).click()
+  await expect(page).toHaveURL(/\/young-portfolio\/exhibition\/light\/?#painting$/)
   await expect(page.getByRole('heading', { name: '光落之處', level: 1 })).toBeVisible()
 
   const stops = page.getByRole('navigation', { name: '展線', exact: true }).getByRole('link')
   await expect(stops).toHaveCount(3)
+  const painting = page.getByRole('heading', { name: '唯一真神', exact: true, level: 2 })
+  await expect(painting).toBeVisible()
+  await expect(stops.nth(0)).toHaveAttribute('aria-current', 'step')
   const windowLink = page.getByRole('link', { name: /觀景窗/ })
   await windowLink.focus()
   await page.keyboard.press('Enter')
@@ -33,31 +30,80 @@ test('the thematic exhibition connects the two galleries and its three stops', a
   await expect(stops.nth(1)).toHaveAttribute('aria-current', 'step')
 
   await stops.nth(0).click()
-  await page.getByRole('link', { name: /進入畫界/ }).click()
-  await expect(page.getByRole('heading', { name: '畫界迴廊', level: 1 })).toBeVisible()
-  await page.getByRole('link', { name: '返回光落之處', exact: true }).click()
+  await expect(painting).toBeVisible()
+  const orchard = page.getByRole('region', { name: '唯一真神', exact: true }).getByRole('link', { name: /畫界/ })
+  const orchardUrl = /\/young-portfolio\/painted-worlds\/index\.html\?from=light#orchard$/
+  await expect(orchard).toHaveAttribute('href', orchardUrl)
+  await orchard.click()
+  await expect(page).toHaveURL(orchardUrl)
+  await expect(page.getByRole('heading', { name: '柑橘樹下', exact: true, level: 1 })).toBeVisible()
+  await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
+  await page.getByRole('link', { name: '回到繪作站', exact: true }).click()
   await expect(page).toHaveURL(/\/exhibition\/light\/?#painting$/)
-  await expect(page.getByRole('heading', { name: '光落之處', level: 1 })).toBeVisible()
+  await expect(painting).toBeVisible()
   await expect(stops.nth(0)).toHaveAttribute('aria-current', 'step')
 })
 
+test('catalogue failures leave exhibition navigation usable and retry restores the artwork', async ({ page }) => {
+  await page.goto('article')
+  await waitForSiteHydration(page)
+  let failRequests = true
+  const failed = new Set<string>()
+  await page.route(/\/(galleryList|photographyList)\.json(?:\?|$)/, async route => {
+    if (!failRequests) return route.continue()
+    failed.add(new URL(route.request().url()).pathname.split('/').at(-1)!)
+    await route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+  })
+  await page.getByRole('link', { name: 'NCTU Young — 首頁', exact: true }).click()
+  await page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展', exact: true }).click()
+  const status = page.getByRole('status').filter({ hasText: '館藏資料暫時無法讀取。' })
+  await expect(status).toBeVisible({ timeout: 20_000 })
+  expect(failed).toEqual(new Set(['galleryList.json', 'photographyList.json']))
+  await expect(page.getByRole('link', { name: '回序廳', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: /觀景窗.*花下/ })).toBeVisible()
+
+  failRequests = false
+  await page.getByRole('button', { name: '重試', exact: true }).click()
+  await expect(status).toBeHidden()
+  await expect(page.getByRole('heading', { name: '唯一真神', exact: true, level: 2 })).toBeVisible()
+  await expect(page.getByRole('link', { name: /觀景窗.*DSC_1377-編輯-1/ })).toBeVisible()
+})
+
 for (const station of [
-  { hash: '#flowers', stop: '花下', title: 'DSC_1377-編輯-1' },
-  { hash: '#bench', stop: '長椅', title: '長椅與參道' }
+  { hash: '#flowers', stop: '花下', title: 'DSC_1377-編輯-1', adjacentStop: '長椅' },
+  { hash: '#bench', stop: '長椅', title: '長椅與參道', adjacentStop: '花下' }
 ]) {
   test(`fresh ${station.hash} bookmark renders its artwork and active stop`, async ({ page }) => {
     await page.goto(`exhibition/light/${station.hash}`, { waitUntil: 'domcontentloaded' })
     await waitForSiteHydration(page)
     expect(new URL(page.url()).hash).toBe(station.hash)
-    await expect(page.getByRole('heading', { level: 2, name: station.title, exact: true })).toBeVisible()
+    const artwork = page.getByRole('heading', { level: 2, name: station.title, exact: true })
+    await expect(artwork).toBeVisible()
     const route = page.getByRole('navigation', { name: '展線', exact: true })
     await expect(route.locator('[aria-current="step"]')).toHaveCount(1)
-    await expect(route.getByRole('link', { name: station.stop, exact: true })).toHaveAttribute('aria-current', 'step')
+    const activeStop = route.getByRole('link', { name: station.stop, exact: true })
+    await expect(activeStop).toHaveAttribute('aria-current', 'step')
+    const bookmarkUrl = page.url()
     if (station.hash === '#bench') {
-      const exit = page.getByRole('link', { name: '前往攝影館', exact: true })
+      const exit = page.getByRole('link', { name: /展覽出口.*前往館藏/ })
       await expect(exit).toBeVisible()
-      await expect(exit).toHaveAttribute('href', /\/young-portfolio\/gallery\/photography\/?$/)
+      await expect(exit).toHaveAttribute('href', /\/young-portfolio\/gallery\/?$/)
+      await page.getByRole('link', { name: /續看攝影系列.*WBC東京 台澳/ }).click()
+      await expect(page.locator('#event-cover-heading')).toHaveText('WBC東京 台澳')
+      await page.goBack()
+      await expect(page).toHaveURL(bookmarkUrl)
+      await expect(activeStop).toHaveAttribute('aria-current', 'step')
     }
+    const adjacentStop = route.getByRole('link', { name: station.adjacentStop, exact: true })
+    await adjacentStop.click()
+    await expect(adjacentStop).toHaveAttribute('aria-current', 'step')
+    await page.goBack()
+    await expect(page).toHaveURL(bookmarkUrl)
+    await expect(activeStop).toHaveAttribute('aria-current', 'step')
+    await expect(artwork).toBeVisible()
+    await page.getByRole('link', { name: '回序廳', exact: true }).click()
+    await expect(page).toHaveURL(/\/young-portfolio\/$/)
+    await expect(page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展' })).toBeVisible()
   })
 }
 

@@ -7,7 +7,8 @@ test.describe('Gallery /gallery/photography', () => {
     await expect(page.locator('.photo-map-entry')).toBeVisible({ timeout: 10_000 })
     await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible()
     await expect(page.getByRole('button', { name: /組圖，共 \d+ 張/ }).first()).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: '踏跡' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: '攝影館', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name: '踏跡', exact: true })).toBeVisible()
   })
 
   test('點地圖代表照片進入組圖，系列照片預設展開', async ({ page }) => {

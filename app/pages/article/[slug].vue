@@ -160,7 +160,7 @@ const article = computed<ArticleData>(() => {
 })
 
 useSeoMeta({
-  title: () => `${article.value.title} · 文章`,
+  title: () => `${article.value.title} · 手記`,
   description: () => article.value.strongestLine,
   ogTitle: () => `${article.value.title} — NCTU Young`,
   ogDescription: () => article.value.strongestLine,

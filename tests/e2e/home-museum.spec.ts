@@ -1,18 +1,14 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 import { waitForSiteHydration } from './site-ready'
 
-type Work = { title: string, series?: string[] }
-const digitalWorks = (JSON.parse(readFileSync(resolve(process.cwd(), 'public/galleryList.json'), 'utf8')) as { Img: Work[] }).Img
-const photoWorks = (JSON.parse(readFileSync(resolve(process.cwd(), 'public/photographyList.json'), 'utf8')) as { Img: Work[] }).Img
-
-test.describe('首頁展廳入口', () => {
-  test('keeps two hero entrances and goes straight to about without repeating selected works', async ({ page }) => {
+test.describe('首頁序廳', () => {
+  test('the foyer offers the current exhibition and collection before the author sections', async ({ page }) => {
     await page.goto('/young-portfolio/')
-    const entrance = page.getByRole('region', { name: '日光迴廊' })
-    await expect(entrance.getByRole('link', { name: /繪畫館/ })).toBeVisible()
-    await expect(entrance.getByRole('link', { name: /攝影館/ })).toBeVisible()
+    const entrance = page.getByRole('region', { name: '光落之處' })
+    await expect(entrance.getByRole('link', { name: '開始看展', exact: true }))
+      .toHaveAttribute('href', /\/young-portfolio\/exhibition\/light\/?#painting$/)
+    await expect(entrance.getByRole('link', { name: '瀏覽館藏', exact: true }))
+      .toHaveAttribute('href', /\/young-portfolio\/gallery\/?$/)
     await expect(page.getByRole('heading', { name: '作品選集', exact: true })).toHaveCount(0)
     await expect(page.locator('#featured')).toHaveCount(0)
     await expect(page.locator('#about')).toBeVisible()
@@ -22,38 +18,6 @@ test.describe('首頁展廳入口', () => {
       Array.from(main.querySelectorAll('section')).map(section => section.id || 'hero')
     )
     expect(order).toEqual(['hero', 'about', 'journey', 'epilogue'])
-  })
-
-  test('failed hero data shows a retry that restores the real hero titles', async ({ page }) => {
-    await page.goto('/young-portfolio/article')
-    await waitForSiteHydration(page)
-    let failRequests = true
-    const failed = { galleryList: 0, photographyList: 0 }
-    await page.route(/\/(galleryList|photographyList)\.json(?:\?|$)/, async route => {
-      if (failRequests) {
-        const name = route.request().url().includes('photographyList.json') ? 'photographyList' : 'galleryList'
-        failed[name]++
-        await route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
-      } else {
-        await route.continue()
-      }
-    })
-    await page.getByRole('link', { name: 'NCTU Young — 首頁' }).click()
-    const alert = page.getByTestId('home-gallery-error')
-    await expect(alert).toBeVisible({ timeout: 20_000 })
-    await expect(alert).toHaveAttribute('role', 'alert')
-    await expect(alert).toContainText('作品資料暫時無法載入，請重新載入。')
-    expect(failed.galleryList).toBeGreaterThan(0)
-    expect(failed.photographyList).toBeGreaterThan(0)
-    await expect(page.getByRole('link', { name: /繪畫館/ })).toBeVisible()
-    await expect(page.getByRole('link', { name: /攝影館/ })).toBeVisible()
-    failRequests = false
-    await alert.getByRole('button', { name: '重新載入作品' }).click()
-    await expect(alert).toBeHidden()
-    const artwork = digitalWorks.find(work => work.series?.includes('hero'))!
-    const photograph = photoWorks.find(work => work.series?.includes('hero'))!
-    await expect(page.locator('.hero-page--kai img')).toHaveAttribute('alt', `電繪作品代表 — ${artwork.title}`)
-    await expect(page.locator('.hero-page__print--main img')).toHaveAttribute('alt', photograph.title)
   })
 
   test('full journey starts closed and opens with the keyboard to show all five milestones', async ({ page }) => {
@@ -73,20 +37,30 @@ test.describe('首頁展廳入口', () => {
   })
 })
 
-test.describe('首頁展廳入口 / mobile', () => {
-  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
-  test('menu stays visitor focused and the shorter homepage does not overflow', async ({ page }) => {
+test.describe('首頁導覽 / 320px', () => {
+  test.use({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true })
+  test('all three navigation links and the theme button fit on the same tappable row', async ({ page }) => {
     await page.goto('/young-portfolio/')
     await waitForSiteHydration(page)
-    const menu = page.getByRole('button', { name: '開啟選單' })
-    await expect(menu).toBeVisible()
-    const box = await menu.boundingBox()
-    expect(box).not.toBeNull()
-    expect(box!.width).toBeGreaterThanOrEqual(44)
-    expect(box!.height).toBeGreaterThanOrEqual(44)
-    await menu.click()
-    await expect(page.getByRole('menu')).toBeVisible()
-    await expect(page.getByRole('menu').locator('a[href*="/admin"]')).toHaveCount(0)
+    const nav = page.getByRole('navigation', { name: '網站導覽' })
+    const exhibition = nav.getByRole('link', { name: '當期展', exact: true })
+    const collection = nav.getByRole('link', { name: '館藏', exact: true })
+    const journal = nav.getByRole('link', { name: '手記', exact: true })
+    const theme = nav.getByRole('button', { name: '切換到深色模式', exact: true })
+    const centers = []
+    for (const control of [exhibition, collection, journal, theme]) {
+      await expect(control).toBeInViewport({ ratio: 1 })
+      const box = (await control.boundingBox())!
+      expect(box.width).toBeGreaterThanOrEqual(44)
+      expect(box.height).toBeGreaterThanOrEqual(44)
+      centers.push(box.y + box.height / 2)
+    }
+    expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(2)
+    await expect(exhibition).toHaveAttribute('href', /\/exhibition\/light\/?#painting$/)
+    await expect(collection).toHaveAttribute('href', /\/gallery\/?$/)
+    await expect(journal).toHaveAttribute('href', /\/article\/?$/)
+    await expect(nav.getByRole('button', { name: '開啟選單' })).toHaveCount(0)
+    await expect(nav.locator('a[href*="/admin"]')).toHaveCount(0)
     await expect(page.locator('footer a[href$="/admin"]')).toHaveCount(1)
     await expect(page.locator('#featured')).toHaveCount(0)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
@@ -97,34 +71,44 @@ for (const viewport of [
   { width: 320, height: 640 }, { width: 360, height: 640 },
   { width: 390, height: 844 }, { width: 1440, height: 900 }
 ]) {
-  test.describe(`Museum doors at ${viewport.width}px`, () => {
+  test.describe(`Foyer entrances at ${viewport.width}px`, () => {
     const mobile = viewport.width < 768
     test.use({ viewport, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' })
 
-    test('both doors start within the viewport and lead directly to their halls', async ({ page }) => {
+    test('the exhibition and collection links fit on the first screen and reach their destinations', async ({ page }) => {
       await page.goto('./')
       await waitForSiteHydration(page)
-      const entrance = page.getByRole('region', { name: '日光迴廊' })
-      const digital = entrance.getByRole('link', { name: /繪畫館/ })
-      const photography = entrance.getByRole('link', { name: /攝影館/ })
+      const entrance = page.getByRole('region', { name: '光落之處' })
+      const start = entrance.getByRole('link', { name: '開始看展', exact: true })
+      const collection = entrance.getByRole('link', { name: '瀏覽館藏', exact: true })
 
-      for (const door of [digital, photography]) {
-        await expect(door).toBeInViewport({ ratio: 1 })
-        const bounds = (await door.boundingBox())!
+      for (const link of [start, collection]) {
+        await expect(link).toBeInViewport({ ratio: 1 })
+        const bounds = (await link.boundingBox())!
         expect(bounds.width).toBeGreaterThanOrEqual(44)
         expect(bounds.height).toBeGreaterThanOrEqual(44)
       }
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 
-      await digital.click()
-      await expect(page).toHaveURL(/\/young-portfolio\/gallery\/digital\/?$/)
-      await expect(page.getByTestId('gallery-archive-controls')).toBeVisible()
+      await start.focus()
+      await expect(start).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(page).toHaveURL(/\/young-portfolio\/exhibition\/light\/?#painting$/)
+      await expect(page.getByRole('heading', { level: 2, name: '唯一真神', exact: true })).toBeVisible()
       await page.goBack()
       await expect(page).toHaveURL(/\/young-portfolio\/$/)
       await waitForSiteHydration(page)
-      await photography.click()
-      await expect(page).toHaveURL(/\/young-portfolio\/gallery\/photography\/?$/)
-      await expect(page.getByRole('region', { name: '影的互動拍攝地圖' })).toBeVisible({ timeout: 20_000 })
+      await collection.click()
+      await expect(page).toHaveURL(/\/young-portfolio\/gallery\/?$/)
+      const rooms = page.getByRole('navigation', { name: '館藏目錄' })
+      for (const name of ['繪畫館', '攝影館']) {
+        const room = rooms.getByRole('link', { name, exact: true })
+        await expect(room).toBeVisible()
+        const bounds = (await room.boundingBox())!
+        expect(bounds.width).toBeGreaterThanOrEqual(44)
+        expect(bounds.height).toBeGreaterThanOrEqual(44)
+      }
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     })
   })
 }
@@ -163,21 +147,14 @@ for (const mobile of [false, true]) {
       await page.goto('./')
       await waitForSiteHydration(page)
       const html = page.locator('html')
-      const toggle = async (name: string) => {
-        if (mobile) {
-          await page.getByRole('button', { name: '開啟選單' }).click()
-          await page.getByRole('menuitem', { name }).click()
-        } else {
-          await page.getByRole('button', { name }).click()
-        }
-      }
+      const nav = page.getByRole('navigation', { name: '網站導覽' })
       await expect(html).not.toHaveClass(/\bdark\b/)
-      await toggle('切換到深色模式')
+      await nav.getByRole('button', { name: '切換到深色模式', exact: true }).click()
       await expect(html).toHaveClass(/\bdark\b/)
       await page.reload()
       await waitForSiteHydration(page)
       await expect(html).toHaveClass(/\bdark\b/)
-      await toggle('切換到淺色模式')
+      await nav.getByRole('button', { name: '切換到淺色模式', exact: true }).click()
       await expect(html).not.toHaveClass(/\bdark\b/)
     })
   })

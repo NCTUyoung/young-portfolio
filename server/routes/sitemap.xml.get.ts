@@ -5,6 +5,7 @@ import { sitePageUrl } from '../../shared/utils/sitePageUrl'
 
 const pages = [
   '/',
+  '/gallery',
   '/gallery/digital',
   '/gallery/photography',
   '/article',

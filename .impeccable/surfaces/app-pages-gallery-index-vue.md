@@ -5,10 +5,10 @@ primary_target: "app/pages/gallery/index.vue"
 related_targets: ["app/layouts/default.vue", "app/pages/gallery/[category]/[[event]].vue"]
 ---
 
-# Direct exhibition entrance
+# Collection index
 
-Mode: Experience. Updated after user feedback, 2026-10-16.
+Mode: Experience.
 
-The user rejected the additional room-selection stop after trying it. The global gallery link now opens photography directly. Existing homepage entrances and in-gallery category links provide the two-room navigation.
+The global 館藏 link opens a collection index with real artwork and photography previews. Each collection has a clearly named direct entrance. The location map belongs inside the photography collection.
 
-`/gallery` is only a compatibility redirect. It sends digital image IDs to digital and other visits to photography, preserving query/hash and replacing history. It renders no selection cards, previews or extra explanatory screen. Verify direct header navigation, old links, category switching and browser Back. Keep the existing exhibition layouts.
+`/gallery?image=<id>` and `/gallery/all` preserve the legacy shared-image redirect, query, and hash. Verify a plain direct entry before and after hydration, legacy links, category switching, and browser Back.

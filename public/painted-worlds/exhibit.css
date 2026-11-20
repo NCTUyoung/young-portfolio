@@ -7,8 +7,9 @@
   --light: var(--museum-light, #fffaf0);
   --warm: var(--museum-warm, #eee3d3);
   --cool: var(--museum-cool, #e7ebea);
-  --serif: "Noto Serif JP", "Noto Serif TC", "PMingLiU", Georgia, serif;
-  --sans: Outfit, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --mark: var(--museum-mark, #894831);
+  --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "PMingLiU", serif;
+  --sans: Outfit, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", ui-sans-serif, system-ui, sans-serif;
   --gutter: clamp(16px, 5vw, 80px);
 }
 
@@ -21,6 +22,7 @@
   --light: var(--museum-light, #3a312a);
   --warm: var(--museum-warm, #352823);
   --cool: var(--museum-cool, #252e34);
+  --mark: var(--museum-mark, #e4ab8c);
 }
 
 * { box-sizing: border-box; }
@@ -53,7 +55,7 @@ a { text-decoration: none; }
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
-  min-height: 56px;
+  min-height: 64px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -62,18 +64,18 @@ a { text-decoration: none; }
   align-items: baseline;
   gap: .45rem;
   padding-left: .65rem;
-  border-left: 2px solid var(--museum-mark, #875c49);
+  border-left: 2px solid var(--mark);
   line-height: 1;
 }
 .signature strong { font-size: 1.26rem; letter-spacing: .06em; }
-.signature small { font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; }
-.museum-header nav, .room-actions {
+.signature small { font-size: .6875rem; letter-spacing: .24em; text-transform: uppercase; }
+.site-links {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 2.5vw, 32px);
+  gap: clamp(4px, 2vw, 28px);
 }
 
-.museum-header a, .room-actions button, .work-plaque button {
+.museum-header a, .room-exit a, .room-heading button, .work-plaque button {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -82,12 +84,31 @@ a { text-decoration: none; }
   text-underline-offset: .28em;
 }
 
-.museum-header a:hover, .room-actions button:hover, .work-plaque button:hover {
+.site-links a {
+  justify-content: center;
+  min-width: 44px;
+  white-space: nowrap;
+  color: var(--muted);
+  border-bottom: 1px solid transparent;
+}
+.site-links a[aria-current], .site-links a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--mark);
+}
+
+.room-heading button:hover, .work-plaque button:hover, #gallery-link {
   text-decoration: underline;
 }
 
-.return-link { gap: 8px; }
-.return-link::before, .doors a::after {
+.room-exit .source-return {
+  gap: 10px;
+  padding-inline: 14px;
+  color: var(--paper);
+  background: var(--ink);
+  font-weight: 600;
+}
+.source-return:hover { text-decoration: underline; }
+.source-return::before, .doors a::after {
   content: "";
   display: block;
   flex: none;
@@ -101,16 +122,27 @@ a { text-decoration: none; }
 main { padding-bottom: 32px; }
 
 .room-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px 20px;
+  display: grid;
+  grid-template-areas: "heading exit";
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 24px;
   padding: clamp(22px, 3.2vw, 48px) 0 12px;
 }
 
+.room-exit { grid-area: exit; }
+.room-exit a { min-width: 44px; }
+.room-heading {
+  grid-area: heading;
+  display: flex;
+  align-items: baseline;
+  gap: 4px clamp(12px, 3vw, 36px);
+}
+.room-heading button { flex: none; }
+
 h1 {
   margin: 0;
-  font: 400 clamp(30px, 3.4vw, 52px)/1.2 var(--serif);
+  font: 300 clamp(30px, 3.4vw, 52px)/1.2 var(--serif);
   letter-spacing: .045em;
 }
 
@@ -155,11 +187,23 @@ h1 {
 .work-title, .work-meta { margin: 0; }
 .work-meta { margin-top: 4px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 
+.room-route {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 0 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.room-route > button {
+  min-height: 52px;
+  padding-inline: clamp(8px, 2vw, 28px);
+  border-inline-end: 1px solid var(--line);
+  font-size: 14px;
+}
+
 .stations {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0 0 12px;
-  border-bottom: 1px solid var(--line);
 }
 
 .stations button {
@@ -173,7 +217,7 @@ h1 {
 }
 
 .stations button[aria-pressed="true"] { border-color: currentColor; color: var(--ink); }
-.stations button:hover { background: color-mix(in srgb, var(--warm) 50%, transparent); }
+.room-route button:hover { background: color-mix(in srgb, var(--warm) 50%, transparent); }
 .station-cue { display: block; min-height: 1.3em; margin-top: 2px; }
 
 .exhibition { margin: 0; }
@@ -230,15 +274,22 @@ dialog p { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
 @media (max-width: 650px) {
   .museum-header { min-height: 48px; }
   .signature strong { font-size: 1rem; }
-  .museum-header a, .room-actions button, .work-plaque button { font-size: 13px; }
-  .room-header { align-items: center; padding-block: 16px 8px; }
+  .museum-header a, .room-exit a, .room-heading button, .work-plaque button { font-size: 13px; }
+  .room-header {
+    grid-template-areas: "exit" "heading";
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: 12px 8px;
+  }
+  .room-heading { align-items: center; justify-content: space-between; }
   .doors a { min-height: 68px; }
   .scene { height: clamp(320px, 54svh, 570px); }
   figcaption { flex-wrap: wrap; }
 }
 
 @media (max-width: 380px) {
-  .museum-header nav { gap: 8px; }
+  .room-route > button, .stations button, .station-cue { font-size: 12px; }
+  .room-route > button { padding-inline: 6px; }
+  .stations button { padding-inline: 1px; }
   .doors a { grid-template-columns: auto minmax(0, 1fr); }
   .doors a::after { display: none; }
 }

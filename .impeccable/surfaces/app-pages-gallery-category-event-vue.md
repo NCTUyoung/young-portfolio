@@ -10,16 +10,16 @@ related_targets: ["app/pages/index.vue","app/components/gallery/GalleryPhotoLigh
 Mode: Experience. Direction seed: user-approved-exhibition-light-table-2026-10-15.
 
 ## THESIS
-The artwork is encountered as a museum exhibition; photography is encountered as prints being chosen from a photographer's light table. Both are visible as separate entries on the homepage.
+The artwork is encountered on exhibition walls. Photography is encountered as prints on a photographer's light table. Both collections have direct entries from 館藏.
 
 ## OWN-WORLD
 Keep the existing Japanese editorial identity: warm ivory exhibition walls, cool silver photography work surfaces, original-color works, sparse stone-colored type, hairlines, and limited terracotta accents. The October 2026 museum concept and the user-approved generated light-table image are directional references. Use the original portfolio images and their actual metadata rather than generated image content or invented dates.
 
 ## STORY
-Homepage offers the two distinct viewing experiences. Digital gallery opens with a single prominent framed work, then complete year rooms. Photography opens with a full-width map of always-visible circular activity photos and a remote-region inset, followed by the activity directory. Entering an activity opens a light table, followed by its complete contact sheet and existing large-image viewer.
+The digital gallery opens with a single prominent framed work, then complete year rooms. Photography uses a full-width location map with circular activity photos and a remote-region inset, followed by the activity directory. Entering an activity opens a light table, followed by its complete contact sheet and existing large-image viewer.
 
 ## FIRST VIEWPORT
-The homepage shows framed art and loose photo prints together. The digital gallery makes a single artwork physically prominent on a warm wall. With no saved view, the photography overview fits nearby activities with a maximum zoom of `10`, using `[100, 100]` map padding on desktop and `[32, 70]` on mobile; the remote inset fit is capped at zoom `8`. “顯示全部活動” fits every location, including Tokyo, and hides the inset. The current collection places 12 activities near the main region and two Tokyo activities in the inset. A photography activity immediately presents its name, small neighboring prints, one enlarged selected print, and a selection strip at a coherent scale. Mobile keeps the complete main image and uses smaller neighbors without horizontal page overflow.
+The digital gallery makes a single artwork physically prominent on a warm wall. With no saved view, the photography overview fits nearby activities with a maximum zoom of `10`, using `[100, 100]` map padding on desktop and `[32, 70]` on mobile. The remote inset fit is capped at zoom `8`. “顯示全部活動” fits every location, including Tokyo, and hides the inset. A photography activity presents its name, small neighboring prints, one enlarged selected print, and a selection strip. Mobile keeps the complete main image and uses smaller neighbors without horizontal page overflow.
 
 ## FORM
 Museum: original-ratio artwork, quiet wood-tone frame, mat, wash light, small plaque, breathing room. Photography activity: original-ratio selected print on warm-white paper, three unique smaller neighbors, soft offset shadows, bottom contact strip. Selecting a strip frame changes the local selection; clicking the main print opens the existing viewer with the current activity's images. Viewer changes update the table underneath, including deep links. Closing retains selection. No autoplay, additional modal, or duplicated route/body-scroll ownership.
@@ -28,5 +28,5 @@ Photography overview map: every nearby activity has its own circular cropped rep
 
 ## BOUNDARIES AND VERIFICATION
 
-The global gallery link opens photography directly. Both rooms remain accessible through the homepage's existing entrances and the gallery category links; do not add a separate room-selection page. The map's existing selected-activity button pairs an uncropped cover with an available authentic series line and the visible action 看這組照片. Camera filenames remain source metadata; visitor-facing unnamed-photo labels use the real activity name and a stable ordinal from the complete activity collection, shared by the light table and viewer.
+The global 館藏 link opens the preview index. Both rooms remain accessible through its entrances and the in-gallery category links. The map's selected-activity button pairs an uncropped cover with an authentic series line when one exists and the visible action 看這組照片. Visitor-facing unnamed-photo labels use the real activity name and a stable ordinal from the complete activity collection, shared by the light table and viewer.
 Preserve category/year/search, map state and activity routing, URL sharing, complete image counts, SEO hero sources, and keyboard/reduced-motion/light/dark behavior. The map uses the public OpenStreetMap tile service and contributor attribution. Keep the legacy cover's unconnected technique/topic chips as descriptive metadata rather than pretending to filter. Verify before/after captures, selection/viewer/deep-link/event-reset flows, 0/1/2 images, existing gallery/map/overview checks, lint, typecheck, unit tests, and a production build.

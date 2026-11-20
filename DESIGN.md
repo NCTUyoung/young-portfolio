@@ -92,7 +92,7 @@ components:
 
 ## Overview
 
-The global gallery entrance opens photography directly, without a separate room-selection page. The homepage's existing two entrances and the in-gallery category links provide access to both collections. Photography retains its map-first arrival; its existing selected-series entry uses an uncropped photograph and authentic series text. Unnamed camera-file titles are displayed as activity name and stable collection order while original metadata remains available. Articles use one chapter list with one entrance per published piece and truthful publication states.
+The homepage is the prologue to 《光落之處》. The sculpture of 《唯一真神》 introduces the first stop. The primary navigation gives the current exhibition, collection, and journals consistent names. The collection index presents both media and leads directly to each gallery. Photography retains its location map and uses an uncropped photograph and authentic series text on the selected-series entry. Painted worlds belong to their artworks and return to the initiating artwork or exhibition stop.
 
 **Creative North Star: "展廳與選片光桌"**
 
@@ -135,7 +135,7 @@ The global stone scale supplies readable text and neutral surfaces; each gallery
 
 ### Hierarchy
 
-- **Display:** the homepage's paired world titles use medium weight, the same responsive size, and distinct family and letter spacing. Gallery world headings continue this family split.
+- **Display:** the prologue and exhibit titles share the site's serif display stack. Collection rooms can use their own display voice over the shared body typography.
 - **Exhibition plaque:** the featured work's title uses a compact display size beside the image; date and medium step down to small, quiet labels.
 - **Body:** the site defaults to Outfit / Noto Sans TC. Longer Japanese copy in the art world uses a tighter rhythm (`1.85` line height); the photography world uses a more open rhythm (`2.2`).
 - **Photo caption:** small body text (`0.75rem`, `1.6` line height) names the selected photograph and displays its position in the series.
@@ -145,11 +145,11 @@ The global stone scale supplies readable text and neutral surfaces; each gallery
 
 ## Layout
 
-The site uses a `72rem` content maximum and responsive gutters. Section spacing is `6rem` or `9rem` where a larger pause is needed. The homepage places the two entry worlds side by side on desktop; at widths below `1024px` they stack vertically around a single dividing spine.
+The site uses responsive gutters. The prologue centers on one sculpture, an exhibit label, and a clear action to begin the exhibition. The collection index gives both media direct entrances with real work previews.
 
 The exhibition opens with one prominent work and a nearby plaque, then continues through year rooms. Each room holds two columns above `767px` and one column below. Frames size from the artwork's ratio rather than forcing a common crop. The photo activity's light table sizes the selected paper to its photograph's ratio and places three smaller neighbors across the desktop surface; below `640px`, the selected print and two small neighbors occupy separate columns, and the thumbnail strip remains horizontally scrollable.
 
-The photography overview places a full-width location map before its activity directory. Every activity in the nearby region appears as its own circular photo, including activities with shared coordinates: neighboring circles fan outward instead of collapsing into a count. The selected circle is larger. Remote activities appear in their own inset until the visitor chooses the all-locations view; that view shows every activity on the main map and hides the inset. A single 1px film edge keeps the map surface quiet.
+The photography overview offers a location map and an activity directory. The collection entrance links to the activity directory. Every activity in the nearby region appears as its own circular photo, including activities with shared coordinates: neighboring circles fan outward instead of collapsing into a count. The selected circle is larger. Remote activities appear in their own inset until the visitor chooses the all-locations view; that view shows every activity on the main map and hides the inset. A single 1px film edge keeps the map surface quiet.
 
 **The Viewing Distance Rule.** Give the selected work the most space, then let captions and neighboring works provide scale and context.
 
@@ -174,7 +174,7 @@ Exhibition frames, mats, and photographic paper have square edges. Hairlines and
 
 ### Gallery entry links
 
-The homepage presents two complete image-led links. The art link contains a framed original work on a warm wall; the photography link contains overlapping prints on a cool surface. Their text sits in a separate caption region. Hover and keyboard focus raise the featured physical object; a visible outline marks keyboard focus.
+The collection index previews each medium with original work and a clearly named entrance. Use the same title, caption, and focus treatments for both. Photography can render as loose paper prints while artwork uses the exhibition frame.
 
 ### Exhibition frames and plaques
 

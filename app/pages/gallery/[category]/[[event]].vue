@@ -83,17 +83,20 @@
         v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent && eventLocations.length"
         id="gallery-footsteps"
         ref="mapSectionRef"
-        class="photo-map-entry scroll-mt-24"
+        class="photo-map-entry"
+        tabindex="-1"
         aria-labelledby="photo-map-heading"
       >
         <div class="photo-map-entry__caption">
-          <div>
-            <h1 id="photo-map-heading" class="jp-section-title">踏跡</h1>
-            <p class="photo-map-entry__description">攝影展間</p>
-          </div>
-          <a class="hall-link" href="#gallery-activities">
-            活動索引 <Icon name="lucide:arrow-down" aria-hidden="true" />
-          </a>
+          <h1 class="jp-section-title">攝影館</h1>
+          <nav class="photo-map-entry__browse" aria-label="攝影館瀏覽方式">
+            <a class="hall-link" href="#gallery-footsteps" aria-current="location">依地點</a>
+            <a class="hall-link" href="#gallery-activities">依活動</a>
+          </nav>
+        </div>
+        <div class="photo-map-entry__description">
+          <h2 id="photo-map-heading" class="font-jp" tabindex="-1">踏跡</h2>
+          <span>從地圖選擇拍攝地點</span>
         </div>
         <div class="photo-map-entry__map">
           <EventMap
@@ -113,8 +116,11 @@
         v-if="!isGalleryLoading && !galleryLoadFailed && currentCategory === 'photography' && !filterState.selectedEvent"
         id="gallery-activities"
         ref="controlsSectionRef"
-        class="scroll-mt-24"
       >
+        <nav v-if="eventLocations.length" class="photo-map-entry__browse" aria-label="拍攝活動瀏覽方式">
+          <a class="hall-link" href="#gallery-footsteps">依地點</a>
+          <a class="hall-link" href="#gallery-activities" aria-current="location">依活動</a>
+        </nav>
         <GalleryArchiveControls
           ref="archiveControlsRef"
           :world="worldId"
@@ -204,7 +210,7 @@
       </transition>
     </div>
 
-    <nav v-if="!isGalleryLoading && !galleryLoadFailed" class="hall-content hall-exit" aria-label="展間動線">
+    <nav v-if="!isGalleryLoading && !galleryLoadFailed" class="hall-content hall-exit" aria-label="館藏動線">
       <NuxtLink
         v-if="filterState.selectedEvent"
         :to="`/gallery/${currentCategory}`"
@@ -212,13 +218,13 @@
         class="hall-link"
       >
         <Icon name="lucide:arrow-left" aria-hidden="true" />
-        {{ currentCategory === 'photography' ? '回踏跡地圖' : '回繪畫展間' }}
+        {{ currentCategory === 'photography' ? '回踏跡地圖' : '回繪畫館' }}
       </NuxtLink>
-      <NuxtLink v-else to="/" class="hall-link">
-        <Icon name="lucide:arrow-left" aria-hidden="true" /> 回首頁
+      <NuxtLink v-else to="/gallery" class="hall-link">
+        <Icon name="lucide:arrow-left" aria-hidden="true" /> 回館藏
       </NuxtLink>
       <NuxtLink :to="currentCategory === 'photography' ? '/gallery/digital' : '/gallery/photography'" class="hall-link">
-        {{ currentCategory === 'photography' ? '前往繪畫展間' : '前往攝影展間' }}
+        {{ currentCategory === 'photography' ? '前往繪畫館' : '前往攝影館' }}
         <Icon name="lucide:arrow-right" aria-hidden="true" />
       </NuxtLink>
     </nav>
@@ -318,6 +324,7 @@ const restoredPhotoMapView = computed(() => {
   return center && zoom !== null ? { center, zoom, allLocations } : null
 })
 const router = useRouter()
+const route = useRoute()
 
 let galleryPayloadReusesStore = false
 const { data: galleryPayload, pending: galleryPending, error: galleryPayloadError, refresh: refreshGalleryPayload } = await useAsyncData('gallery-works', async () => {
@@ -388,6 +395,18 @@ const showControlMiniBar = ref(false)
  */
 const mapShouldMount = ref(false)
 
+onMounted(() => {
+  // Nuxt may resolve the gallery in a detached Suspense tree during navigation.
+  watch([() => router.currentRoute.value.hash, controlsSectionRef, mapSectionRef], ([hash, activities, map]) => {
+    if (router.currentRoute.value.query.image !== undefined) return
+    if (hash === '#gallery-activities' && activities?.id === 'gallery-activities') {
+      activities.querySelector<HTMLElement>('#gallery-archive-title')?.focus({ preventScroll: true })
+    } else if (hash === '#gallery-footsteps') {
+      map?.querySelector<HTMLElement>('#photo-map-heading')?.focus({ preventScroll: true })
+    }
+  }, { immediate: true, flush: 'post' })
+})
+
 // ===== 計算屬性 =====
 // 當前選擇的類別
 const currentCategory = computed(() => filterState.value.selectedCategory)
@@ -407,10 +426,7 @@ const categoryCount = computed(() => {
   return photographyEventItems.value.reduce((sum, g) => sum + (g.images?.length || 0), 0)
 })
 
-const miniCategoryLabel = computed(() => {
-  const labels: Record<FilterState['selectedCategory'], string> = { digital: 'Digital', photography: 'Photography' }
-  return labels[currentCategory.value]
-})
+const miniCategoryLabel = computed(() => currentCategory.value === 'digital' ? '繪畫館' : '攝影館')
 
 const miniEventLabel = computed(() => filterState.value.selectedEvent || '全部事件')
 const miniYearLabel = computed(() => filterState.value.yearFilter || '全年份')
@@ -717,7 +733,6 @@ const defaultOgImageAbs = absoluteUrlFromSitePath(
   'images/photography/2024新北耶誕城/DSC_4319-NEF_DxO_DeepPRIMEXD-1.jpg'
 )
 
-const route = useRoute()
 const shareUrl = computed(() => {
   const [location = ''] = route.fullPath.split('#', 1)
   const queryStart = location.indexOf('?')
@@ -860,10 +875,10 @@ useHead({
 .photo-map-entry { margin: 0 auto clamp(2.75rem, 5vw, 4.5rem); padding-top: clamp(1.25rem, 3vw, 2.5rem); }
 .photo-map-entry__caption {
   display: flex;
-  align-items: end;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.9rem;
+  gap: 0.25rem 1rem;
 }
 .photo-map-entry__caption .jp-section-title {
   margin: 0;
@@ -871,7 +886,28 @@ useHead({
   font-size: clamp(2.15rem, 5vw, 4.35rem);
   line-height: 1.16;
 }
-.photo-map-entry__description { margin: 0.35rem 0 0; color: var(--museum-muted); font-size: 0.85rem; }
+.photo-map-entry__description {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.6rem;
+  margin-block: 0.6rem 0.75rem;
+  color: var(--museum-muted);
+  font-size: 0.875rem;
+}
+.photo-map-entry__description h2 { color: var(--museum-ink); font-size: 1.125rem; font-weight: 500; }
+.photo-map-entry__description h2:focus-visible {
+  outline: none;
+  text-decoration: underline var(--museum-mark) 1px;
+  text-underline-offset: 0.2em;
+}
+.photo-map-entry__browse { display: flex; gap: clamp(0.65rem, 3vw, 1.25rem); }
+.photo-map-entry__browse .hall-link { min-width: 44px; justify-content: center; white-space: nowrap; }
+.photo-map-entry__browse [aria-current='location'] {
+  font-weight: 600;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
 .photo-map-entry__map {
   padding: clamp(0.25rem, 0.7vw, 0.55rem);
   background: var(--museum-cool);

@@ -21,33 +21,38 @@
     window.addEventListener('storage', syncTheme)
     window.addEventListener('pageshow', syncTheme)
   </script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400..700&amp;family=Noto+Serif+JP:wght@300..500&amp;family=Outfit:wght@400..700&amp;display=swap">
   <link rel="stylesheet" href="./exhibit.css">
 </head>
 <body data-world="hall" data-mode="stills">
 <header class="museum-header">
   <a class="signature" href="../" aria-label="NCTU Young — 首頁"><span><strong>NCTU</strong><small>Young</small></span></a>
-  <nav aria-label="離開畫界">
-    <a id="source-return" class="return-link" href="../" hidden></a>
-    <a id="gallery-link" href="../gallery/digital">數位繪畫展廳</a>
-    <a id="light-link" href="../exhibition/light/#painting">光落之處</a>
+  <nav class="site-links" aria-label="網站導覽">
+    <a id="light-link" href="../exhibition/light/#painting">當期展</a>
+    <a id="collection-link" href="../gallery/">館藏</a>
+    <a href="../article/">手記</a>
   </nav>
 </header>
 <main>
   <header class="room-header">
-    <h1 id="room-title" tabindex="-1">畫界迴廊</h1>
-    <div class="room-actions">
-      <button id="back" class="return-link" type="button" hidden>返回迴廊</button>
+    <div class="room-exit">
+      <a id="source-return" class="source-return" href="../" hidden></a>
+      <a id="gallery-link" href="../gallery/digital">繪畫館</a>
+    </div>
+    <div class="room-heading">
+      <h1 id="room-title" tabindex="-1">畫界迴廊</h1>
       <button id="sculpture" type="button" hidden>近看雕像</button>
     </div>
   </header>
   <nav class="doors" aria-label="畫中展間">
     <a href="#orchard" data-door="orchard">
       <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/23-編輯-4-1.webp" alt="">
-      <span><strong>唯一真神</strong><small>柑橘樹下</small></span>
+      <span><strong>唯一真神</strong><small>進入畫界 · <span class="door-room">柑橘樹下</span></small></span>
     </a>
     <a href="#stage" data-door="stage">
       <img width="54" height="70" src="../images/_thumbs/400w/gallery/2026年電繪作品/16-編輯-1.webp" alt="">
-      <span><strong lang="en">Mika Nakashima</strong><small>紅色舞台</small></span>
+      <span><strong lang="en">Mika Nakashima</strong><small>進入畫界 · <span class="door-room">紅色舞台</span></small></span>
     </a>
   </nav>
   <div class="work-plaque" hidden>
@@ -57,7 +62,10 @@
     </div>
     <button id="original" type="button">看原畫</button>
   </div>
-  <nav class="stations" aria-label="展線站點" hidden></nav>
+  <div class="room-route" role="group" aria-label="畫界內導覽" hidden>
+    <button id="back" type="button">迴廊總覽</button>
+    <nav class="stations" aria-label="展線站點" hidden></nav>
+  </div>
   <figure class="exhibition">
     <div id="scene" class="scene" data-ready="false">
       <canvas tabindex="-1" aria-hidden="true"></canvas>

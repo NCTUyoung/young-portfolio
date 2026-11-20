@@ -16,7 +16,7 @@
       data-testid="gallery-work-painted-room"
       class="work-links__link"
     >
-      <span>{{ paintedRoom.label }}</span>
+      <span>進入畫界 · {{ paintedRoom.title }}</span>
       <Icon name="lucide:arrow-up-right" aria-hidden="true" />
     </a>
   </div>
@@ -29,8 +29,8 @@ import { computed } from 'vue'
 const orchardId = 'digital-gallery/2026年電繪作品/23-編輯-4-1'
 const stageId = 'digital-gallery/2026年電繪作品/16-編輯-1'
 const paintedRooms = new Map([
-  [orchardId, { hash: 'orchard', label: '畫界 · 柑橘樹下' }],
-  [stageId, { hash: 'stage', label: '畫界 · 紅色舞台' }]
+  [orchardId, { hash: 'orchard', title: '柑橘樹下' }],
+  [stageId, { hash: 'stage', title: '紅色舞台' }]
 ])
 
 // These are the three works displayed on /exhibition/light.

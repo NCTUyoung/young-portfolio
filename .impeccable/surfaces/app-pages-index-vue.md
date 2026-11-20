@@ -7,11 +7,11 @@ related_targets: ["app/layouts/default.vue"]
 
 # Homepage exhibition sequence
 
-Mode: Experience. Revised user direction: the two entrances already introduce the works; remove the redundant selected-works section (2026-10-16).
+Mode: Experience.
 
 ## THESIS
 
-The visitor sees the works in the static artwork/photography entrances, followed directly by a short author introduction → optional creative history → signature. Do not repeat the entrances with another selected-works section.
+The homepage is the prologue to 《光落之處》. 《唯一真神》 is the central exhibit. A short label presents the work and the main action opens the first exhibition stop.
 
 ## OWN-WORLD
 
@@ -19,10 +19,10 @@ Preserve the warm framed-art exhibition and cool photographic-print language in 
 
 ## FIRST VIEWPORT AND FLOW
 
-Keep the existing Hero and its SEO image source. The next section is the author introduction. Keep both category entrance links and data-load recovery. Do not add more featured cards, a viewer, or duplicate URL/body-scroll effects.
+Use a responsive static render of the sculpture for the hero. The prologue offers a secondary link to 館藏. The author introduction follows.
 
-The author section preserves the actual media, photography subjects, and social links. The complete five-entry history remains available in a native, initially closed disclosure; keep journey/dialogue anchors. Place admin access in the footer, away from visitor navigation. Preserve the three navigation destinations and theme toggle.
+Keep the author media, social links, creative-history disclosure, and journey/dialogue anchors. The primary navigation reads 當期展, 館藏, and 手記.
 
 ## VERIFICATION
 
-Check desktop/mobile, both themes, no repeated selected-works section, direct Hero-to-about flow, visible keyboard focus, disclosure controls, category entrance navigation, data-load recovery, and no overflow. No auto carousel, fabricated exhibition claims, new dependencies, or gallery/map/viewer redesign.
+Check desktop and mobile in both themes. Verify that the main action opens the first stop, 館藏 opens the collection, and the first viewport fits at 320 px. Check visible focus, the history disclosure, and that homepage entry makes no WebGL requests.

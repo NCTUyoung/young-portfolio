@@ -23,24 +23,25 @@ const workOrigin = source === 'work' && (workFiles.has(savedWork) ? savedWork : 
 
 function updateReturnLink() {
   const link = $('#source-return')
+  if (source === 'light') $('#light-link').setAttribute('aria-current', 'location')
+  if (source === 'work') $('#collection-link').setAttribute('aria-current', 'location')
   if (source === 'home') {
     link.href = '../'
-    link.textContent = '返回首頁'
+    link.textContent = '回到首頁'
   } else if (source === 'light') {
     link.href = $('#light-link').href
-    link.textContent = '返回光落之處'
+    link.textContent = '回到繪作站'
   } else if (workFiles.has(workOrigin)) {
     // The gallery uses the full filename minus its extension as part of generateImageId.
     const imageId = 'digital-' + workFiles.get(workOrigin).replace(/\.[^/.]+$/, '')
     const gallery = new URL($('#gallery-link').href)
     gallery.searchParams.set('image', imageId)
     link.href = gallery.href
-    link.textContent = '返回《' + doors.get(workOrigin).querySelector('strong').textContent + '》'
+    link.textContent = '回到《' + doors.get(workOrigin).querySelector('strong').textContent + '》'
   } else {
     return
   }
   link.hidden = false
-  $('#light-link').hidden = true
   $('#gallery-link').hidden = true
 }
 
@@ -93,7 +94,7 @@ async function mount() {
     const description = point
       ? (point.description ?? r.title + '，' + point.label)
       : (closeup ? '中央雕像《唯一真神》' : '中央雕像與牆上的兩幅電繪')
-    const title = r?.title ?? (hall ? '畫界迴廊' : doors.get(room).querySelector('small').textContent)
+    const title = r?.title ?? (hall ? '畫界迴廊' : doors.get(room).querySelector('.door-room').textContent)
 
     roomTitle.textContent = title
     document.title = title + '｜Young Portfolio'
@@ -101,8 +102,8 @@ async function mount() {
     document.body.dataset.mode = live ? 'webgl' : 'stills'
     document.body.dataset.stop = String(station)
     $('#sculpture').hidden = !hall || !r
-    $('#sculpture').textContent = closeup ? '退回展廊' : '近看雕像'
-    $('#back').hidden = hall
+    $('#sculpture').textContent = closeup ? '展廊全景' : '近看雕像'
+    $('.room-route').hidden = hall
     $('.doors').hidden = !hall
     $('.work-plaque').hidden = !r?.art
     if (r?.art) {
