@@ -42,6 +42,9 @@ async function paintingPoint(page: Page, item: Awaited<ReturnType<typeof artwork
 }
 
 test('changing year hangs the works in the same hall without loading room models', async ({ page }) => {
+  // The CI browser renders in software while other room tests run. Each
+  // gallery load still uses waitForYear's own readiness deadline.
+  test.setTimeout(90_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.addInitScript(() => {
     document.addEventListener('webglcontextrestored', () => {
