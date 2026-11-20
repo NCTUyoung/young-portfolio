@@ -7,17 +7,16 @@
         </NuxtLink>
 
         <div class="site-nav-links">
-          <NuxtLink
+          <a
             v-for="link in navLinks"
             :key="link.to"
-            :to="link.to"
-            aria-current-value="location"
+            :href="joinURL(baseURL, link.to)"
             class="site-nav-link"
             :class="{ 'site-nav-current': currentSection === link.section }"
             :aria-current="currentSection === link.section ? 'location' : undefined"
           >
             {{ link.label }}
-          </NuxtLink>
+          </a>
           <PaintedWorldLink :href="paintedWorldsHref" class="site-nav-link">3D 迴廊</PaintedWorldLink>
           <button type="button" class="site-menu-toggle" :title="themeLabel" :aria-label="themeLabel" @click="toggleDark()">
             <Icon v-if="layoutHydrated && isDark" name="lucide:sun" aria-hidden="true" />
@@ -68,8 +67,10 @@ const toggleDark = useToggle(isDark)
 const layoutHydrated = ref(false)
 const themeLabel = computed(() => layoutHydrated.value && isDark.value ? '切換到淺色模式' : '切換到深色模式')
 const currentYear = new Date().getFullYear()
-const paintedWorldsHref = joinURL(useRuntimeConfig().app.baseURL, 'painted-worlds/index.html?from=home')
+const baseURL = useRuntimeConfig().app.baseURL
+const paintedWorldsHref = joinURL(baseURL, 'painted-worlds/index.html?from=home')
 
+// Document links let browser history restore the previous gallery activity and its filters.
 const navLinks = [
   { to: '/gallery/digital', label: '繪畫', section: 'digital' },
   { to: '/gallery/photography#gallery-activities', label: '攝影', section: 'photography' },
