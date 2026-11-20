@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { waitForSiteHydration } from './site-ready'
 
 test('the orchard and stage each contain their own three-dimensional character', async ({ request }) => {
   type Model = {
@@ -35,12 +36,14 @@ test('the orchard and stage each contain their own three-dimensional character',
   }
 })
 
-test('digital gallery reaches both painted worlds, their stations and original art', async ({ page }) => {
+test('the homepage reaches the painted-worlds hub, both rooms and their original art', async ({ page }) => {
   test.setTimeout(90_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/gallery/digital')
-  await page.getByRole('link', { name: '進入畫界迴廊' }).click()
-  await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html$/)
+  await page.goto('./')
+  await waitForSiteHydration(page)
+  await page.getByRole('region', { name: '日光迴廊' }).getByRole('link', { name: /畫界迴廊/ }).click()
+  await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
+  await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
   await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
 
   for (const [door, room, artwork] of [
@@ -66,9 +69,46 @@ test('digital gallery reaches both painted worlds, their stations and original a
     await page.getByRole('button', { name: '返回迴廊' }).click()
     await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
   }
-  await page.getByRole('link', { name: '數位繪畫展廳' }).click()
-  await expect(page).toHaveURL(/\/gallery\/digital\/?$/)
+  await page.getByRole('link', { name: '返回首頁', exact: true }).click()
+  await expect(page).toHaveURL(/\/young-portfolio\/$/)
 })
+
+const paintedWorks = [
+  { room: 'orchard', heading: '柑橘樹下', art: '唯一真神', id: 'digital-gallery/2026年電繪作品/23-編輯-4-1' },
+  { room: 'stage', heading: '紅色舞台', art: 'Mika Nakashima', id: 'digital-gallery/2026年電繪作品/16-編輯-1' }
+] as const
+
+for (const work of paintedWorks) {
+  test(`${work.art} enters its painted world and returns to the same artwork`, async ({ page }) => {
+    test.setTimeout(60_000)
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('gallery/digital')
+    await waitForSiteHydration(page)
+
+    const artwork = page.locator('main figure').filter({ has: page.getByRole('button', { name: `觀看作品：${work.art}`, exact: true }) })
+    const entrance = artwork.getByRole('link', { name: new RegExp(work.heading) })
+    await expect(entrance).toHaveCount(1)
+    await entrance.click()
+    await expect(page).toHaveURL(new RegExp(`/young-portfolio/painted-worlds/index\\.html\\?from=work#${work.room}$`))
+    await expect(page.getByRole('heading', { level: 1, name: work.heading })).toBeVisible()
+    await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
+    await page.getByRole('button', { name: '看原畫' }).click()
+    const original = page.getByRole('dialog')
+    await expect(original.getByRole('heading', { name: work.art })).toBeVisible()
+    await page.getByRole('button', { name: '關閉' }).click()
+
+    // Exploring a different room and reloading must retain the original source artwork.
+    await page.getByRole('button', { name: '返回迴廊' }).click()
+    await page.locator(`[data-door="${work.room === 'orchard' ? 'stage' : 'orchard'}"]`).click()
+    await expect(page).not.toHaveURL(new RegExp(`#${work.room}$`))
+    await page.reload()
+    await page.getByRole('link', { name: `返回《${work.art}》`, exact: true }).click()
+    await expect(page).toHaveURL(/\/young-portfolio\/gallery\/digital\/?\?/)
+    await expect.poll(() => new URL(page.url()).searchParams.get('image')).toBe(work.id)
+    const viewer = page.getByRole('dialog', { name: '圖片檢視器' })
+    await expect(viewer.locator('.image-viewer-area picture img')).toHaveAttribute('alt', work.art)
+  })
+}
 
 test('painted worlds remain usable on a narrow viewport without WebGL', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
@@ -79,7 +119,11 @@ test('painted worlds remain usable on a narrow viewport without WebGL', async ({
       return original.call(this, type, ...args)
     } as typeof original
   })
-  await page.goto('/painted-worlds/index.html')
+  const models: string[] = []
+  page.on('request', request => {
+    if (/\.glb(?:[?#]|$)/i.test(request.url())) models.push(request.url())
+  })
+  await page.goto('painted-worlds/index.html')
   await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true')
   await expect(page.locator('body')).toHaveAttribute('data-mode', 'stills')
   await page.locator('[data-door="orchard"]').click()
@@ -98,4 +142,5 @@ test('painted worlds remain usable on a narrow viewport without WebGL', async ({
   await page.getByRole('button', { name: '關閉' }).click()
   await page.getByRole('button', { name: '返回迴廊' }).click()
   await expect(page.locator('#room-title')).toHaveText('畫界迴廊')
+  expect(models).toEqual([])
 })

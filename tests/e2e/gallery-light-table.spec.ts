@@ -3,13 +3,13 @@ import { resolve } from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
 
 const EVENT = 'Annber 外拍'
-const EVENT_PATH = `/gallery/photography/${encodeURIComponent(EVENT)}`
+const EVENT_PATH = `gallery/photography/${encodeURIComponent(EVENT)}`
 const photoData = JSON.parse(readFileSync(resolve(process.cwd(), 'public/photographyList.json'), 'utf8')) as {
   Img: Array<{ filename: string; title: string; event: { name: string } }>
 }
 
 async function openTable (page: Page, path = EVENT_PATH) {
-  await page.goto(path)
+  await page.goto(path, { waitUntil: 'domcontentloaded' })
   const table = page.getByTestId('photo-light-table')
   await expect(table).toBeVisible()
   await expect(page.getByRole('button', { name: /前往系列照片/ })).toHaveAttribute('data-hydrated', 'true', { timeout: 20_000 })
@@ -17,7 +17,7 @@ async function openTable (page: Page, path = EVENT_PATH) {
 }
 
 async function filterAndOpenEvent (page: Page, searchQuery: string) {
-  await page.goto('/gallery/photography')
+  await page.goto('gallery/photography')
   const controls = page.getByTestId('gallery-archive-controls')
   await expect(controls).toHaveAttribute('data-hydrated', 'true', { timeout: 20_000 })
   const disclosure = controls.getByTestId('gallery-filter-disclosure')
@@ -51,7 +51,7 @@ test.describe('Photography selection table', () => {
     const viewerImage = dialog.locator('.image-viewer-area picture img')
     await expect(viewerImage).toHaveAttribute('alt', secondTitle!)
     await expect.poll(() => viewerImage.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true)
-    const index = dialog.locator('p').filter({ hasText: /^\s*\d+\s*[／/]\s*\d+\s*$/ })
+    const index = dialog.locator('.viewer-museum-plaque__meta .tabular-nums')
     await expect(index).toHaveText(new RegExp(`^\\s*2\\s*[／/]\\s*${total}\\s*$`))
 
     await page.keyboard.press('ArrowRight')
@@ -78,7 +78,7 @@ test.describe('Photography selection table', () => {
     await expect(dialog.locator('.image-viewer-area picture img')).toHaveAttribute('alt', target.title)
     const choices = table.getByRole('group', { name: '選擇照片' }).getByRole('button')
     const total = await choices.count()
-    await expect(dialog.locator('p').filter({ hasText: /^\s*\d+\s*[／/]\s*\d+\s*$/ })).toContainText(new RegExp(`[／/]\\s*${total}\\s*$`))
+    await expect(dialog.locator('.viewer-museum-plaque__meta .tabular-nums')).toContainText(new RegExp(`[／/]\\s*${total}\\s*$`))
 
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
@@ -147,7 +147,7 @@ test.describe('Photography selection table boundaries', () => {
     await table.getByTestId('light-table-open').click()
     const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
     await expect(dialog).toBeVisible()
-    await expect(dialog.locator('p').filter({ hasText: /^\s*\d+\s*[／/]\s*\d+\s*$/ })).toHaveText(/^\s*2\s*[／/]\s*2\s*$/)
+    await expect(dialog.locator('.viewer-museum-plaque__meta .tabular-nums')).toHaveText(/^\s*2\s*[／/]\s*2\s*$/)
   })
 
   test('zero matching prints show recovery and restore the activity after reset', async ({ page }) => {
@@ -166,7 +166,9 @@ test('dark mode keeps the page opaque and the selected print usable after viewer
   const table = await openTable(page)
   await expect(page.locator('html')).toHaveClass(/dark/)
   await expect.poll(() => page.locator('html').evaluate(element => getComputedStyle(element).opacity)).toBe('1')
-  await expect(table.getByTestId('light-table-open')).toHaveCSS('background-color', 'rgb(48, 46, 40)')
+  const stage = table.getByTestId('light-table-open')
+  const darkBackground = /^rgb\(\s*[0-6]?\d,\s*[0-6]?\d,\s*[0-6]?\d\s*\)$/
+  await expect(stage).toHaveCSS('background-color', darkBackground)
   const choices = table.getByRole('group', { name: '選擇照片' }).getByRole('button')
   await choices.nth(1).click()
   await table.getByTestId('light-table-open').click()

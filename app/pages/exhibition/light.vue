@@ -95,6 +95,8 @@ onMounted(() => {
   window.addEventListener('hashchange', syncStationHash)
   watch(currentIndex, () => workHeading.value?.focus({ preventScroll: true }), { flush: 'post' })
 })
+// Prerendered routes can restore their fragment with replaceState after mount.
+onNuxtReady(syncStationHash)
 onBeforeUnmount(() => window.removeEventListener('hashchange', syncStationHash))
 
 useSeoMeta({

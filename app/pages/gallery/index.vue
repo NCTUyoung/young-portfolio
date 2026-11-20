@@ -3,16 +3,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-
 // Keep old /gallery links usable without adding a stop before the exhibition.
 definePageMeta({ alias: ['/gallery/all'] })
 useSeoMeta({ robots: 'noindex, follow' })
-const route = useRoute()
-// A prerendered HTTP redirect would discard the visitor's image query on GitHub Pages.
-onMounted(() => {
-  const image = Array.isArray(route.query.image) ? route.query.image[0] : route.query.image
+const router = useRouter()
+
+// Read the full browser URL after Nuxt restores the query and fragment of the
+// prerendered bridge. An HTTP redirect would discard that context on Pages.
+onNuxtReady(() => {
+  const path = router.currentRoute.value.path
+  if (!/^\/gallery(?:\/all)?\/?$/.test(path)) return
+  const { query, hash } = router.resolve(path + window.location.search + window.location.hash)
+  const image = Array.isArray(query.image) ? query.image[0] : query.image
   const category = typeof image === 'string' && image.startsWith('digital-') ? 'digital' : 'photography'
-  void navigateTo({ path: `/gallery/${category}`, query: route.query, hash: route.hash }, { replace: true })
+  void router.replace({ path: `/gallery/${category}`, query, hash })
 })
 </script>

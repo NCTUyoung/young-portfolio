@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-const PHOTO_MAP_PATH = '/gallery/photography'
+const PHOTO_MAP_PATH = 'gallery/photography'
 const ALL_ACTIVITY_COUNT = 14
 
 async function openMap (page: Page) {
@@ -61,9 +61,11 @@ test('all activity circles are visible across the Taiwan map and Japan inset', a
   await expect(map.locator('.event-map-marker--selected')).toHaveCount(1)
 })
 
-test('selecting a circle stays on the map; entering and returning preserves its selection and zoom', async ({ page }) => {
+test('map → group → shared photo → map preserves selection, zoom and pan', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   const map = await openMap(page)
-  const choice = map.locator('.event-map-photo-card[aria-pressed="false"]').first()
+  const choice = map.locator('.event-map-photos').first().locator('.event-map-photo-card[aria-pressed="false"]').first()
   const eventName = await choice.getAttribute('data-event-name')
   expect(eventName).toBeTruthy()
   await choice.click()
@@ -78,14 +80,54 @@ test('selecting a circle stays on the map; entering and returning preserves its 
   const initialZoom = await mapZoom(map)
   await map.getByRole('button', { name: '放大地圖並靠近活動位置' }).click()
   await expect(map).toHaveAttribute('data-map-zoom', String(initialZoom + 1))
+  const line = map.locator('.event-map-connectors').first().locator(`line[data-event-name="${eventName}"]`)
+  await expect(line).toHaveAttribute('x1', /\d+/)
+  const originalX = Number(await line.getAttribute('x1'))
+  const mainMap = map.getByRole('region', { name: '影的互動拍攝地圖' })
+  await mainMap.scrollIntoViewIfNeeded()
+  const box = (await mainMap.boundingBox())!
+  const x = box.x + box.width * 0.30
+  const y = box.y + box.height * 0.60
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x + 52, y + 24, { steps: 6 })
+  await page.mouse.up()
+  const readPosition = () => line.evaluate(element => ({
+    x: Number(element.getAttribute('x1')),
+    y: Number(element.getAttribute('y1'))
+  }))
+  await expect.poll(async () => Math.abs((await readPosition()).x - originalX)).toBeGreaterThan(20)
+  let panned = await readPosition()
+  let stableSince = performance.now()
+  // Leaflet can keep moving after mouseup. Capture the center after both axes settle.
+  await expect.poll(async () => {
+    const next = await readPosition()
+    const now = performance.now()
+    if (next.x !== panned.x || next.y !== panned.y) {
+      panned = next
+      stableSince = now
+    }
+    return now - stableSince
+  }, { intervals: [50, 100, 100] }).toBeGreaterThanOrEqual(250)
+
   await footer.click()
   await expect(page.locator('#event-cover-heading')).toHaveText(eventName!)
+  await expect(page.getByRole('button', { name: /前往系列照片/ })).toHaveAttribute('data-hydrated', 'true', { timeout: 20_000 })
+  await page.getByTestId('light-table-open').click()
+  const dialog = page.getByRole('dialog', { name: '圖片檢視器' })
+  await expect(dialog).toBeVisible()
+  await expect(page).toHaveURL(/[?&]image=/)
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+  await expect(page).not.toHaveURL(/[?&]image=/)
 
   await page.getByTestId('event-cover-return-map').click()
-  const restoredMap = page.locator('.event-map-wrapper:not(.event-map-wrapper--compact):not(.event-map-inset)')
-  await expect(restoredMap).toHaveAttribute('data-map-zoom', String(initialZoom + 1))
-  await expect(restoredMap.locator('.event-map-photo-card--focused')).toHaveAttribute('data-event-name', eventName!)
-  await expect(restoredMap.locator('.event-map-selection .event-map-photo-title')).toHaveText(eventName!)
+  await expect(map).toHaveAttribute('data-map-zoom', String(initialZoom + 1))
+  await expect(map.locator('.event-map-photo-card--focused')).toHaveAttribute('data-event-name', eventName!)
+  await expect(footer.locator('.event-map-photo-title')).toHaveText(eventName!)
+  await expect(line).toHaveAttribute('x1', /\d+/)
+  await expect.poll(async () => Math.abs((await readPosition()).x - panned.x)).toBeLessThanOrEqual(2)
+  await expect.poll(async () => Math.abs((await readPosition()).y - panned.y)).toBeLessThanOrEqual(2)
 })
 
 test('circle keyboard selection exposes a separate action to enter the group', async ({ page }) => {

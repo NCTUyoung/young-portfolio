@@ -15,13 +15,16 @@ import { chromium, type FullConfig } from '@playwright/test'
  * 任一路由失敗（編譯慢、暫時 5xx）只記 warn 不中斷，真正把關交給各 spec 的可見性斷言。
  */
 const ROUTES = [
-  '/', // 首頁 Hero 對開
-  '/gallery', // 舊入口直接轉入展廳
-  '/gallery/photography', // 影 overview（最重）
-  '/gallery/digital', // 繪 overview
-  '/exhibition/light', // 光落之處主題展
-  '/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D', // 代表性 event 沉浸頁
-  '/admin' // CSR-only 後台
+  '',
+  'gallery',
+  'gallery/photography',
+  'gallery/digital',
+  'exhibition/light',
+  'gallery/photography/Annber%20%E5%A4%96%E6%8B%8D',
+  'article',
+  'article/design-thinking',
+  'article/gear-119mm',
+  'admin'
 ]
 
 export default async function globalSetup (config: FullConfig) {
@@ -37,13 +40,16 @@ export default async function globalSetup (config: FullConfig) {
   for (const route of ROUTES) {
     const routeStartedAt = Date.now()
     try {
-      await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90_000 })
-      if (route === '/gallery/photography') {
+      const response = await page.goto(new URL(route, base).href, { waitUntil: 'domcontentloaded', timeout: 90_000 })
+      if (!response?.ok()) throw new Error(`HTTP ${response?.status()}`)
+      if (route === 'admin') {
+        await page.getByRole('heading', { name: '後台管理', exact: true }).waitFor({ timeout: 60_000 })
+      } else {
+        await page.locator('nav[data-hydrated="true"]').waitFor({ timeout: 60_000 })
+      }
+      if (route === 'gallery/photography') {
         // 地圖使用 async Leaflet import；只等 DOMContentLoaded 會在卡片佈局完成前就關閉暖機頁。
         await page.locator('.event-map-photo-card').first().waitFor({ state: 'visible', timeout: 60_000 })
-      } else {
-        // 給 client chunk 起手請求一點時間，讓 Vite 把該頁前端模組也編出來。
-        await page.waitForTimeout(400)
       }
     } catch (e) {
       console.warn(`[e2e warmup] ${route} 暖機未完成（不致命）：${(e as Error).message}`)
