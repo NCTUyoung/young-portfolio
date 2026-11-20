@@ -129,7 +129,29 @@
         讓策展節奏取代功能感。
       -->
 
-      <!-- Photography overview keeps the book-spread map; event routes begin at the event cover. -->
+      <nav
+        v-if="!filterState.selectedEvent && !isGalleryLoading && !galleryLoadFailed"
+        aria-label="主題展"
+        class="mx-auto mb-8 mt-6 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-y border-stone-300/70 dark:border-stone-600/70 lg:mb-12"
+      >
+        <NuxtLink
+          to="/exhibition/light"
+          class="group flex min-h-11 flex-1 items-center justify-between gap-5 py-3 text-stone-800 hover:text-accent-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-600 dark:text-stone-100 dark:hover:text-accent-300 dark:focus-visible:outline-accent-300"
+        >
+          <span class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span class="font-jp text-lg tracking-[0.08em] sm:text-xl">光落之處</span>
+            <span class="text-sm text-stone-600 dark:text-stone-300">從電繪走向攝影</span>
+          </span>
+          <span aria-hidden="true" class="text-accent-700 dark:text-accent-300">↗</span>
+        </NuxtLink>
+        <a
+          v-if="currentCategory === 'digital'"
+          :href="paintedWorldsUrl"
+          class="inline-flex min-h-11 items-center text-sm text-stone-700 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-600 dark:text-stone-200 dark:focus-visible:outline-accent-300"
+        >
+          進入畫界迴廊
+        </a>
+      </nav>
 
       <!-- 根據當前類別顯示不同佈局（帶切換動畫） -->
       <transition name="gallery-fade" mode="out-in">
@@ -288,6 +310,10 @@ import GalleryControlMiniBar from '~/components/gallery/GalleryControlMiniBar.vu
 import EventMap from '~/components/EventMap.vue'
 import ImageViewer from '~/components/ImageViewer.vue'
 
+// Both collection tabs share one gallery. The route watchers switch its contents
+// without restarting the async page setup during a quick return to the other tab.
+definePageMeta({ key: route => route.params.event ? route.path : 'gallery-overview' })
+
 const loadGalleryAtelierTimeline = () => import('~/components/gallery/GalleryAtelierTimeline.vue')
 const loadGalleryPhotographySection = () => import('~/components/gallery/GalleryPhotographySection.vue')
 const loadGalleryEventCover = () => import('~/components/gallery/GalleryEventCover.vue')
@@ -320,6 +346,7 @@ const {
 } = galleryStore
 
 const { getImagePath, getThumbPath } = useImagePath()
+const paintedWorldsUrl = `${useRuntimeConfig().app.baseURL.replace(/\/?$/, '/')}painted-worlds/index.html`
 
 type PhotoMapState = {
   center: [number, number] | null
@@ -714,21 +741,21 @@ watch([digitalError, photographyError], ([digitalErr, photoErr]) => {
 
 // ===== 生命週期 =====
 onMounted(async () => {
-  // 攝影 overview 首屏即以互動地圖為主，避免等作品清單的防禦性補抓才掛載。
-  if (currentCategory.value === 'photography' && !filterState.value.selectedEvent) {
-    mapShouldMount.value = true
-  }
-
-  // 攝影總覽的主要下一步是打開事件。提早暖載事件封面與印樣格元件，
-  // 讓使用者進事件時不必再等 async component chunk 載入。
-  if (currentCategory.value === 'photography' && !filterState.value.selectedEvent) {
-    void Promise.all([
-      loadGalleryEventCover(),
-      loadGalleryPhotographySection()
-    ]).catch((error) => {
-      console.warn('Unable to preload photography event components', error)
-    })
-  }
+  // The mounted overview can enter photography either directly or from the digital tab.
+  watch(
+    () => currentCategory.value === 'photography' && !filterState.value.selectedEvent,
+    (isPhotographyOverview) => {
+      if (!isPhotographyOverview || mapShouldMount.value) return
+      mapShouldMount.value = true
+      void Promise.all([
+        loadGalleryEventCover(),
+        loadGalleryPhotographySection()
+      ]).catch((error) => {
+        console.warn('Unable to preload photography event components', error)
+      })
+    },
+    { immediate: true }
+  )
 
   // 防禦性 fallback：useAsyncData 走完 hydrate 後若仍有任一邊為空（過去因 payload key
   // 不對齊導致 SSR 只灌數位的 bug 觸發過；現已修正），補抓一次保 UX 正常。

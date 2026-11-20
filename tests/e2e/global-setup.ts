@@ -19,6 +19,7 @@ const ROUTES = [
   '/gallery', // 舊入口直接轉入展廳
   '/gallery/photography', // 影 overview（最重）
   '/gallery/digital', // 繪 overview
+  '/exhibition/light', // 光落之處主題展
   '/gallery/photography/Annber%20%E5%A4%96%E6%8B%8D', // 代表性 event 沉浸頁
   '/admin' // CSR-only 後台
 ]

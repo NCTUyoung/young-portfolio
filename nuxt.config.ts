@@ -156,6 +156,7 @@ export default defineNuxtConfig({
         // 舊 path 由 useGalleryCategoryRoute 在 client-side replace 到 /gallery/photography
         '/gallery/digital',
         '/gallery/photography',
+        '/exhibition/light',
         // 每個事件一份 HTML：分享連結（Slack/Discord/X/Threads）爬蟲現在能讀到該事件的 hero 圖與 JSON-LD。
         // 不對 slug 做 encodeURIComponent；Nitro 對 prerender 路由內部會 decodeURI 後再 encodeURI（見
         // nitropack/dist/core/index.mjs 的 generateRoute），原始 unicode 字串能直接落到輸出資料夾名。
