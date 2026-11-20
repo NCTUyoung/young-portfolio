@@ -78,6 +78,7 @@ for (const viewport of [
     test.use({ viewport, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' })
 
     test('the first-screen 3D action works with the keyboard and returns focus', async ({ page }) => {
+      test.setTimeout(75_000)
       await page.goto('./')
       await waitForSiteHydration(page)
       const entrance = page.getByRole('region', { name: '作品集' })

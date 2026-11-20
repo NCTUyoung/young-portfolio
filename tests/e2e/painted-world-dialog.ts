@@ -10,7 +10,6 @@ export async function expectPaintedWorldDialog (page: Page, title: string) {
   const frame = dialog.frameLocator('iframe')
   await expect(frame.getByRole('heading', { name: title, exact: true, level: 1 }))
     .toBeVisible({ timeout: 20_000 })
-  await expect.poll(() => frame.locator('body').evaluate(() => new URL(location.href).searchParams.get('embed')))
-    .toBe('1')
+  await expect(frame.locator('html')).toHaveAttribute('data-embed', '1', { timeout: 20_000 })
   return { dialog, close, frame }
 }
