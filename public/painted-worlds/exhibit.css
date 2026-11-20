@@ -91,7 +91,7 @@ a { text-decoration: none; }
   color: var(--muted);
   border-bottom: 1px solid transparent;
 }
-.site-links a[aria-current], .site-links a:hover {
+.site-links a:hover {
   color: var(--ink);
   border-bottom-color: var(--mark);
 }
@@ -292,4 +292,12 @@ dialog p { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
   .stations button { padding-inline: 1px; }
   .doors a { grid-template-columns: auto minmax(0, 1fr); }
   .doors a::after { display: none; }
+}
+
+:root[data-embed="1"] { overscroll-behavior: contain; }
+:root[data-embed="1"] :is(.museum-header, .room-exit) { display: none; }
+:root[data-embed="1"] .room-header {
+  grid-template-areas: "heading";
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: clamp(12px, 2vw, 24px);
 }

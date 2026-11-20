@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test'
+import { expectPaintedWorldDialog } from './painted-world-dialog'
 import { waitForSiteHydration } from './site-ready'
 
-test.describe('首頁序廳', () => {
-  test('the foyer offers the current exhibition and 3D corridor before the author sections', async ({ page }) => {
+test.describe('首頁作品集', () => {
+  test('the homepage offers one corridor action before the author sections', async ({ page }) => {
     await page.goto('/young-portfolio/')
-    const entrance = page.getByRole('region', { name: '光落之處' })
-    await expect(entrance.getByRole('link', { name: '開始看展', exact: true }))
-      .toHaveAttribute('href', /\/young-portfolio\/exhibition\/light\/?#painting$/)
+    const entrance = page.getByRole('region', { name: '作品集' })
+    await expect(entrance.getByRole('link')).toHaveCount(1)
+    await expect(page.getByRole('link', { name: '開始看展', exact: true })).toHaveCount(0)
     await expect(entrance.getByRole('link', { name: '逛 3D 迴廊', exact: true }))
       .toHaveAttribute('href', /\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
     await expect(page.getByRole('heading', { name: '作品選集', exact: true })).toHaveCount(0)
@@ -43,12 +44,12 @@ test.describe('首頁導覽 / 320px', () => {
     await page.goto('/young-portfolio/')
     await waitForSiteHydration(page)
     const nav = page.getByRole('navigation', { name: '網站導覽' })
-    const exhibition = nav.getByRole('link', { name: '當期展', exact: true })
-    const collection = nav.getByRole('link', { name: '館藏', exact: true })
-    const journal = nav.getByRole('link', { name: '手記', exact: true })
+    const painting = nav.getByRole('link', { name: '繪畫', exact: true })
+    const photography = nav.getByRole('link', { name: '攝影', exact: true })
+    const corridor = nav.getByRole('link', { name: '3D 迴廊', exact: true })
     const theme = nav.getByRole('button', { name: '切換到深色模式', exact: true })
     const centers = []
-    for (const control of [exhibition, collection, journal, theme]) {
+    for (const control of [painting, photography, corridor, theme]) {
       await expect(control).toBeInViewport({ ratio: 1 })
       const box = (await control.boundingBox())!
       expect(box.width).toBeGreaterThanOrEqual(44)
@@ -56,9 +57,10 @@ test.describe('首頁導覽 / 320px', () => {
       centers.push(box.y + box.height / 2)
     }
     expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(2)
-    await expect(exhibition).toHaveAttribute('href', /\/exhibition\/light\/?#painting$/)
-    await expect(collection).toHaveAttribute('href', /\/gallery\/?$/)
-    await expect(journal).toHaveAttribute('href', /\/article\/?$/)
+    await expect(nav.getByRole('link')).toHaveCount(4) // Three destinations and the home signature.
+    await expect(painting).toHaveAttribute('href', '/young-portfolio/gallery/digital')
+    await expect(photography).toHaveAttribute('href', '/young-portfolio/gallery/photography#gallery-activities')
+    await expect(corridor).toHaveAttribute('href', /\/young-portfolio\/painted-worlds\/index\.html(?:\?|$)/)
     await expect(nav.getByRole('button', { name: '開啟選單' })).toHaveCount(0)
     await expect(nav.locator('a[href*="/admin"]')).toHaveCount(0)
     await expect(page.locator('footer a[href$="/admin"]')).toHaveCount(1)
@@ -71,39 +73,35 @@ for (const viewport of [
   { width: 320, height: 640 }, { width: 360, height: 640 },
   { width: 390, height: 844 }, { width: 1440, height: 900 }
 ]) {
-  test.describe(`Foyer entrances at ${viewport.width}px`, () => {
+  test.describe(`Portfolio at ${viewport.width}px`, () => {
     const mobile = viewport.width < 768
     test.use({ viewport, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' })
 
-    test('the exhibition and 3D corridor links fit on the first screen and reach their destinations', async ({ page }) => {
+    test('the first-screen 3D action works with the keyboard and returns focus', async ({ page }) => {
       await page.goto('./')
       await waitForSiteHydration(page)
-      const entrance = page.getByRole('region', { name: '光落之處' })
-      const start = entrance.getByRole('link', { name: '開始看展', exact: true })
+      const entrance = page.getByRole('region', { name: '作品集' })
       const corridor = entrance.getByRole('link', { name: '逛 3D 迴廊', exact: true })
 
-      for (const link of [start, corridor]) {
-        await expect(link).toBeInViewport({ ratio: 1 })
-        const bounds = (await link.boundingBox())!
-        expect(bounds.width).toBeGreaterThanOrEqual(44)
-        expect(bounds.height).toBeGreaterThanOrEqual(44)
-      }
+      await expect(corridor).toBeInViewport({ ratio: 1 })
+      const bounds = (await corridor.boundingBox())!
+      expect(bounds.width).toBeGreaterThanOrEqual(44)
+      expect(bounds.height).toBeGreaterThanOrEqual(44)
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 
-      await start.focus()
-      await expect(start).toBeFocused()
+      await corridor.focus()
+      await expect(corridor).toBeFocused()
+      const homeUrl = page.url()
       await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(/\/young-portfolio\/exhibition\/light\/?#painting$/)
-      await expect(page.getByRole('heading', { level: 2, name: '唯一真神', exact: true })).toBeVisible()
-      await page.goBack()
-      await expect(page).toHaveURL(/\/young-portfolio\/$/)
-      await waitForSiteHydration(page)
-      await corridor.click()
-      await expect(page).toHaveURL(/\/young-portfolio\/painted-worlds\/index\.html\?from=home$/)
-      const rooms = page.getByRole('navigation', { name: '畫中展間' })
+      const { dialog, close, frame } = await expectPaintedWorldDialog(page, '畫界迴廊')
+      await expect(page).toHaveURL(homeUrl)
+      const rooms = frame.getByRole('navigation', { name: '畫中展間' })
       await expect(rooms.getByRole('link', { name: /柑橘樹下/ })).toBeVisible()
       await expect(rooms.getByRole('link', { name: /紅色舞台/ })).toBeVisible()
-      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+      await close.click()
+      await expect(dialog).toBeHidden()
+      await expect(page).toHaveURL(homeUrl)
+      await expect(corridor).toBeFocused()
     })
   })
 }

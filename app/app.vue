@@ -4,6 +4,8 @@
     <ToastContainer />
   </NuxtLayout>
 
+  <PaintedWorldOverlay ref="worldOverlay" />
+
   <!--
     Round 19：全站 SVG defs — 印章 ink-bleed 濾鏡（用於 .jp-seal 字身）
     feTurbulence + feDisplacementMap：模擬朱泥印章因紙吸墨而邊緣參差
@@ -21,5 +23,10 @@
 </template>
 
 <script setup lang="ts">
-// 应用入口组件的逻辑
+import { provide, useTemplateRef } from 'vue'
+import PaintedWorldOverlay from '~/components/museum/PaintedWorldOverlay.vue'
+import { paintedWorldOpenKey } from '~/composables/usePaintedWorld'
+
+const worldOverlay = useTemplateRef('worldOverlay')
+provide(paintedWorldOpenKey, anchor => worldOverlay.value?.open(anchor) ?? false)
 </script>

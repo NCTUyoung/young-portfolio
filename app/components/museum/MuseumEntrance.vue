@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { joinURL } from 'ufo'
+import PaintedWorldLink from '~/components/museum/PaintedWorldLink.vue'
 
 const { cover } = defineProps<{
   cover: { desktop: string, mobile: string, alt: string }
@@ -31,14 +32,13 @@ const corridorUrl = joinURL(baseURL, 'painted-worlds/index.html?from=home')
     </figure>
 
     <div class="museum-entrance__intro">
-      <h1 id="museum-entrance-title" class="museum-heading">光落之處</h1>
-      <p class="museum-entrance__byline">序廳<span aria-hidden="true" />NCTU Young</p>
-      <div class="museum-entrance__links">
-        <NuxtLink to="/exhibition/light#painting" class="museum-entrance__start">
-          開始看展
+      <h1 id="museum-entrance-title" class="museum-heading">作品集</h1>
+      <p class="museum-entrance__subtitle">繪畫與攝影</p>
+      <div class="museum-entrance__action">
+        <PaintedWorldLink :href="corridorUrl" class="museum-entrance__corridor">
+          逛 3D 迴廊
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-        </NuxtLink>
-        <a :href="corridorUrl" class="museum-entrance__corridor">逛 3D 迴廊</a>
+        </PaintedWorldLink>
       </div>
     </div>
   </section>
@@ -109,38 +109,22 @@ const corridorUrl = joinURL(baseURL, 'painted-worlds/index.html?from=home')
   letter-spacing: .075em;
 }
 
-.museum-entrance__byline {
-  display: flex;
-  align-items: center;
-  gap: .7rem;
+.museum-entrance__subtitle {
   margin: .8rem 0 0;
   color: var(--museum-muted);
   font-size: .9rem;
   letter-spacing: .07em;
 }
 
-.museum-entrance__byline span {
-  width: 1px;
-  height: .9em;
-  background: var(--museum-line);
-}
-
-.museum-entrance__links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .375rem clamp(.9rem, 2vw, 1.5rem);
+.museum-entrance__action {
   margin-top: clamp(1.5rem, 3vw, 2.75rem);
 }
 
-.museum-entrance__links a {
+.museum-entrance__action :deep(.museum-entrance__corridor) {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   font-size: .9375rem;
-}
-
-.museum-entrance__start {
   gap: .65rem;
   padding-inline: .85rem;
   border: 1px solid var(--museum-mark);
@@ -148,20 +132,13 @@ const corridorUrl = joinURL(baseURL, 'painted-worlds/index.html?from=home')
   font-weight: 600;
 }
 
-.museum-entrance__start svg {
+.museum-entrance__action :deep(.museum-entrance__corridor svg) {
   flex: none;
   width: 1rem;
   height: 1rem;
 }
 
-.museum-entrance__corridor {
-  color: var(--museum-muted);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: .3em;
-}
-
-.museum-entrance__links a:hover {
+.museum-entrance__action :deep(.museum-entrance__corridor:hover) {
   color: var(--museum-mark);
 }
 
@@ -180,11 +157,11 @@ const corridorUrl = joinURL(baseURL, 'painted-worlds/index.html?from=home')
     font-size: clamp(2.125rem, 9vw, 3rem);
   }
 
-  .museum-entrance__byline {
+  .museum-entrance__subtitle {
     margin-top: .5rem;
   }
 
-  .museum-entrance__links {
+  .museum-entrance__action {
     margin-top: 1.1rem;
   }
 

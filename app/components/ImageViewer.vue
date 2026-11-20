@@ -574,8 +574,10 @@ const releaseTrap = () => {
   previouslyFocused = null
 }
 
+const shouldHandleViewerKeys = () => isOpen.value && !document.querySelector('dialog[data-painted-world-dialog][open]')
+
 const handleTabKey = (event: KeyboardEvent) => {
-  if (event.key !== 'Tab' || !isOpen.value || !lightboxRoot.value) return
+  if (event.key !== 'Tab' || !shouldHandleViewerKeys() || !lightboxRoot.value) return
   const items = getFocusable()
   if (items.length === 0) {
     event.preventDefault()
@@ -712,7 +714,7 @@ const handleTouchStart = (event: TouchEvent) => {
 
 // 鍵盤事件處理
 const handleKeydown = (event: KeyboardEvent) => {
-  if (!isOpen.value) return
+  if (!shouldHandleViewerKeys()) return
 
   switch (event.key) {
     case 'Escape':

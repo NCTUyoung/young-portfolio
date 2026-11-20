@@ -81,21 +81,21 @@ function scrollToTop () {
   window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
 }
 
-const exhibitionTitle = '光落之處 — NCTU Young'
-const exhibitionDescription = 'NCTU Young 的數位繪畫與攝影展《光落之處》，從《唯一真神》的原作開始。'
+const portfolioTitle = 'NCTU Young 作品集'
+const portfolioDescription = 'NCTU Young 的繪畫與攝影作品集，收錄數位插畫、城市街拍、活動紀實與創作手記。'
 
 useSeoMeta({
-  title: exhibitionTitle,
-  description: exhibitionDescription,
-  ogTitle: exhibitionTitle,
-  ogDescription: exhibitionDescription,
+  title: portfolioTitle,
+  description: portfolioDescription,
+  ogTitle: portfolioTitle,
+  ogDescription: portfolioDescription,
   ogType: 'website',
   ogUrl: SEO_CONFIG.siteUrl,
   ogImage: coverURL,
   ogImageAlt: cover.alt,
   twitterCard: 'summary_large_image',
-  twitterTitle: exhibitionTitle,
-  twitterDescription: exhibitionDescription,
+  twitterTitle: portfolioTitle,
+  twitterDescription: portfolioDescription,
   twitterImage: coverURL,
   twitterImageAlt: cover.alt
 })

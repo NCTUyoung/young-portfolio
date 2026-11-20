@@ -9,6 +9,6 @@ related_targets: ["app/layouts/default.vue", "app/pages/gallery/[category]/[[eve
 
 Mode: Experience.
 
-The global 館藏 link opens a collection index with real artwork and photography previews. Each collection has a clearly named direct entrance. The location map belongs inside the photography collection.
+The collection index shows real artwork and photography previews. The primary navigation opens each collection directly. The location map belongs inside the photography collection.
 
 `/gallery?image=<id>` and `/gallery/all` preserve the legacy shared-image redirect, query, and hash. Verify a plain direct entry before and after hydration, legacy links, category switching, and browser Back.

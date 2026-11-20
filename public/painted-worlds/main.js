@@ -17,19 +17,18 @@ function roomFromHash() {
   return doors.has(id) ? id : 'hall'
 }
 
+const isEmbedded = document.documentElement.dataset.embed === '1'
 const source = new URLSearchParams(location.search).get('from')
 const savedWork = history.state?.paintedWorldsWork
 const workOrigin = source === 'work' && (workFiles.has(savedWork) ? savedWork : roomFromHash())
 
 function updateReturnLink() {
   const link = $('#source-return')
-  if (source === 'light') $('#light-link').setAttribute('aria-current', 'location')
-  if (source === 'work') $('#collection-link').setAttribute('aria-current', 'location')
   if (source === 'home') {
     link.href = '../'
     link.textContent = '回到首頁'
   } else if (source === 'light') {
-    link.href = $('#light-link').href
+    link.href = '../exhibition/light/#painting'
     link.textContent = '回到繪作站'
   } else if (workFiles.has(workOrigin)) {
     // The gallery uses the full filename minus its extension as part of generateImageId.
@@ -46,7 +45,7 @@ function updateReturnLink() {
 }
 
 function rememberWorkOrigin() {
-  if (workFiles.has(workOrigin) && history.state?.paintedWorldsWork !== workOrigin) {
+  if (!isEmbedded && workFiles.has(workOrigin) && history.state?.paintedWorldsWork !== workOrigin) {
     // Keep the original work across room changes, browser Back and reloads.
     history.replaceState({ ...history.state, paintedWorldsWork: workOrigin }, '')
   }
@@ -173,10 +172,10 @@ async function mount() {
     shell.dataset.ready = 'true'
   }
 
-  function selectRoom() {
+  function selectRoom(id) {
     clearTimeout(approach)
     rememberWorkOrigin()
-    room = roomFromHash()
+    room = id
     station = 0
     closeup = false
     live = false
@@ -184,15 +183,15 @@ async function mount() {
     if (rendererSettled) void showScene()
   }
 
-  function onRoomChange() {
+  function onRoomChange(id) {
     if (dialog.open) dialog.close()
-    selectRoom()
+    selectRoom(id)
     roomTitle.focus()
   }
 
   function goToRoom(id) {
-    history.pushState(history.state, '', '#' + id)
-    onRoomChange()
+    if (!isEmbedded) history.pushState(history.state, '', '#' + id)
+    onRoomChange(id)
   }
 
   function enter(id) {
@@ -253,10 +252,10 @@ async function mount() {
   })
   canvas.addEventListener('exhibit-restored', showScene)
   mobile.addEventListener('change', () => { if (live) engine.setView(view()) })
-  window.addEventListener('hashchange', onRoomChange)
+  window.addEventListener('hashchange', () => onRoomChange(roomFromHash()))
 
-  updateReturnLink()
-  selectRoom()
+  if (!isEmbedded) updateReturnLink()
+  selectRoom(roomFromHash())
   const embedded = $('#exhibit-data')
   try {
     data = embedded ? JSON.parse(embedded.textContent) : await fetch('./exhibition.json').then(response => {
@@ -275,6 +274,16 @@ async function mount() {
   } catch { /* Keep the stills, station controls, and original art available. */ }
   rendererSettled = true
   await showScene()
+}
+
+if (isEmbedded) {
+  window.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing) return
+    event.preventDefault()
+    if (event.repeat) return
+    if (dialog.open) dialog.close()
+    else window.parent.postMessage({ type: 'painted-world:close' }, location.origin)
+  })
 }
 
 void mount()

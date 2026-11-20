@@ -5,13 +5,13 @@ primary_target: "app/pages/index.vue"
 related_targets: ["app/layouts/default.vue"]
 ---
 
-# Homepage exhibition sequence
+# Portfolio entrance
 
 Mode: Experience.
 
 ## THESIS
 
-The homepage is the prologue to 《光落之處》. 《唯一真神》 is the central exhibit. A short label presents the work and the main action opens the first exhibition stop.
+The homepage opens on 《唯一真神》. Its label identifies the sculpture and the primary action opens the 3D corridor on the same page.
 
 ## OWN-WORLD
 
@@ -19,10 +19,10 @@ Preserve the warm framed-art exhibition and cool photographic-print language in 
 
 ## FIRST VIEWPORT AND FLOW
 
-Use a responsive static render of the sculpture for the hero. The prologue links directly to the exhibition and the 3D corridor. The author introduction follows.
+Use a responsive static render of the sculpture for the hero. The author introduction follows.
 
-Keep the author media, social links, creative-history disclosure, and journey/dialogue anchors. The primary navigation reads 當期展, 館藏, and 手記.
+Keep the author media, social links, creative-history disclosure, and journey/dialogue anchors. The primary navigation reads 繪畫, 攝影, and 3D 迴廊. The author section and footer link to 手記.
 
 ## VERIFICATION
 
-Check desktop and mobile in both themes. Verify that the first stop and the 3D corridor are reachable from the first viewport at 320 px. 館藏 in the shared navigation opens the collection. Check visible focus, the history disclosure, and that homepage entry makes no WebGL requests.
+Check desktop and mobile in both themes. Verify that 3D opens from the first viewport at 320 px and closing it restores focus. Check that 繪畫 and 攝影 open their galleries directly. Check the history disclosure and that homepage entry makes no WebGL requests.

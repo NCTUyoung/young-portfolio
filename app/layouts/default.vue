@@ -11,12 +11,14 @@
             v-for="link in navLinks"
             :key="link.to"
             :to="link.to"
+            aria-current-value="location"
             class="site-nav-link"
             :class="{ 'site-nav-current': currentSection === link.section }"
             :aria-current="currentSection === link.section ? 'location' : undefined"
           >
             {{ link.label }}
           </NuxtLink>
+          <PaintedWorldLink :href="paintedWorldsHref" class="site-nav-link">3D 迴廊</PaintedWorldLink>
           <button type="button" class="site-menu-toggle" :title="themeLabel" :aria-label="themeLabel" @click="toggleDark()">
             <Icon v-if="layoutHydrated && isDark" name="lucide:sun" aria-hidden="true" />
             <Icon v-else name="lucide:moon" aria-hidden="true" />
@@ -39,6 +41,7 @@
           <p class="site-copyright">© {{ currentYear }} NCTU Young</p>
         </div>
         <div class="site-footer-actions">
+          <NuxtLink to="/article" class="site-footer-link">手記</NuxtLink>
           <SocialMediaLinks variant="bare" />
           <NuxtLink to="/admin" class="site-admin" aria-label="後台管理入口">
             管理入口
@@ -51,6 +54,8 @@
 
 <script setup lang="ts">
 import { useDark, useToggle } from '@vueuse/core'
+import { joinURL } from 'ufo'
+import PaintedWorldLink from '~/components/museum/PaintedWorldLink.vue'
 import { sitePageUrl } from '~~/shared/utils/sitePageUrl'
 
 const route = useRoute()
@@ -63,18 +68,16 @@ const toggleDark = useToggle(isDark)
 const layoutHydrated = ref(false)
 const themeLabel = computed(() => layoutHydrated.value && isDark.value ? '切換到淺色模式' : '切換到深色模式')
 const currentYear = new Date().getFullYear()
+const paintedWorldsHref = joinURL(useRuntimeConfig().app.baseURL, 'painted-worlds/index.html?from=home')
 
 const navLinks = [
-  { to: '/exhibition/light#painting', label: '當期展', section: 'exhibition' },
-  { to: '/gallery', label: '館藏', section: 'collection' },
-  { to: '/article', label: '手記', section: 'journal' },
+  { to: '/gallery/digital', label: '繪畫', section: 'digital' },
+  { to: '/gallery/photography#gallery-activities', label: '攝影', section: 'photography' },
 ] as const
 
 const currentSection = computed(() => {
-  if (route.path === '/' || route.path.startsWith('/exhibition')) return 'exhibition'
-  if (route.path.startsWith('/gallery')) return 'collection'
-  if (route.path.startsWith('/article')) return 'journal'
-  return undefined
+  const category = route.params.category
+  return category === 'digital' || category === 'photography' ? category : undefined
 })
 
 onMounted(() => { layoutHydrated.value = true })
@@ -154,8 +157,15 @@ onMounted(() => { layoutHydrated.value = true })
 
 .site-footer-signature { margin-bottom: .7rem; }
 .site-copyright { color: var(--museum-muted); font-size: .75rem; }
-.site-admin { display: flex; align-items: center; min-height: 44px; color: var(--museum-muted); font-size: .75rem; }
-.site-admin:hover { color: var(--museum-mark); text-decoration: underline; text-underline-offset: .22em; }
+.site-admin, .site-footer-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--museum-muted);
+  font-size: .75rem;
+}
+.site-footer-link { font-size: .875rem; }
+.site-admin:hover, .site-footer-link:hover { color: var(--museum-mark); text-decoration: underline; text-underline-offset: .22em; }
 
 @media (max-width: 767px) {
   .site-nav-inner { gap: .45rem; }

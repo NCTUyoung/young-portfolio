@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PaintedWorldLink from '~/components/museum/PaintedWorldLink.vue'
 import { fetchDigitalWorks, fetchPhotographyWorks } from '~/stores/galleryLoaders'
 import { formatDateKey } from '~/utils/formatters'
 
@@ -187,10 +188,10 @@ useSeoMeta({
               >
                 重試
               </button>
-              <a v-if="current.anchor === 'painting'" class="light-text-link" :href="orchardUrl">
+              <PaintedWorldLink v-if="current.anchor === 'painting'" class="light-text-link" :href="orchardUrl">
                 進入畫界 · 柑橘樹下
                 <Icon name="lucide:arrow-up-right" aria-hidden="true" />
-              </a>
+              </PaintedWorldLink>
             </div>
           </figcaption>
         </figure>

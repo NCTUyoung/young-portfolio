@@ -2,26 +2,23 @@ import { test, expect } from '@playwright/test'
 import { waitForSiteHydration } from './site-ready'
 
 test.describe('首頁 /', () => {
-  test('載入光落之處序廳與作者介紹', async ({ page }) => {
+  test('載入作品集與作者介紹', async ({ page }) => {
     await page.goto('./')
 
     await expect(page).toHaveTitle(/Young Portfolio/i)
 
-    await expect(page.getByRole('heading', { level: 1, name: '光落之處', exact: true })).toBeVisible()
-    await expect(page.getByRole('region', { name: '光落之處' }).getByText(/序廳/)).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: '作品集', exact: true })).toBeVisible()
     await expect(
       page.getByRole('heading', { level: 2, name: /關於作者/ })
     ).toBeVisible()
   })
 
-  test('可從序廳經館藏先看拍攝活動，再到踏跡地圖', async ({ page }) => {
+  test('首頁可直達拍攝活動，再切換到踏跡地圖', async ({ page }) => {
     await page.goto('./')
     await waitForSiteHydration(page)
 
-    await page.getByRole('navigation', { name: '網站導覽' }).getByRole('link', { name: '館藏', exact: true }).click()
-    await expect(page).toHaveURL(/\/young-portfolio\/gallery\/?$/)
-    const photography = page.getByRole('navigation', { name: '館藏目錄' })
-      .getByRole('link', { name: '攝影館', exact: true })
+    const photography = page.getByRole('navigation', { name: '網站導覽' })
+      .getByRole('link', { name: '攝影', exact: true })
     await expect(photography).toHaveAttribute('href', '/young-portfolio/gallery/photography#gallery-activities')
     await photography.click()
     await expect(page).toHaveURL(/\/young-portfolio\/gallery\/photography\/?#gallery-activities$/)

@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
+import { expectPaintedWorldDialog } from './painted-world-dialog'
 import { waitForSiteHydration } from './site-ready'
 
-test('the current exhibition goes from the home foyer to all three stops and returns from the painted world', async ({ page }) => {
+test('the legacy exhibition keeps all three stops and opens the orchard on the same page', async ({ page }) => {
   test.setTimeout(75_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('./')
+  await page.goto('exhibition/light/#painting')
   await waitForSiteHydration(page)
-  await page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展', exact: true }).click()
   await expect(page).toHaveURL(/\/young-portfolio\/exhibition\/light\/?#painting$/)
   await expect(page.getByRole('heading', { name: '光落之處', level: 1 })).toBeVisible()
 
@@ -34,12 +34,19 @@ test('the current exhibition goes from the home foyer to all three stops and ret
   const orchard = page.getByRole('region', { name: '唯一真神', exact: true }).getByRole('link', { name: /畫界/ })
   const orchardUrl = /\/young-portfolio\/painted-worlds\/index\.html\?from=light#orchard$/
   await expect(orchard).toHaveAttribute('href', orchardUrl)
+  await orchard.scrollIntoViewIfNeeded()
+  const paintingUrl = page.url()
+  const originScroll = await page.evaluate(() => scrollY)
   await orchard.click()
-  await expect(page).toHaveURL(orchardUrl)
-  await expect(page.getByRole('heading', { name: '柑橘樹下', exact: true, level: 1 })).toBeVisible()
-  await expect(page.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
-  await page.getByRole('link', { name: '回到繪作站', exact: true }).click()
-  await expect(page).toHaveURL(/\/exhibition\/light\/?#painting$/)
+  const { dialog, close, frame } = await expectPaintedWorldDialog(page, '柑橘樹下')
+  await expect(frame.locator('#scene')).toHaveAttribute('data-ready', 'true', { timeout: 25_000 })
+  await expect.poll(() => frame.locator('body').evaluate(() => location.hash)).toBe('#orchard')
+  await expect(page).toHaveURL(paintingUrl)
+  await close.click()
+  await expect(dialog).toBeHidden()
+  await expect(page).toHaveURL(paintingUrl)
+  await expect(orchard).toBeFocused()
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(originScroll)
   await expect(painting).toBeVisible()
   await expect(stops.nth(0)).toHaveAttribute('aria-current', 'step')
 })
@@ -54,8 +61,14 @@ test('catalogue failures leave exhibition navigation usable and retry restores t
     failed.add(new URL(route.request().url()).pathname.split('/').at(-1)!)
     await route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
   })
-  await page.getByRole('link', { name: 'NCTU Young — 首頁', exact: true }).click()
-  await page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展', exact: true }).click()
+  // Enter through the client router so failure injection reaches the loaders.
+  // A direct request to Pages hydrates its catalogue from prerendered data.
+  await page.evaluate(() => {
+    const root = document.getElementById('__nuxt')
+    if (!root || !('__vue_app__' in root)) throw new Error('Nuxt app is unavailable after hydration')
+    const app = root.__vue_app__ as { config: { globalProperties: { $router: { push: (path: string) => Promise<unknown> } } } }
+    return app.config.globalProperties.$router.push('/exhibition/light#painting')
+  })
   const status = page.getByRole('status').filter({ hasText: '館藏資料暫時無法讀取。' })
   await expect(status).toBeVisible({ timeout: 20_000 })
   expect(failed).toEqual(new Set(['galleryList.json', 'photographyList.json']))
@@ -103,7 +116,7 @@ for (const station of [
     await expect(artwork).toBeVisible()
     await page.getByRole('link', { name: '回序廳', exact: true }).click()
     await expect(page).toHaveURL(/\/young-portfolio\/$/)
-    await expect(page.getByRole('region', { name: '光落之處' }).getByRole('link', { name: '開始看展' })).toBeVisible()
+    await expect(page.getByRole('region', { name: '作品集' }).getByRole('link', { name: '逛 3D 迴廊' })).toBeVisible()
   })
 }
 

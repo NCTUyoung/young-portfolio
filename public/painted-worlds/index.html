@@ -9,6 +9,11 @@
   <link rel="canonical" href="https://nctuyoung.github.io/young-portfolio/painted-worlds/index.html">
   <link rel="icon" href="data:,">
   <script>
+    if (window.parent !== window && new URLSearchParams(location.search).get('embed') === '1') {
+      try {
+        if (window.parent.location.origin === location.origin) document.documentElement.dataset.embed = '1'
+      } catch { /* Keep standalone navigation when framed by another origin. */ }
+    }
     const systemDark = matchMedia('(prefers-color-scheme: dark)')
     function syncTheme() {
       try {
@@ -29,8 +34,8 @@
 <header class="museum-header">
   <a class="signature" href="../" aria-label="NCTU Young — 首頁"><span><strong>NCTU</strong><small>Young</small></span></a>
   <nav class="site-links" aria-label="網站導覽">
-    <a id="light-link" href="../exhibition/light/#painting">當期展</a>
-    <a id="collection-link" href="../gallery/">館藏</a>
+    <a href="../gallery/digital">繪畫</a>
+    <a href="../gallery/photography#gallery-activities">攝影</a>
     <a href="../article/">手記</a>
   </nav>
 </header>

@@ -92,7 +92,7 @@ components:
 
 ## Overview
 
-The homepage is the prologue to 《光落之處》. The sculpture of 《唯一真神》 introduces the first stop. The primary navigation gives the current exhibition, collection, and journals consistent names. The collection index presents both media and leads directly to each gallery. Photography retains its location map and uses an uncropped photograph and authentic series text on the selected-series entry. Painted worlds belong to their artworks and return to the initiating artwork or exhibition stop.
+The homepage introduces the portfolio with the sculpture of 《唯一真神》. The primary navigation goes straight to paintings, photographic activities, and the 3D corridor. Photography retains its location map and uses an uncropped photograph and authentic series text on the selected-series entry. A painted world opens over the current page and returns focus to its entrance when closed.
 
 **Creative North Star: "展廳與選片光桌"**
 
@@ -145,7 +145,7 @@ The global stone scale supplies readable text and neutral surfaces; each gallery
 
 ## Layout
 
-The site uses responsive gutters. The prologue centers on one sculpture, an exhibit label, and a clear action to begin the exhibition. The collection index gives both media direct entrances with real work previews.
+The site uses responsive gutters. The homepage centers on one sculpture and its 3D entrance. The collection index gives both media direct entrances with real work previews.
 
 The exhibition opens with one prominent work and a nearby plaque, then continues through year rooms. Each room holds two columns above `767px` and one column below. Frames size from the artwork's ratio rather than forcing a common crop. The photo activity's light table sizes the selected paper to its photograph's ratio and places three smaller neighbors across the desktop surface; below `640px`, the selected print and two small neighbors occupy separate columns, and the thumbnail strip remains horizontally scrollable.
 
