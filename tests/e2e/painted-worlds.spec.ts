@@ -190,6 +190,7 @@ test('the standalone gallery room remembers the original work across room change
   await page.reload()
   await page.getByRole('link', { name: '回到《Mika Nakashima》', exact: true }).click()
   await expect.poll(() => new URL(page.url()).searchParams.get('image')).toBe(paintedWorks[1].id)
+  await waitForSiteHydration(page)
   const viewer = page.getByRole('dialog', { name: '圖片檢視器' })
   await expect(viewer.locator('.image-viewer-area picture img')).toHaveAttribute('alt', 'Mika Nakashima')
 })
