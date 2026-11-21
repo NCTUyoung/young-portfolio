@@ -894,33 +894,38 @@
           "label": "穿過取景人群",
           "description": "從手機與攝影者之間看紙白舞台上的斜展長耳與圓框眼鏡。",
           "position": [
-            0.15,
-            2.15,
-            4.67
+            0.14,
+            1.82,
+            4.17
           ],
           "target": [
             0.03,
-            1.51,
-            0
+            1.47,
+            -0.06
           ],
-          "fov": 46,
-          "mobileFov": 52
+          "fov": 41,
+          "mobileFov": 51
         },
         {
           "label": "棚燈一側",
           "description": "從側面看人物、地上石墨線、相機和後排攝影者拉開的深度。",
           "position": [
-            2.85,
-            2.19,
-            3.72
+            -1.53,
+            1.69,
+            3.24
           ],
           "target": [
-            0.06,
-            1.45,
-            -0.04
+            0,
+            1.53,
+            -0.08
           ],
-          "fov": 48,
-          "mobileFov": 51
+          "fov": 54,
+          "mobileFov": 54,
+          "mobileTarget": [
+            0,
+            1.55,
+            -0.08
+          ]
         }
       ],
       "stills": [
@@ -943,7 +948,8 @@
         "ground": "#b79196",
         "keyIntensity": 1.65,
         "fillIntensity": 0.68,
-        "skyIntensity": 0.95
+        "skyIntensity": 0.95,
+        "shadowIntensity": 0.49
       },
       "art": {
         "title": "Cosplayer",
