@@ -689,36 +689,46 @@
       "title": "36-編輯-1",
       "views": [
         {
-          "label": "紅黑雙環",
-          "description": "漆紅黑格前，兩頂冷藍帽與手銬構成交錯的雙人輪廓。",
+          "label": "近看雙臉與搭肩",
+          "description": "視線落在雙瞼、肩掌與前後交臂。",
           "position": [
-            0.38,
-            2.13,
-            4.12
+            -0.08,
+            1.125,
+            2.14
           ],
           "target": [
-            0,
-            1.65,
-            -0.1
+            0.018,
+            1.226,
+            -0.01
           ],
-          "fov": 48,
-          "mobileFov": 49
+          "fov": 22,
+          "mobileTarget": [
+            0.024,
+            1.205,
+            -0.01
+          ],
+          "mobileFov": 32
         },
         {
-          "label": "藍側鏈列",
-          "description": "從藍光側移讀出兩人的肩臂、扣環與後方懸吊紅環的距離。",
+          "label": "穿廊看全身",
+          "description": "從左前退到斜角，看四靴落地和右後方走道。",
           "position": [
-            -2.26,
-            2.02,
-            3.6
+            -0.54,
+            1.21,
+            3.47
           ],
           "target": [
-            0,
-            1.58,
-            -0.09
+            0.245,
+            0.738,
+            -0.19
           ],
-          "fov": 47,
-          "mobileFov": 49
+          "fov": 34,
+          "mobileTarget": [
+            0.1,
+            0.745,
+            -0.13
+          ],
+          "mobileFov": 33
         }
       ],
       "stills": [
@@ -730,18 +740,18 @@
         "./rooms/2025-36/view-1-mobile.webp"
       ],
       "look": {
-        "sky": "#160711",
+        "sky": "#110a10",
         "fog": {
-          "color": "#160711",
-          "near": 8,
-          "far": 24
+          "color": "#110a10",
+          "near": 9,
+          "far": 32
         },
-        "key": "#ffe5ce",
-        "fill": "#a1baff",
-        "ground": "#70424f",
-        "keyIntensity": 3.2,
-        "fillIntensity": 1.95,
-        "skyIntensity": 1.15
+        "key": "#fff1e8",
+        "fill": "#a1b6d8",
+        "ground": "#6c575d",
+        "keyIntensity": 0.68,
+        "fillIntensity": 0.74,
+        "skyIntensity": 0.88
       },
       "art": {
         "title": "36-編輯-1",
@@ -843,20 +853,25 @@
           "mobileFov": 53
         },
         {
-          "label": "晶瓣側面",
-          "description": "繞向另一側可讀出晶瓣的厚度、劍尖落點與月盤之間的空間。",
+          "label": "兩腕與劍柄",
+          "description": "靠近劍柄一側看回眸、雙腕與晶瓣，從冷白背光裡辨出持劍輪廓。",
           "position": [
-            -2.41,
-            2.17,
-            4.08
+            -1.37,
+            2.62,
+            3.2
           ],
           "target": [
-            -0.13,
-            1.48,
-            -0.16
+            -0.18,
+            2.17,
+            -0.08
           ],
-          "fov": 47,
-          "mobileFov": 53
+          "fov": 31,
+          "mobileFov": 44,
+          "mobileTarget": [
+            -0.04,
+            2.19,
+            -0.08
+          ]
         }
       ],
       "stills": [
