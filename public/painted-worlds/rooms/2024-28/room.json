@@ -15,6 +15,7 @@
   "views": [
     {
       "label": "紅藍主軸",
+      "orbitDistance": 4.8,
       "description": "由紅藍柱基的彩色反照，沿中央暖光望進後方通道。",
       "position": [
         0.13,

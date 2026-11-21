@@ -115,6 +115,7 @@ async function readRoom(entry) {
   for (const view of views) {
     assert(label(view.label) && label(view.description) && vector(view.position) && vector(view.target) &&
       view.position.some((coordinate, index) => coordinate !== view.target[index]) &&
+      (view.orbitDistance === undefined || (Number.isFinite(view.orbitDistance) && view.orbitDistance > 0)) &&
       number(view.fov, 1, 179) && number(view.mobileFov, 1, 179), `${id}: invalid view`)
   }
   assert(new Set(views.map(({ position, target }) => JSON.stringify([position, target]))).size === views.length, `${id}: duplicate views`)

@@ -8,6 +8,13 @@ const palettes = {
 }
 const sculptureLighting = { hemisphere: 1.12, ground: 0xa59a89, power: 2.15, bounce: .40, sun: [-4.5, 7, 3], shadow: .77 }
 const roomDefaults = { sky: 0xd9d5c9, ground: 0xa59a89, key: 0xffeed6, fill: 0xdce6ef, keyIntensity: 2.15, fillIntensity: .55, skyIntensity: 1.05 }
+const solidSurfaces = {
+  hall: /limewash|sawn oak|honed fossil limestone/i,
+  orchard: /bark|trunk/i,
+  stage: /garnet inks|wine ink|dyed reverse|carbon at overlaps|carmine glaze/i,
+  '2024-28': /tower stone|vitreous enamel|fluted concourse concrete|backlit plaster/i,
+  '2024-55': /pale gray plaster|window joinery|newsprint seen|copier indigo|scanner blue|printed paper|ivory rag/i
+}
 
 function omitOpaqueShadowMaps(_renderer, _object, _camera, _shadowCamera, _geometry, depthMaterial) {
   // The shared depth material can otherwise retain a disposed room's color map in its uniforms.
@@ -72,8 +79,9 @@ export function createExhibition(canvas, data, enterPainting) {
   Object.assign(key.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: .2, far: 32 })
   key.shadow.bias = -.00015
   key.shadow.normalBias = .012
-  const exhibitLight = new T.PointLight(0xffeed6, 2.2, 4)
-  exhibitLight.position.set(-.85, 2.45, .95)
+  const exhibitLight = new T.SpotLight(0xfff3df, 19, 3.6, .47, .68)
+  exhibitLight.position.set(-1.45, 2.76, .65)
+  exhibitLight.target.position.set(0, 1.10, -.16)
   const stageLight = new T.SpotLight(0xffd6cb, 34, 12, .49, .82)
   stageLight.position.set(-.72, 4.12, 2.39)
   stageLight.target.position.set(.10, 1.12, .80)
@@ -101,7 +109,7 @@ export function createExhibition(canvas, data, enterPainting) {
   scene.add(roseKey, roseKey.target, denimBounce)
   const hairLight = new T.PointLight(0xafedff, 10.5, 5)
   hairLight.position.set(1.64, 3.12, -.73)
-  scene.add(hemi, key, key.target, fill, exhibitLight, stageLight, stageLight.target, curtainLight, skirtFill, portraitFill, hairLight)
+  scene.add(hemi, key, key.target, fill, exhibitLight, exhibitLight.target, stageLight, stageLight.target, curtainLight, skirtFill, portraitFill, hairLight)
   const loader = new T.GLTFLoader().setMeshoptDecoder(T.MeshoptDecoder)
   const ray = new T.Raycaster()
   const pointer = new T.Vector2()
@@ -109,6 +117,9 @@ export function createExhibition(canvas, data, enterPainting) {
   let pending = null
   let pendingHangings = null
   let hallHangings = null
+  let visitorHands = null
+  let visitorFacing = 0
+  let handsLowered = 0
   let frame = 0
   let room = null
   let world = ''
@@ -129,6 +140,7 @@ export function createExhibition(canvas, data, enterPainting) {
       const ease = t * t * (3 - 2 * t)
       camera.position.lerpVectors(travel.from, travel.to, ease)
       orbit.target.lerpVectors(travel.fromTarget, travel.target, ease)
+      if (visitorHands) handsLowered = T.MathUtils.lerp(travel.fromHands, travel.toHands, ease)
       camera.fov = travel.fromFov + (travel.fov - travel.fromFov) * ease
       camera.updateProjectionMatrix()
       if (t === 1) {
@@ -145,8 +157,9 @@ export function createExhibition(canvas, data, enterPainting) {
     displayCamera.projectionMatrixInverse.copy(camera.projectionMatrixInverse)
     sightline.subVectors(camera.position, orbit.target)
     const distance = sightline.length()
+    if (distance > 0) sightline.divideScalar(distance)
     if (distance > orbit.minDistance) {
-      obstructionRay.set(orbit.target, sightline.divideScalar(distance))
+      obstructionRay.set(orbit.target, sightline)
       obstructionRay.near = .12
       obstructionRay.far = distance + .12
       let obstruction = obstructionRay.intersectObjects(blockers, false)[0]
@@ -161,7 +174,23 @@ export function createExhibition(canvas, data, enterPainting) {
         displayCamera.position.copy(orbit.target).addScaledVector(sightline, clearance)
       }
     }
+    if (world === '2024-55') {
+      // Walk around the front edge of the copier to keep the artist's hands in sight.
+      const eastAisle = T.MathUtils.smoothstep(sightline.x, .50, .96)
+      displayCamera.position.lerp(orbit.target, .71 * eastAisle)
+      displayCamera.position.z += 2.6 * eastAisle
+      displayCamera.position.y += .82 * eastAisle
+      displayCamera.lookAt(orbit.target)
+    }
     displayCamera.updateMatrixWorld()
+    if (visitorHands) {
+      const yaw = Math.atan2(sightline.x, sightline.z)
+      const turn = Math.min(1, 1 - Math.cos(yaw - visitorFacing))
+      visitorHands.position.copy(displayCamera.position)
+      visitorHands.quaternion.copy(displayCamera.quaternion)
+      visitorHands.translateX(.14 * turn)
+      visitorHands.translateY(-2.4 * handsLowered - .28 * turn)
+    }
     renderer.render(scene, displayCamera)
     if (travel) draw()
   }
@@ -182,7 +211,11 @@ export function createExhibition(canvas, data, enterPainting) {
     }
     draw()
   })
-  orbit.addEventListener('start', () => { travel = null })
+  function interruptTravel() {
+    if (travel && visitorHands) handsLowered = travel.toHands
+    travel = null
+  }
+  orbit.addEventListener('start', interruptTravel)
   document.addEventListener('visibilitychange', draw)
   canvas.addEventListener('webglcontextlost', event => {
     event.preventDefault()
@@ -314,6 +347,8 @@ export function createExhibition(canvas, data, enterPainting) {
     scene.remove(room)
     disposeAssets([room], [scene.environment, canopySun.map])
     room = null
+    visitorHands = null
+    handsLowered = 0
     world = ''
     scene.environment = null
     canopySun.map = null
@@ -342,7 +377,10 @@ export function createExhibition(canvas, data, enterPainting) {
     }
     const to = new T.Vector3(...view.position)
     const target = new T.Vector3(...view.target)
+    // An authored view may frame distant architecture while orbiting a nearer subject.
+    if (view.orbitDistance > 0) target.sub(to).setLength(view.orbitDistance).add(to)
     const distance = to.distanceTo(target)
+    const toHands = visitorHands && view.label !== data.rooms[world].views[0].label ? 1 : 0
     const legacy = Object.hasOwn(palettes, world)
     const limit = legacy ? Math.min(18, distance * 1.4) : distance * 1.65
     orbit.minDistance = legacy ? .45 : Math.min(.45, distance * .45)
@@ -352,9 +390,10 @@ export function createExhibition(canvas, data, enterPainting) {
     if (animated && !reduced.matches) {
       orbit.maxDistance = Math.max(limit, camera.position.distanceTo(orbit.target))
       travel = { from: camera.position.clone(), fromTarget: orbit.target.clone(), fromFov: camera.fov,
-        to, target, fov, limit, time: performance.now() }
+        to, target, fov, limit, fromHands: handsLowered, toHands, time: performance.now() }
     } else {
       travel = null
+      handsLowered = toHands
       orbit.maxDistance = limit
       camera.position.copy(to)
       orbit.target.copy(target)
@@ -395,14 +434,30 @@ export function createExhibition(canvas, data, enterPainting) {
     if (orchard && panorama) room.add(skyDome(panorama))
     scene.add(room)
     room.updateMatrixWorld(true)
+    if (id === 'cosplayer') {
+      const phone = primary.children.find(node => node.userData.foregroundRole === 'cosplayer-first-person-phone'
+        || node.userData.name === 'Tripo Studio | phone')
+      if (phone) {
+        // The foreground hands belong to the visitor holding the phone.
+        const first = data.rooms[id].views[0]
+        const restCamera = camera.clone()
+        restCamera.position.fromArray(first.position)
+        restCamera.lookAt(new T.Vector3(...first.target))
+        visitorFacing = Math.atan2(first.position[0] - first.target[0], first.position[2] - first.target[2])
+        visitorHands = new T.Group()
+        visitorHands.position.copy(restCamera.position)
+        visitorHands.quaternion.copy(restCamera.quaternion)
+        room.add(visitorHands)
+        visitorHands.attach(phone)
+        phone.traverse(node => { node.castShadow = false })
+      }
+    }
     const legacy = Object.hasOwn(palettes, id)
-    if (legacy) primary.traverse(node => {
+    const solid = solidSurfaces[id]
+    if (solid) primary.traverse(node => {
       if (!node.isMesh) return
       const surface = [node.material].flat().map(material => material.name).join(' ')
-      const solid = hall ? /limewash|sawn oak|honed fossil limestone/i.test(surface)
-        : orchard ? /bark|trunk/i.test(surface)
-        : /garnet inks|wine ink|dyed reverse|carbon at overlaps|carmine glaze/i.test(surface)
-      if (solid) blockers.push(node)
+      if (solid.test(surface)) blockers.push(node)
       if (orchard && /citron green|leaf blades|waxy citrus lamina/i.test(surface)) foliage.push(node)
     })
     world = id
@@ -454,7 +509,7 @@ export function createExhibition(canvas, data, enterPainting) {
     exhibitLight.visible = hall
     roseKey.visible = denimBounce.visible = stageLight.visible = stage
     curtainLight.visible = skirtFill.visible = hairLight.visible = stage
-    portraitFill.visible = orchard || stage
+    portraitFill.visible = orchard || stage || id === 'raven'
     if (stage) {
       portraitFill.position.set(1.6, 3.2, 3.9)
       portraitFill.color.setHex(0xffc3ba)
@@ -465,13 +520,18 @@ export function createExhibition(canvas, data, enterPainting) {
       portraitFill.color.setHex(0xffefcb)
       portraitFill.intensity = 2.6
       portraitFill.distance = 5
+    } else if (id === 'raven') {
+      portraitFill.position.set(-.36, 3.12, 1.16)
+      portraitFill.color.setHex(0xffe4db)
+      portraitFill.intensity = 1.55
+      portraitFill.distance = 1.75
     }
     resize()
     setView(view)
     return true
   }
   function move(direction) {
-    travel = null
+    interruptTravel()
     const offset = camera.position.clone().sub(orbit.target)
     if (direction === 'left' || direction === 'right') {
       offset.applyAxisAngle(new T.Vector3(0,1,0), direction === 'left' ? -.18 : .18)
