@@ -90,7 +90,7 @@ async function mount() {
       return data.hallView[mobile.matches ? 'mobile' : 'desktop']
     }
     const v = data.rooms[room].views[station]
-    return { ...v, fov: mobile.matches ? v.mobileFov : v.fov }
+    return mobile.matches ? { ...v, target: v.mobileTarget ?? v.target, fov: v.mobileFov } : v
   }
 
   const yearWorks = () => registry.filter(work => work.year === year)
@@ -266,6 +266,11 @@ async function mount() {
     engine?.clear()
     delete shell.dataset.hangingYear
     room = id
+    const roomYear = works.get(room)?.year
+    if (roomYear !== undefined && roomYear !== year) {
+      year = roomYear
+      doors.replaceChildren()
+    }
     station = 0
     closeup = live = false
     void showScene()

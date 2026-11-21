@@ -148,3 +148,19 @@ test('without WebGL, the selected year still links to its room and mobile views'
     image.complete && image.naturalWidth > 0 ? image.currentSrc : '')).toMatch(/cosplayer\/.*mobile\.webp$/)
   expect(models).toEqual([])
 })
+
+test('the corridor follows the year of the room restored by browser history', async ({ page }) => {
+  await page.route('**/painted-worlds/renderer.js', route => route.abort())
+  await page.goto(documentPath + '#2024-23')
+  await expect(page.locator('body')).toHaveAttribute('data-world', '2024-23')
+  await page.locator('#back').click()
+  await page.locator('[data-year="2025"]').click()
+  await expect(page.locator('[data-year="2025"]')).toHaveAttribute('aria-pressed', 'true')
+
+  await page.goBack()
+  await expect(page.locator('body')).toHaveAttribute('data-world', '2024-23')
+  await page.locator('#back').click()
+  await expect(page.locator('[data-year="2024"]')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('[data-door="2024-23"]')).toBeVisible()
+  await expect(page.locator('[data-door="cosplayer"]')).toHaveCount(0)
+})
