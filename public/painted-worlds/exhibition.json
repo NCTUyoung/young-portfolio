@@ -717,35 +717,45 @@
       "views": [
         {
           "label": "鏡前半身",
-          "description": "近看鏡內外的側臉與相對的指尖，拱框和白花掠過畫面邊緣。",
+          "description": "左側鏡中雙眼與右側低頭側臉，在玻璃前隔著相對的彎指。",
           "position": [
-            -2.38,
-            2.5,
-            0.62
+            -2.04,
+            2.25,
+            2.28
           ],
           "target": [
-            0.55,
-            2.03,
-            -0.26
+            0.26,
+            1.985,
+            0.01
           ],
-          "fov": 25,
-          "mobileFov": 34
+          "fov": 27,
+          "mobileTarget": [
+            0.19,
+            1.98,
+            0.01
+          ],
+          "mobileFov": 37
         },
         {
-          "label": "指尖與台面",
-          "description": "從鏡側讀指尖到玻璃的距離，白花、龍頭與妝台輪廓形成前後層次。",
+          "label": "指尖與檯面",
+          "description": "從鏡側看彎指、前臂與檯面的前後距離，白百合在左側。",
           "position": [
-            -3.4,
-            2.66,
-            1.86
+            -2.96,
+            2.46,
+            2.12
           ],
           "target": [
-            0.02,
-            2.15,
-            -0.13
+            0.29,
+            1.43,
+            0.23
           ],
-          "fov": 44,
-          "mobileFov": 52
+          "fov": 39,
+          "mobileTarget": [
+            0.32,
+            1.45,
+            0.19
+          ],
+          "mobileFov": 45
         }
       ],
       "stills": [
@@ -757,18 +767,18 @@
         "./rooms/mirror/view-1-mobile.webp"
       ],
       "look": {
-        "sky": "#1d343f",
+        "sky": "#1c3641",
         "fog": {
           "color": "#1d343f",
           "near": 8,
           "far": 25
         },
-        "key": "#d8efff",
-        "fill": "#a6baff",
-        "ground": "#34485a",
-        "keyIntensity": 1.75,
-        "fillIntensity": 0.72,
-        "skyIntensity": 0.82
+        "key": "#edf9ff",
+        "fill": "#d7e7ff",
+        "ground": "#68858d",
+        "keyIntensity": 1.78,
+        "fillIntensity": 0.96,
+        "skyIntensity": 1.2
       },
       "art": {
         "title": "鏡",
