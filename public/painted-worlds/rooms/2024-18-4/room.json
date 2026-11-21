@@ -17,47 +17,53 @@
       "label": "花冠與虹彩",
       "description": "從左側白裙和胸前相合的兩手，看向右面的虹彩玻璃。",
       "position": [
-        0.1,
-        2.13,
-        5.78
+        -0.01,
+        2.42,
+        4.85
       ],
       "target": [
-        -0.19,
-        1.83,
-        -0.41
+        -0.11,
+        2.17,
+        -0.16
       ],
-      "fov": 37,
-      "mobileFov": 55
+      "fov": 35,
+      "mobileFov": 60,
+      "mobileTarget": [
+        0.04,
+        2.05,
+        -0.11
+      ]
     },
     {
       "label": "手套與裙褶",
       "description": "從另一側看花冠、手套和裙褶，遠處的花與玻璃逐層交疊。",
       "position": [
-        -2.89,
-        2.67,
-        5.01
+        -2.55,
+        2.6,
+        3.75
       ],
       "target": [
-        -0.15,
-        1.8,
-        -0.39
+        -0.88,
+        2.23,
+        0.08
       ],
-      "fov": 40,
-      "mobileFov": 54
+      "fov": 37,
+      "mobileFov": 48
     }
   ],
   "look": {
-    "sky": "#c6aebc",
+    "sky": "#f3e2e7",
     "fog": {
       "color": "#c6aebc",
       "near": 9,
       "far": 25
     },
     "key": "#fff1e2",
-    "fill": "#c3eef4",
-    "ground": "#c1adb5",
+    "fill": "#ddf5fb",
+    "ground": "#d0b8c0",
     "keyIntensity": 1.99,
     "fillIntensity": 0.82,
-    "skyIntensity": 1.17
+    "skyIntensity": 1.17,
+    "shadowIntensity": 0.4
   }
 }

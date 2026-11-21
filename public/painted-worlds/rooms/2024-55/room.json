@@ -30,20 +30,25 @@
       "mobileFov": 54
     },
     {
-      "label": "窗邊側面",
-      "description": "沿通風格柵側板看前景紙、文件夾與機頂紙疊的前後距離。",
+      "label": "臉與持紙",
+      "description": "從窗前正斜看眼鏡下的臉、持紙手、酒紅文件夾與出紙口。",
       "position": [
-        -3.92,
-        2.91,
-        2.88
+        -1.15,
+        2.47,
+        2.86
       ],
       "target": [
-        -0.11,
-        1.74,
-        -0.64
+        -1.28,
+        2.15,
+        -0.18
       ],
-      "fov": 43,
-      "mobileFov": 55
+      "fov": 37,
+      "mobileFov": 45,
+      "mobileTarget": [
+        -1.07,
+        2.18,
+        -0.18
+      ]
     }
   ],
   "look": {
@@ -58,6 +63,7 @@
     "ground": "#9caaa9",
     "keyIntensity": 2.3,
     "fillIntensity": 0.95,
-    "skyIntensity": 1.18
+    "skyIntensity": 1.18,
+    "shadowIntensity": 0.56
   }
 }

@@ -91,6 +91,7 @@ function validateLook(id, look) {
   for (const key of ['keyIntensity', 'fillIntensity', 'skyIntensity']) {
     assert(look[key] === undefined || number(look[key], 0, Infinity), `${id}: invalid look.${key}`)
   }
+  assert(look.shadowIntensity === undefined || number(look.shadowIntensity, 0, 1), `${id}: invalid look.shadowIntensity`)
   const fog = look.fog
   if (fog != null) {
     assert(color(fog.color) && number(fog.near, 0, Infinity) && number(fog.far, 0, Infinity) && fog.near < fog.far, `${id}: invalid fog`)

@@ -444,7 +444,7 @@ export function createExhibition(canvas, data, enterPainting) {
       shadowFar = radius * 5
       key.position.set(-.65, 1.25, .72).multiplyScalar(radius).add(key.target.position)
       fill.position.set(.5, .65, .8).multiplyScalar(radius).add(key.target.position)
-      key.shadow.intensity = 1
+      key.shadow.intensity = look.shadowIntensity ?? 1
       renderer.shadowMap.needsUpdate = true
     }
     Object.assign(key.shadow.camera, { left: -radius, right: radius, top: radius, bottom: -radius, far: shadowFar })

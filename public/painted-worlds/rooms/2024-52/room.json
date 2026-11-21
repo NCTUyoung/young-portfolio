@@ -14,50 +14,60 @@
   ],
   "views": [
     {
-      "label": "手勢與雙晶心",
-      "description": "從粉心與青心之間看靠近臉頰的手勢、交疊的腿與座面。",
+      "label": "肩前金晶與托掌",
+      "description": "近看肩前的淡金與琥珀切面、青瞳和承托粉晶心的手。",
       "position": [
-        0.14,
-        2.04,
-        5.5
+        -1.41,
+        2.2,
+        3.68
       ],
       "target": [
-        -0.08,
-        1.39,
-        -0.52
+        -0.29,
+        1.95,
+        -0.32
       ],
-      "fov": 39,
-      "mobileFov": 57
+      "fov": 31,
+      "mobileFov": 45.5,
+      "mobileTarget": [
+        -0.31,
+        1.885,
+        -0.32
+      ]
     },
     {
-      "label": "彩心與側影",
-      "description": "從斜側看坐姿和雙手、前後懸吊的晶心與光帶。",
+      "label": "粉白弧墊與落腳",
+      "description": "從低斜角確認粉白弧墊、前鞋貼地及雙晶心的前後距離。",
       "position": [
-        1.95,
-        2.49,
-        4.83
+        -2.34,
+        1.38,
+        4.22
       ],
       "target": [
-        0.03,
-        1.38,
-        -0.49
+        -0.39,
+        1.39,
+        -0.32
       ],
-      "fov": 41,
-      "mobileFov": 57
+      "fov": 42.5,
+      "mobileFov": 52,
+      "mobileTarget": [
+        -0.5,
+        1.36,
+        -0.32
+      ]
     }
   ],
   "look": {
-    "sky": "#15233b",
+    "sky": "#101d31",
     "fog": {
-      "color": "#15233b",
+      "color": "#101d31",
       "near": 8,
       "far": 24
     },
     "key": "#fff1df",
     "fill": "#beefff",
     "ground": "#394b61",
-    "keyIntensity": 1.76,
-    "fillIntensity": 0.98,
-    "skyIntensity": 1.04
+    "keyIntensity": 1.94,
+    "fillIntensity": 1.39,
+    "skyIntensity": 1.23
   }
 }
