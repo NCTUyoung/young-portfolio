@@ -480,33 +480,43 @@
           "label": "紅藍主軸",
           "description": "由紅藍柱基的彩色反照，沿中央暖光望進後方通道。",
           "position": [
-            0.02,
+            0.13,
             1.64,
-            6.6
+            7.25
           ],
           "target": [
-            0.02,
-            2.78,
-            -0.93
+            -0.04,
+            2.34,
+            -0.86
           ],
           "fov": 52,
-          "mobileFov": 61
+          "mobileFov": 63,
+          "mobileTarget": [
+            -0.15,
+            2.06,
+            -0.9
+          ]
         },
         {
-          "label": "藍柱後仰望",
-          "description": "從柱後斜仰看藍柱的弧面、錯位紅柱和跨過兩柱的拱形格棚。",
+          "label": "旅人與彩窗",
+          "description": "從藍柱旁回看旅人的側臉、行李與紅柱透出的暖光。",
           "position": [
-            -2.01,
-            1.59,
-            -6.66
+            2.72,
+            1.48,
+            6.48
           ],
           "target": [
-            0.01,
-            2.99,
-            -1.1
+            -0.04,
+            1.4,
+            2.37
           ],
-          "fov": 58,
-          "mobileFov": 67
+          "fov": 48,
+          "mobileFov": 62,
+          "mobileTarget": [
+            -0.04,
+            1.39,
+            2.37
+          ]
         }
       ],
       "stills": [
@@ -1014,36 +1024,36 @@
       "title": "蕾雯 Raven",
       "views": [
         {
-          "label": "電青斜刃",
-          "description": "從正面看斜向青光跨過人物，深藍髮束和衣帶在暗艙中往外延伸。",
+          "label": "貼額與冰青斜刃",
+          "description": "從近正面看貼額手、橫過胸前的黑袖，以及斜落到左下的冰青寬刃。",
           "position": [
-            1.15,
-            2.35,
-            7.9
+            -0.03,
+            2.08,
+            6.96
           ],
           "target": [
-            0.02,
-            1.77,
-            0
+            -0.12,
+            1.72,
+            0.1
           ],
-          "fov": 32,
-          "mobileFov": 49
+          "fov": 31.4,
+          "mobileFov": 32.8
         },
         {
-          "label": "從光刃側看",
-          "description": "橫移看髮束、手與青光的間距，腳下深色基座托住整尊雕塑。",
+          "label": "沿刃側看",
+          "description": "向側面看弧形護手、分束長髮與交疊的膝腿，腳下是低矮的石墨展台。",
           "position": [
-            5.04,
-            2.62,
-            6.25
+            3.38,
+            2.44,
+            6.02
           ],
           "target": [
-            0.03,
-            1.68,
-            -0.02
+            -0.06,
+            1.71,
+            0.1
           ],
-          "fov": 36,
-          "mobileFov": 52
+          "fov": 32.1,
+          "mobileFov": 33.1
         }
       ],
       "stills": [
@@ -1055,18 +1065,19 @@
         "./rooms/raven/view-1-mobile.webp"
       ],
       "look": {
-        "sky": "#05080e",
+        "sky": "#06070b",
         "fog": {
-          "color": "#05080e",
-          "near": 10,
-          "far": 17
+          "color": "#06070b",
+          "near": 9,
+          "far": 18
         },
-        "key": "#badceb",
-        "fill": "#85c0e5",
-        "ground": "#1c3049",
-        "keyIntensity": 1.5,
-        "fillIntensity": 1.7,
-        "skyIntensity": 1.1
+        "key": "#ffe9e3",
+        "fill": "#9dccdf",
+        "ground": "#212b3a",
+        "keyIntensity": 1.02,
+        "fillIntensity": 0.6,
+        "skyIntensity": 1.02,
+        "shadowIntensity": 0.82
       },
       "art": {
         "title": "蕾雯 Raven",
