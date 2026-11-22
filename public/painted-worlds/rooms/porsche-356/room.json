@@ -53,17 +53,18 @@
     }
   ],
   "look": {
-    "sky": "#dfded8",
+    "sky": "#dbdcdd",
     "fog": {
       "color": "#dfded8",
       "near": 15,
       "far": 45
     },
-    "key": "#fffcf1",
-    "fill": "#dde5ed",
-    "ground": "#948c83",
-    "keyIntensity": 2.6,
-    "fillIntensity": 0.62,
-    "skyIntensity": 1.14
+    "key": "#f6f4f2",
+    "fill": "#e0e1e3",
+    "ground": "#858483",
+    "keyIntensity": 2.15,
+    "fillIntensity": 0.7,
+    "skyIntensity": 1.12,
+    "shadowIntensity": 0.86
   }
 }
