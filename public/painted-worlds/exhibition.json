@@ -479,29 +479,29 @@
       "views": [
         {
           "label": "紅藍主軸",
-          "orbitDistance": 4.8,
+          "orbitDistance": 2.69,
           "description": "由紅藍柱基的彩色反照，沿中央暖光望進後方通道。",
           "position": [
-            0.13,
-            1.64,
-            7.25
+            0.15,
+            1.54,
+            6.19
           ],
           "target": [
-            -0.04,
-            2.34,
-            -0.86
+            -0.27,
+            2.96,
+            -0.9
           ],
-          "fov": 52,
-          "mobileFov": 63,
+          "fov": 50,
+          "mobileFov": 67,
           "mobileTarget": [
-            -0.15,
-            2.06,
+            -0.27,
+            2.96,
             -0.9
           ]
         },
         {
           "label": "階梯旁的旅人",
-          "description": "從階梯旁回望紅藍彩窗，看兩名旅人的步伐、側包和拖行的箱輪。",
+          "description": "從階梯回望彩窗，近看兩位旅人的外套與步伐。",
           "position": [
             -1.51,
             1.45,
@@ -538,10 +538,11 @@
         },
         "key": "#ffe5cf",
         "fill": "#b7d8ff",
-        "ground": "#636674",
-        "keyIntensity": 1.8,
-        "fillIntensity": 0.84,
-        "skyIntensity": 1.06
+        "ground": "#8d7b85",
+        "keyIntensity": 1.65,
+        "fillIntensity": 0.94,
+        "skyIntensity": 1.15,
+        "shadowIntensity": 0.73
       },
       "art": {
         "title": "28-編輯-2",
