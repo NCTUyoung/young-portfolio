@@ -29,10 +29,11 @@
       "fov": 35,
       "mobileFov": 47,
       "mobileTarget": [
-        0.02,
-        0.72,
-        2.2
-      ]
+        0.22,
+        0.2,
+        2.25
+      ],
+      "orbitDistance": 4.2
     },
     {
       "label": "帽下與手籃",

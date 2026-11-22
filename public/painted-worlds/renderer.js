@@ -8,6 +8,12 @@ const palettes = {
 }
 const sculptureLighting = { hemisphere: 1.12, ground: 0xa59a89, power: 2.15, bounce: .40, sun: [-4.5, 7, 3], shadow: .77 }
 const roomDefaults = { sky: 0xd9d5c9, ground: 0xa59a89, key: 0xffeed6, fill: 0xdce6ef, keyIntensity: 2.15, fillIntensity: .55, skyIntensity: 1.05 }
+// Authored paths let the visitor pass the crystal hearts, opal globe, and rain shelter.
+const sceneryPaths = {
+  '2024-52': { approach: .32, lift: 1.48, depth: -2.87, from: 1.25, to: 3.1 },
+  '2024-18-4': { approach: .54, lift: 1.40, depth: 0, from: 4.1, to: 5.0 },
+  solitude: { approach: .41, lift: .29, depth: 0, from: 1.25, to: 3.1 }
+}
 const solidSurfaces = {
   hall: /limewash|sawn oak|honed fossil limestone/i,
   orchard: /bark|trunk/i,
@@ -180,6 +186,17 @@ export function createExhibition(canvas, data, enterPainting) {
       displayCamera.position.lerp(orbit.target, .71 * eastAisle)
       displayCamera.position.z += 2.6 * eastAisle
       displayCamera.position.y += .82 * eastAisle
+      displayCamera.lookAt(orbit.target)
+    }
+    const path = sceneryPaths[world]
+    if (path) {
+      const side = world === '2024-52'
+        ? Math.max(T.MathUtils.smoothstep(sightline.x, -.02, .47), T.MathUtils.smoothstep(-sightline.x, .50, .83))
+        : T.MathUtils.smoothstep(sightline.x, .15, .80)
+      const clearance = side * T.MathUtils.smoothstep(distance, path.from, path.to)
+      displayCamera.position.lerp(orbit.target, path.approach * clearance)
+      displayCamera.position.y += path.lift * clearance
+      displayCamera.position.z += path.depth * clearance
       displayCamera.lookAt(orbit.target)
     }
     displayCamera.updateMatrixWorld()
