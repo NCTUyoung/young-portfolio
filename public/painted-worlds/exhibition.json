@@ -109,7 +109,8 @@
   "reflections": {
     "hall": "./media/hall-light.webp",
     "orchard": "./media/orchard-sky.webp",
-    "stage": "./media/stage-light.webp"
+    "stage": "./media/stage-light.webp",
+    "2024-52": "./media/hall-light.webp"
   },
   "rooms": {
     "hall": {
@@ -610,11 +611,12 @@
           "far": 24
         },
         "key": "#fff1df",
-        "fill": "#beefff",
-        "ground": "#394b61",
+        "fill": "#ffe4ce",
+        "ground": "#9d7c78",
         "keyIntensity": 1.94,
-        "fillIntensity": 1.39,
-        "skyIntensity": 1.23
+        "fillIntensity": 1.7,
+        "skyIntensity": 1.23,
+        "shadowIntensity": 0.52
       },
       "art": {
         "title": "52-1",

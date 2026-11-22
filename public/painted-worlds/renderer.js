@@ -8,9 +8,8 @@ const palettes = {
 }
 const sculptureLighting = { hemisphere: 1.12, ground: 0xa59a89, power: 2.15, bounce: .40, sun: [-4.5, 7, 3], shadow: .77 }
 const roomDefaults = { sky: 0xd9d5c9, ground: 0xa59a89, key: 0xffeed6, fill: 0xdce6ef, keyIntensity: 2.15, fillIntensity: .55, skyIntensity: 1.05 }
-// Authored paths let the visitor pass the crystal hearts, opal globe, and rain shelter.
+// Authored paths let the visitor pass the opal globe and rain shelter.
 const sceneryPaths = {
-  '2024-52': { approach: .32, lift: 1.48, depth: -2.87, from: 1.25, to: 3.1 },
   '2024-18-4': { approach: .54, lift: 1.40, depth: 0, from: 4.1, to: 5.0 },
   solitude: { approach: .41, lift: .29, depth: 0, from: 1.25, to: 3.1 }
 }
@@ -86,8 +85,6 @@ export function createExhibition(canvas, data, enterPainting) {
   key.shadow.bias = -.00015
   key.shadow.normalBias = .012
   const exhibitLight = new T.SpotLight(0xfff3df, 19, 3.6, .47, .68)
-  exhibitLight.position.set(-1.45, 2.76, .65)
-  exhibitLight.target.position.set(0, 1.10, -.16)
   const stageLight = new T.SpotLight(0xffd6cb, 34, 12, .49, .82)
   stageLight.position.set(-.72, 4.12, 2.39)
   stageLight.target.position.set(.10, 1.12, .80)
@@ -190,9 +187,7 @@ export function createExhibition(canvas, data, enterPainting) {
     }
     const path = sceneryPaths[world]
     if (path) {
-      const side = world === '2024-52'
-        ? Math.max(T.MathUtils.smoothstep(sightline.x, -.02, .47), T.MathUtils.smoothstep(-sightline.x, .50, .83))
-        : T.MathUtils.smoothstep(sightline.x, .15, .80)
+      const side = T.MathUtils.smoothstep(sightline.x, .15, .80)
       const clearance = side * T.MathUtils.smoothstep(distance, path.from, path.to)
       displayCamera.position.lerp(orbit.target, path.approach * clearance)
       displayCamera.position.y += path.lift * clearance
@@ -383,6 +378,19 @@ export function createExhibition(canvas, data, enterPainting) {
     fill.intensity = rig.bounce
     renderer.shadowMap.needsUpdate = true
   }
+  function aimSculptureLight(close) {
+    if (close) {
+      exhibitLight.position.set(1.16, 2.06, 1.35)
+      exhibitLight.target.position.set(0, 1.45, -.16)
+      exhibitLight.color.setHex(0xfff5e9)
+      exhibitLight.intensity = 8.5
+    } else {
+      exhibitLight.position.set(-1.45, 2.76, .65)
+      exhibitLight.target.position.set(0, 1.10, -.16)
+      exhibitLight.color.setHex(0xfff3df)
+      exhibitLight.intensity = 19
+    }
+  }
   function setView(view, animated = false) {
     if (world === 'hall' && closeupLighting !== (view === data.figureView)) {
       closeupLighting = view === data.figureView
@@ -390,7 +398,8 @@ export function createExhibition(canvas, data, enterPainting) {
       aimLights(rig)
       hemi.groundColor.setHex(rig.ground)
       key.shadow.intensity = rig.shadow
-      scene.environmentIntensity = closeupLighting ? 0 : .35
+      aimSculptureLight(closeupLighting)
+      scene.environmentIntensity = closeupLighting ? .045 : .35
     }
     const to = new T.Vector3(...view.position)
     const target = new T.Vector3(...view.target)
@@ -523,10 +532,11 @@ export function createExhibition(canvas, data, enterPainting) {
     key.shadow.camera.updateProjectionMatrix()
     canopySun.map = sunflecks
     canopySun.visible = !!sunflecks
+    if (hall) aimSculptureLight(false)
     exhibitLight.visible = hall
     roseKey.visible = denimBounce.visible = stageLight.visible = stage
     curtainLight.visible = skirtFill.visible = hairLight.visible = stage
-    portraitFill.visible = orchard || stage || id === 'raven'
+    portraitFill.visible = orchard || stage || id === 'raven' || id === '2024-52'
     if (stage) {
       portraitFill.position.set(1.6, 3.2, 3.9)
       portraitFill.color.setHex(0xffc3ba)
@@ -537,6 +547,12 @@ export function createExhibition(canvas, data, enterPainting) {
       portraitFill.color.setHex(0xffefcb)
       portraitFill.intensity = 2.6
       portraitFill.distance = 5
+    } else if (id === '2024-52') {
+      scene.environmentIntensity = .17
+      portraitFill.position.set(-.66, 2.43, .66)
+      portraitFill.color.setHex(0xffe5cc)
+      portraitFill.intensity = 3.3
+      portraitFill.distance = 2.1
     } else if (id === 'raven') {
       portraitFill.position.set(-.36, 3.12, 1.16)
       portraitFill.color.setHex(0xffe4db)
